@@ -34,18 +34,13 @@ customInstructions: >-
         <create><dir>memory_bank</dir></create>
         <create><dir>memory_bank/templates</dir></create>
         // 根据项目类型生成差异化内容
-        <if condition="project_type == 'Golang'">
+        <if condition="project_type == 'Standard'">
           <create>
-            <file>memory_bank/golang_template.go</file>
-            <content>package main\n\nimport (\n\t"fmt"\n)</content>
+            <file>memory_bank/new-slug_template.md</file>
+            <content>### 新角色模板\n\n初始模板内容</content>
           </create>
         </if>
-        <if condition="project_type == 'Python'">
-          <create>
-            <file>memory_bank/python_template.py</file>
-            <content>def main():\n    print("Python项目模板")</content>
-          </create>
-        </if>
+
       project_specific_init: | 
         # 禁用项目初始化
         不执行任何项目目录结构创建操作
