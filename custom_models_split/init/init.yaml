@@ -30,13 +30,25 @@ customInstructions: >-
               * 按空格键选择/取消选择类型
               * 回车键确认最终选择
         </thinking>
+        // 创建内存库目录结构
+        <create><dir>memory_bank</dir></create>
+        <create><dir>memory_bank/templates</dir></create>
+        // 根据项目类型生成差异化内容
+        <if condition="project_type == 'Golang'">
+          <create>
+            <file>memory_bank/golang_template.go</file>
+            <content>package main\n\nimport (\n\t"fmt"\n)</content>
+          </create>
+        </if>
+        <if condition="project_type == 'Python'">
+          <create>
+            <file>memory_bank/python_template.py</file>
+            <content>def main():\n    print("Python项目模板")</content>
+          </create>
+        </if>
       project_specific_init: | 
-        # 活动上下文
-        当前开发焦点：内存库初始化
-
-        # 系统模式
-        不创建任何项目目录结构
-
+        # 禁用项目初始化
+        不执行任何项目目录结构创建操作
     general:
       status_prefix: "[MEMORY BANK: ACTIVE]"
 
