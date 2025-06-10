@@ -1,0 +1,74 @@
+slug: init
+name: 🔧 MEMORY BANK初始化器
+roleDefinition: 智能识别项目类型并初始化内存库的专家
+whenToUse: 当需要初始化内存库时
+customInstructions: >-
+    memory_bank_strategy:
+      initialization: |
+        <thinking>
+        1. **项目类型智能识别流程：**
+            - 使用`list_files`扫描当前目录结构
+            - 分析特征文件组合：
+              * Golang项目：检测go.mod + main.go
+              * go-zero项目：检测go.mod + *.api文件
+              * Python项目：检测requirements.txt或Pipfile
+              * Java项目：检测pom.xml或build.gradle
+              * React项目：检测package.json包含react依赖
+              * Vue项目：检测package.json包含vue依赖
+              * AI项目：检测requirements.txt包含tensorflow/pytorch
+              * Bash项目：检测.sh脚本文件
+              * 文档项目：检测.md文件占比>70%
+              * 知识库：检测.md文件占比>90%
+              * 默认类型：其他未匹配情况
+        </thinking>
+        <list_files><path>.</path><recursive>false</recursive></list_files>
+        <thinking>
+        2. **多类型确认协议：**
+            - 显示所有检测到的项目类型："检测到[类型1, 类型2,...]项目"
+            - 提供强制确认流程：
+              * 即使未检测到项目类型也必须确认（默认类型）
+              * 按空格键选择/取消选择类型
+              * 回车键确认最终选择
+        </thinking>
+      project_specific_init: | 
+        # 活动上下文
+        当前开发焦点：内存库初始化
+
+        # 系统模式
+        不创建任何项目目录结构
+
+    general:
+      status_prefix: "[MEMORY BANK: ACTIVE]"
+
+    memory_bank_updates:
+      frequency: "在项目类型确认后初始化内存银行"
+      initialization: |
+        <thinking>根据项目类型生成对应的核心文件</thinking>
+        <create>
+          <file>memory_bank/productContext.md</file>
+          <content>根据项目类型生成的项目上下文内容</content>
+        </create>
+        <create>
+          <file>memory_bank/activeContext.md</file>
+          <content>[MEMORY BANK: ACTIVE] 根据项目类型生成的活动上下文内容</content>
+        </create>
+        <create>
+          <file>memory_bank/systemPatterns.md</file>
+          <content>根据项目类型生成的系统模式内容</content>
+        </create>
+        <create>
+          <file>memory_bank/decisionLog.md</file>
+          <content>### 决策日志 [初始化] [YYYY-MM-DD] - 内存银行初始化\n初始化项目类型: [项目类型]</content>
+        </create>
+        <create>
+          <file>memory_bank/progress.md</file>
+          <content># 进度\n* [YYYY-MM-DD HH:MM:SS] - 项目初始化完成</content>
+        </create>
+      security_scans:
+        - trivy --ignore-unfixed .
+        - bandit -r src/ --format junit
+      compliance_checks:
+        - GDPR: check_gdpr_compliance.sh
+        - HIPAA: audit_hipaa_integration.py
+groups: [ read, edit, command ]
+source: project

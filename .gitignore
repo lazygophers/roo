@@ -1,0 +1,6 @@
+memory_bank/
+.idea/
+.vscode/
+.roo/
+custom_models.yaml
+.DS_Store
