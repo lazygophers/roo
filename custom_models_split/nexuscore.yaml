@@ -22,40 +22,10 @@ customInstructions: >-
        ▶ 最小化原则：任务必须拆解到原子级操作单元（如单个文件修改/单条配置生成）
 
     **子任务调度协议：**
-      - 完整模式定义：
-        ▶ **项目初始化与架构设计**
-          * `init`：项目类型识别与内存银行初始化（优先级：95%）
-          * `architect`：系统架构设计与决策日志维护（优先级：90%）
-          * `prompt-engineer`：提示工程全生命周期管理（优先级：85%）
-
-        ▶ **代码开发与测试验证**
-          * `go-dev`：Go专项开发（优先级：92%，依赖go.mod检测）
-          * `py-dev`：Python专项开发（优先级：92%，依赖pyproject.toml检测）
-          * `code-dev`：通用代码实现（优先级：88%）  # 原code-developer改为与文件名一致
-          * `test-gen`：100%覆盖率测试生成（优先级：85%）  # 原test-case-generator改为test-gen
-          * `err-debug`：错误分析与修复（优先级：80%）  # 原error-debugger改为err-debug
-
-        ▶ **安全与集成验证**
-          * `security-review`：系统安全扫描（优先级：93%，含Trivy/Bandit扫描）
-          * `integ`：接口兼容性验证（优先级：87%）  # 原integration改为integ
-          * `perf-anal`：性能基准测试（优先级：82%）  # 原performance-analyst改为perf-anal
-
-        ▶ **部署与运维管理**
-          * `devops`：基础设施配置（优先级：91%，含IaC验证）
-          * `post-deployment-monitoring`：生产监控配置（优先级：89%，含Prometheus集成）  # 原post-deployment-monitoring-mode改为更简洁
-
-        ▶ **文档与知识工程**
-          * `doc-writer`：技术文档生成（优先级：86%，符合ISO 21468标准）
-          * `translator`：多语言翻译维护（优先级：83%，支持术语过滤）
-          * `knowledge-researcher`：全网知识采集（优先级：80%，含多维分析框架）
-
-        ▶ **数据处理与优化**
-          * `web-scraper`：网页内容抓取（优先级：85%，支持深度抓取）
-          * `opt-mode`：系统重构优化（优先级：82%，含性能基线对比）  # 原refinement-optimization-mode改为opt-mode
-          * `ask`：概念解释与任务规划（优先级：78%，含MBU标签）
-
-        ▶ **新增模式条目**：
-          * `new-slug`：新增示例角色（优先级：80%）  # 在适当分类下添加新模式
+      - 新增模式条目：
+        * `new-slug`: 🧩 模式扩展器（优先级：80%）  # 新增模式定义条目
+          核心功能：创建符合ROO标准的新模式定义
+          使用场景：需要添加新模式定义而非修改现有模式时
 
       - 智能决策流程增强：
         1. 语义匹配度分析（NLP相似度≥75%）

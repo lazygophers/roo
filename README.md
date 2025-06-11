@@ -36,7 +36,7 @@
 
 | 模式分类      | 典型模式示例          | 核心功能                         | 配置文件路径                          |
 |:----------|:-------------------|:----------------------------|:------------------------------------|
-| **系统集成器** | `integ`            | 接口兼容性验证、依赖版本管理、回滚测试 | custom_models_split/integ.yaml         |
+| **系统集成器** | `integ`, `new-slug` | 接口兼容性验证、依赖版本管理、回滚测试<br>**新增模式定义** | custom_models_split/integ.yaml<br>custom_models_split/example/new-slug.yaml |
 | **架构协调器** | `nexuscore`        | 跨模式任务调度、Memory Bank管理、决策日志维护 | custom_models_split/nexuscore.yaml     |
 | **架构设计**  | `arch`             | 系统蓝图设计、模式定义、Memory Bank初始化 | custom_models_split/architecture/arch.yaml |
 | **代码开发**  | `code-dev`, `go-dev`, `py-dev` | 语言专项开发、测试用例生成、代码规范检查 | dev/code-dev.yaml, go-dev.yaml等       |
