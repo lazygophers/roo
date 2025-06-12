@@ -1,118 +1,178 @@
-# 模式文档总览
+# README.md
 
-1. **模式文档总览**  
-    - 本文档遵循ISO 21468标准，整合系统架构与开发规范  
-    - 核心章节包含：架构设计、开发流程、部署运维、知识管理  
+### 可用模式
 
----
-
-2. **内存银行管理规范**  
-
-   **初始化协议**：  
-    - NexusCore通过`list_files`检查`memory_bank/`目录结构  
-    - 加载顺序：`systemPatterns.md` → `decisionLog.md` → `progress.md`  
-   **更新触发条件**：  
-    - 关键章节生成时自动触发`apply_diff`更新  
-    - 决策变更需记录到`decisionLog.md`（格式：---\n### 文档设计 [类型] [时间] - [摘要]）  
-   **状态标记规则**：  
-    - 成功加载时标记`[MEMORY BANK: ACTIVE]`  
-    - 异常状态时标记`[MEMORY BANK: INACTIVE]`并记录到`activeContext.md`  
-
-   **安全集成参数**：  
-
-   ```yaml
-   security_scans:
-     - trivy --ignore-unfixed .
-     - bandit -r src/ --format junit
-   compliance_checks:
-     - GDPR: check_gdpr_compliance.sh
-     - HIPAA: audit_hipaa_integration.py
-   ```
-
----
-
-
-3. **各模式分组说明**
-
-| 模式分类      | 典型模式示例          | 核心功能                         | 配置文件路径                          |
-|:----------|:-------------------|:----------------------------|:------------------------------------|
-| **系统集成器** | `integ`, `new-slug` | 接口兼容性验证、依赖版本管理、回滚测试<br>**新增模式定义** | custom_models_split/integ.yaml<br>custom_models_split/example/new-slug.yaml |
-| **架构协调器** | `nexuscore`        | 跨模式任务调度、Memory Bank管理、决策日志维护 | custom_models_split/nexuscore.yaml     |
-| **架构设计**  | `arch`             | 系统蓝图设计、模式定义、Memory Bank初始化 | custom_models_split/architecture/arch.yaml |
-| **代码开发**  | `code-dev`, `go-dev`, `py-dev` | 语言专项开发、测试用例生成、代码规范检查 | dev/code-dev.yaml, go-dev.yaml等       |
-| **错误调试**  | `err-debug`        | 日志分析、异常定位、修复方案生成       | dev/err-debug.yaml                     |
-| **测试生成**  | `test-gen`         | 单元测试覆盖、性能基准测试、测试框架配置 | dev/test-gen.yaml                      |
-| **运维部署**  | `devops`           | CI/CD流水线、容器化部署、基础设施配置    | devops/devops.yaml                     |
-| **部署监控**  | `post-deployment-monitoring` | Prometheus指标监控、告警策略配置、故障注入测试 | devops/post-deployment-monitoring.yaml |
-| **文档工程**  | `doc-writer`, `translator` | 技术文档生成、多语言翻译、术语库维护   | doc/doc-writer.yaml等                  |
-| **安全审查**  | `sec-rev`          | 依赖项扫描、漏洞修复、合规性验证       | security/security-review.yaml          |
-| **提示工程**  | `prompt`           | 专业提示词设计、优化规则管理、生命周期维护 | prompt/prompt.yaml                     |
+| 模式名称 | 描述 | 配置文件路径 | slug标识 |
+|---------|------|--------------|----------|
+| 💻 Code | Roo 作为精通多种编程语言的工程师 | `custom_models.yaml` | code |
+| 🏗️ Architect | Roo 作为技术架构师 | `custom_models.yaml` | architect |
+| ❓ Ask | Roo 作为技术咨询助手 | `custom_models.yaml` | ask |
+| 🪲 Debug | Roo 作为专业调试专家 | `custom_models.yaml` | debug |
+| 🪃 Orchestrator | Roo 作为工作流协调者 | `custom_models.yaml` | orchestrator |
+| 📝 文档生成器 | Roo 作为技术文档撰写专家 | `custom_models_split/documentation_generator.yaml` | documentation-generator |
+| 📝 提示工程师 | Roo 作为提示词设计专家 | `custom_models_split/prompt_engineer.yaml` | prompt-engineer |
+| 📚 知识研究模式 | 领域知识体系构建和规律发现 | `custom_models_split/knowledge_research.yaml` | knowledge-research |
+| 🗂️ 知识库创建器 | 设计结构化知识库存储方案 | `custom_models_split/knowledge_base_creator.yaml` | knowledge-base-creator |
+| 🕷️ 网页抓取解析器 | 使用Playwright/Puppeteer进行页面交互，支持HTML/XML解析和JSON数据提取 | `custom_models_split/web_scraper_parser.yaml` | web-scraper-parser |
+| 💡 文章总结器 | 使用NLP技术生成文本摘要并提取关键信息 | `custom_models_split/article_summarizer.yaml` | article-summarizer |
+| 📦 配置迁移器 | 处理配置文件的版本管理和跨环境迁移 | `custom_models_split/config-mover.yaml` | config-mover |
+| 🔍 深度研究模式 | 通过多源数据交叉验证和系统性分析解决复杂问题 | `custom_models_split/deep_research.yaml` | deep-research |
+| 📁 文档分类器 | 管理文档文件并将其分类到合适目录 | `custom_models_split/document-mover.yaml` | document-mover |
+| 📝 文档生成器 | Roo 作为
+| ✂️ 任务分解器 | 将复杂任务拆解为独立可
+| �️ 网页抓取解析器 | 使用Playwright/Puppeteer进行页面交互，支持HTML/XML解析和JSON数据提取 | `custom_models_split/web_scraper_parser.yaml` | web-scraper-parser |
+| 🔍 深度研究模式 | 通过多源数据交叉验证和系统性分析解决复杂问题 | `custom_models_split/deep_research.yaml` | deep-research |
+| 💡 文章总结器 | 使用NLP技术生成文本摘要并提取关键信息 | `custom_models_split/article_summarizer.yaml` | article-summarizer |
+| 🕷️ 网页抓取解析器 | 使用Playwright/Puppeteer进行页面交互，支持HTML/XML解析和JSON数据提取 | `custom_models_split/web_scraper_parser.yaml` | web-scraper-parser |
+| 🔍 深度研究模式 | 通过多源数据交叉验证和系统性分析解决复杂问题 | `custom_models_split/deep_research.yaml` | deep-research |
+| � Go代码生成器 | 生成高效、符合Go语言规范的代码结构，支持标准库和常见框架，包含必要注释和文档 | `custom_models_split/code_generator/golang_code_generator.yaml` | golang-code-generator |
+| 🐍 Python代码生成器 | 生成符合PEP8规范的Python代码，集成标准库和流行框架，包含完整文档字符串 | `custom_models_split/code_generator/python_code_generator.yaml` | python-code-generator |
+| 🐍 GoZero代码生成器 | 生成基于GoZero框架的微服务代码，包含API路由、服务定义和配置文件 | `custom_models_split/code_generator/go_zero_code_generator.yaml` | go-zero-code-generator |
+| 🎉 React代码生成器 | 生成使用函数组件和Hooks的React项目，遵循JSX规范并集成PropTypes/TS类型 | `custom_models_split/code_generator/react_code_generator.yaml` | react-code-generator |
+| 🌿 Vue代码生成器 | 生成Vue 3组合式API组件，包含template/script/style三部分和TypeScript支持 | `custom_models_split/code_generator/vue_code_generator.yaml` | vue-code-generator |
+| 🌀 JS代码生成器 | 生成ES6+规范的JavaScript模块，包含JSDoc注释和Airbnb代码风格 | `custom_models_split/code_generator/javascript_code_generator.yaml` | javascript-code-generator |
+| 🌟 TS代码生成器 | 生成类型安全的TypeScript代码，集成严格类型检查和最新ECMAScript特性 | `custom_models_split/code_generator/typescript_code_generator.yaml` | typescript-code-generator |
+| ☕ Java代码生成器 | 生成Spring Boot工程代码，集成Lombok和单元测试框架，符合Google Java格式 | `custom_models_split/code_generator/java_code_generator.yaml` | java-code-generator |
+| 🗄️ SQL生成器 | 生成符合ANSI SQL标准的数据库脚本，包含表注释、约束和可移植性设计 | `custom_models_split/code_generator/sql_code_generator.yaml` | sql-code-generator |
+| 🦀 Rust代码生成器 | 生成安全高效的Rust系统代码，集成Tokio/Actix框架和Clippy最佳实践 | `custom_models_split/code_generator/rust_code_generator.yaml` | rust-code-generator |
+| 🐍 Go爬虫生成器 | 生成使用goroutine并发模型的Go爬虫，集成colly框架和反爬处理机制 | `custom_models_split/code_generator/golang_crawler_code_generator.yaml` | golang-crawler-code-generator |
+| 🐍 Python爬虫生成器 | 生成async/await异步Python爬虫，集成Scrapy框架和分布式爬取方案 | `custom_models_split/code_generator/python_crawler_code_generator.yaml` | python-crawler-code-generator |
+| 🤖 Python AI生成器 | 生成TensorFlow/PyTorch机器学习代码，包含数据预处理和模型可视化方案 | `custom_models_split/code_generator/python_ai_code_generator.yaml` | python-ai-code-generator |
+| 🌀 Go+React生成器 | 生成Go后端+React前端的全栈项目，集成跨域处理和状态管理方案 | `custom_models_split/code_generator/golang_react_code_generator.yaml` | golang-react-code-generator |
+| 🤖 Go AI生成器 | 生成集成Gorgonia框架的Go语言AI服务，包含模型服务化和GRPC接口定义 | `custom_models_split/code_generator/golang_ai_code_generator.yaml` | golang-ai-code-generator |
+| 🕷️ 网页抓取解析器 | 使用Playwright/Puppeteer进行页面交互，支持HTML/XML解析和JSON数据提取 | `custom_models_split/web_scraper_parser.yaml` | web-scraper-parser |
 
 ---
 
+### 🔐 权限组
 
-
-4. **目录结构与模式映射** 
-
-```mermaid
-graph TD
-    subgraph 核心架构层
-        nexuscore --> arch
-        arch --> memory_bank
-    end
-    core -->|驱动架构| 开发工具链
-    subgraph 开发工具链
-        code-dev --> go-dev
-        code-dev --> py-dev
-        test-gen --> coverage_reports
-        err-debug --> logs_analysis
-    end
-    部署运维 -->|保障安全| 安全扩展
-    subgraph 部署运维
-        devops --> k8s_configs
-        post-deployment-monitoring-mode --> prometheus_rules
-    end
-    安全扩展 -->|支持文档| 文档系统
-    subgraph 安全扩展
-        sec-rev --> trivy_reports
-        sec-rev --> bandit_scans
-    end
-    memory_bank -->|驱动架构| 开发工具链
-    subgraph 文档系统
-        doc-writer --> api_specs
-        translator --> multilingual_docs
-    end
-```
-
----
-
-
-
-5. **安全审查配置扩展**
-
-### 安全审查模式配置
+### slug标识
 
 ```yaml
-# security/security-review.yaml 关键参数
-customInstructions:
-    security_scans:
-        - trivy --ignore-unfixed .
-        - bandit -r src/ --format junit
-    compliance_checks:
-        - GDPR: check_gdpr_compliance.sh
-        - HIPAA: audit_hipaa_integration.py
+code
+architect
+ask
+debug
+orchestrator
+documentation-generator
+prompt-engineer
 ```
 
 ---
 
-6. **提示工程配置示例**
+### 📌 字段说明
 
+- **slug**: 模式的唯一标识符，用于内部引用和文件路径（如 `.roo/rules-{slug}`）
+- **name**: 用户界面中显示的模式名称（可包含表情符号）
+- **roleDefinition**: 定义模式的核心职责和专业领域（第一句为默认摘要）
+- **whenToUse**: 说明何时使用该模式（优先级高于 `roleDefinition` 摘要）
+- **customInstructions**: 模式的行为规范（通常在系统提示末尾添加）
+- **groups**: 权限组控制（`read`/`edit`/`browser`/`mcp`/`command`）
 
-### 提示词工程模式参数
+---
+
+### ⚙️ 配置原则
+
+1. 项目级配置优先于全局配置  
+2. YAML 格式支持多行字符串和注释（如 `|-` 保留换行）  
+3. 权限组 `edit` 可通过 `fileRegex` 限制文件类型  
+4. 配置迁移时 JSON 文件会自动转换为 YAML  
+
+---
+
+### 🧩 权限组说明
+
+- **read**: 允许读取文件  
+- **edit**: 允许编辑文件（需配置 `fileRegex`）  
+- **browser**: 支持浏览器操作  
+- **mcp**: 可调用 MCP 服务器工具  
+- **command**: 可执行 CLI 命令  
+
+---
+
+### 📜 示例配置
 
 ```yaml
-# prompt/prompt.yaml 核心配置
-prompt_lifecycle:
-    optimization_rules:
-        - 避免绝对化表述 ✅
+customModes:
+  - slug: documentation-generator
+    name: 📝 文档生成器
+    roleDefinition: 您是一名技术撰稿人，擅长撰写清晰、简明和具有视觉吸引力的文档。
+    whenToUse: 适用于生成结构合理的技术文档。
+    groups:
+      - read
+      - edit
+      - browser
+      - mcp
+      - command
+    customInstructions: |
+      注重按逻辑组织内容，使用标题、列表和表格提高可读性。
+      在适当的地方加入图表来说明复杂的概念。
 ```
+
+---
+
+### 🛠️ 可用的MCP工具
+
+#### playwright 服务
+**工具列表**：
+- `browser_close`：关闭浏览器页面
+- `browser_resize`：调整浏览器窗口大小
+- `browser_network_requests`：获取页面网络请求记录
+- `browser_console_messages`：返回所有控制台消息
+- `browser_click`：执行页面点击操作
+
+**资源**：
+- `console://logs`：浏览器控制台日志
+
+#### fetch 服务
+**工具列表**：
+- `fetch_html`：获取网页HTML内容
+- `fetch_markdown`：获取网页Markdown内容
+- `fetch_txt`：获取纯文本网页内容
+- `fetch_json`：获取JSON数据
+
+**资源**：
+- 无
+
+#### puppeteer 服务
+**工具列表**：
+- `puppeteer_navigate`：导航到指定URL
+- `puppeteer_click`：点击页面元素
+- `puppeteer_fill`：填写输入框内容
+- `puppeteer_hover`：悬浮元素触发交互
+- `puppeteer_evaluate`：执行JS代码
+
+**资源**：
+- 无
+
+#### think-tool 服务
+**工具列表**：
+- `think`：记录复杂推理过程
+- `get_thoughts`：获取当前会话的全部思考记录
+
+**资源**：
+- 无
+
+#### fire-stdio 服务
+**工具列表**：
+- `bash`：执行系统命令
+- `dns_resolve`：解析DNS记录
+- `git_branches`：获取本地仓库分支
+- `git_commits`：获取提交记录详情
+- `notify_tts`：发送系统通知
+
+**资源**：
+- `fire://node/used`：获取当前使用代理节点信息
+### 🛠️ 可用的MCP工具
+
+| fire-stdio       | dns_resolve                      | 解析DNS记录                                                            | `domain` (string)                                                       | `<dns_resolve domain="example.com"/>`                                  |
+| fire-stdio       | git_branches                     | 获取本地仓库分支列表                                                   | `path` (string)                                                         | `<git_branches path="/Users/luoxin/persons/knowledge/roo"/>`           |
+| think-tool       | get_thoughts                     | 获取当前会话的全部思考记录                                             | 无参数                                                                  | `<get_thoughts/>`                                                      |
+| playwright       | browser_network_requests         | 获取页面网络请求记录                                                   | 无参数                                                                  | `<browser_network_requests/>`                                          |
+| puppeteer        | puppeteer_click                  | 点击页面元素                                                           | `selector` (string)                                                     | `<puppeteer_click selector="#submit-button"/>`                         |
+</insert_content>
+</insert_content>
+### 🛠️ 补充说明
+
+#### 字段优先级  
+- `whenToUse` 优先级高于 `roleDefinition` 第一句摘要  

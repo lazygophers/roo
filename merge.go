@@ -19,8 +19,8 @@ type CustomModel struct {
 
 	CustomInstructions string `yaml:"customInstructions,omitempty" validate:"required"`
 
-	Groups []string `yaml:"groups,omitempty" validate:"required"`
-	Source string   `yaml:"source,omitempty" validate:"required"`
+	Groups []string `yaml:"groups,omitempty" validate:"required,dive,oneof=read edit browser mcp command"`
+	//Source string   `yaml:"source,omitempty" validate:"required"`
 }
 
 func main() {
