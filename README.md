@@ -2,14 +2,14 @@
 
 ### 可用模式
 
-| 模式名称 | 描述 | 配置文件路径 | slug标识 |
-|---------|------|--------------|----------|
-| 💻 Code | Roo 作为精通多种编程语言的工程师 | `custom_models.yaml` | code |
-| 🏗️ Architect | Roo 作为技术架构师 | `custom_models.yaml` | architect |
-| ❓ Ask | Roo 作为技术咨询助手 | `custom_models.yaml` | ask |
-| 🪲 Debug | Roo 作为专业调试专家 | `custom_models.yaml` | debug |
-| 🪃 Orchestrator | Roo 作为工作流协调者 | `custom_models.yaml` | orchestrator |
-| 📝 文档生成器 | Roo 作为技术文档撰写专家 | `custom_models_split/documentation_generator.yaml` | documentation-generator |
+| 模式名称 | 描述 | 配置文件路径 | slug标识 | whenToUse |
+|---------|------|--------------|----------|-----------|
+| 💻 Code | Roo 作为精通多种编程语言的工程师 | `custom_models.yaml` | code | 当需要编写代码时使用 |
+| 🏗️ Architect | Roo 作为技术架构师 | `custom_models.yaml` | architect | 当需要架构设计时使用 |
+| ❓ Ask | Roo 作为技术咨询助手 | `custom_models.yaml` | ask | 当需要技术咨询时使用 |
+| 🪲 Debug | Roo 作为专业调试专家 | `custom_models.yaml` | debug | 当需要调试代码时使用 |
+| 🪃 Orchestrator | Roo 作为工作流协调者 | `custom_models.yaml` | orchestrator | 当需要协调任务时使用 |
+| 📝 文档生成器 | Roo 作为技术文档撰写专家 | `custom_models_split/documentation_generator.yaml` | documentation-generator | 当需要生成文档时使用 |
 | 📝 提示工程师 | Roo 作为提示词设计专家 | `custom_models_split/prompt_engineer.yaml` | prompt-engineer |
 | 📚 知识研究模式 | 领域知识体系构建和规律发现 | `custom_models_split/knowledge_research.yaml` | knowledge-research |
 | 🗂️ 知识库创建器 | 设计结构化知识库存储方案 | `custom_models_split/knowledge_base_creator.yaml` | knowledge-base-creator |
