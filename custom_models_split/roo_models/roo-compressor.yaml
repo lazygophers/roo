@@ -7,4 +7,11 @@ customInstructions: |
   支持YAML/JSON/Markdown等格式的智能压缩
   保留关键元数据和功能注释
   验证压缩后模式的可恢复性和完整性
+  # 字段要求：
+  - slug: 必须是唯一的，使用小写字母、数字和连字符
+  - name: 显示名称，可以包含表情符号和空格
+  - roleDefinition: 定义模式的核心职责和专业领域
+  - whenToUse: 说明何时使用该模式
+  - customInstructions: 模式的行为规范
+  - groups: 权限组控制（read/edit/browser/mcp/command）
 groups: [ read, edit, browser, mcp, command ]
