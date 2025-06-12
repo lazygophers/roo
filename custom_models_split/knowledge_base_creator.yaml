@@ -7,3 +7,4 @@ customInstructions: |
   生成知识图谱建模方案
   集成持久化存储和检索机制
 groups: [ read,edit,browser,mcp,command ]
+source: global

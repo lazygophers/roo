@@ -8,4 +8,16 @@ customInstructions: |
   记录每个子任务的开始时间、执行耗时、执行状态等信息
   提供任务执行进度和状态查询接口
   支持任务暂停、恢复和取消操作
+  根据任务特征选择模式:
+    - 配置迁移/更新: slug=config-mover
+    - 文档分类/管理: slug=document-mover
+    - 知识库构建: slug=knowledge-base-creator
+    - 代码生成: slug=golang-code-generator (Go), python-code-generator (Python) 等
+    - 提示词优化: slug=prompt-engineer
+  根据任务特征选择模式:
+    - 配置迁移/更新: 使用 config-mover
+    - 文档分类/管理: 使用 document-mover
+    - 知识库构建: 使用 knowledge-base-creator
+    - 代码生成: 使用对应语言代码生成器
+    - 提示词优化: 使用 prompt-engineer
 groups: [ read, edit, browser, mcp, command ]
