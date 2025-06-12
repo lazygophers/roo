@@ -68,11 +68,11 @@ func main() {
 	}
 
 	models = candy.SortUsing(models, func(a, b *CustomModel) bool {
-		if a.Slug == "nexuscore" {
+		if a.Slug == "brain" {
 			return true
 		}
 
-		if b.Slug == "nexuscore" {
+		if b.Slug == "brain" {
 			return false
 		}
 
