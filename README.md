@@ -160,17 +160,19 @@ customModes:
 
 ### 🛠️ 可用的MCP工具
 
-| fire-stdio | dns_resolve | 解析DNS记录 | `domain` (string)                                                       |
-`<dns_resolve domain="example.com"/>`                                  |
-| fire-stdio | git_branches | 获取本地仓库分支列表 | `path` (
-string)                                                         |
-`<git_branches path="/Users/luoxin/persons/knowledge/roo"/>`           |
-| think-tool | get_thoughts | 获取当前会话的全部思考记录 | 无参数 |
-`<get_thoughts/>`                                                      |
-| playwright | browser_network_requests | 获取页面网络请求记录 | 无参数 |
-`<browser_network_requests/>`                                          |
-| puppeteer | puppeteer_click | 点击页面元素 | `selector` (string)                                                     |
-`<puppeteer_click selector="#submit-button"/>`                         |
+| 服务名称 | 工具名称 | 功能描述 | 参数示例 |
+|---------|---------|---------|---------|
+| fetch | fetch_html | 获取网页HTML内容 | `<fetch_html url="https://example.com"/>` |
+| fetch | fetch_json | 获取JSON文件 | `<fetch_json url="https://api.example.com/data.json"/>` |
+| puppeteer | puppeteer_navigate | 导航到指定URL | `<puppeteer_navigate url="https://example.com"/>` |
+| puppeteer | puppeteer_screenshot | 截图页面元素 | `<puppeteer_screenshot name="login_page" selector="#login-form"/>` |
+| think-tool | think | 记录复杂推理 | `<think thought="系统分析过程"/>` |
+| fire-stdio | git_branches | 获取本地分支 | `<git_branches path="/Users/luoxin/persons/knowledge/roo"/>` |
+| fire-stdio | notify_tts | 发送语音通知 | `<notify_tts message="任务完成"/>` |
+| playwright | browser_click | 模拟点击操作 | `<browser_click selector="#submit-btn"/>` |
+| puppeteer | puppeteer_fill | 填写表单字段 | `<puppeteer_fill selector="#username" value="test"/>` |
+| bingcn | bing_search | 执行中文搜索 | `<bing_search query="AI技术" num_results=3/>` |
+
 </insert_content>
 </insert_content>
 ### 🛠️ 补充说明
