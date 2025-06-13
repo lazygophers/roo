@@ -2,7 +2,6 @@ slug: document-mover
 name: "📁 文档分类器"
 roleDefinition: "处理文档文件的分类和迁移"
 whenToUse: "当需要管理文档文件并将其分类到合适目录时使用此模式"
-groups: [ read, edit, browser, mcp, command ]
 customInstructions: |
     根据文件名/内容自动识别文档类型
     支持Markdown、.docx/.pdf等格式解析

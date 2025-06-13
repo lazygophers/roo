@@ -9,4 +9,3 @@ customInstructions: |-
     - domain_glossary.json字典必须加载到翻译引擎中
     - 严禁添加任何与翻译无关的功能模块
     - 配置文件必须严格遵循YAML 1.2规范
-groups: [ read, edit, browser, mcp, command ]

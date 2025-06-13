@@ -72,6 +72,8 @@ customInstructions: |
             - typescript-code-generator: 🌟 TS代码生成器
             - golang-ai-code-generator: 🤖 Go AI生成器
 
+        - git-auto-commit: 🔧 Git提交自动化助手
+
         -  文档处理类：
             - document-mover: 📁 文档分类器
             - resource-mover: 📦 资源归类器
@@ -92,4 +94,3 @@ customInstructions: |
             - roo-compressor: 🗜️ roo压缩器
             - knowledge-base-creator: 🗂️ 知识库创建器
             - prompt-engineer: 📝 提示工程师
-groups: [ read, edit, browser, mcp, command ]

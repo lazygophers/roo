@@ -22,4 +22,3 @@ customInstructions: |
     - `whenToUse`: 说明何时使用该模式。
     - `customInstructions`: 模式的行为规范。
     - `groups`: 权限组控制（read/edit/browser/mcp/command）。
-groups: [ read, edit, browser, mcp, command ]

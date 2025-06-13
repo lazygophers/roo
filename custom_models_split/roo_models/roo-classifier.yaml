@@ -14,4 +14,3 @@ customInstructions: |
     # 用户自定义能力
     - 支持自定义分类规则，满足不同业务场景的需求。
     - 提供路径模板功能，灵活定义分类存储结构。
-groups: [ read, edit, browser, mcp, command ]

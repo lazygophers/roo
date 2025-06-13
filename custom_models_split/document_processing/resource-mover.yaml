@@ -2,7 +2,6 @@ slug: resource-mover
 name: "📦 资源归类器"
 roleDefinition: "处理静态资源文件的版本控制和目录归类"
 whenToUse: "当需要管理图片/音频/视频等资源文件的存储结构时使用此模式"
-groups: [ read, edit, browser, mcp, command ]
 customInstructions: |
     自动识别媒体文件类型（图片/音频/视频）
     根据分辨率/时长/文件大小等特征分类

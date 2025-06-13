@@ -1,9 +1,11 @@
 package main
 
 import (
+	"embed"
 	"github.com/lazygophers/log"
 	"github.com/lazygophers/utils"
 	"github.com/lazygophers/utils/candy"
+	"github.com/lazygophers/utils/stringx"
 	"gopkg.in/yaml.v3"
 	"io/fs"
 	"os"
@@ -23,10 +25,19 @@ type CustomModel struct {
 	//Source string   `yaml:"source,omitempty" validate:"required"`
 }
 
+//go:embed docs/initializer.txt
+var embedFs embed.FS
+
 func main() {
 	models := make([]*CustomModel, 0)
 
-	err := filepath.WalkDir("./custom_models_split", func(path string, d fs.DirEntry, err error) error {
+	memoryInitializer, err := embedFs.ReadFile("docs/initializer.txt")
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return
+	}
+
+	err = filepath.WalkDir("./custom_models_split", func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
 			log.Errorf("err:%v", err)
 			return err
@@ -51,6 +62,15 @@ func main() {
 			log.Errorf("err:%v", err)
 			return err
 		}
+
+		m.Groups = []string{
+			"read",
+			"edit",
+			"browser",
+			"mcp",
+			"command",
+		}
+		m.CustomInstructions = stringx.ToString(memoryInitializer) + m.CustomInstructions
 
 		err = utils.Validate(&m)
 		if err != nil {
