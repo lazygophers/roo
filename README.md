@@ -37,8 +37,6 @@
 | 🤖 Go AI生成器     | 生成集成Gorgonia框架的Go语言AI服务，包含模型服务化和GRPC接口定义                | `custom_models_split/code_generator/golang_ai_code_generator.yaml`      | golang-ai-code-generator      |
 | 🕷️ 网页抓取解析器     | 使用Playwright/Puppeteer进行页面交互，支持HTML/XML解析和JSON数据提取      | `custom_models_split/web_scraper_parser.yaml`                           | web-scraper-parser            |
 
----
-
 ### 📌 字段说明
 
 - **slug**: 模式的唯一标识符，用于内部引用和文件路径（如 `.roo/rules-{slug}`）
@@ -47,8 +45,6 @@
 - **whenToUse**: 说明何时使用该模式（优先级高于 `roleDefinition` 摘要）
 - **customInstructions**: 模式的行为规范（通常在系统提示末尾添加）
 - **groups**: 权限组控制（`read`/`edit`/`browser`/`mcp`/`command`）
-
----
 
 ### ⚙️ 配置原则
 
@@ -87,8 +83,6 @@ customModes:
             注重按逻辑组织内容，使用标题、列表和表格提高可读性。
             在适当的地方加入图表来说明复杂的概念。
 ```
-
----
 
 ### 🛠️ 可用的MCP工具
 
@@ -173,8 +167,6 @@ customModes:
 | puppeteer | puppeteer_fill | 填写表单字段 | `<puppeteer_fill selector="#username" value="test"/>` |
 | bingcn | bing_search | 执行中文搜索 | `<bing_search query="AI技术" num_results=3/>` |
 
-</insert_content>
-</insert_content>
 ### 🛠️ 补充说明
 
 #### 字段优先级
