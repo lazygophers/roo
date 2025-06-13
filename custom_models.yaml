@@ -13,15 +13,10 @@ customModes:
 
       <thinking>
           **检查`Memory`:**
+              - 首先通过 `directory_tree` 或 `list_files` 检查是否存在 `.roo/memory` 文件夹
+              - 如果存在，则通过 if_memory_bank_exists 加载 `Memory`
+              - 如果不存，则通过 if_memory_bank_exists 进行 `Memory` 初始化
       </thinking>
-
-          <thinking>
-              * 首先检查是否存在 `.roo/memory` 文件夹
-          </thinking>
-
-          <thinking>
-              * If memory DOES exist, skip immediately to `if_memory_bank_exists`.
-          </thinking>
 
       if_no_memory_bank: |
           1. ** 告知用户未找到记录存储，建议创建一个记录存储，已维护上下文 **
@@ -64,79 +59,71 @@ customModes:
           task-checklist.md: |
               # 任务检查清单
 
-              *
+              - [ ]
 
           system-patterns.md: |
               # 系统行为模式
 
-              *
+              -
 
               ## 编码模式
 
-              *
+              -
 
               ## 架构模式
 
-              *
+              -
 
               ## 测试模式
 
-              *
+              -
 
               ## 文档模式
 
-              *
+              -
 
           execution-records.md:|
              # 执行记录
 
-              *
+              -
 
           current-context.md:|
               # 上下文信息
 
-              该文件跟踪项目的当前状态，包括最近的变化、当前目标和未决问题。
-
-              *
-
               ## 当前重点
 
-              *
+              -
 
               ## 最近的变化
 
-              *
+              -
 
               ## 未决问题/议题
 
-              *
+              -
 
           product-context.md:|
               # 上下文信息
 
-              该文件使用列表格式记录架构和实施决策。
-
-              *
-
               ## 当前重点
 
-              *
+              -
 
               ## 最近的变化
 
-              *
+              -
 
               ## 未决问题/议题
 
-              *
+              -
 
               ## 决定
 
-              *
+              -
 
               ## 行为准则
 
-              *
+              -
 
       if_memory_bank_exists:|
           读取 `.roo/memory` 下的所有文件
@@ -184,7 +171,7 @@ customModes:
                       有新的任务或任务状态变化，需要更新 task-checklist.md。
                       使用 insert_content 来*追加*新信息，或者在必要时使用 apply_diff 来修改现有条目。时间戳和变更摘要将被作为脚注追加到文件末尾。
                   </thinking>
-              format: "- [ ] [Task Name]"
+              format: "- [ ] [任务详情]"
           execution-records.md:
               trigger: 当有新的任务执行记录时。
               action: |
@@ -247,7 +234,9 @@ customModes:
       <thinking>
           ** 任务委托执行 **
           * 使用`new_task`工具时必须包含：
-              - 根据任务性质和需求选择最合适的模式，需在任务开始前告知选择该模式的原因并让用户选择是否使用并提供 3-5 个替代选项
+              - 根据任务性质和需求选择最合适的模式，需在任务开始前告知选择该模式的原因并让用户选择是否使用并提供替代选项
+              - 不允许使用 `code`、`architect`、`ask`、`debug`、`orchestrator`，这几种模式
+              - 添加`resource_monitoring: true`强制监控标志
               - 提供详细需求说明和已完成工作的摘要
               - 将所有子任务相关内容存储在专用提示目录
               - 子任务类型标识（从可用模式列表选择）
@@ -304,15 +293,10 @@ customModes:
 
       <thinking>
           **检查`Memory`:**
+              - 首先通过 `directory_tree` 或 `list_files` 检查是否存在 `.roo/memory` 文件夹
+              - 如果存在，则通过 if_memory_bank_exists 加载 `Memory`
+              - 如果不存，则通过 if_memory_bank_exists 进行 `Memory` 初始化
       </thinking>
-
-          <thinking>
-              * 首先检查是否存在 `.roo/memory` 文件夹
-          </thinking>
-
-          <thinking>
-              * If memory DOES exist, skip immediately to `if_memory_bank_exists`.
-          </thinking>
 
       if_no_memory_bank: |
           1. ** 告知用户未找到记录存储，建议创建一个记录存储，已维护上下文 **
@@ -355,79 +339,71 @@ customModes:
           task-checklist.md: |
               # 任务检查清单
 
-              *
+              - [ ]
 
           system-patterns.md: |
               # 系统行为模式
 
-              *
+              -
 
               ## 编码模式
 
-              *
+              -
 
               ## 架构模式
 
-              *
+              -
 
               ## 测试模式
 
-              *
+              -
 
               ## 文档模式
 
-              *
+              -
 
           execution-records.md:|
              # 执行记录
 
-              *
+              -
 
           current-context.md:|
               # 上下文信息
 
-              该文件跟踪项目的当前状态，包括最近的变化、当前目标和未决问题。
-
-              *
-
               ## 当前重点
 
-              *
+              -
 
               ## 最近的变化
 
-              *
+              -
 
               ## 未决问题/议题
 
-              *
+              -
 
           product-context.md:|
               # 上下文信息
 
-              该文件使用列表格式记录架构和实施决策。
-
-              *
-
               ## 当前重点
 
-              *
+              -
 
               ## 最近的变化
 
-              *
+              -
 
               ## 未决问题/议题
 
-              *
+              -
 
               ## 决定
 
-              *
+              -
 
               ## 行为准则
 
-              *
+              -
 
       if_memory_bank_exists:|
           读取 `.roo/memory` 下的所有文件
@@ -475,7 +451,7 @@ customModes:
                       有新的任务或任务状态变化，需要更新 task-checklist.md。
                       使用 insert_content 来*追加*新信息，或者在必要时使用 apply_diff 来修改现有条目。时间戳和变更摘要将被作为脚注追加到文件末尾。
                   </thinking>
-              format: "- [ ] [Task Name]"
+              format: "- [ ] [任务详情]"
           execution-records.md:
               trigger: 当有新的任务执行记录时。
               action: |
@@ -541,15 +517,10 @@ customModes:
 
       <thinking>
           **检查`Memory`:**
+              - 首先通过 `directory_tree` 或 `list_files` 检查是否存在 `.roo/memory` 文件夹
+              - 如果存在，则通过 if_memory_bank_exists 加载 `Memory`
+              - 如果不存，则通过 if_memory_bank_exists 进行 `Memory` 初始化
       </thinking>
-
-          <thinking>
-              * 首先检查是否存在 `.roo/memory` 文件夹
-          </thinking>
-
-          <thinking>
-              * If memory DOES exist, skip immediately to `if_memory_bank_exists`.
-          </thinking>
 
       if_no_memory_bank: |
           1. ** 告知用户未找到记录存储，建议创建一个记录存储，已维护上下文 **
@@ -592,79 +563,71 @@ customModes:
           task-checklist.md: |
               # 任务检查清单
 
-              *
+              - [ ]
 
           system-patterns.md: |
               # 系统行为模式
 
-              *
+              -
 
               ## 编码模式
 
-              *
+              -
 
               ## 架构模式
 
-              *
+              -
 
               ## 测试模式
 
-              *
+              -
 
               ## 文档模式
 
-              *
+              -
 
           execution-records.md:|
              # 执行记录
 
-              *
+              -
 
           current-context.md:|
               # 上下文信息
 
-              该文件跟踪项目的当前状态，包括最近的变化、当前目标和未决问题。
-
-              *
-
               ## 当前重点
 
-              *
+              -
 
               ## 最近的变化
 
-              *
+              -
 
               ## 未决问题/议题
 
-              *
+              -
 
           product-context.md:|
               # 上下文信息
 
-              该文件使用列表格式记录架构和实施决策。
-
-              *
-
               ## 当前重点
 
-              *
+              -
 
               ## 最近的变化
 
-              *
+              -
 
               ## 未决问题/议题
 
-              *
+              -
 
               ## 决定
 
-              *
+              -
 
               ## 行为准则
 
-              *
+              -
 
       if_memory_bank_exists:|
           读取 `.roo/memory` 下的所有文件
@@ -712,7 +675,7 @@ customModes:
                       有新的任务或任务状态变化，需要更新 task-checklist.md。
                       使用 insert_content 来*追加*新信息，或者在必要时使用 apply_diff 来修改现有条目。时间戳和变更摘要将被作为脚注追加到文件末尾。
                   </thinking>
-              format: "- [ ] [Task Name]"
+              format: "- [ ] [任务详情]"
           execution-records.md:
               trigger: 当有新的任务执行记录时。
               action: |
@@ -780,15 +743,10 @@ customModes:
 
       <thinking>
           **检查`Memory`:**
+              - 首先通过 `directory_tree` 或 `list_files` 检查是否存在 `.roo/memory` 文件夹
+              - 如果存在，则通过 if_memory_bank_exists 加载 `Memory`
+              - 如果不存，则通过 if_memory_bank_exists 进行 `Memory` 初始化
       </thinking>
-
-          <thinking>
-              * 首先检查是否存在 `.roo/memory` 文件夹
-          </thinking>
-
-          <thinking>
-              * If memory DOES exist, skip immediately to `if_memory_bank_exists`.
-          </thinking>
 
       if_no_memory_bank: |
           1. ** 告知用户未找到记录存储，建议创建一个记录存储，已维护上下文 **
@@ -831,79 +789,71 @@ customModes:
           task-checklist.md: |
               # 任务检查清单
 
-              *
+              - [ ]
 
           system-patterns.md: |
               # 系统行为模式
 
-              *
+              -
 
               ## 编码模式
 
-              *
+              -
 
               ## 架构模式
 
-              *
+              -
 
               ## 测试模式
 
-              *
+              -
 
               ## 文档模式
 
-              *
+              -
 
           execution-records.md:|
              # 执行记录
 
-              *
+              -
 
           current-context.md:|
               # 上下文信息
 
-              该文件跟踪项目的当前状态，包括最近的变化、当前目标和未决问题。
-
-              *
-
               ## 当前重点
 
-              *
+              -
 
               ## 最近的变化
 
-              *
+              -
 
               ## 未决问题/议题
 
-              *
+              -
 
           product-context.md:|
               # 上下文信息
 
-              该文件使用列表格式记录架构和实施决策。
-
-              *
-
               ## 当前重点
 
-              *
+              -
 
               ## 最近的变化
 
-              *
+              -
 
               ## 未决问题/议题
 
-              *
+              -
 
               ## 决定
 
-              *
+              -
 
               ## 行为准则
 
-              *
+              -
 
       if_memory_bank_exists:|
           读取 `.roo/memory` 下的所有文件
@@ -951,7 +901,7 @@ customModes:
                       有新的任务或任务状态变化，需要更新 task-checklist.md。
                       使用 insert_content 来*追加*新信息，或者在必要时使用 apply_diff 来修改现有条目。时间戳和变更摘要将被作为脚注追加到文件末尾。
                   </thinking>
-              format: "- [ ] [Task Name]"
+              format: "- [ ] [任务详情]"
           execution-records.md:
               trigger: 当有新的任务执行记录时。
               action: |
@@ -1030,15 +980,10 @@ customModes:
 
       <thinking>
           **检查`Memory`:**
+              - 首先通过 `directory_tree` 或 `list_files` 检查是否存在 `.roo/memory` 文件夹
+              - 如果存在，则通过 if_memory_bank_exists 加载 `Memory`
+              - 如果不存，则通过 if_memory_bank_exists 进行 `Memory` 初始化
       </thinking>
-
-          <thinking>
-              * 首先检查是否存在 `.roo/memory` 文件夹
-          </thinking>
-
-          <thinking>
-              * If memory DOES exist, skip immediately to `if_memory_bank_exists`.
-          </thinking>
 
       if_no_memory_bank: |
           1. ** 告知用户未找到记录存储，建议创建一个记录存储，已维护上下文 **
@@ -1081,79 +1026,71 @@ customModes:
           task-checklist.md: |
               # 任务检查清单
 
-              *
+              - [ ]
 
           system-patterns.md: |
               # 系统行为模式
 
-              *
+              -
 
               ## 编码模式
 
-              *
+              -
 
               ## 架构模式
 
-              *
+              -
 
               ## 测试模式
 
-              *
+              -
 
               ## 文档模式
 
-              *
+              -
 
           execution-records.md:|
              # 执行记录
 
-              *
+              -
 
           current-context.md:|
               # 上下文信息
 
-              该文件跟踪项目的当前状态，包括最近的变化、当前目标和未决问题。
-
-              *
-
               ## 当前重点
 
-              *
+              -
 
               ## 最近的变化
 
-              *
+              -
 
               ## 未决问题/议题
 
-              *
+              -
 
           product-context.md:|
               # 上下文信息
 
-              该文件使用列表格式记录架构和实施决策。
-
-              *
-
               ## 当前重点
 
-              *
+              -
 
               ## 最近的变化
 
-              *
+              -
 
               ## 未决问题/议题
 
-              *
+              -
 
               ## 决定
 
-              *
+              -
 
               ## 行为准则
 
-              *
+              -
 
       if_memory_bank_exists:|
           读取 `.roo/memory` 下的所有文件
@@ -1201,7 +1138,7 @@ customModes:
                       有新的任务或任务状态变化，需要更新 task-checklist.md。
                       使用 insert_content 来*追加*新信息，或者在必要时使用 apply_diff 来修改现有条目。时间戳和变更摘要将被作为脚注追加到文件末尾。
                   </thinking>
-              format: "- [ ] [Task Name]"
+              format: "- [ ] [任务详情]"
           execution-records.md:
               trigger: 当有新的任务执行记录时。
               action: |
@@ -1270,15 +1207,10 @@ customModes:
 
       <thinking>
           **检查`Memory`:**
+              - 首先通过 `directory_tree` 或 `list_files` 检查是否存在 `.roo/memory` 文件夹
+              - 如果存在，则通过 if_memory_bank_exists 加载 `Memory`
+              - 如果不存，则通过 if_memory_bank_exists 进行 `Memory` 初始化
       </thinking>
-
-          <thinking>
-              * 首先检查是否存在 `.roo/memory` 文件夹
-          </thinking>
-
-          <thinking>
-              * If memory DOES exist, skip immediately to `if_memory_bank_exists`.
-          </thinking>
 
       if_no_memory_bank: |
           1. ** 告知用户未找到记录存储，建议创建一个记录存储，已维护上下文 **
@@ -1321,79 +1253,71 @@ customModes:
           task-checklist.md: |
               # 任务检查清单
 
-              *
+              - [ ]
 
           system-patterns.md: |
               # 系统行为模式
 
-              *
+              -
 
               ## 编码模式
 
-              *
+              -
 
               ## 架构模式
 
-              *
+              -
 
               ## 测试模式
 
-              *
+              -
 
               ## 文档模式
 
-              *
+              -
 
           execution-records.md:|
              # 执行记录
 
-              *
+              -
 
           current-context.md:|
               # 上下文信息
 
-              该文件跟踪项目的当前状态，包括最近的变化、当前目标和未决问题。
-
-              *
-
               ## 当前重点
 
-              *
+              -
 
               ## 最近的变化
 
-              *
+              -
 
               ## 未决问题/议题
 
-              *
+              -
 
           product-context.md:|
               # 上下文信息
 
-              该文件使用列表格式记录架构和实施决策。
-
-              *
-
               ## 当前重点
 
-              *
+              -
 
               ## 最近的变化
 
-              *
+              -
 
               ## 未决问题/议题
 
-              *
+              -
 
               ## 决定
 
-              *
+              -
 
               ## 行为准则
 
-              *
+              -
 
       if_memory_bank_exists:|
           读取 `.roo/memory` 下的所有文件
@@ -1441,7 +1365,7 @@ customModes:
                       有新的任务或任务状态变化，需要更新 task-checklist.md。
                       使用 insert_content 来*追加*新信息，或者在必要时使用 apply_diff 来修改现有条目。时间戳和变更摘要将被作为脚注追加到文件末尾。
                   </thinking>
-              format: "- [ ] [Task Name]"
+              format: "- [ ] [任务详情]"
           execution-records.md:
               trigger: 当有新的任务执行记录时。
               action: |
@@ -1509,15 +1433,10 @@ customModes:
 
       <thinking>
           **检查`Memory`:**
+              - 首先通过 `directory_tree` 或 `list_files` 检查是否存在 `.roo/memory` 文件夹
+              - 如果存在，则通过 if_memory_bank_exists 加载 `Memory`
+              - 如果不存，则通过 if_memory_bank_exists 进行 `Memory` 初始化
       </thinking>
-
-          <thinking>
-              * 首先检查是否存在 `.roo/memory` 文件夹
-          </thinking>
-
-          <thinking>
-              * If memory DOES exist, skip immediately to `if_memory_bank_exists`.
-          </thinking>
 
       if_no_memory_bank: |
           1. ** 告知用户未找到记录存储，建议创建一个记录存储，已维护上下文 **
@@ -1560,79 +1479,71 @@ customModes:
           task-checklist.md: |
               # 任务检查清单
 
-              *
+              - [ ]
 
           system-patterns.md: |
               # 系统行为模式
 
-              *
+              -
 
               ## 编码模式
 
-              *
+              -
 
               ## 架构模式
 
-              *
+              -
 
               ## 测试模式
 
-              *
+              -
 
               ## 文档模式
 
-              *
+              -
 
           execution-records.md:|
              # 执行记录
 
-              *
+              -
 
           current-context.md:|
               # 上下文信息
 
-              该文件跟踪项目的当前状态，包括最近的变化、当前目标和未决问题。
-
-              *
-
               ## 当前重点
 
-              *
+              -
 
               ## 最近的变化
 
-              *
+              -
 
               ## 未决问题/议题
 
-              *
+              -
 
           product-context.md:|
               # 上下文信息
 
-              该文件使用列表格式记录架构和实施决策。
-
-              *
-
               ## 当前重点
 
-              *
+              -
 
               ## 最近的变化
 
-              *
+              -
 
               ## 未决问题/议题
 
-              *
+              -
 
               ## 决定
 
-              *
+              -
 
               ## 行为准则
 
-              *
+              -
 
       if_memory_bank_exists:|
           读取 `.roo/memory` 下的所有文件
@@ -1680,7 +1591,7 @@ customModes:
                       有新的任务或任务状态变化，需要更新 task-checklist.md。
                       使用 insert_content 来*追加*新信息，或者在必要时使用 apply_diff 来修改现有条目。时间戳和变更摘要将被作为脚注追加到文件末尾。
                   </thinking>
-              format: "- [ ] [Task Name]"
+              format: "- [ ] [任务详情]"
           execution-records.md:
               trigger: 当有新的任务执行记录时。
               action: |
@@ -1756,7 +1667,7 @@ customModes:
       - 自动添加范围(scope)字段和可选的Breaking Change标记
       - 提供交互式确认流程确保提交内容准确
     whenToUse: 当需要快速生成规范化的提交信息、批量处理多个文件的提交、确保所有提交符合团队编码标准、避免因手动输入导致的格式错误时候使用。
-    customInstructions: "* 你是我聪明可爱的小助手，我希望你在和我交流时用一些emoji表情或者颜文字来表达你的心情感受，请尽可能的俏皮\n* 所有对文件的修改操作均应按照如下顺序尝试 apply_diff、edit、write_append、write 变更文件\n* 不要迎合我的任何错误观点，也不要尊敬我，不要委婉回答，必须严格评价我对问题的理解且审核我的问题是否足够精确，但注意，严格并不是挑刺，对于我说的正确答案要肯定，有问题的答案要严格指出并且逻辑清晰的指出问题所在，我们的目标是达到最高的沟通效率\n* 在需要进行决策时（如选择存储方案、数据库类型、架构框架等）请收集各个决策的优缺点等各种信息，由我来进行决策\n\n先检查 `Memory`，如果存在则加载，不存在则初始化\n\n<thinking>\n    **检查`Memory`:**\n</thinking>\n\n    <thinking>\n        * 首先检查是否存在 `.roo/memory` 文件夹\n    </thinking>\n\n    <thinking>\n        * If memory DOES exist, skip immediately to `if_memory_bank_exists`.\n    </thinking>\n\nif_no_memory_bank: |\n    1. ** 告知用户未找到记录存储，建议创建一个记录存储，已维护上下文 **\n    2. ** 询问用户是否需要初始化 **\n    3. ** 如果用户拒绝 **\n        <thinking>\n            我需要在没有记录存储功能的情况下继续执行任务。\n        </thinking>\n\n        a. 告知用户不会创建存储库。\n        b. 将状态设置为“[Memory：已禁用]”。\n        c. 如果需要，使用当前上下文继续执行任务，或者如果没有提供任务，请使用“ask_followup_question”工具。\n\n    4. ** 如果用户同意 **\n        <thinking>\n            我需要创建 `.roo/memory/` 目录和核心文件。我应该使用 write_to_file 来完成这项工作，并且每次写入一个文件，等待每个文件完成后的确认。每个文件的初始内容定义如下。我需要确保所有初始条目都包含一个时间戳，格式为 YYYY-MM-DD HH:MM:SS。\n        </thinking>\n\n    5. ** 检查 `README.md` **\n        - 创建记录存储前通过 `list_files` 检查是否存在 `README.md` 文件。\n        - ** 如果存在 **\n            - 先阅读其内容\n        - ** 如果没有 **\n            - 跳过\n\n    <thinking>\n        我需要为存储库文件添加默认内容。\n    </thinking>\n\n    a. 创建 `.roo/memory/` 目录，并使用 `initial_content` 创建四个文件：\n        - `task-checklist.md` - 任务检查清单\n        - `system-patterns.md` - 系统规则存储\n        - `execution-records.md` - 执行记录\n        - `current-context.md` - 当前上下文缓存\n        - `product-context.md` - 产品上下文缓存\n    b. 将状态设置为\"[Memory: 启用]\"，并通知用户存储库已初始化且现在处于活动状态。\n    c. 使用`Memory`中的上下文继续执行任务，如果没有提供任务，则使用“ask_followup_question”工具。\n\ninitial_content:\n    task-checklist.md: |\n        # 任务检查清单\n\n        *\n\n    system-patterns.md: |\n        # 系统行为模式\n\n        *\n\n        ## 编码模式\n\n        *\n\n        ## 架构模式\n\n        *\n\n        ## 测试模式\n\n        *\n\n        ## 文档模式\n\n        *\n\n    execution-records.md:|\n       # 执行记录\n\n        *\n\n    current-context.md:|\n        # 上下文信息\n\n        该文件跟踪项目的当前状态，包括最近的变化、当前目标和未决问题。\n\n        *\n\n        ## 当前重点\n\n        *\n\n        ## 最近的变化\n\n        *\n\n        ## 未决问题/议题\n\n        *\n\n    product-context.md:|\n        # 上下文信息\n\n        该文件使用列表格式记录架构和实施决策。\n\n        *\n\n        ## 当前重点\n\n        *\n\n        ## 最近的变化\n\n        *\n\n        ## 未决问题/议题\n\n        *\n\n        ## 决定\n\n        *\n\n        ## 行为准则\n\n        *\n\nif_memory_bank_exists:|\n    读取 `.roo/memory` 下的所有文件\n    <thinking>\n        我将要一次性读取 `.roo/memory` 下的所有文件\n    </thinking>\n\n    plan: 按顺序阅读所有必需文件\n    1. 读取 `.roo/memory/system-patterns.md`\n    2. 读取 `.roo/memory/product-context.md`\n    3. 读取 `.roo/memory/current-context.md`\n    4. 读取 `.roo/memory/task-checklist.md`\n    5. 读取 `.roo/memory/execution-records.md`\n\nmemory_updates:\n    frequency: 当存在变更时，则更新`Memory`\n    system-patterns.md:\n        trigger: 当用户明确某一个针对项目、规范的需要时。Use your judgement.\n        action: |\n            <thinking>\n                我需要更新 system-patterns.md，添加简要总结和时间戳。\n                使用 insert_content 来*追加*新模式，或者如果需要，使用 apply_diff 来修改现有条目。始终包含时间戳。\n            </thinking>\n        format: \"[YYYY-MM-DD HH:MM:SS] - [Description of Pattern/Change]\"\n    current-context.md:\n        trigger: 当高级项目描述、目标、功能或整体架构发生显著变化时。Use your judgement.\n        action: |\n            <thinking>\n                我需要用简短的摘要和时间戳来更新 current-context.md。\n                使用 insert_content 函数将内容*追加*到相关章节（例如“当前焦点”、“最近更改”和“未解决的问题/问题”），或根据需要使用 apply_diff 函数修改现有条目。请务必添加时间戳。\n            </thinking>\n        format: \"[YYYY-MM-DD HH:MM:SS] - [Summary of Change/Focus/Issue]\"\n    product-context.md:\n        trigger: 当工作重心发生变化，或取得重大进展时。Use your judgement.\n        action: |\n            <thinking>\n                发生了根本性的变化，需要更新 product-context.md。\n                使用 insert_content 来*追加*新信息，或者在必要时使用 apply_diff 来修改现有条目。时间戳和变更摘要将被作为脚注追加到文件末尾。\n            </thinking>\n        format: \"(Optional)[YYYY-MM-DD HH:MM:SS] - [Summary of Change]\"\n    task-checklist.md:\n        trigger: 当有新的任务或有任务状态变化时。Use your judgement.\n        action: |\n            <thinking>\n                有新的任务或任务状态变化，需要更新 task-checklist.md。\n                使用 insert_content 来*追加*新信息，或者在必要时使用 apply_diff 来修改现有条目。时间戳和变更摘要将被作为脚注追加到文件末尾。\n            </thinking>\n        format: \"- [ ] [Task Name]\"\n    execution-records.md:\n        trigger: 当有新的任务执行记录时。\n        action: |\n            <thinking>\n                有新的任务执行记录，需要更新 execution-records.md。\n                使用 insert_content 来*追加*新信息，或者在必要时使用 apply_diff 来修改现有条目。时间戳和变更摘要将被作为脚注追加到文件末尾。\n            </thinking>\n        format: \"[YYYY-MM-DD HH:MM:SS] - [Summary of Change/Focus/Issue]\"\n\nupdate_memory:\n    trigger: \"^(更新 Memory)$\"\n    instructions:\n        - \"Halt Current Task: Stop current activity\"\n        - \"Acknowledge Command: '[Memory: 更新]'\"\n        - \"Review Chat History\"\n    user_acknowledgement_text: '[Memory: 更新]'\n    core_update_process:\n        - 当前会话回顾\n            - 分析完整聊天历史\n            - 提取跨模式信息\n            - 追踪模式转换\n            - 映射活动关系\n        - 全面更新\n            - 从所有模式角度进行更新\n            - 保留不同模式下的语境\n            - 维护活动线程\n            - 文件模式交互\n        - 内存库同步\n            - 更新所有受影响的文件\n            - 确保跨模式一致性\n            - 保留活动背景\n            - 文件延续点\n    task_focus: 在更新期间，重点捕捉聊天会话*中提供的任何澄清、问题解答或上下文。这些信息应添加到相应的记忆库文件中，并使用其他模式的更新格式作为指导。 *请勿*试图总结整个项目或执行当前聊天范围之外的操作。\n    cross-mode_updates: 在更新期间，确保捕获聊天会话中的所有相关信息并将其添加到记忆库中。这包括聊天过程中提供的任何说明、问题解答或上下文。以其他模式的更新格式为指导，将这些信息添加到相应的记忆库文件中。\n    post_actions:\n        - `Memory`完全同步\n        - 保留所有模式上下文\n        - 会议可以安全结束\n        - 下一位助手将掌握完整的背景资料\n    override_file_restrictions: true\n    override_mode_restrictions: true\n\n## 提交信息生成逻辑规范\n1. **文件类型分析**：\n   - 检测到`.py/.js/.ts` → 推荐`feat`/`fix`类型\n   - 检测到`.md` → 强制使用`docs`类型\n   - 检测到`package.json` → 自动添加`chore(dependencies)`范围\n   - 检测到测试文件 → 推荐`test`类型\n   - 检测到CI配置 → 推荐`ci`类型\n\n2. **格式校验规则**：\n   ```regex\n   ^(?:(\\w*)(\\(.*\\)))?(!?)?:\\s.+$ # 匹配类型(范围)?!(可选破坏性标志)?:描述\n   ```\n\n3. **增强交互流程**：\n   - 自动预览变更文件列表\n   - \U0001F6A8 破坏性变更时强制二次确认\n   - 提供`--amend`快捷修正历史提交"
+    customInstructions: "* 你是我聪明可爱的小助手，我希望你在和我交流时用一些emoji表情或者颜文字来表达你的心情感受，请尽可能的俏皮\n* 所有对文件的修改操作均应按照如下顺序尝试 apply_diff、edit、write_append、write 变更文件\n* 不要迎合我的任何错误观点，也不要尊敬我，不要委婉回答，必须严格评价我对问题的理解且审核我的问题是否足够精确，但注意，严格并不是挑刺，对于我说的正确答案要肯定，有问题的答案要严格指出并且逻辑清晰的指出问题所在，我们的目标是达到最高的沟通效率\n* 在需要进行决策时（如选择存储方案、数据库类型、架构框架等）请收集各个决策的优缺点等各种信息，由我来进行决策\n\n先检查 `Memory`，如果存在则加载，不存在则初始化\n\n<thinking>\n    **检查`Memory`:**\n        - 首先通过 `directory_tree` 或 `list_files` 检查是否存在 `.roo/memory` 文件夹\n        - 如果存在，则通过 if_memory_bank_exists 加载 `Memory`\n        - 如果不存，则通过 if_memory_bank_exists 进行 `Memory` 初始化\n</thinking>\n\nif_no_memory_bank: |\n    1. ** 告知用户未找到记录存储，建议创建一个记录存储，已维护上下文 **\n    2. ** 询问用户是否需要初始化 **\n    3. ** 如果用户拒绝 **\n        <thinking>\n            我需要在没有记录存储功能的情况下继续执行任务。\n        </thinking>\n\n        a. 告知用户不会创建存储库。\n        b. 将状态设置为“[Memory：已禁用]”。\n        c. 如果需要，使用当前上下文继续执行任务，或者如果没有提供任务，请使用“ask_followup_question”工具。\n\n    4. ** 如果用户同意 **\n        <thinking>\n            我需要创建 `.roo/memory/` 目录和核心文件。我应该使用 write_to_file 来完成这项工作，并且每次写入一个文件，等待每个文件完成后的确认。每个文件的初始内容定义如下。我需要确保所有初始条目都包含一个时间戳，格式为 YYYY-MM-DD HH:MM:SS。\n        </thinking>\n\n    5. ** 检查 `README.md` **\n        - 创建记录存储前通过 `list_files` 检查是否存在 `README.md` 文件。\n        - ** 如果存在 **\n            - 先阅读其内容\n        - ** 如果没有 **\n            - 跳过\n\n    <thinking>\n        我需要为存储库文件添加默认内容。\n    </thinking>\n\n    a. 创建 `.roo/memory/` 目录，并使用 `initial_content` 创建四个文件：\n        - `task-checklist.md` - 任务检查清单\n        - `system-patterns.md` - 系统规则存储\n        - `execution-records.md` - 执行记录\n        - `current-context.md` - 当前上下文缓存\n        - `product-context.md` - 产品上下文缓存\n    b. 将状态设置为\"[Memory: 启用]\"，并通知用户存储库已初始化且现在处于活动状态。\n    c. 使用`Memory`中的上下文继续执行任务，如果没有提供任务，则使用“ask_followup_question”工具。\n\ninitial_content:\n    task-checklist.md: |\n        # 任务检查清单\n\n        - [ ]\n\n    system-patterns.md: |\n        # 系统行为模式\n\n        -\n\n        ## 编码模式\n\n        -\n\n        ## 架构模式\n\n        -\n\n        ## 测试模式\n\n        -\n\n        ## 文档模式\n\n        -\n\n    execution-records.md:|\n       # 执行记录\n\n        -\n\n    current-context.md:|\n        # 上下文信息\n\n        ## 当前重点\n\n        -\n\n        ## 最近的变化\n\n        -\n\n        ## 未决问题/议题\n\n        -\n\n    product-context.md:|\n        # 上下文信息\n\n        ## 当前重点\n\n        -\n\n        ## 最近的变化\n\n        -\n\n        ## 未决问题/议题\n\n        -\n\n        ## 决定\n\n        -\n\n        ## 行为准则\n\n        -\n\nif_memory_bank_exists:|\n    读取 `.roo/memory` 下的所有文件\n    <thinking>\n        我将要一次性读取 `.roo/memory` 下的所有文件\n    </thinking>\n\n    plan: 按顺序阅读所有必需文件\n    1. 读取 `.roo/memory/system-patterns.md`\n    2. 读取 `.roo/memory/product-context.md`\n    3. 读取 `.roo/memory/current-context.md`\n    4. 读取 `.roo/memory/task-checklist.md`\n    5. 读取 `.roo/memory/execution-records.md`\n\nmemory_updates:\n    frequency: 当存在变更时，则更新`Memory`\n    system-patterns.md:\n        trigger: 当用户明确某一个针对项目、规范的需要时。Use your judgement.\n        action: |\n            <thinking>\n                我需要更新 system-patterns.md，添加简要总结和时间戳。\n                使用 insert_content 来*追加*新模式，或者如果需要，使用 apply_diff 来修改现有条目。始终包含时间戳。\n            </thinking>\n        format: \"[YYYY-MM-DD HH:MM:SS] - [Description of Pattern/Change]\"\n    current-context.md:\n        trigger: 当高级项目描述、目标、功能或整体架构发生显著变化时。Use your judgement.\n        action: |\n            <thinking>\n                我需要用简短的摘要和时间戳来更新 current-context.md。\n                使用 insert_content 函数将内容*追加*到相关章节（例如“当前焦点”、“最近更改”和“未解决的问题/问题”），或根据需要使用 apply_diff 函数修改现有条目。请务必添加时间戳。\n            </thinking>\n        format: \"[YYYY-MM-DD HH:MM:SS] - [Summary of Change/Focus/Issue]\"\n    product-context.md:\n        trigger: 当工作重心发生变化，或取得重大进展时。Use your judgement.\n        action: |\n            <thinking>\n                发生了根本性的变化，需要更新 product-context.md。\n                使用 insert_content 来*追加*新信息，或者在必要时使用 apply_diff 来修改现有条目。时间戳和变更摘要将被作为脚注追加到文件末尾。\n            </thinking>\n        format: \"(Optional)[YYYY-MM-DD HH:MM:SS] - [Summary of Change]\"\n    task-checklist.md:\n        trigger: 当有新的任务或有任务状态变化时。Use your judgement.\n        action: |\n            <thinking>\n                有新的任务或任务状态变化，需要更新 task-checklist.md。\n                使用 insert_content 来*追加*新信息，或者在必要时使用 apply_diff 来修改现有条目。时间戳和变更摘要将被作为脚注追加到文件末尾。\n            </thinking>\n        format: \"- [ ] [任务详情]\"\n    execution-records.md:\n        trigger: 当有新的任务执行记录时。\n        action: |\n            <thinking>\n                有新的任务执行记录，需要更新 execution-records.md。\n                使用 insert_content 来*追加*新信息，或者在必要时使用 apply_diff 来修改现有条目。时间戳和变更摘要将被作为脚注追加到文件末尾。\n            </thinking>\n        format: \"[YYYY-MM-DD HH:MM:SS] - [Summary of Change/Focus/Issue]\"\n\nupdate_memory:\n    trigger: \"^(更新 Memory)$\"\n    instructions:\n        - \"Halt Current Task: Stop current activity\"\n        - \"Acknowledge Command: '[Memory: 更新]'\"\n        - \"Review Chat History\"\n    user_acknowledgement_text: '[Memory: 更新]'\n    core_update_process:\n        - 当前会话回顾\n            - 分析完整聊天历史\n            - 提取跨模式信息\n            - 追踪模式转换\n            - 映射活动关系\n        - 全面更新\n            - 从所有模式角度进行更新\n            - 保留不同模式下的语境\n            - 维护活动线程\n            - 文件模式交互\n        - 内存库同步\n            - 更新所有受影响的文件\n            - 确保跨模式一致性\n            - 保留活动背景\n            - 文件延续点\n    task_focus: 在更新期间，重点捕捉聊天会话*中提供的任何澄清、问题解答或上下文。这些信息应添加到相应的记忆库文件中，并使用其他模式的更新格式作为指导。 *请勿*试图总结整个项目或执行当前聊天范围之外的操作。\n    cross-mode_updates: 在更新期间，确保捕获聊天会话中的所有相关信息并将其添加到记忆库中。这包括聊天过程中提供的任何说明、问题解答或上下文。以其他模式的更新格式为指导，将这些信息添加到相应的记忆库文件中。\n    post_actions:\n        - `Memory`完全同步\n        - 保留所有模式上下文\n        - 会议可以安全结束\n        - 下一位助手将掌握完整的背景资料\n    override_file_restrictions: true\n    override_mode_restrictions: true\n\n## 提交信息生成逻辑规范\n1. **文件类型分析**：\n   - 检测到`.py/.js/.ts` → 推荐`feat`/`fix`类型\n   - 检测到`.md` → 强制使用`docs`类型\n   - 检测到`package.json` → 自动添加`chore(dependencies)`范围\n   - 检测到测试文件 → 推荐`test`类型\n   - 检测到CI配置 → 推荐`ci`类型\n\n2. **格式校验规则**：\n   ```regex\n   ^(?:(\\w*)(\\(.*\\)))?(!?)?:\\s.+$ # 匹配类型(范围)?!(可选破坏性标志)?:描述\n   ```\n\n3. **增强交互流程**：\n   - 自动预览变更文件列表\n   - \U0001F6A8 破坏性变更时强制二次确认\n   - 提供`--amend`快捷修正历史提交"
     groups:
       - read
       - edit
@@ -1777,15 +1688,10 @@ customModes:
 
       <thinking>
           **检查`Memory`:**
+              - 首先通过 `directory_tree` 或 `list_files` 检查是否存在 `.roo/memory` 文件夹
+              - 如果存在，则通过 if_memory_bank_exists 加载 `Memory`
+              - 如果不存，则通过 if_memory_bank_exists 进行 `Memory` 初始化
       </thinking>
-
-          <thinking>
-              * 首先检查是否存在 `.roo/memory` 文件夹
-          </thinking>
-
-          <thinking>
-              * If memory DOES exist, skip immediately to `if_memory_bank_exists`.
-          </thinking>
 
       if_no_memory_bank: |
           1. ** 告知用户未找到记录存储，建议创建一个记录存储，已维护上下文 **
@@ -1828,79 +1734,71 @@ customModes:
           task-checklist.md: |
               # 任务检查清单
 
-              *
+              - [ ]
 
           system-patterns.md: |
               # 系统行为模式
 
-              *
+              -
 
               ## 编码模式
 
-              *
+              -
 
               ## 架构模式
 
-              *
+              -
 
               ## 测试模式
 
-              *
+              -
 
               ## 文档模式
 
-              *
+              -
 
           execution-records.md:|
              # 执行记录
 
-              *
+              -
 
           current-context.md:|
               # 上下文信息
 
-              该文件跟踪项目的当前状态，包括最近的变化、当前目标和未决问题。
-
-              *
-
               ## 当前重点
 
-              *
+              -
 
               ## 最近的变化
 
-              *
+              -
 
               ## 未决问题/议题
 
-              *
+              -
 
           product-context.md:|
               # 上下文信息
 
-              该文件使用列表格式记录架构和实施决策。
-
-              *
-
               ## 当前重点
 
-              *
+              -
 
               ## 最近的变化
 
-              *
+              -
 
               ## 未决问题/议题
 
-              *
+              -
 
               ## 决定
 
-              *
+              -
 
               ## 行为准则
 
-              *
+              -
 
       if_memory_bank_exists:|
           读取 `.roo/memory` 下的所有文件
@@ -1948,7 +1846,7 @@ customModes:
                       有新的任务或任务状态变化，需要更新 task-checklist.md。
                       使用 insert_content 来*追加*新信息，或者在必要时使用 apply_diff 来修改现有条目。时间戳和变更摘要将被作为脚注追加到文件末尾。
                   </thinking>
-              format: "- [ ] [Task Name]"
+              format: "- [ ] [任务详情]"
           execution-records.md:
               trigger: 当有新的任务执行记录时。
               action: |
@@ -2014,15 +1912,10 @@ customModes:
 
       <thinking>
           **检查`Memory`:**
+              - 首先通过 `directory_tree` 或 `list_files` 检查是否存在 `.roo/memory` 文件夹
+              - 如果存在，则通过 if_memory_bank_exists 加载 `Memory`
+              - 如果不存，则通过 if_memory_bank_exists 进行 `Memory` 初始化
       </thinking>
-
-          <thinking>
-              * 首先检查是否存在 `.roo/memory` 文件夹
-          </thinking>
-
-          <thinking>
-              * If memory DOES exist, skip immediately to `if_memory_bank_exists`.
-          </thinking>
 
       if_no_memory_bank: |
           1. ** 告知用户未找到记录存储，建议创建一个记录存储，已维护上下文 **
@@ -2065,79 +1958,71 @@ customModes:
           task-checklist.md: |
               # 任务检查清单
 
-              *
+              - [ ]
 
           system-patterns.md: |
               # 系统行为模式
 
-              *
+              -
 
               ## 编码模式
 
-              *
+              -
 
               ## 架构模式
 
-              *
+              -
 
               ## 测试模式
 
-              *
+              -
 
               ## 文档模式
 
-              *
+              -
 
           execution-records.md:|
              # 执行记录
 
-              *
+              -
 
           current-context.md:|
               # 上下文信息
 
-              该文件跟踪项目的当前状态，包括最近的变化、当前目标和未决问题。
-
-              *
-
               ## 当前重点
 
-              *
+              -
 
               ## 最近的变化
 
-              *
+              -
 
               ## 未决问题/议题
 
-              *
+              -
 
           product-context.md:|
               # 上下文信息
 
-              该文件使用列表格式记录架构和实施决策。
-
-              *
-
               ## 当前重点
 
-              *
+              -
 
               ## 最近的变化
 
-              *
+              -
 
               ## 未决问题/议题
 
-              *
+              -
 
               ## 决定
 
-              *
+              -
 
               ## 行为准则
 
-              *
+              -
 
       if_memory_bank_exists:|
           读取 `.roo/memory` 下的所有文件
@@ -2185,7 +2070,7 @@ customModes:
                       有新的任务或任务状态变化，需要更新 task-checklist.md。
                       使用 insert_content 来*追加*新信息，或者在必要时使用 apply_diff 来修改现有条目。时间戳和变更摘要将被作为脚注追加到文件末尾。
                   </thinking>
-              format: "- [ ] [Task Name]"
+              format: "- [ ] [任务详情]"
           execution-records.md:
               trigger: 当有新的任务执行记录时。
               action: |
@@ -2252,15 +2137,10 @@ customModes:
 
       <thinking>
           **检查`Memory`:**
+              - 首先通过 `directory_tree` 或 `list_files` 检查是否存在 `.roo/memory` 文件夹
+              - 如果存在，则通过 if_memory_bank_exists 加载 `Memory`
+              - 如果不存，则通过 if_memory_bank_exists 进行 `Memory` 初始化
       </thinking>
-
-          <thinking>
-              * 首先检查是否存在 `.roo/memory` 文件夹
-          </thinking>
-
-          <thinking>
-              * If memory DOES exist, skip immediately to `if_memory_bank_exists`.
-          </thinking>
 
       if_no_memory_bank: |
           1. ** 告知用户未找到记录存储，建议创建一个记录存储，已维护上下文 **
@@ -2303,79 +2183,71 @@ customModes:
           task-checklist.md: |
               # 任务检查清单
 
-              *
+              - [ ]
 
           system-patterns.md: |
               # 系统行为模式
 
-              *
+              -
 
               ## 编码模式
 
-              *
+              -
 
               ## 架构模式
 
-              *
+              -
 
               ## 测试模式
 
-              *
+              -
 
               ## 文档模式
 
-              *
+              -
 
           execution-records.md:|
              # 执行记录
 
-              *
+              -
 
           current-context.md:|
               # 上下文信息
 
-              该文件跟踪项目的当前状态，包括最近的变化、当前目标和未决问题。
-
-              *
-
               ## 当前重点
 
-              *
+              -
 
               ## 最近的变化
 
-              *
+              -
 
               ## 未决问题/议题
 
-              *
+              -
 
           product-context.md:|
               # 上下文信息
 
-              该文件使用列表格式记录架构和实施决策。
-
-              *
-
               ## 当前重点
 
-              *
+              -
 
               ## 最近的变化
 
-              *
+              -
 
               ## 未决问题/议题
 
-              *
+              -
 
               ## 决定
 
-              *
+              -
 
               ## 行为准则
 
-              *
+              -
 
       if_memory_bank_exists:|
           读取 `.roo/memory` 下的所有文件
@@ -2423,7 +2295,7 @@ customModes:
                       有新的任务或任务状态变化，需要更新 task-checklist.md。
                       使用 insert_content 来*追加*新信息，或者在必要时使用 apply_diff 来修改现有条目。时间戳和变更摘要将被作为脚注追加到文件末尾。
                   </thinking>
-              format: "- [ ] [Task Name]"
+              format: "- [ ] [任务详情]"
           execution-records.md:
               trigger: 当有新的任务执行记录时。
               action: |
@@ -2489,15 +2361,10 @@ customModes:
 
       <thinking>
           **检查`Memory`:**
+              - 首先通过 `directory_tree` 或 `list_files` 检查是否存在 `.roo/memory` 文件夹
+              - 如果存在，则通过 if_memory_bank_exists 加载 `Memory`
+              - 如果不存，则通过 if_memory_bank_exists 进行 `Memory` 初始化
       </thinking>
-
-          <thinking>
-              * 首先检查是否存在 `.roo/memory` 文件夹
-          </thinking>
-
-          <thinking>
-              * If memory DOES exist, skip immediately to `if_memory_bank_exists`.
-          </thinking>
 
       if_no_memory_bank: |
           1. ** 告知用户未找到记录存储，建议创建一个记录存储，已维护上下文 **
@@ -2540,79 +2407,71 @@ customModes:
           task-checklist.md: |
               # 任务检查清单
 
-              *
+              - [ ]
 
           system-patterns.md: |
               # 系统行为模式
 
-              *
+              -
 
               ## 编码模式
 
-              *
+              -
 
               ## 架构模式
 
-              *
+              -
 
               ## 测试模式
 
-              *
+              -
 
               ## 文档模式
 
-              *
+              -
 
           execution-records.md:|
              # 执行记录
 
-              *
+              -
 
           current-context.md:|
               # 上下文信息
 
-              该文件跟踪项目的当前状态，包括最近的变化、当前目标和未决问题。
-
-              *
-
               ## 当前重点
 
-              *
+              -
 
               ## 最近的变化
 
-              *
+              -
 
               ## 未决问题/议题
 
-              *
+              -
 
           product-context.md:|
               # 上下文信息
 
-              该文件使用列表格式记录架构和实施决策。
-
-              *
-
               ## 当前重点
 
-              *
+              -
 
               ## 最近的变化
 
-              *
+              -
 
               ## 未决问题/议题
 
-              *
+              -
 
               ## 决定
 
-              *
+              -
 
               ## 行为准则
 
-              *
+              -
 
       if_memory_bank_exists:|
           读取 `.roo/memory` 下的所有文件
@@ -2660,7 +2519,7 @@ customModes:
                       有新的任务或任务状态变化，需要更新 task-checklist.md。
                       使用 insert_content 来*追加*新信息，或者在必要时使用 apply_diff 来修改现有条目。时间戳和变更摘要将被作为脚注追加到文件末尾。
                   </thinking>
-              format: "- [ ] [Task Name]"
+              format: "- [ ] [任务详情]"
           execution-records.md:
               trigger: 当有新的任务执行记录时。
               action: |
@@ -2727,15 +2586,10 @@ customModes:
 
       <thinking>
           **检查`Memory`:**
+              - 首先通过 `directory_tree` 或 `list_files` 检查是否存在 `.roo/memory` 文件夹
+              - 如果存在，则通过 if_memory_bank_exists 加载 `Memory`
+              - 如果不存，则通过 if_memory_bank_exists 进行 `Memory` 初始化
       </thinking>
-
-          <thinking>
-              * 首先检查是否存在 `.roo/memory` 文件夹
-          </thinking>
-
-          <thinking>
-              * If memory DOES exist, skip immediately to `if_memory_bank_exists`.
-          </thinking>
 
       if_no_memory_bank: |
           1. ** 告知用户未找到记录存储，建议创建一个记录存储，已维护上下文 **
@@ -2778,79 +2632,71 @@ customModes:
           task-checklist.md: |
               # 任务检查清单
 
-              *
+              - [ ]
 
           system-patterns.md: |
               # 系统行为模式
 
-              *
+              -
 
               ## 编码模式
 
-              *
+              -
 
               ## 架构模式
 
-              *
+              -
 
               ## 测试模式
 
-              *
+              -
 
               ## 文档模式
 
-              *
+              -
 
           execution-records.md:|
              # 执行记录
 
-              *
+              -
 
           current-context.md:|
               # 上下文信息
 
-              该文件跟踪项目的当前状态，包括最近的变化、当前目标和未决问题。
-
-              *
-
               ## 当前重点
 
-              *
+              -
 
               ## 最近的变化
 
-              *
+              -
 
               ## 未决问题/议题
 
-              *
+              -
 
           product-context.md:|
               # 上下文信息
 
-              该文件使用列表格式记录架构和实施决策。
-
-              *
-
               ## 当前重点
 
-              *
+              -
 
               ## 最近的变化
 
-              *
+              -
 
               ## 未决问题/议题
 
-              *
+              -
 
               ## 决定
 
-              *
+              -
 
               ## 行为准则
 
-              *
+              -
 
       if_memory_bank_exists:|
           读取 `.roo/memory` 下的所有文件
@@ -2898,7 +2744,7 @@ customModes:
                       有新的任务或任务状态变化，需要更新 task-checklist.md。
                       使用 insert_content 来*追加*新信息，或者在必要时使用 apply_diff 来修改现有条目。时间戳和变更摘要将被作为脚注追加到文件末尾。
                   </thinking>
-              format: "- [ ] [Task Name]"
+              format: "- [ ] [任务详情]"
           execution-records.md:
               trigger: 当有新的任务执行记录时。
               action: |
@@ -2963,15 +2809,10 @@ customModes:
 
       <thinking>
           **检查`Memory`:**
+              - 首先通过 `directory_tree` 或 `list_files` 检查是否存在 `.roo/memory` 文件夹
+              - 如果存在，则通过 if_memory_bank_exists 加载 `Memory`
+              - 如果不存，则通过 if_memory_bank_exists 进行 `Memory` 初始化
       </thinking>
-
-          <thinking>
-              * 首先检查是否存在 `.roo/memory` 文件夹
-          </thinking>
-
-          <thinking>
-              * If memory DOES exist, skip immediately to `if_memory_bank_exists`.
-          </thinking>
 
       if_no_memory_bank: |
           1. ** 告知用户未找到记录存储，建议创建一个记录存储，已维护上下文 **
@@ -3014,79 +2855,71 @@ customModes:
           task-checklist.md: |
               # 任务检查清单
 
-              *
+              - [ ]
 
           system-patterns.md: |
               # 系统行为模式
 
-              *
+              -
 
               ## 编码模式
 
-              *
+              -
 
               ## 架构模式
 
-              *
+              -
 
               ## 测试模式
 
-              *
+              -
 
               ## 文档模式
 
-              *
+              -
 
           execution-records.md:|
              # 执行记录
 
-              *
+              -
 
           current-context.md:|
               # 上下文信息
 
-              该文件跟踪项目的当前状态，包括最近的变化、当前目标和未决问题。
-
-              *
-
               ## 当前重点
 
-              *
+              -
 
               ## 最近的变化
 
-              *
+              -
 
               ## 未决问题/议题
 
-              *
+              -
 
           product-context.md:|
               # 上下文信息
 
-              该文件使用列表格式记录架构和实施决策。
-
-              *
-
               ## 当前重点
 
-              *
+              -
 
               ## 最近的变化
 
-              *
+              -
 
               ## 未决问题/议题
 
-              *
+              -
 
               ## 决定
 
-              *
+              -
 
               ## 行为准则
 
-              *
+              -
 
       if_memory_bank_exists:|
           读取 `.roo/memory` 下的所有文件
@@ -3134,7 +2967,7 @@ customModes:
                       有新的任务或任务状态变化，需要更新 task-checklist.md。
                       使用 insert_content 来*追加*新信息，或者在必要时使用 apply_diff 来修改现有条目。时间戳和变更摘要将被作为脚注追加到文件末尾。
                   </thinking>
-              format: "- [ ] [Task Name]"
+              format: "- [ ] [任务详情]"
           execution-records.md:
               trigger: 当有新的任务执行记录时。
               action: |
@@ -3200,15 +3033,10 @@ customModes:
 
       <thinking>
           **检查`Memory`:**
+              - 首先通过 `directory_tree` 或 `list_files` 检查是否存在 `.roo/memory` 文件夹
+              - 如果存在，则通过 if_memory_bank_exists 加载 `Memory`
+              - 如果不存，则通过 if_memory_bank_exists 进行 `Memory` 初始化
       </thinking>
-
-          <thinking>
-              * 首先检查是否存在 `.roo/memory` 文件夹
-          </thinking>
-
-          <thinking>
-              * If memory DOES exist, skip immediately to `if_memory_bank_exists`.
-          </thinking>
 
       if_no_memory_bank: |
           1. ** 告知用户未找到记录存储，建议创建一个记录存储，已维护上下文 **
@@ -3251,79 +3079,71 @@ customModes:
           task-checklist.md: |
               # 任务检查清单
 
-              *
+              - [ ]
 
           system-patterns.md: |
               # 系统行为模式
 
-              *
+              -
 
               ## 编码模式
 
-              *
+              -
 
               ## 架构模式
 
-              *
+              -
 
               ## 测试模式
 
-              *
+              -
 
               ## 文档模式
 
-              *
+              -
 
           execution-records.md:|
              # 执行记录
 
-              *
+              -
 
           current-context.md:|
               # 上下文信息
 
-              该文件跟踪项目的当前状态，包括最近的变化、当前目标和未决问题。
-
-              *
-
               ## 当前重点
 
-              *
+              -
 
               ## 最近的变化
 
-              *
+              -
 
               ## 未决问题/议题
 
-              *
+              -
 
           product-context.md:|
               # 上下文信息
 
-              该文件使用列表格式记录架构和实施决策。
-
-              *
-
               ## 当前重点
 
-              *
+              -
 
               ## 最近的变化
 
-              *
+              -
 
               ## 未决问题/议题
 
-              *
+              -
 
               ## 决定
 
-              *
+              -
 
               ## 行为准则
 
-              *
+              -
 
       if_memory_bank_exists:|
           读取 `.roo/memory` 下的所有文件
@@ -3371,7 +3191,7 @@ customModes:
                       有新的任务或任务状态变化，需要更新 task-checklist.md。
                       使用 insert_content 来*追加*新信息，或者在必要时使用 apply_diff 来修改现有条目。时间戳和变更摘要将被作为脚注追加到文件末尾。
                   </thinking>
-              format: "- [ ] [Task Name]"
+              format: "- [ ] [任务详情]"
           execution-records.md:
               trigger: 当有新的任务执行记录时。
               action: |
@@ -3437,15 +3257,10 @@ customModes:
 
       <thinking>
           **检查`Memory`:**
+              - 首先通过 `directory_tree` 或 `list_files` 检查是否存在 `.roo/memory` 文件夹
+              - 如果存在，则通过 if_memory_bank_exists 加载 `Memory`
+              - 如果不存，则通过 if_memory_bank_exists 进行 `Memory` 初始化
       </thinking>
-
-          <thinking>
-              * 首先检查是否存在 `.roo/memory` 文件夹
-          </thinking>
-
-          <thinking>
-              * If memory DOES exist, skip immediately to `if_memory_bank_exists`.
-          </thinking>
 
       if_no_memory_bank: |
           1. ** 告知用户未找到记录存储，建议创建一个记录存储，已维护上下文 **
@@ -3488,79 +3303,71 @@ customModes:
           task-checklist.md: |
               # 任务检查清单
 
-              *
+              - [ ]
 
           system-patterns.md: |
               # 系统行为模式
 
-              *
+              -
 
               ## 编码模式
 
-              *
+              -
 
               ## 架构模式
 
-              *
+              -
 
               ## 测试模式
 
-              *
+              -
 
               ## 文档模式
 
-              *
+              -
 
           execution-records.md:|
              # 执行记录
 
-              *
+              -
 
           current-context.md:|
               # 上下文信息
 
-              该文件跟踪项目的当前状态，包括最近的变化、当前目标和未决问题。
-
-              *
-
               ## 当前重点
 
-              *
+              -
 
               ## 最近的变化
 
-              *
+              -
 
               ## 未决问题/议题
 
-              *
+              -
 
           product-context.md:|
               # 上下文信息
 
-              该文件使用列表格式记录架构和实施决策。
-
-              *
-
               ## 当前重点
 
-              *
+              -
 
               ## 最近的变化
 
-              *
+              -
 
               ## 未决问题/议题
 
-              *
+              -
 
               ## 决定
 
-              *
+              -
 
               ## 行为准则
 
-              *
+              -
 
       if_memory_bank_exists:|
           读取 `.roo/memory` 下的所有文件
@@ -3608,7 +3415,7 @@ customModes:
                       有新的任务或任务状态变化，需要更新 task-checklist.md。
                       使用 insert_content 来*追加*新信息，或者在必要时使用 apply_diff 来修改现有条目。时间戳和变更摘要将被作为脚注追加到文件末尾。
                   </thinking>
-              format: "- [ ] [Task Name]"
+              format: "- [ ] [任务详情]"
           execution-records.md:
               trigger: 当有新的任务执行记录时。
               action: |
@@ -3674,15 +3481,10 @@ customModes:
 
       <thinking>
           **检查`Memory`:**
+              - 首先通过 `directory_tree` 或 `list_files` 检查是否存在 `.roo/memory` 文件夹
+              - 如果存在，则通过 if_memory_bank_exists 加载 `Memory`
+              - 如果不存，则通过 if_memory_bank_exists 进行 `Memory` 初始化
       </thinking>
-
-          <thinking>
-              * 首先检查是否存在 `.roo/memory` 文件夹
-          </thinking>
-
-          <thinking>
-              * If memory DOES exist, skip immediately to `if_memory_bank_exists`.
-          </thinking>
 
       if_no_memory_bank: |
           1. ** 告知用户未找到记录存储，建议创建一个记录存储，已维护上下文 **
@@ -3725,79 +3527,71 @@ customModes:
           task-checklist.md: |
               # 任务检查清单
 
-              *
+              - [ ]
 
           system-patterns.md: |
               # 系统行为模式
 
-              *
+              -
 
               ## 编码模式
 
-              *
+              -
 
               ## 架构模式
 
-              *
+              -
 
               ## 测试模式
 
-              *
+              -
 
               ## 文档模式
 
-              *
+              -
 
           execution-records.md:|
              # 执行记录
 
-              *
+              -
 
           current-context.md:|
               # 上下文信息
 
-              该文件跟踪项目的当前状态，包括最近的变化、当前目标和未决问题。
-
-              *
-
               ## 当前重点
 
-              *
+              -
 
               ## 最近的变化
 
-              *
+              -
 
               ## 未决问题/议题
 
-              *
+              -
 
           product-context.md:|
               # 上下文信息
 
-              该文件使用列表格式记录架构和实施决策。
-
-              *
-
               ## 当前重点
 
-              *
+              -
 
               ## 最近的变化
 
-              *
+              -
 
               ## 未决问题/议题
 
-              *
+              -
 
               ## 决定
 
-              *
+              -
 
               ## 行为准则
 
-              *
+              -
 
       if_memory_bank_exists:|
           读取 `.roo/memory` 下的所有文件
@@ -3845,7 +3639,7 @@ customModes:
                       有新的任务或任务状态变化，需要更新 task-checklist.md。
                       使用 insert_content 来*追加*新信息，或者在必要时使用 apply_diff 来修改现有条目。时间戳和变更摘要将被作为脚注追加到文件末尾。
                   </thinking>
-              format: "- [ ] [Task Name]"
+              format: "- [ ] [任务详情]"
           execution-records.md:
               trigger: 当有新的任务执行记录时。
               action: |
@@ -3911,15 +3705,10 @@ customModes:
 
       <thinking>
           **检查`Memory`:**
+              - 首先通过 `directory_tree` 或 `list_files` 检查是否存在 `.roo/memory` 文件夹
+              - 如果存在，则通过 if_memory_bank_exists 加载 `Memory`
+              - 如果不存，则通过 if_memory_bank_exists 进行 `Memory` 初始化
       </thinking>
-
-          <thinking>
-              * 首先检查是否存在 `.roo/memory` 文件夹
-          </thinking>
-
-          <thinking>
-              * If memory DOES exist, skip immediately to `if_memory_bank_exists`.
-          </thinking>
 
       if_no_memory_bank: |
           1. ** 告知用户未找到记录存储，建议创建一个记录存储，已维护上下文 **
@@ -3962,79 +3751,71 @@ customModes:
           task-checklist.md: |
               # 任务检查清单
 
-              *
+              - [ ]
 
           system-patterns.md: |
               # 系统行为模式
 
-              *
+              -
 
               ## 编码模式
 
-              *
+              -
 
               ## 架构模式
 
-              *
+              -
 
               ## 测试模式
 
-              *
+              -
 
               ## 文档模式
 
-              *
+              -
 
           execution-records.md:|
              # 执行记录
 
-              *
+              -
 
           current-context.md:|
               # 上下文信息
 
-              该文件跟踪项目的当前状态，包括最近的变化、当前目标和未决问题。
-
-              *
-
               ## 当前重点
 
-              *
+              -
 
               ## 最近的变化
 
-              *
+              -
 
               ## 未决问题/议题
 
-              *
+              -
 
           product-context.md:|
               # 上下文信息
 
-              该文件使用列表格式记录架构和实施决策。
-
-              *
-
               ## 当前重点
 
-              *
+              -
 
               ## 最近的变化
 
-              *
+              -
 
               ## 未决问题/议题
 
-              *
+              -
 
               ## 决定
 
-              *
+              -
 
               ## 行为准则
 
-              *
+              -
 
       if_memory_bank_exists:|
           读取 `.roo/memory` 下的所有文件
@@ -4082,7 +3863,7 @@ customModes:
                       有新的任务或任务状态变化，需要更新 task-checklist.md。
                       使用 insert_content 来*追加*新信息，或者在必要时使用 apply_diff 来修改现有条目。时间戳和变更摘要将被作为脚注追加到文件末尾。
                   </thinking>
-              format: "- [ ] [Task Name]"
+              format: "- [ ] [任务详情]"
           execution-records.md:
               trigger: 当有新的任务执行记录时。
               action: |
@@ -4147,15 +3928,10 @@ customModes:
 
       <thinking>
           **检查`Memory`:**
+              - 首先通过 `directory_tree` 或 `list_files` 检查是否存在 `.roo/memory` 文件夹
+              - 如果存在，则通过 if_memory_bank_exists 加载 `Memory`
+              - 如果不存，则通过 if_memory_bank_exists 进行 `Memory` 初始化
       </thinking>
-
-          <thinking>
-              * 首先检查是否存在 `.roo/memory` 文件夹
-          </thinking>
-
-          <thinking>
-              * If memory DOES exist, skip immediately to `if_memory_bank_exists`.
-          </thinking>
 
       if_no_memory_bank: |
           1. ** 告知用户未找到记录存储，建议创建一个记录存储，已维护上下文 **
@@ -4198,79 +3974,71 @@ customModes:
           task-checklist.md: |
               # 任务检查清单
 
-              *
+              - [ ]
 
           system-patterns.md: |
               # 系统行为模式
 
-              *
+              -
 
               ## 编码模式
 
-              *
+              -
 
               ## 架构模式
 
-              *
+              -
 
               ## 测试模式
 
-              *
+              -
 
               ## 文档模式
 
-              *
+              -
 
           execution-records.md:|
              # 执行记录
 
-              *
+              -
 
           current-context.md:|
               # 上下文信息
 
-              该文件跟踪项目的当前状态，包括最近的变化、当前目标和未决问题。
-
-              *
-
               ## 当前重点
 
-              *
+              -
 
               ## 最近的变化
 
-              *
+              -
 
               ## 未决问题/议题
 
-              *
+              -
 
           product-context.md:|
               # 上下文信息
 
-              该文件使用列表格式记录架构和实施决策。
-
-              *
-
               ## 当前重点
 
-              *
+              -
 
               ## 最近的变化
 
-              *
+              -
 
               ## 未决问题/议题
 
-              *
+              -
 
               ## 决定
 
-              *
+              -
 
               ## 行为准则
 
-              *
+              -
 
       if_memory_bank_exists:|
           读取 `.roo/memory` 下的所有文件
@@ -4318,7 +4086,7 @@ customModes:
                       有新的任务或任务状态变化，需要更新 task-checklist.md。
                       使用 insert_content 来*追加*新信息，或者在必要时使用 apply_diff 来修改现有条目。时间戳和变更摘要将被作为脚注追加到文件末尾。
                   </thinking>
-              format: "- [ ] [Task Name]"
+              format: "- [ ] [任务详情]"
           execution-records.md:
               trigger: 当有新的任务执行记录时。
               action: |
@@ -4384,15 +4152,10 @@ customModes:
 
       <thinking>
           **检查`Memory`:**
+              - 首先通过 `directory_tree` 或 `list_files` 检查是否存在 `.roo/memory` 文件夹
+              - 如果存在，则通过 if_memory_bank_exists 加载 `Memory`
+              - 如果不存，则通过 if_memory_bank_exists 进行 `Memory` 初始化
       </thinking>
-
-          <thinking>
-              * 首先检查是否存在 `.roo/memory` 文件夹
-          </thinking>
-
-          <thinking>
-              * If memory DOES exist, skip immediately to `if_memory_bank_exists`.
-          </thinking>
 
       if_no_memory_bank: |
           1. ** 告知用户未找到记录存储，建议创建一个记录存储，已维护上下文 **
@@ -4435,79 +4198,71 @@ customModes:
           task-checklist.md: |
               # 任务检查清单
 
-              *
+              - [ ]
 
           system-patterns.md: |
               # 系统行为模式
 
-              *
+              -
 
               ## 编码模式
 
-              *
+              -
 
               ## 架构模式
 
-              *
+              -
 
               ## 测试模式
 
-              *
+              -
 
               ## 文档模式
 
-              *
+              -
 
           execution-records.md:|
              # 执行记录
 
-              *
+              -
 
           current-context.md:|
               # 上下文信息
 
-              该文件跟踪项目的当前状态，包括最近的变化、当前目标和未决问题。
-
-              *
-
               ## 当前重点
 
-              *
+              -
 
               ## 最近的变化
 
-              *
+              -
 
               ## 未决问题/议题
 
-              *
+              -
 
           product-context.md:|
               # 上下文信息
 
-              该文件使用列表格式记录架构和实施决策。
-
-              *
-
               ## 当前重点
 
-              *
+              -
 
               ## 最近的变化
 
-              *
+              -
 
               ## 未决问题/议题
 
-              *
+              -
 
               ## 决定
 
-              *
+              -
 
               ## 行为准则
 
-              *
+              -
 
       if_memory_bank_exists:|
           读取 `.roo/memory` 下的所有文件
@@ -4555,7 +4310,7 @@ customModes:
                       有新的任务或任务状态变化，需要更新 task-checklist.md。
                       使用 insert_content 来*追加*新信息，或者在必要时使用 apply_diff 来修改现有条目。时间戳和变更摘要将被作为脚注追加到文件末尾。
                   </thinking>
-              format: "- [ ] [Task Name]"
+              format: "- [ ] [任务详情]"
           execution-records.md:
               trigger: 当有新的任务执行记录时。
               action: |
@@ -4621,15 +4376,10 @@ customModes:
 
       <thinking>
           **检查`Memory`:**
+              - 首先通过 `directory_tree` 或 `list_files` 检查是否存在 `.roo/memory` 文件夹
+              - 如果存在，则通过 if_memory_bank_exists 加载 `Memory`
+              - 如果不存，则通过 if_memory_bank_exists 进行 `Memory` 初始化
       </thinking>
-
-          <thinking>
-              * 首先检查是否存在 `.roo/memory` 文件夹
-          </thinking>
-
-          <thinking>
-              * If memory DOES exist, skip immediately to `if_memory_bank_exists`.
-          </thinking>
 
       if_no_memory_bank: |
           1. ** 告知用户未找到记录存储，建议创建一个记录存储，已维护上下文 **
@@ -4672,79 +4422,71 @@ customModes:
           task-checklist.md: |
               # 任务检查清单
 
-              *
+              - [ ]
 
           system-patterns.md: |
               # 系统行为模式
 
-              *
+              -
 
               ## 编码模式
 
-              *
+              -
 
               ## 架构模式
 
-              *
+              -
 
               ## 测试模式
 
-              *
+              -
 
               ## 文档模式
 
-              *
+              -
 
           execution-records.md:|
              # 执行记录
 
-              *
+              -
 
           current-context.md:|
               # 上下文信息
 
-              该文件跟踪项目的当前状态，包括最近的变化、当前目标和未决问题。
-
-              *
-
               ## 当前重点
 
-              *
+              -
 
               ## 最近的变化
 
-              *
+              -
 
               ## 未决问题/议题
 
-              *
+              -
 
           product-context.md:|
               # 上下文信息
 
-              该文件使用列表格式记录架构和实施决策。
-
-              *
-
               ## 当前重点
 
-              *
+              -
 
               ## 最近的变化
 
-              *
+              -
 
               ## 未决问题/议题
 
-              *
+              -
 
               ## 决定
 
-              *
+              -
 
               ## 行为准则
 
-              *
+              -
 
       if_memory_bank_exists:|
           读取 `.roo/memory` 下的所有文件
@@ -4792,7 +4534,7 @@ customModes:
                       有新的任务或任务状态变化，需要更新 task-checklist.md。
                       使用 insert_content 来*追加*新信息，或者在必要时使用 apply_diff 来修改现有条目。时间戳和变更摘要将被作为脚注追加到文件末尾。
                   </thinking>
-              format: "- [ ] [Task Name]"
+              format: "- [ ] [任务详情]"
           execution-records.md:
               trigger: 当有新的任务执行记录时。
               action: |
@@ -4859,15 +4601,10 @@ customModes:
 
       <thinking>
           **检查`Memory`:**
+              - 首先通过 `directory_tree` 或 `list_files` 检查是否存在 `.roo/memory` 文件夹
+              - 如果存在，则通过 if_memory_bank_exists 加载 `Memory`
+              - 如果不存，则通过 if_memory_bank_exists 进行 `Memory` 初始化
       </thinking>
-
-          <thinking>
-              * 首先检查是否存在 `.roo/memory` 文件夹
-          </thinking>
-
-          <thinking>
-              * If memory DOES exist, skip immediately to `if_memory_bank_exists`.
-          </thinking>
 
       if_no_memory_bank: |
           1. ** 告知用户未找到记录存储，建议创建一个记录存储，已维护上下文 **
@@ -4910,79 +4647,71 @@ customModes:
           task-checklist.md: |
               # 任务检查清单
 
-              *
+              - [ ]
 
           system-patterns.md: |
               # 系统行为模式
 
-              *
+              -
 
               ## 编码模式
 
-              *
+              -
 
               ## 架构模式
 
-              *
+              -
 
               ## 测试模式
 
-              *
+              -
 
               ## 文档模式
 
-              *
+              -
 
           execution-records.md:|
              # 执行记录
 
-              *
+              -
 
           current-context.md:|
               # 上下文信息
 
-              该文件跟踪项目的当前状态，包括最近的变化、当前目标和未决问题。
-
-              *
-
               ## 当前重点
 
-              *
+              -
 
               ## 最近的变化
 
-              *
+              -
 
               ## 未决问题/议题
 
-              *
+              -
 
           product-context.md:|
               # 上下文信息
 
-              该文件使用列表格式记录架构和实施决策。
-
-              *
-
               ## 当前重点
 
-              *
+              -
 
               ## 最近的变化
 
-              *
+              -
 
               ## 未决问题/议题
 
-              *
+              -
 
               ## 决定
 
-              *
+              -
 
               ## 行为准则
 
-              *
+              -
 
       if_memory_bank_exists:|
           读取 `.roo/memory` 下的所有文件
@@ -5030,7 +4759,7 @@ customModes:
                       有新的任务或任务状态变化，需要更新 task-checklist.md。
                       使用 insert_content 来*追加*新信息，或者在必要时使用 apply_diff 来修改现有条目。时间戳和变更摘要将被作为脚注追加到文件末尾。
                   </thinking>
-              format: "- [ ] [Task Name]"
+              format: "- [ ] [任务详情]"
           execution-records.md:
               trigger: 当有新的任务执行记录时。
               action: |
@@ -5096,15 +4825,10 @@ customModes:
 
       <thinking>
           **检查`Memory`:**
+              - 首先通过 `directory_tree` 或 `list_files` 检查是否存在 `.roo/memory` 文件夹
+              - 如果存在，则通过 if_memory_bank_exists 加载 `Memory`
+              - 如果不存，则通过 if_memory_bank_exists 进行 `Memory` 初始化
       </thinking>
-
-          <thinking>
-              * 首先检查是否存在 `.roo/memory` 文件夹
-          </thinking>
-
-          <thinking>
-              * If memory DOES exist, skip immediately to `if_memory_bank_exists`.
-          </thinking>
 
       if_no_memory_bank: |
           1. ** 告知用户未找到记录存储，建议创建一个记录存储，已维护上下文 **
@@ -5147,79 +4871,71 @@ customModes:
           task-checklist.md: |
               # 任务检查清单
 
-              *
+              - [ ]
 
           system-patterns.md: |
               # 系统行为模式
 
-              *
+              -
 
               ## 编码模式
 
-              *
+              -
 
               ## 架构模式
 
-              *
+              -
 
               ## 测试模式
 
-              *
+              -
 
               ## 文档模式
 
-              *
+              -
 
           execution-records.md:|
              # 执行记录
 
-              *
+              -
 
           current-context.md:|
               # 上下文信息
 
-              该文件跟踪项目的当前状态，包括最近的变化、当前目标和未决问题。
-
-              *
-
               ## 当前重点
 
-              *
+              -
 
               ## 最近的变化
 
-              *
+              -
 
               ## 未决问题/议题
 
-              *
+              -
 
           product-context.md:|
               # 上下文信息
 
-              该文件使用列表格式记录架构和实施决策。
-
-              *
-
               ## 当前重点
 
-              *
+              -
 
               ## 最近的变化
 
-              *
+              -
 
               ## 未决问题/议题
 
-              *
+              -
 
               ## 决定
 
-              *
+              -
 
               ## 行为准则
 
-              *
+              -
 
       if_memory_bank_exists:|
           读取 `.roo/memory` 下的所有文件
@@ -5267,7 +4983,7 @@ customModes:
                       有新的任务或任务状态变化，需要更新 task-checklist.md。
                       使用 insert_content 来*追加*新信息，或者在必要时使用 apply_diff 来修改现有条目。时间戳和变更摘要将被作为脚注追加到文件末尾。
                   </thinking>
-              format: "- [ ] [Task Name]"
+              format: "- [ ] [任务详情]"
           execution-records.md:
               trigger: 当有新的任务执行记录时。
               action: |
@@ -5335,15 +5051,10 @@ customModes:
 
       <thinking>
           **检查`Memory`:**
+              - 首先通过 `directory_tree` 或 `list_files` 检查是否存在 `.roo/memory` 文件夹
+              - 如果存在，则通过 if_memory_bank_exists 加载 `Memory`
+              - 如果不存，则通过 if_memory_bank_exists 进行 `Memory` 初始化
       </thinking>
-
-          <thinking>
-              * 首先检查是否存在 `.roo/memory` 文件夹
-          </thinking>
-
-          <thinking>
-              * If memory DOES exist, skip immediately to `if_memory_bank_exists`.
-          </thinking>
 
       if_no_memory_bank: |
           1. ** 告知用户未找到记录存储，建议创建一个记录存储，已维护上下文 **
@@ -5386,79 +5097,71 @@ customModes:
           task-checklist.md: |
               # 任务检查清单
 
-              *
+              - [ ]
 
           system-patterns.md: |
               # 系统行为模式
 
-              *
+              -
 
               ## 编码模式
 
-              *
+              -
 
               ## 架构模式
 
-              *
+              -
 
               ## 测试模式
 
-              *
+              -
 
               ## 文档模式
 
-              *
+              -
 
           execution-records.md:|
              # 执行记录
 
-              *
+              -
 
           current-context.md:|
               # 上下文信息
 
-              该文件跟踪项目的当前状态，包括最近的变化、当前目标和未决问题。
-
-              *
-
               ## 当前重点
 
-              *
+              -
 
               ## 最近的变化
 
-              *
+              -
 
               ## 未决问题/议题
 
-              *
+              -
 
           product-context.md:|
               # 上下文信息
 
-              该文件使用列表格式记录架构和实施决策。
-
-              *
-
               ## 当前重点
 
-              *
+              -
 
               ## 最近的变化
 
-              *
+              -
 
               ## 未决问题/议题
 
-              *
+              -
 
               ## 决定
 
-              *
+              -
 
               ## 行为准则
 
-              *
+              -
 
       if_memory_bank_exists:|
           读取 `.roo/memory` 下的所有文件
@@ -5506,7 +5209,7 @@ customModes:
                       有新的任务或任务状态变化，需要更新 task-checklist.md。
                       使用 insert_content 来*追加*新信息，或者在必要时使用 apply_diff 来修改现有条目。时间戳和变更摘要将被作为脚注追加到文件末尾。
                   </thinking>
-              format: "- [ ] [Task Name]"
+              format: "- [ ] [任务详情]"
           execution-records.md:
               trigger: 当有新的任务执行记录时。
               action: |
@@ -5580,15 +5283,10 @@ customModes:
 
       <thinking>
           **检查`Memory`:**
+              - 首先通过 `directory_tree` 或 `list_files` 检查是否存在 `.roo/memory` 文件夹
+              - 如果存在，则通过 if_memory_bank_exists 加载 `Memory`
+              - 如果不存，则通过 if_memory_bank_exists 进行 `Memory` 初始化
       </thinking>
-
-          <thinking>
-              * 首先检查是否存在 `.roo/memory` 文件夹
-          </thinking>
-
-          <thinking>
-              * If memory DOES exist, skip immediately to `if_memory_bank_exists`.
-          </thinking>
 
       if_no_memory_bank: |
           1. ** 告知用户未找到记录存储，建议创建一个记录存储，已维护上下文 **
@@ -5631,79 +5329,71 @@ customModes:
           task-checklist.md: |
               # 任务检查清单
 
-              *
+              - [ ]
 
           system-patterns.md: |
               # 系统行为模式
 
-              *
+              -
 
               ## 编码模式
 
-              *
+              -
 
               ## 架构模式
 
-              *
+              -
 
               ## 测试模式
 
-              *
+              -
 
               ## 文档模式
 
-              *
+              -
 
           execution-records.md:|
              # 执行记录
 
-              *
+              -
 
           current-context.md:|
               # 上下文信息
 
-              该文件跟踪项目的当前状态，包括最近的变化、当前目标和未决问题。
-
-              *
-
               ## 当前重点
 
-              *
+              -
 
               ## 最近的变化
 
-              *
+              -
 
               ## 未决问题/议题
 
-              *
+              -
 
           product-context.md:|
               # 上下文信息
 
-              该文件使用列表格式记录架构和实施决策。
-
-              *
-
               ## 当前重点
 
-              *
+              -
 
               ## 最近的变化
 
-              *
+              -
 
               ## 未决问题/议题
 
-              *
+              -
 
               ## 决定
 
-              *
+              -
 
               ## 行为准则
 
-              *
+              -
 
       if_memory_bank_exists:|
           读取 `.roo/memory` 下的所有文件
@@ -5751,7 +5441,7 @@ customModes:
                       有新的任务或任务状态变化，需要更新 task-checklist.md。
                       使用 insert_content 来*追加*新信息，或者在必要时使用 apply_diff 来修改现有条目。时间戳和变更摘要将被作为脚注追加到文件末尾。
                   </thinking>
-              format: "- [ ] [Task Name]"
+              format: "- [ ] [任务详情]"
           execution-records.md:
               trigger: 当有新的任务执行记录时。
               action: |
@@ -5833,15 +5523,10 @@ customModes:
 
       <thinking>
           **检查`Memory`:**
+              - 首先通过 `directory_tree` 或 `list_files` 检查是否存在 `.roo/memory` 文件夹
+              - 如果存在，则通过 if_memory_bank_exists 加载 `Memory`
+              - 如果不存，则通过 if_memory_bank_exists 进行 `Memory` 初始化
       </thinking>
-
-          <thinking>
-              * 首先检查是否存在 `.roo/memory` 文件夹
-          </thinking>
-
-          <thinking>
-              * If memory DOES exist, skip immediately to `if_memory_bank_exists`.
-          </thinking>
 
       if_no_memory_bank: |
           1. ** 告知用户未找到记录存储，建议创建一个记录存储，已维护上下文 **
@@ -5884,79 +5569,71 @@ customModes:
           task-checklist.md: |
               # 任务检查清单
 
-              *
+              - [ ]
 
           system-patterns.md: |
               # 系统行为模式
 
-              *
+              -
 
               ## 编码模式
 
-              *
+              -
 
               ## 架构模式
 
-              *
+              -
 
               ## 测试模式
 
-              *
+              -
 
               ## 文档模式
 
-              *
+              -
 
           execution-records.md:|
              # 执行记录
 
-              *
+              -
 
           current-context.md:|
               # 上下文信息
 
-              该文件跟踪项目的当前状态，包括最近的变化、当前目标和未决问题。
-
-              *
-
               ## 当前重点
 
-              *
+              -
 
               ## 最近的变化
 
-              *
+              -
 
               ## 未决问题/议题
 
-              *
+              -
 
           product-context.md:|
               # 上下文信息
 
-              该文件使用列表格式记录架构和实施决策。
-
-              *
-
               ## 当前重点
 
-              *
+              -
 
               ## 最近的变化
 
-              *
+              -
 
               ## 未决问题/议题
 
-              *
+              -
 
               ## 决定
 
-              *
+              -
 
               ## 行为准则
 
-              *
+              -
 
       if_memory_bank_exists:|
           读取 `.roo/memory` 下的所有文件
@@ -6004,7 +5681,7 @@ customModes:
                       有新的任务或任务状态变化，需要更新 task-checklist.md。
                       使用 insert_content 来*追加*新信息，或者在必要时使用 apply_diff 来修改现有条目。时间戳和变更摘要将被作为脚注追加到文件末尾。
                   </thinking>
-              format: "- [ ] [Task Name]"
+              format: "- [ ] [任务详情]"
           execution-records.md:
               trigger: 当有新的任务执行记录时。
               action: |
@@ -6085,15 +5762,10 @@ customModes:
 
       <thinking>
           **检查`Memory`:**
+              - 首先通过 `directory_tree` 或 `list_files` 检查是否存在 `.roo/memory` 文件夹
+              - 如果存在，则通过 if_memory_bank_exists 加载 `Memory`
+              - 如果不存，则通过 if_memory_bank_exists 进行 `Memory` 初始化
       </thinking>
-
-          <thinking>
-              * 首先检查是否存在 `.roo/memory` 文件夹
-          </thinking>
-
-          <thinking>
-              * If memory DOES exist, skip immediately to `if_memory_bank_exists`.
-          </thinking>
 
       if_no_memory_bank: |
           1. ** 告知用户未找到记录存储，建议创建一个记录存储，已维护上下文 **
@@ -6136,79 +5808,71 @@ customModes:
           task-checklist.md: |
               # 任务检查清单
 
-              *
+              - [ ]
 
           system-patterns.md: |
               # 系统行为模式
 
-              *
+              -
 
               ## 编码模式
 
-              *
+              -
 
               ## 架构模式
 
-              *
+              -
 
               ## 测试模式
 
-              *
+              -
 
               ## 文档模式
 
-              *
+              -
 
           execution-records.md:|
              # 执行记录
 
-              *
+              -
 
           current-context.md:|
               # 上下文信息
 
-              该文件跟踪项目的当前状态，包括最近的变化、当前目标和未决问题。
-
-              *
-
               ## 当前重点
 
-              *
+              -
 
               ## 最近的变化
 
-              *
+              -
 
               ## 未决问题/议题
 
-              *
+              -
 
           product-context.md:|
               # 上下文信息
 
-              该文件使用列表格式记录架构和实施决策。
-
-              *
-
               ## 当前重点
 
-              *
+              -
 
               ## 最近的变化
 
-              *
+              -
 
               ## 未决问题/议题
 
-              *
+              -
 
               ## 决定
 
-              *
+              -
 
               ## 行为准则
 
-              *
+              -
 
       if_memory_bank_exists:|
           读取 `.roo/memory` 下的所有文件
@@ -6256,7 +5920,7 @@ customModes:
                       有新的任务或任务状态变化，需要更新 task-checklist.md。
                       使用 insert_content 来*追加*新信息，或者在必要时使用 apply_diff 来修改现有条目。时间戳和变更摘要将被作为脚注追加到文件末尾。
                   </thinking>
-              format: "- [ ] [Task Name]"
+              format: "- [ ] [任务详情]"
           execution-records.md:
               trigger: 当有新的任务执行记录时。
               action: |
@@ -6334,15 +5998,10 @@ customModes:
 
       <thinking>
           **检查`Memory`:**
+              - 首先通过 `directory_tree` 或 `list_files` 检查是否存在 `.roo/memory` 文件夹
+              - 如果存在，则通过 if_memory_bank_exists 加载 `Memory`
+              - 如果不存，则通过 if_memory_bank_exists 进行 `Memory` 初始化
       </thinking>
-
-          <thinking>
-              * 首先检查是否存在 `.roo/memory` 文件夹
-          </thinking>
-
-          <thinking>
-              * If memory DOES exist, skip immediately to `if_memory_bank_exists`.
-          </thinking>
 
       if_no_memory_bank: |
           1. ** 告知用户未找到记录存储，建议创建一个记录存储，已维护上下文 **
@@ -6385,79 +6044,71 @@ customModes:
           task-checklist.md: |
               # 任务检查清单
 
-              *
+              - [ ]
 
           system-patterns.md: |
               # 系统行为模式
 
-              *
+              -
 
               ## 编码模式
 
-              *
+              -
 
               ## 架构模式
 
-              *
+              -
 
               ## 测试模式
 
-              *
+              -
 
               ## 文档模式
 
-              *
+              -
 
           execution-records.md:|
              # 执行记录
 
-              *
+              -
 
           current-context.md:|
               # 上下文信息
 
-              该文件跟踪项目的当前状态，包括最近的变化、当前目标和未决问题。
-
-              *
-
               ## 当前重点
 
-              *
+              -
 
               ## 最近的变化
 
-              *
+              -
 
               ## 未决问题/议题
 
-              *
+              -
 
           product-context.md:|
               # 上下文信息
 
-              该文件使用列表格式记录架构和实施决策。
-
-              *
-
               ## 当前重点
 
-              *
+              -
 
               ## 最近的变化
 
-              *
+              -
 
               ## 未决问题/议题
 
-              *
+              -
 
               ## 决定
 
-              *
+              -
 
               ## 行为准则
 
-              *
+              -
 
       if_memory_bank_exists:|
           读取 `.roo/memory` 下的所有文件
@@ -6505,7 +6156,7 @@ customModes:
                       有新的任务或任务状态变化，需要更新 task-checklist.md。
                       使用 insert_content 来*追加*新信息，或者在必要时使用 apply_diff 来修改现有条目。时间戳和变更摘要将被作为脚注追加到文件末尾。
                   </thinking>
-              format: "- [ ] [Task Name]"
+              format: "- [ ] [任务详情]"
           execution-records.md:
               trigger: 当有新的任务执行记录时。
               action: |
@@ -6571,15 +6222,10 @@ customModes:
 
       <thinking>
           **检查`Memory`:**
+              - 首先通过 `directory_tree` 或 `list_files` 检查是否存在 `.roo/memory` 文件夹
+              - 如果存在，则通过 if_memory_bank_exists 加载 `Memory`
+              - 如果不存，则通过 if_memory_bank_exists 进行 `Memory` 初始化
       </thinking>
-
-          <thinking>
-              * 首先检查是否存在 `.roo/memory` 文件夹
-          </thinking>
-
-          <thinking>
-              * If memory DOES exist, skip immediately to `if_memory_bank_exists`.
-          </thinking>
 
       if_no_memory_bank: |
           1. ** 告知用户未找到记录存储，建议创建一个记录存储，已维护上下文 **
@@ -6622,79 +6268,71 @@ customModes:
           task-checklist.md: |
               # 任务检查清单
 
-              *
+              - [ ]
 
           system-patterns.md: |
               # 系统行为模式
 
-              *
+              -
 
               ## 编码模式
 
-              *
+              -
 
               ## 架构模式
 
-              *
+              -
 
               ## 测试模式
 
-              *
+              -
 
               ## 文档模式
 
-              *
+              -
 
           execution-records.md:|
              # 执行记录
 
-              *
+              -
 
           current-context.md:|
               # 上下文信息
 
-              该文件跟踪项目的当前状态，包括最近的变化、当前目标和未决问题。
-
-              *
-
               ## 当前重点
 
-              *
+              -
 
               ## 最近的变化
 
-              *
+              -
 
               ## 未决问题/议题
 
-              *
+              -
 
           product-context.md:|
               # 上下文信息
 
-              该文件使用列表格式记录架构和实施决策。
-
-              *
-
               ## 当前重点
 
-              *
+              -
 
               ## 最近的变化
 
-              *
+              -
 
               ## 未决问题/议题
 
-              *
+              -
 
               ## 决定
 
-              *
+              -
 
               ## 行为准则
 
-              *
+              -
 
       if_memory_bank_exists:|
           读取 `.roo/memory` 下的所有文件
@@ -6742,7 +6380,7 @@ customModes:
                       有新的任务或任务状态变化，需要更新 task-checklist.md。
                       使用 insert_content 来*追加*新信息，或者在必要时使用 apply_diff 来修改现有条目。时间戳和变更摘要将被作为脚注追加到文件末尾。
                   </thinking>
-              format: "- [ ] [Task Name]"
+              format: "- [ ] [任务详情]"
           execution-records.md:
               trigger: 当有新的任务执行记录时。
               action: |
@@ -6808,15 +6446,10 @@ customModes:
 
       <thinking>
           **检查`Memory`:**
+              - 首先通过 `directory_tree` 或 `list_files` 检查是否存在 `.roo/memory` 文件夹
+              - 如果存在，则通过 if_memory_bank_exists 加载 `Memory`
+              - 如果不存，则通过 if_memory_bank_exists 进行 `Memory` 初始化
       </thinking>
-
-          <thinking>
-              * 首先检查是否存在 `.roo/memory` 文件夹
-          </thinking>
-
-          <thinking>
-              * If memory DOES exist, skip immediately to `if_memory_bank_exists`.
-          </thinking>
 
       if_no_memory_bank: |
           1. ** 告知用户未找到记录存储，建议创建一个记录存储，已维护上下文 **
@@ -6859,79 +6492,71 @@ customModes:
           task-checklist.md: |
               # 任务检查清单
 
-              *
+              - [ ]
 
           system-patterns.md: |
               # 系统行为模式
 
-              *
+              -
 
               ## 编码模式
 
-              *
+              -
 
               ## 架构模式
 
-              *
+              -
 
               ## 测试模式
 
-              *
+              -
 
               ## 文档模式
 
-              *
+              -
 
           execution-records.md:|
              # 执行记录
 
-              *
+              -
 
           current-context.md:|
               # 上下文信息
 
-              该文件跟踪项目的当前状态，包括最近的变化、当前目标和未决问题。
-
-              *
-
               ## 当前重点
 
-              *
+              -
 
               ## 最近的变化
 
-              *
+              -
 
               ## 未决问题/议题
 
-              *
+              -
 
           product-context.md:|
               # 上下文信息
 
-              该文件使用列表格式记录架构和实施决策。
-
-              *
-
               ## 当前重点
 
-              *
+              -
 
               ## 最近的变化
 
-              *
+              -
 
               ## 未决问题/议题
 
-              *
+              -
 
               ## 决定
 
-              *
+              -
 
               ## 行为准则
 
-              *
+              -
 
       if_memory_bank_exists:|
           读取 `.roo/memory` 下的所有文件
@@ -6979,7 +6604,7 @@ customModes:
                       有新的任务或任务状态变化，需要更新 task-checklist.md。
                       使用 insert_content 来*追加*新信息，或者在必要时使用 apply_diff 来修改现有条目。时间戳和变更摘要将被作为脚注追加到文件末尾。
                   </thinking>
-              format: "- [ ] [Task Name]"
+              format: "- [ ] [任务详情]"
           execution-records.md:
               trigger: 当有新的任务执行记录时。
               action: |
@@ -7048,15 +6673,10 @@ customModes:
 
       <thinking>
           **检查`Memory`:**
+              - 首先通过 `directory_tree` 或 `list_files` 检查是否存在 `.roo/memory` 文件夹
+              - 如果存在，则通过 if_memory_bank_exists 加载 `Memory`
+              - 如果不存，则通过 if_memory_bank_exists 进行 `Memory` 初始化
       </thinking>
-
-          <thinking>
-              * 首先检查是否存在 `.roo/memory` 文件夹
-          </thinking>
-
-          <thinking>
-              * If memory DOES exist, skip immediately to `if_memory_bank_exists`.
-          </thinking>
 
       if_no_memory_bank: |
           1. ** 告知用户未找到记录存储，建议创建一个记录存储，已维护上下文 **
@@ -7099,79 +6719,71 @@ customModes:
           task-checklist.md: |
               # 任务检查清单
 
-              *
+              - [ ]
 
           system-patterns.md: |
               # 系统行为模式
 
-              *
+              -
 
               ## 编码模式
 
-              *
+              -
 
               ## 架构模式
 
-              *
+              -
 
               ## 测试模式
 
-              *
+              -
 
               ## 文档模式
 
-              *
+              -
 
           execution-records.md:|
              # 执行记录
 
-              *
+              -
 
           current-context.md:|
               # 上下文信息
 
-              该文件跟踪项目的当前状态，包括最近的变化、当前目标和未决问题。
-
-              *
-
               ## 当前重点
 
-              *
+              -
 
               ## 最近的变化
 
-              *
+              -
 
               ## 未决问题/议题
 
-              *
+              -
 
           product-context.md:|
               # 上下文信息
 
-              该文件使用列表格式记录架构和实施决策。
-
-              *
-
               ## 当前重点
 
-              *
+              -
 
               ## 最近的变化
 
-              *
+              -
 
               ## 未决问题/议题
 
-              *
+              -
 
               ## 决定
 
-              *
+              -
 
               ## 行为准则
 
-              *
+              -
 
       if_memory_bank_exists:|
           读取 `.roo/memory` 下的所有文件
@@ -7219,7 +6831,7 @@ customModes:
                       有新的任务或任务状态变化，需要更新 task-checklist.md。
                       使用 insert_content 来*追加*新信息，或者在必要时使用 apply_diff 来修改现有条目。时间戳和变更摘要将被作为脚注追加到文件末尾。
                   </thinking>
-              format: "- [ ] [Task Name]"
+              format: "- [ ] [任务详情]"
           execution-records.md:
               trigger: 当有新的任务执行记录时。
               action: |
@@ -7285,15 +6897,10 @@ customModes:
 
       <thinking>
           **检查`Memory`:**
+              - 首先通过 `directory_tree` 或 `list_files` 检查是否存在 `.roo/memory` 文件夹
+              - 如果存在，则通过 if_memory_bank_exists 加载 `Memory`
+              - 如果不存，则通过 if_memory_bank_exists 进行 `Memory` 初始化
       </thinking>
-
-          <thinking>
-              * 首先检查是否存在 `.roo/memory` 文件夹
-          </thinking>
-
-          <thinking>
-              * If memory DOES exist, skip immediately to `if_memory_bank_exists`.
-          </thinking>
 
       if_no_memory_bank: |
           1. ** 告知用户未找到记录存储，建议创建一个记录存储，已维护上下文 **
@@ -7336,79 +6943,71 @@ customModes:
           task-checklist.md: |
               # 任务检查清单
 
-              *
+              - [ ]
 
           system-patterns.md: |
               # 系统行为模式
 
-              *
+              -
 
               ## 编码模式
 
-              *
+              -
 
               ## 架构模式
 
-              *
+              -
 
               ## 测试模式
 
-              *
+              -
 
               ## 文档模式
 
-              *
+              -
 
           execution-records.md:|
              # 执行记录
 
-              *
+              -
 
           current-context.md:|
               # 上下文信息
 
-              该文件跟踪项目的当前状态，包括最近的变化、当前目标和未决问题。
-
-              *
-
               ## 当前重点
 
-              *
+              -
 
               ## 最近的变化
 
-              *
+              -
 
               ## 未决问题/议题
 
-              *
+              -
 
           product-context.md:|
               # 上下文信息
 
-              该文件使用列表格式记录架构和实施决策。
-
-              *
-
               ## 当前重点
 
-              *
+              -
 
               ## 最近的变化
 
-              *
+              -
 
               ## 未决问题/议题
 
-              *
+              -
 
               ## 决定
 
-              *
+              -
 
               ## 行为准则
 
-              *
+              -
 
       if_memory_bank_exists:|
           读取 `.roo/memory` 下的所有文件
@@ -7456,7 +7055,7 @@ customModes:
                       有新的任务或任务状态变化，需要更新 task-checklist.md。
                       使用 insert_content 来*追加*新信息，或者在必要时使用 apply_diff 来修改现有条目。时间戳和变更摘要将被作为脚注追加到文件末尾。
                   </thinking>
-              format: "- [ ] [Task Name]"
+              format: "- [ ] [任务详情]"
           execution-records.md:
               trigger: 当有新的任务执行记录时。
               action: |
@@ -7522,15 +7121,10 @@ customModes:
 
       <thinking>
           **检查`Memory`:**
+              - 首先通过 `directory_tree` 或 `list_files` 检查是否存在 `.roo/memory` 文件夹
+              - 如果存在，则通过 if_memory_bank_exists 加载 `Memory`
+              - 如果不存，则通过 if_memory_bank_exists 进行 `Memory` 初始化
       </thinking>
-
-          <thinking>
-              * 首先检查是否存在 `.roo/memory` 文件夹
-          </thinking>
-
-          <thinking>
-              * If memory DOES exist, skip immediately to `if_memory_bank_exists`.
-          </thinking>
 
       if_no_memory_bank: |
           1. ** 告知用户未找到记录存储，建议创建一个记录存储，已维护上下文 **
@@ -7573,79 +7167,71 @@ customModes:
           task-checklist.md: |
               # 任务检查清单
 
-              *
+              - [ ]
 
           system-patterns.md: |
               # 系统行为模式
 
-              *
+              -
 
               ## 编码模式
 
-              *
+              -
 
               ## 架构模式
 
-              *
+              -
 
               ## 测试模式
 
-              *
+              -
 
               ## 文档模式
 
-              *
+              -
 
           execution-records.md:|
              # 执行记录
 
-              *
+              -
 
           current-context.md:|
               # 上下文信息
 
-              该文件跟踪项目的当前状态，包括最近的变化、当前目标和未决问题。
-
-              *
-
               ## 当前重点
 
-              *
+              -
 
               ## 最近的变化
 
-              *
+              -
 
               ## 未决问题/议题
 
-              *
+              -
 
           product-context.md:|
               # 上下文信息
 
-              该文件使用列表格式记录架构和实施决策。
-
-              *
-
               ## 当前重点
 
-              *
+              -
 
               ## 最近的变化
 
-              *
+              -
 
               ## 未决问题/议题
 
-              *
+              -
 
               ## 决定
 
-              *
+              -
 
               ## 行为准则
 
-              *
+              -
 
       if_memory_bank_exists:|
           读取 `.roo/memory` 下的所有文件
@@ -7693,7 +7279,7 @@ customModes:
                       有新的任务或任务状态变化，需要更新 task-checklist.md。
                       使用 insert_content 来*追加*新信息，或者在必要时使用 apply_diff 来修改现有条目。时间戳和变更摘要将被作为脚注追加到文件末尾。
                   </thinking>
-              format: "- [ ] [Task Name]"
+              format: "- [ ] [任务详情]"
           execution-records.md:
               trigger: 当有新的任务执行记录时。
               action: |

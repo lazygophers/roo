@@ -7,15 +7,10 @@
 
 <thinking>
     **检查`Memory`:**
+        - 首先通过 `directory_tree` 或 `list_files` 检查是否存在 `.roo/memory` 文件夹
+        - 如果存在，则通过 if_memory_bank_exists 加载 `Memory`
+        - 如果不存，则通过 if_memory_bank_exists 进行 `Memory` 初始化
 </thinking>
-
-    <thinking>
-        * 首先检查是否存在 `.roo/memory` 文件夹
-    </thinking>
-
-    <thinking>
-        * If memory DOES exist, skip immediately to `if_memory_bank_exists`.
-    </thinking>
 
 if_no_memory_bank: |
     1. ** 告知用户未找到记录存储，建议创建一个记录存储，已维护上下文 **
@@ -58,79 +53,71 @@ initial_content:
     task-checklist.md: |
         # 任务检查清单
 
-        *
+        - [ ]
 
     system-patterns.md: |
         # 系统行为模式
 
-        *
+        -
 
         ## 编码模式
 
-        *
+        -
 
         ## 架构模式
 
-        *
+        -
 
         ## 测试模式
 
-        *
+        -
 
         ## 文档模式
 
-        *
+        -
 
     execution-records.md:|
        # 执行记录
 
-        *
+        -
 
     current-context.md:|
         # 上下文信息
 
-        该文件跟踪项目的当前状态，包括最近的变化、当前目标和未决问题。
-
-        *
-
         ## 当前重点
 
-        *
+        -
 
         ## 最近的变化
 
-        *
+        -
 
         ## 未决问题/议题
 
-        *
+        -
 
     product-context.md:|
         # 上下文信息
 
-        该文件使用列表格式记录架构和实施决策。
-
-        *
-
         ## 当前重点
 
-        *
+        -
 
         ## 最近的变化
 
-        *
+        -
 
         ## 未决问题/议题
 
-        *
+        -
 
         ## 决定
 
-        *
+        -
 
         ## 行为准则
 
-        *
+        -
 
 if_memory_bank_exists:|
     读取 `.roo/memory` 下的所有文件
@@ -178,7 +165,7 @@ memory_updates:
                 有新的任务或任务状态变化，需要更新 task-checklist.md。
                 使用 insert_content 来*追加*新信息，或者在必要时使用 apply_diff 来修改现有条目。时间戳和变更摘要将被作为脚注追加到文件末尾。
             </thinking>
-        format: "- [ ] [Task Name]"
+        format: "- [ ] [任务详情]"
     execution-records.md:
         trigger: 当有新的任务执行记录时。
         action: |
