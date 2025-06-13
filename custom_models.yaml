@@ -247,7 +247,7 @@ customModes:
       <thinking>
           ** 任务委托执行 **
           * 使用`new_task`工具时必须包含：
-              - 根据任务性质和需求选择最合适的模式，参考 `custom_models` 部分选择合适的模式
+              - 根据任务性质和需求选择最合适的模式，需在任务开始前告知选择该模式的原因并让用户选择是否使用并提供 3-5 个替代选项
               - 提供详细需求说明和已完成工作的摘要
               - 将所有子任务相关内容存储在专用提示目录
               - 子任务类型标识（从可用模式列表选择）
@@ -284,72 +284,6 @@ customModes:
       4. 当所有子任务完成后，综合结果提供全面的成果概览。
       5. 必要时提出澄清问题以更好地分解复杂任务。
       6. 根据已完成子任务的结果建议工作流改进方案。
-
-      custom_models:
-      	- 模式: default-code-generator
-      	  使用场景: 当未指定具体框架类型或需要跨语言兼容的基础代码结构时使用此模式。
-      	- 模式: go-zero-code-generator
-      	  使用场景: 当需要构建基于GoZero的微服务项目时使用此模式。
-      	- 模式: golang-ai-code-generator
-      	  使用场景: 当需要创建Go语言AI模型服务或数据处理模块时使用此模式。
-      	- 模式: golang-code-generator
-      	  使用场景: 当需要快速生成Go语言代码模板或实现时使用此模式。
-      	- 模式: golang-crawler-code-generator
-      	  使用场景: 当需要创建Go语言爬虫项目时使用此模式。
-      	- 模式: golang-react-code-generator
-      	  使用场景: 当需要创建Go语言后端配合React前端的全栈项目时使用此模式。
-      	- 模式: java-code-generator
-      	  使用场景: 当需要创建Java类、接口或Spring Boot微服务模板时使用此模式。
-      	- 模式: javascript-code-generator
-      	  使用场景: 当需要创建JavaScript模块、函数或Node.js脚本模板时使用此模式。
-      	- 模式: python-ai-code-generator
-      	  使用场景: 当需要创建AI模型训练/推理代码时使用此模式。
-      	- 模式: python-code-generator
-      	  使用场景: 当需要快速生成Python代码模板或实现时使用此模式。
-      	- 模式: python-crawler-code-generator
-      	  使用场景: 当需要创建Python爬虫项目时使用此模式。
-      	- 模式: react-code-generator
-      	  使用场景: 当需要创建React函数组件或类组件模板时使用此模式。
-      	- 模式: rust-code-generator
-      	  使用场景: 当需要创建Rust模块、结构体或系统级编程模板时使用此模式。
-      	- 模式: sql-code-generator
-      	  使用场景: 当需要创建数据库表结构、存储过程或复杂查询模板时使用此模式。
-      	- 模式: typescript-code-generator
-      	  使用场景: 当需要创建TypeScript类/接口/模块模板时使用此模式。
-      	- 模式: vue-code-generator
-      	  使用场景: 当需要创建Vue单文件组件或组合式API模板时使用此模式。
-      	- 模式: config-mover
-      	  使用场景: 当需要迁移配置文件到不同环境或更新配置版本时使用此模式
-      	- 模式: document-mover
-      	  使用场景: 当需要管理文档文件并将其分类到合适目录时使用此模式
-      	- 模式: article-summarizer
-      	  使用场景: 当需要快速提取长文档核心观点时使用此模式。
-      	- 模式: documentation-generator
-      	  使用场景: 使用该模式可生成结构合理、易于维护的技术文档
-      	- 模式: resource-mover
-      	  使用场景: 当需要管理图片/音频/视频等资源文件的存储结构时使用此模式
-      	- 模式: translator
-      	  使用场景: 当需要翻译文档时使用此模式
-      	- 模式: git-auto-commit
-      	  使用场景: 当需要快速生成规范化的提交信息、批量处理多个文件的提交、确保所有提交符合团队编码标准、避免因手动输入导致的格式错误时候使用。
-      	- 模式: prompt-engineer
-      	  使用场景: 使用该模式可生成高质量、结构清晰的提示词模板，适用于各种场景下的任务优化。
-      	- 模式: deep-research
-      	  使用场景: 当需要深度分析技术原理或进行跨领域研究时使用此模式。
-      	- 模式: knowledge-base-creator
-      	  使用场景: 当需要从零开始构建知识库体系时使用此模式。
-      	- 模式: knowledge-research
-      	  使用场景: 当需要深入研究特定技术领域或构建知识图谱时使用此模式。
-      	- 模式: web-scraper-parser
-      	  使用场景: 当需要自动化获取和解析网页数据时使用此模式。
-      	- 模式: roo-classifier
-      	  使用场景: 当需要对roo模式重新分类并组织存储结构时使用此模式
-      	- 模式: roo-compressor
-      	  使用场景: 当需要压缩roo模式文件或减少资源占用时使用此模式
-      	- 模式: roo-creator
-      	  使用场景: 当需要创建新的roo模式时使用此模式
-      	- 模式: roo-optimizer
-      	  使用场景: 当需要优化现有roo模式的执行效率或功能逻辑时使用此模式
     groups:
       - read
       - edit

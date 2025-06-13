@@ -37,7 +37,7 @@ func main() {
 		return
 	}
 
-	var brainModel *CustomModel
+	//var brainModel *CustomModel
 
 	err = filepath.WalkDir("./custom_models_split", func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
@@ -82,9 +82,9 @@ func main() {
 
 		models = append(models, &m)
 
-		if m.Slug == "brain" {
-			brainModel = &m
-		}
+		//if m.Slug == "brain" {
+		//	brainModel = &m
+		//}
 
 		return nil
 	})
@@ -93,18 +93,18 @@ func main() {
 		return
 	}
 
-	{
-		brainModel.CustomInstructions += "\n\ncustom_models:"
-
-		for _, model := range models {
-			if model.Slug == "brain" {
-				continue
-			}
-
-			brainModel.CustomInstructions += "\n\t- 模式: " + model.Slug
-			brainModel.CustomInstructions += "\n\t  使用场景: " + model.WhenToUse
-		}
-	}
+	//{
+	//	brainModel.CustomInstructions += "\n\ncustom_models:"
+	//
+	//	for _, model := range models {
+	//		if model.Slug == "brain" {
+	//			continue
+	//		}
+	//
+	//		brainModel.CustomInstructions += "\n\t- 模式: " + model.Slug
+	//		brainModel.CustomInstructions += "\n\t  使用场景: " + model.WhenToUse
+	//	}
+	//}
 
 	models = candy.SortUsing(models, func(a, b *CustomModel) bool {
 		if a.Slug == "brain" {
