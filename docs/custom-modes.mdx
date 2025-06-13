@@ -13,7 +13,7 @@ Each mode—including custom ones—features **Sticky Models**. This means Roo C
 *   **Experimentation:** Safely experiment with different prompts and configurations without affecting other modes.
 *   **Team Collaboration:** Share custom modes with your team to standardize workflows.
 
-<img src="/img/custom-modes/custom-modes-3.png" alt="Overview of custom modes interface" width="500" />
+<img src="/img/custom-modes/custom-modes-3.png" alt="Overview of custom modes interface" width="500"/>
 
     *Roo Code's interface for creating and managing custom modes.*
 
@@ -48,7 +48,7 @@ Roo Code will guide you through the process, prompting for necessary information
 2.  **Create New Mode:** Click the <Codicon name="add" /> button to the right of the Modes heading.
 3.  **Fill in Fields:**
 
-<img src="/img/custom-modes/custom-modes-4.png" alt="Custom mode creation interface in the Prompts tab" width="600" />
+<img src="/img/custom-modes/custom-modes-4.png" alt="Custom mode creation interface in the Prompts tab" width="600"/>
 
     *The custom mode creation interface showing fields for name, slug, save location, role definition, available tools, custom instructions.*
 
@@ -129,11 +129,11 @@ customModes:
 *   **Placement:** This text is placed at the beginning of the system prompt when the mode is active.
 *   **Important First Sentence:** The first sentence (up to the first period `.`) serves as a default concise summary for Roo to understand the mode's general purpose. **However, if the `whenToUse` property is defined, `whenToUse` takes precedence** for summarizing the mode's function, especially in contexts like task orchestration or mode selection.
 *   *YAML Example (multi-line):*
-    ```yaml
-    roleDefinition: >-
-      You are a test engineer with expertise in:
-      - Writing comprehensive test suites
-      - Test-driven development
+```yaml
+roleDefinition: >-
+  You are a test engineer with expertise in:
+  - Writing comprehensive test suites
+  - Test-driven development
     ```
 *   *JSON Example:* `"roleDefinition": "You are a technical writer specializing in clear documentation."`
 
@@ -141,28 +141,28 @@ customModes:
 *   **Purpose:** Array/list defining which tool groups the mode can access and any file restrictions.
 *   **Available Tool Groups (Strings):** `"read"`, `"edit"`, `"browser"`, `"command"`, `"mcp"`.
 *   **File Restrictions for "edit" group:**
-    *   To apply file restrictions, the "edit" entry becomes a list (YAML) or array (JSON) where the first element is `"edit"` and the second is a map/object defining the restrictions.
-    *   `fileRegex`: A regular expression string to control which files the mode can edit.
-        *   In YAML, typically use single backslashes for regex special characters (e.g., `\.md$`).
-        *   In JSON, backslashes must be double-escaped (e.g., `\\.md$`).
-    *   `description`: An optional string describing the restriction.
-    *   For more complex patterns, see [Understanding Regex in Custom Modes](#understanding-regex-in-custom-modes).
+*   To apply file restrictions, the "edit" entry becomes a list (YAML) or array (JSON) where the first element is `"edit"` and the second is a map/object defining the restrictions.
+*   `fileRegex`: A regular expression string to control which files the mode can edit.
+*   In YAML, typically use single backslashes for regex special characters (e.g., `\.md$`).
+*   In JSON, backslashes must be double-escaped (e.g., `\\.md$`).
+*   `description`: An optional string describing the restriction.
+*   For more complex patterns, see [Understanding Regex in Custom Modes](#understanding-regex-in-custom-modes).
 *   *YAML Example:*
-    ```yaml
-    groups:
-      - read
-      - - edit # Start of "edit" tool with restrictions
-        - fileRegex: \.(js|ts)$ # Restriction map for JS/TS files
-          description: JS/TS files only
-      - command
+```yaml
+groups:
+  - read
+  - - edit # Start of "edit" tool with restrictions
+    - fileRegex: \.(js|ts)$ # Restriction map for JS/TS files
+      description: JS/TS files only
+  - command
     ```
 *   *JSON Example:*
-    ```json
-    "groups": [
-      "read",
-      ["edit", { "fileRegex": "\\.(js|ts)$", "description": "JS/TS files only" }],
-      "command"
-    ]
+```json
+"groups": [
+  "read",
+  ["edit", { "fileRegex": "\\.(js|ts)$", "description": "JS/TS files only" }],
+  "command"
+]
     ```
 
 ##### `whenToUse`
@@ -177,11 +177,11 @@ customModes:
 *   **Placement:** This text is added near the end of the system prompt.
 *   **Supplementing:** Can be supplemented by [Mode-Specific Instructions via Files/Directories](#mode-specific-instructions-via-filesdirectories).
 *   *YAML Example (multi-line):*
-    ```yaml
-    customInstructions: |-
-      When writing tests:
-      - Use describe/it blocks
-      - Include meaningful descriptions
+```yaml
+customInstructions: |-
+  When writing tests:
+  - Use describe/it blocks
+  - Include meaningful descriptions
     ```
 *   *JSON Example:* `"customInstructions": "Focus on explaining concepts and providing examples."`
 
@@ -191,36 +191,36 @@ YAML is now the preferred format for defining custom modes due to several advant
 
 *   **Readability:** YAML's indentation-based structure is often easier for humans to read and understand complex configurations.
 *   **Comments:** YAML allows for comments (lines starting with `#`), making it possible to annotate your mode definitions.
-    ```yaml
-    customModes:
-      - slug: security-review
-        name: 🔒 Security Reviewer
-        # This mode is restricted to read-only access
-        roleDefinition: You are a security specialist reviewing code for vulnerabilities.
-        whenToUse: Use for security reviews and vulnerability assessments.
-        # Only allow reading files, no editing permissions
-        groups:
-          - read
-          - browser
+```yaml
+customModes:
+  - slug: security-review
+    name: 🔒 Security Reviewer
+    # This mode is restricted to read-only access
+    roleDefinition: You are a security specialist reviewing code for vulnerabilities.
+    whenToUse: Use for security reviews and vulnerability assessments.
+    # Only allow reading files, no editing permissions
+    groups:
+      - read
+      - browser
     ```
 *   **Multi-line Strings:** YAML provides cleaner syntax for multi-line strings (e.g., for `roleDefinition` or `customInstructions`) using `|` (literal block) or `>` (folded block).
-    ```yaml
-    customModes:
-      - slug: test-engineer
-        name: 🧪 Test Engineer
-        roleDefinition: >-
-          You are a test engineer with expertise in:
-          - Writing comprehensive test suites
-          - Test-driven development
-          - Integration testing
-          - Performance testing
-        customInstructions: |-
-          When writing tests:
-          - Use describe/it blocks
-          - Include meaningful descriptions
-          - Test edge cases
-          - Ensure proper coverage
-        # ... other properties
+```yaml
+customModes:
+  - slug: test-engineer
+    name: 🧪 Test Engineer
+    roleDefinition: >-
+      You are a test engineer with expertise in:
+      - Writing comprehensive test suites
+      - Test-driven development
+      - Integration testing
+      - Performance testing
+    customInstructions: |-
+      When writing tests:
+      - Use describe/it blocks
+      - Include meaningful descriptions
+      - Test edge cases
+      - Ensure proper coverage
+    # ... other properties
     ```
 *   **Less Punctuation:** YAML generally requires less punctuation (like commas and braces) compared to JSON, reducing syntax errors.
 *   **Editor Support:** Most modern code editors provide excellent syntax highlighting and validation for YAML files, further enhancing readability and reducing errors.
@@ -239,20 +239,20 @@ When editing YAML manually, keep these points in mind:
 ### Migration to YAML Format
 
 *   **Global Modes:** The migration from `custom_modes.json` to `custom_modes.yaml` happens automatically when Roo Code starts up, under these conditions:
-    1.  Roo Code starts up.
-    2.  A `custom_modes.json` file exists.
-    3.  No `custom_modes.yaml` file exists yet.
-    The migration process reads the existing JSON file, converts it to YAML format, creates a new `custom_modes.yaml` file, and preserves the original JSON file (e.g., by renaming it) for rollback purposes. If `custom_modes.yaml` already exists, it will be used, and no automatic migration of `custom_modes.json` will occur.
+1.  Roo Code starts up.
+2.  A `custom_modes.json` file exists.
+3.  No `custom_modes.yaml` file exists yet.
+The migration process reads the existing JSON file, converts it to YAML format, creates a new `custom_modes.yaml` file, and preserves the original JSON file (e.g., by renaming it) for rollback purposes. If `custom_modes.yaml` already exists, it will be used, and no automatic migration of `custom_modes.json` will occur.
 
 *   **Project Modes (`.roomodes`):**
-    *   **No automatic startup migration:** Unlike global modes, project-specific `.roomodes` files are not automatically converted from JSON to YAML simply when Roo Code starts.
-    *   **Format Detection:** Roo Code can read `.roomodes` files in either YAML or JSON format.
-    *   **Conversion on UI Edit:** If you edit a project-specific mode through the Roo Code UI (e.g., via the Prompts Tab), and the existing `.roomodes` file is in JSON format, Roo Code will save the changes in YAML format. This effectively converts the file to YAML. The original JSON content will be overwritten with YAML.
-    *   **Manual Conversion:** If you want to convert an existing `.roomodes` JSON file to YAML without making UI edits, you'll need to do this manually. You can:
-        1.  Open your existing JSON `.roomodes` file.
-        2.  Convert its content to YAML (you can ask Roo to help with this, or use an online converter).
-        3.  Replace the content of your `.roomodes` file with the new YAML content, or rename the old file (e.g., `.roomodes.json.bak`) and save the new content into a file named `.roomodes`.
-        Ensure the resulting YAML is valid.
+*   **No automatic startup migration:** Unlike global modes, project-specific `.roomodes` files are not automatically converted from JSON to YAML simply when Roo Code starts.
+*   **Format Detection:** Roo Code can read `.roomodes` files in either YAML or JSON format.
+*   **Conversion on UI Edit:** If you edit a project-specific mode through the Roo Code UI (e.g., via the Prompts Tab), and the existing `.roomodes` file is in JSON format, Roo Code will save the changes in YAML format. This effectively converts the file to YAML. The original JSON content will be overwritten with YAML.
+*   **Manual Conversion:** If you want to convert an existing `.roomodes` JSON file to YAML without making UI edits, you'll need to do this manually. You can:
+1.  Open your existing JSON `.roomodes` file.
+2.  Convert its content to YAML (you can ask Roo to help with this, or use an online converter).
+3.  Replace the content of your `.roomodes` file with the new YAML content, or rename the old file (e.g., `.roomodes.json.bak`) and save the new content into a file named `.roomodes`.
+Ensure the resulting YAML is valid.
 
 :::tip
 For manual conversions of `.roomodes` files, you can use online JSON to YAML converters or ask Roo to help reformat a specific mode configuration from JSON to YAML. Always validate your YAML before saving.
