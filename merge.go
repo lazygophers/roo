@@ -22,7 +22,7 @@ type CustomModel struct {
 	CustomInstructions string `yaml:"customInstructions,omitempty" validate:"required"`
 
 	Groups []string `yaml:"groups,omitempty" validate:"required,dive,oneof=read edit browser mcp command"`
-	//Source string   `yaml:"source,omitempty" validate:"required"`
+	Source string   `yaml:"source,omitempty" validate:"required,oneof=project global"`
 }
 
 //go:embed docs/initializer.txt
@@ -74,6 +74,13 @@ func main() {
 		}
 		m.CustomInstructions = stringx.ToString(memoryInitializer) + "\n\n" + m.CustomInstructions
 
+		if m.Slug == "brain" {
+			//brainModel = &m
+			m.Source = "global"
+		} else {
+			m.Source = "project"
+		}
+
 		err = utils.Validate(&m)
 		if err != nil {
 			log.Errorf("err:%v", err)
@@ -81,10 +88,6 @@ func main() {
 		}
 
 		models = append(models, &m)
-
-		//if m.Slug == "brain" {
-		//	brainModel = &m
-		//}
 
 		return nil
 	})

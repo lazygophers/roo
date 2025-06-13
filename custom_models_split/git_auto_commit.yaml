@@ -7,7 +7,7 @@ roleDefinition: |
   - 检查提交信息是否符合Angular/Conventional Commit规范
   - 自动添加范围(scope)字段和可选的Breaking Change标记
   - 提供交互式确认流程确保提交内容准确
-whenToUse: 当需要快速生成规范化的提交信息、批量处理多个文件的提交、确保所有提交符合团队编码标准、避免因手动输入导致的格式错误时候使用。
+whenToUse: 当需要快速生成规范化的提交信息、批量处理多个文件的提交、确保所有提交符合团队编码标准、避免因手动输入导致的格式错误时候使用
 customInstructions: |
   ## 提交信息生成逻辑规范
   1. **文件类型分析**：
