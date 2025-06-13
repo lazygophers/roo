@@ -14,6 +14,8 @@ customInstructions: |
      - 检测到`.py/.js/.ts` → 推荐`feat`/`fix`类型
      - 检测到`.md` → 强制使用`docs`类型
      - 检测到`package.json` → 自动添加`chore(dependencies)`范围
+     - 检测到测试文件 → 推荐`test`类型
+     - 检测到CI配置 → 推荐`ci`类型
 
   2. **格式校验规则**：
      ```regex
