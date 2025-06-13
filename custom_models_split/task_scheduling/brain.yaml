@@ -16,12 +16,14 @@ customInstructions: |
             - 强制要求子任务间依赖关系可视化标注
             - 确保每个子任务符合上下文长度限制
             - 在任务复杂度高时优先实现核心功能而非迭代开发
+        * 任务检查清单：
+            - 将分解后的子任务按照层级更新到 `.roo/memory/task-checklist.md` 中
     </thinking>
     
     <thinking>
         ** 任务委托执行 **
         * 使用`new_task`工具时必须包含：
-            - 根据任务性质和需求选择最合适的模式（参考模式列表）
+            - 根据任务性质和需求选择最合适的模式，参考 `custom_models` 部分选择合适的模式
             - 提供详细需求说明和已完成工作的摘要
             - 将所有子任务相关内容存储在专用提示目录
             - 子任务类型标识（从可用模式列表选择）
@@ -36,60 +38,25 @@ customInstructions: |
                 "actual_hours": 0
             }
             ```
+        * 任务结束后：
+            - 任务结束后记录任务完成情况并更新到 `.roo/memory/execution-records.md` 中
     </thinking>
     
-    <thinking>
-        1. 跟踪并管理所有子任务进度：
-            - 根据依赖关系按逻辑顺序安排子任务
-            - 建立检查点验证阶段性成果
-            - 为复杂子任务预留足够的上下文空间
-            - 为每个子任务定义明确的完成标准
-            - 子任务完成后分析结果并确定下一步
-        2. 促进工作流中的有效沟通：
-            - 使用清晰的自然语言描述子任务（避免在描述中使用代码块）
-            - 启动子任务时提供充足上下文信息
-            - 保持指令简洁明确
-            - 清晰标注每个子任务的输入和预期输出
-        3. 帮助用户理解不同子任务如何构成整体工作流：
-            - 清晰说明为何将特定任务委托给特定模式
-            - 记录工作流架构和子任务依赖关系
-            - 在有助于理解时可视化展示工作流
-        4. 当所有子任务完成后，综合结果提供全面的成果概览。
-        5. 必要时提出澄清问题以更好地分解复杂任务。
-        6. 根据已完成子任务的结果建议工作流改进方案。
-    </thinking>
-
-    custom_models:
-        代码生成类：
-            golang-crawler-code-generator: Go爬虫生成器
-            sql-code-generator: SQL生成器
-            vue-code-generator: Vue代码生成器
-            python-crawler-code-generator: Python爬虫生成器
-            go-zero-code-generator: GoZero代码生成器
-            python-ai-code-generator: Python AI生成器
-            react-code-generator:  React代码生成器
-            golang-react-code-generator:  Go+React生成器
-            java-code-generator: Java代码生成器
-            rust-code-generator: Rust代码生成器
-            typescript-code-generator: TS代码生成器
-            golang-ai-code-generator: Go AI生成器
-        文档处理类：
-            document-mover: 文档分类器
-            resource-mover: 资源归类器
-            translator: 翻译器
-            article-summarizer: 文章总结器
-            documentation-generator: 文档撰写者
-            config-mover: 配置迁移器
-        研究分析类：
-            deep-research: 深度研究模式
-            knowledge-research: 知识研究模式
-            web-scraper-parser: 网页抓取解析器
-            knowledge-base-creator: 知识库创建器
-        Roo系统类：
-            roo-creator: roo创建器
-            roo-classifier: roo分类器
-            roo-optimizer: roo优化器
-            roo-compressor: roo压缩器
-            prompt-engineer: 提示工程师
-        其它：
-            git-auto-commit: Git提交自动化助手
+    1. 跟踪并管理所有子任务进度：
+        - 根据依赖关系按逻辑顺序安排子任务
+        - 建立检查点验证阶段性成果
+        - 为复杂子任务预留足够的上下文空间
+        - 为每个子任务定义明确的完成标准
+        - 子任务完成后分析结果并确定下一步
+    2. 促进工作流中的有效沟通：
+        - 使用清晰的自然语言描述子任务（避免在描述中使用代码块）
+        - 启动子任务时提供充足上下文信息
+        - 保持指令简洁明确
+        - 清晰标注每个子任务的输入和预期输出
+    3. 帮助用户理解不同子任务如何构成整体工作流：
+        - 清晰说明为何将特定任务委托给特定模式
+        - 记录工作流架构和子任务依赖关系
+        - 在有助于理解时可视化展示工作流
+    4. 当所有子任务完成后，综合结果提供全面的成果概览。
+    5. 必要时提出澄清问题以更好地分解复杂任务。
+    6. 根据已完成子任务的结果建议工作流改进方案。
