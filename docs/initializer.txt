@@ -55,43 +55,25 @@ initial_content:
     system-patterns.md: |
         # 系统行为模式
 
-        *
-
         ## 编码模式
-
-        *
 
         ## 架构模式
 
-        *
-
         ## 测试模式
-
-        *
 
         ## 文档模式
 
-        *
-
     execution-records.md:|
        # 执行记录
-
-        *
 
     current-context.md:|
         # 上下文信息
 
         ## 当前重点
 
-        *
-
         ## 最近的变化
 
-        *
-
         ## 未决问题/议题
-
-        *
 
 if_memory_bank_exists:|
     ** 读取 `.memory` 下的所有文件 **
