@@ -43,7 +43,6 @@ if_no_memory_bank: |
         - `system-patterns.md` - 系统规则存储
         - `execution-records.md` - 执行记录
         - `current-context.md` - 当前上下文缓存
-        - `product-context.md` - 产品上下文缓存
     b. 创建 `.roo/knowledge/` 目录，用于存储知识库
     c. 将状态设置为"[Memory: 启用]"，并通知用户存储库已初始化且现在处于活动状态
     d. 使用`Memory`中的上下文继续执行任务，如果没有提供任务，则使用 `ask_followup_question` 工具
@@ -93,29 +92,6 @@ initial_content:
 
         -
 
-    product-context.md:|
-        # 上下文信息
-
-        ## 当前重点
-
-        -
-
-        ## 最近的变化
-
-        -
-
-        ## 未决问题/议题
-
-        -
-
-        ## 决定
-
-        -
-
-        ## 行为准则
-
-        -
-
 if_memory_bank_exists:|
     ** 读取 `.roo/memory` 下的所有文件 **
     <thinking>
@@ -126,9 +102,6 @@ if_memory_bank_exists:|
         <args>
             <file>
                 <path>.roo/memory/system-patterns.md</path>
-            </file>
-            <file>
-                <path>.roo/memory/product-context.md</path>
             </file>
             <file>
                 <path>.roo/memory/current-context.md</path>
@@ -172,14 +145,6 @@ memory_updates:
                 使用 insert_content 函数将内容*追加*到相关章节（例如“当前焦点”、“最近更改”和“未解决的问题/问题”），或根据需要使用 apply_diff 函数修改现有条目。请务必添加时间戳
             </thinking>
         format: "[YYYY-MM-DD HH:MM:SS] - [Summary of Change/Focus/Issue]"
-    product-context.md:
-        trigger: 当工作重心发生变化，或取得重大进展时。Use your judgement.
-        action: |
-            <thinking>
-                发生了根本性的变化，需要更新 product-context.md
-                使用 insert_content 来*追加*新信息，或者在必要时使用 apply_diff 来修改现有条目。时间戳和变更摘要将被作为脚注追加到文件末尾
-            </thinking>
-        format: "(Optional)[YYYY-MM-DD HH:MM:SS] - [Summary of Change]"
     task-checklist.md:
         trigger: 当有新的任务或有任务状态变化时。Use your judgement.
         action: |

@@ -20,6 +20,7 @@ customInstructions: |
                 * 在任务复杂度高时优先实现核心功能而非迭代开发
             *  Memory更新：
                 * 将分解后的子任务按照层级更新到 `.roo/memory/task-checklist.md` 中
+                * 将必要的上下文信息更新到 `.roo/memory/current-context.md` 中
     
         ** 立即进行任务委托执行 **
             * 使用`new_task`工具时必须包含：
@@ -39,12 +40,13 @@ customInstructions: |
                 ```
             * Memory更新：
                 * 任务结束后记录任务完成情况并更新到 `.roo/memory/execution-records.md` 中
+                * 将必要的上下文信息更新到 `.roo/memory/current-context.md` 中   
                 * 更新 `.roo/memory/task-checklist.md` 中的任务状态
     </thinking>
     
     ** 跟踪并管理所有子任务进度 **
-        * 根据依赖关系按逻辑顺序安排子任务
-        * 建立检查点验证阶段性成果
+        * 根据依赖关系按逻辑顺序安排子任务，并将子任务记录到 `.roo/memory/task-checklist.md` 中
+        * 建立检查点验证阶段性成果，将任务执行状态更新到 `.roo/memory/task-checklist.md` 和 `.roo/memory/execution-records.md` 中
         * 为复杂子任务预留足够的上下文空间
         * 为每个子任务定义明确的完成标准
         * 子任务完成后分析结果并确定下一步
