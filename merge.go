@@ -65,20 +65,23 @@ func main() {
 			return err
 		}
 
-		m.Groups = []string{
-			"read",
-			"edit",
-			"browser",
-			"mcp",
-			"command",
-		}
 		m.CustomInstructions = stringx.ToString(memoryInitializer) + "\n\n" + m.CustomInstructions
+		m.Source = "global"
 
 		if m.Slug == "brain" {
 			//brainModel = &m
-			m.Source = "global"
+			m.Groups = []string{
+				"read",
+				"edit",
+			}
 		} else {
-			m.Source = "project"
+			m.Groups = []string{
+				"read",
+				"edit",
+				"browser",
+				"mcp",
+				"command",
+			}
 		}
 
 		err = utils.Validate(&m)

@@ -27,10 +27,11 @@ customInstructions: |
     - 生成可复用的Promise链式回调函数结构
     - 设计嵌套的JSON数据结构嵌入业务语义
     - 确定脏数据过滤规则（如空值、重复、编码问题）
-    - 提供MongoDB与本地CSV的双路径存储方案
-    # Memory触发: 当目标架构确定时更新current-context.md
-    # 写入路径: .memory/current-context.md
-    # 格式: "[YYYY-MM-DD HH:MM:SS] - [目标架构更新: 动态加载机制与存储方案确定]"
+
+    # Memory触发:
+        trigger: 当目标架构确定时更新current-context.md
+        path: .memory/current-context.md
+        format: "[YYYY-MM-DD HH:MM:SS] - [目标架构更新: 动态加载机制与存储方案确定]"
 
     ## Constrains：  
     - 严格区分数据提取的业务逻辑层与技术实现层
