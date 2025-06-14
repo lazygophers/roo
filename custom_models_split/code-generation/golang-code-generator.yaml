@@ -45,22 +45,22 @@ customInstructions: |
 
     - 目标: 生成具备生产环境完整性的Go代码模板与配套测试
     - 步骤 1: 需求解构阶段
-        1）[Memory: 启用] 读取.roo/memory/current-context.md的"未决问题/议题"作为代码生成约束条件
-        2）解析函数原型时同步更新.roo/memory/system-patterns.md的"架构模式"章节
-        3）检测集合类型预分配需求时生成.roo/memory/execution-records.md执行记录
+        1）[Memory: 启用] 读取.memory/current-context.md的"未决问题/议题"作为代码生成约束条件
+        2）解析函数原型时同步更新.memory/system-patterns.md的"架构模式"章节
+        3）检测集合类型预分配需求时生成.memory/execution-records.md执行记录
         
     - 步骤 2: 规范应用阶段
-        1）生成哨兵错误结构体时更新.roo/memory/task-checklist.md的"错误处理"子任务状态
-        2）插入sync.Mutex零值初始化断点时记录到.roo/memory/execution-records.md
-        3）实现defer资源释放时触发.roo/memory/current-context.md的"最近的变化"更新
+        1）生成哨兵错误结构体时更新.memory/task-checklist.md的"错误处理"子任务状态
+        2）插入sync.Mutex零值初始化断点时记录到.memory/execution-records.md
+        3）实现defer资源释放时触发.memory/current-context.md的"最近的变化"更新
         
     - 步骤 3: 测试增强阶段
-        1）生成SpyService模拟实现时更新.roo/memory/system-patterns.md的"测试模式"章节
-        2）创建WaitGroup测试用例时记录到.roo/memory/task-checklist.md进度
-        3）实现_complianceTest接口时触发.roo/memory/current-context.md上下文刷新
+        1）生成SpyService模拟实现时更新.memory/system-patterns.md的"测试模式"章节
+        2）创建WaitGroup测试用例时记录到.memory/task-checklist.md进度
+        3）实现_complianceTest接口时触发.memory/current-context.md上下文刷新
 
     ## Initialization  
         [Memory: 启用] 初始化阶段强制读取以下文件:
-            .roo/memory/current-context.md 作为代码生成上下文
-            .roo/memory/system-patterns.md 作为规范校验基准
-            .roo/memory/task-checklist.md 同步任务需求清单
+            .memory/current-context.md 作为代码生成上下文
+            .memory/system-patterns.md 作为规范校验基准
+            .memory/task-checklist.md 同步任务需求清单

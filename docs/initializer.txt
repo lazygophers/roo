@@ -6,7 +6,7 @@
 * 为了任务的完成，请使用 `Memory` 进行信息存储和检索，请勿使用其他方式进行信息存储和检索。根据不同文件的类型定位，将相关信息存储到相关位置，在不需要时自行清理
 
 **检查并更新`Memory`:**
-    * 首先通过 `directory_tree` 或 `list_files` 检查是否存在 `.roo/memory` 文件夹
+    * 首先通过 `directory_tree` 或 `list_files` 检查是否存在 `.memory` 文件夹
 * 如果存在，则通过 if_memory_bank_exists 加载 `Memory` 的内容
 * 如果不存，则通过 if_no_memory_bank 进行 `Memory` 初始化
 
@@ -24,7 +24,7 @@ if_no_memory_bank: |
 
     4. ** 如果用户同意 **
         <thinking>
-            我需要创建 `.roo/memory` 目录和核心文件。我应该使用 write_to_file 来完成这项工作，并且每次写入一个文件，等待每个文件完成后的确认
+            我需要创建 `.memory` 目录和核心文件。我应该使用 write_to_file 来完成这项工作，并且每次写入一个文件，等待每个文件完成后的确认
         </thinking>
 
     5. ** 检查 `README.md` **
@@ -38,12 +38,12 @@ if_no_memory_bank: |
         我需要为存储库文件添加默认内容
     </thinking>
 
-    a. 创建 `.roo/memory` 目录，并使用 `initial_content` 创建文件：
+    a. 创建 `.memory` 目录，并使用 `initial_content` 创建文件：
         - `task-checklist.md` - 任务检查清单
         - `system-patterns.md` - 系统规则存储
         - `execution-records.md` - 执行记录
         - `current-context.md` - 当前上下文缓存
-    b. 创建 `.roo/knowledge/` 目录，用于存储知识库
+    b. 创建 `.memory/knowledge` 目录，用于存储知识库
     c. 将状态设置为"[Memory: 启用]"，并通知用户存储库已初始化且现在处于活动状态
     d. 使用`Memory`中的上下文继续执行任务，如果没有提供任务，则使用 `ask_followup_question` 工具
 
@@ -93,24 +93,24 @@ initial_content:
         -
 
 if_memory_bank_exists:|
-    ** 读取 `.roo/memory` 下的所有文件 **
+    ** 读取 `.memory` 下的所有文件 **
     <thinking>
-        我将要一次性读取 `.roo/memory` 下的所有文件
+        我将要一次性读取 `.memory` 下的所有文件
     </thinking>
 
     <read_file>
         <args>
             <file>
-                <path>.roo/memory/system-patterns.md</path>
+                <path>.memory/system-patterns.md</path>
             </file>
             <file>
-                <path>.roo/memory/current-context.md</path>
+                <path>.memory/current-context.md</path>
             </file>
             <file>
-                <path>.roo/memory/task-checklist.md</path>
+                <path>.memory/task-checklist.md</path>
             </file>
             <file>
-                <path>.roo/memory/execution-records.md</path>
+                <path>.memory/execution-records.md</path>
             </file>
         </args>
     </read_file>
@@ -121,7 +121,7 @@ if_memory_bank_exists:|
     </thinking>
 
     <list_files>
-        <path>.roo/knowledge/</path>
+        <path>.memory/knowledge</path>
         <recursive>true</recursive>
     </list_files>
 
