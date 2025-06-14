@@ -4,26 +4,26 @@
 
 > 模式存在于 `custom_models_split` 文件夹
 
-| 模式名称            | 描述                                                      | 配置文件路径                                                                  | slug标识                        | whenToUse                |
-|-----------------|---------------------------------------------------------|-------------------------------------------------------------------------|-------------------------------|--------------------------|
-| 📝 文档生成器        | Roo 作为技术文档撰写专家                                          | `custom_models_split/documentation_generator.yaml`                      | documentation-generator       | 当需要生成文档时使用               |
-| 📝 提示工程师        | Roo 作为提示词设计专家                                           | `custom_models_split/prompt_engineer.yaml`                              | prompt-engineer               | 当需要优化提示词时使用              |
-| 📚 知识研究模式       | 领域知识体系构建和规律发现                                           | `custom_models_split/knowledge_research.yaml`                           | knowledge-research            | 当需要深入研究特定技术领域时使用         |
-| 🗂️ 知识库创建器      | 设计结构化知识库存储方案                                            | `custom_models_split/knowledge_base_creator.yaml`                       | knowledge-base-creator        | 当需要从零开始构建知识库体系时使用        |
+| 模式名称            | 描述                                                      | 配置文件路径                                                                  | slug标识                        | whenToUse                        |
+|-----------------|---------------------------------------------------------|-------------------------------------------------------------------------|-------------------------------|----------------------------------|
+| 📝 文档生成器        | Roo 作为技术文档撰写专家                                          | `custom_models_split/documentation_generator.yaml`                      | documentation-generator       | 当需要生成文档时使用                       |
+| 📝 提示工程师        | Roo 作为提示词设计专家                                           | `custom_models_split/prompt_engineer.yaml`                              | prompt-engineer               | 当需要优化提示词时使用                      |
+| 📚 知识研究模式       | 领域知识体系构建和规律发现                                           | `custom_models_split/knowledge_research.yaml`                           | knowledge-research            | 当需要深入研究特定技术领域时使用                 |
+| 🗂️ 知识库创建器      | 设计结构化知识库存储方案                                            | `custom_models_split/knowledge_base_creator.yaml`                       | knowledge-base-creator        | 当需要从零开始构建知识库体系时使用                |
 | 🕷️ 网页抓取解析器     | 使用Playwright/Puppeteer进行页面交互，支持HTML/XML解析和JSON数据提取      | `custom_models_split/web_scraper_parser.yaml`                           | web-scraper-parser            |
-| 💡 文章总结器        | 使用NLP技术生成文本摘要并提取关键信息                                    | `custom_models_split/article_summarizer.yaml`                           | article-summarizer            | 当需要快速提取长文档核心观点时使用        |
+| 💡 文章总结器        | 使用NLP技术生成文本摘要并提取关键信息                                    | `custom_models_split/article_summarizer.yaml`                           | article-summarizer            | 当需要快速提取长文档核心观点时使用                |
 | 📦 配置迁移器        | 处理配置文件的版本管理和跨环境迁移                                       | `custom_models_split/config-mover.yaml`                                 | config-mover                  |
-| 🔍 深度研究模式       | 通过多源数据交叉验证和系统性分析解决复杂问题                                  | `custom_models_split/deep_research.yaml`                                | deep-research                 | 当需要深度分析技术原理或进行跨领域研究时使用   |
-| 📁 文档分类器        | 管理文档文件并将其分类到合适目录                                        | `custom_models_split/document-mover.yaml`                               | document-mover                | 当需要管理文档并自动分类时使用          |
-| 📝 文档生成器        | Roo 作为技术文档撰写专家                                          | `custom_models_split/document_processing/documentation_generator.yaml`  | documentation-generator       | 当需要生成结构合理的技术文档或整理知识体系时使用 |
-| 🧠 Brain        | 将复杂任务拆解为可执行的、逻辑独立的、不可分割的子任务                             | `custom_models_split/task_scheduling/brain.yaml`                        | brain                         | 当需要将任务分解为子任务并协调执行时使用     |
+| 🔍 深度研究模式       | 通过多源数据交叉验证和系统性分析解决复杂问题                                  | `custom_models_split/deep_research.yaml`                                | deep-research                 | 当需要深度分析技术原理或进行跨领域研究时使用           |
+| 📁 文档分类器        | 管理文档文件并将其分类到合适目录                                        | `custom_models_split/document-mover.yaml`                               | document-mover                | 当需要管理文档并自动分类时使用                  |
+| 📝 文档生成器        | Roo 作为技术文档撰写专家                                          | `custom_models_split/document_processing/documentation_generator.yaml`  | documentation-generator       | 当需要生成结构合理的技术文档或整理知识体系时使用         |
+| 🧠 Brain        | 将复杂任务拆解为可执行的、逻辑独立的、不可分割的子任务                             | `custom_models_split/task_scheduling/brain.yaml`                        | brain                         | 当需要将任务分解为子任务并协调执行时使用             |
 | �️ 网页抓取解析器      | 使用Playwright/Puppeteer进行页面交互，支持HTML/XML解析和JSON数据提取      | `custom_models_split/web_scraper_parser.yaml`                           | web-scraper-parser            |
 | 🔍 深度研究模式       | 通过多源数据交叉验证和系统性分析解决复杂问题                                  | `custom_models_split/deep_research.yaml`                                | deep-research                 |
 | 💡 文章总结器        | 使用NLP技术生成文本摘要并提取关键信息                                    | `custom_models_split/article_summarizer.yaml`                           | article-summarizer            |
-| 🕷️ 网页抓取解析器     | 使用Playwright/Puppeteer进行页面交互，支持HTML/XML解析和JSON数据提取      | `custom_models_split/web_scraper_parser.yaml`                           | web-scraper-parser            | 当需要自动化获取和解析网页数据时使用       |
-🔧 Git提交自动化助手   | 根据代码变更自动生成符合规范的提交信息                                | `custom_models_split/git_auto_commit.yaml`                              | git-auto-commit               | 当需要快速生成规范化的提交信息、批量处理多个文件的提交等场景使用 |
-| 🔍 深度研究模式       | 通过多源数据交叉验证和系统性分析解决复杂问题                                  | `custom_models_split/deep_research.yaml`                                | deep-research                 | 当需要深度分析技术原理或进行跨领域研究时使用   |
-| 🐍 Go代码生成器      | 生成高效、符合Go语言规范的代码结构，支持标准库和常见框架，包含必要注释和文档                 | `custom_models_split/code_generator/golang_code_generator.yaml`         | golang-code-generator         | 当需要快速生成Go语言代码模板时使用       |
+| 🕷️ 网页抓取解析器     | 使用Playwright/Puppeteer进行页面交互，支持HTML/XML解析和JSON数据提取      | `custom_models_split/web_scraper_parser.yaml`                           | web-scraper-parser            | 当需要自动化获取和解析网页数据时使用               |
+ 🔧 Git提交自动化助手   | 根据代码变更自动生成符合规范的提交信息                                     | `custom_models_split/git_auto_commit.yaml`                              | git-auto-commit               | 当需要快速生成规范化的提交信息、批量处理多个文件的提交等场景使用 |
+| 🔍 深度研究模式       | 通过多源数据交叉验证和系统性分析解决复杂问题                                  | `custom_models_split/deep_research.yaml`                                | deep-research                 | 当需要深度分析技术原理或进行跨领域研究时使用           |
+| 🐍 Go代码生成器      | 生成高效、符合Go语言规范的代码结构，支持标准库和常见框架，包含必要注释和文档                 | `custom_models_split/code_generator/golang_code_generator.yaml`         | golang-code-generator         | 当需要快速生成Go语言代码模板时使用               |
 | 🐍 Python代码生成器  | 生成符合PEP8规范的Python代码，集成标准库和流行框架，包含完整文档字符串                | `custom_models_split/code_generator/python_code_generator.yaml`         | python-code-generator         |
 | 🐍 GoZero代码生成器  | 生成基于GoZero框架的微服务代码，包含API路由、服务定义和配置文件                    | `custom_models_split/code_generator/go_zero_code_generator.yaml`        | go-zero-code-generator        |
 | 🎉 React代码生成器   | 生成使用函数组件和Hooks的React项目，遵循JSX规范并集成PropTypes/TS类型         | `custom_models_split/code_generator/react_code_generator.yaml`          | react-code-generator          |
@@ -41,6 +41,7 @@
 | 🕷️ 网页抓取解析器     | 使用Playwright/Puppeteer进行页面交互，支持HTML/XML解析和JSON数据提取      | `custom_models_split/web_scraper_parser.yaml`                           | web-scraper-parser            |
 
 ### 📌 字段说明
+
 <br>
 特殊说明：<br>
 - **git-auto-commit**: 支持根据代码变更自动生成符合团队编码标准的提交信息，避免手动输入格式错误，确保所有提交符合规范
@@ -162,18 +163,18 @@ customModes:
 
 ### 🛠️ 可用的MCP工具
 
-| 服务名称 | 工具名称 | 功能描述 | 参数示例 |
-|---------|---------|---------|---------|
-| fetch | fetch_html | 获取网页HTML内容 | `<fetch_html url="https://example.com"/>` |
-| fetch | fetch_json | 获取JSON文件 | `<fetch_json url="https://api.example.com/data.json"/>` |
-| puppeteer | puppeteer_navigate | 导航到指定URL | `<puppeteer_navigate url="https://example.com"/>` |
-| puppeteer | puppeteer_screenshot | 截图页面元素 | `<puppeteer_screenshot name="login_page" selector="#login-form"/>` |
-| think-tool | think | 记录复杂推理 | `<think thought="系统分析过程"/>` |
-| fire-stdio | git_branches | 获取本地分支 | `<git_branches path="/Users/luoxin/persons/knowledge/roo"/>` |
-| fire-stdio | notify_tts | 发送语音通知 | `<notify_tts message="任务完成"/>` |
-| playwright | browser_click | 模拟点击操作 | `<browser_click selector="#submit-btn"/>` |
-| puppeteer | puppeteer_fill | 填写表单字段 | `<puppeteer_fill selector="#username" value="test"/>` |
-| bingcn | bing_search | 执行中文搜索 | `<bing_search query="AI技术" num_results=3/>` |
+| 服务名称       | 工具名称                 | 功能描述       | 参数示例                                                               |
+|------------|----------------------|------------|--------------------------------------------------------------------|
+| fetch      | fetch_html           | 获取网页HTML内容 | `<fetch_html url="https://example.com"/>`                          |
+| fetch      | fetch_json           | 获取JSON文件   | `<fetch_json url="https://api.example.com/data.json"/>`            |
+| puppeteer  | puppeteer_navigate   | 导航到指定URL   | `<puppeteer_navigate url="https://example.com"/>`                  |
+| puppeteer  | puppeteer_screenshot | 截图页面元素     | `<puppeteer_screenshot name="login_page" selector="#login-form"/>` |
+| think-tool | think                | 记录复杂推理     | `<think thought="系统分析过程"/>`                                        |
+| fire-stdio | git_branches         | 获取本地分支     | `<git_branches path="/Users/luoxin/persons/knowledge/roo"/>`       |
+| fire-stdio | notify_tts           | 发送语音通知     | `<notify_tts message="任务完成"/>`                                     |
+| playwright | browser_click        | 模拟点击操作     | `<browser_click selector="#submit-btn"/>`                          |
+| puppeteer  | puppeteer_fill       | 填写表单字段     | `<puppeteer_fill selector="#username" value="test"/>`              |
+| bingcn     | bing_search          | 执行中文搜索     | `<bing_search query="AI技术" num_results=3/>`                        |
 
 ### 🛠️ 补充说明
 

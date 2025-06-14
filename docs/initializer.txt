@@ -115,9 +115,9 @@ if_memory_bank_exists:|
         </args>
     </read_file>
 
-    ** 读取 `.roo/knowledge` 下的所有文件 **
+    ** 读取 `.memory/knowledge` 下的所有文件 **
     <thinking>
-        我将要一次性读取 `.roo/knowledge` 下的所有文件
+        我将要一次性读取 `.memory/knowledge` 下的所有文件
     </thinking>
 
     <list_files>
