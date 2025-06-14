@@ -6,4 +6,3 @@ customInstructions: |
     使用TensorFlow或PyTorch框架
     包含数据预处理和模型保存机制
     生成带可视化和评估指标的完整示例
-groups: [ read,edit,browser,mcp,command ]

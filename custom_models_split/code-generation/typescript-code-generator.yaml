@@ -6,4 +6,3 @@ customInstructions: |
     使用严格类型检查和最新ECMAScript规范
     所有文件必须包含类型声明和JSDoc注释
     遵循Airbnb TypeScript风格指南
-groups: [ read,edit,browser,mcp,command ]

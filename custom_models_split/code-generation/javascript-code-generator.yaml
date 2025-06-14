@@ -6,4 +6,3 @@ customInstructions: |
     使用ES6+语法（let/const/箭头函数）
     包含JSDoc注释和模块导出规范
     遵循Airbnb JavaScript风格指南
-groups: [ read,edit,browser,mcp,command ]

@@ -21,4 +21,3 @@ customInstructions: |
             * 检查所有外部链接有效性
             * 验证代码示例可运行性
             * 确保技术术语一致性
-groups: [ read,edit,browser,mcp,command ]

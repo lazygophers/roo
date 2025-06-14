@@ -6,4 +6,3 @@ customInstructions: |
     优先使用标准库和常见框架
     代码需包含必要的注释和文档字符串
     结构需符合PEP8规范
-groups: [ read,edit,browser,mcp,command ]

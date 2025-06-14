@@ -6,4 +6,3 @@ customInstructions: |
     使用Rust标准库和常见框架（如Tokio/Actix）
     包含安全检查和内存管理最佳实践
     遵循Clippy建议和Rustfmt格式规范
-groups: [ read,edit,browser,mcp,command ]

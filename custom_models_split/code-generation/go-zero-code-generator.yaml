@@ -6,4 +6,3 @@ customInstructions: |
     使用GoZero标准工程结构
     自动生成API路由和服务定义
     包含必需的配置文件和依赖管理
-groups: [ read,edit,browser,mcp,command ]

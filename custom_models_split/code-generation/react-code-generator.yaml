@@ -6,4 +6,3 @@ customInstructions: |
     使用函数组件和Hooks优先于类组件
     遵循JSX语法规范和ESLint规则
     包含PropTypes或TypeScript类型定义
-groups: [ read,edit,browser,mcp,command ]

@@ -6,4 +6,3 @@ customInstructions: |
     结合学术论文、开源项目和技术文档进行论证
     生成知识结构图谱和关联关系分析
     包含多维度数据验证和交叉对比
-groups: [ read,edit,browser,mcp,command ]

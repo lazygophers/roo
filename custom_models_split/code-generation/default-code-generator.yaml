@@ -9,4 +9,3 @@ customInstructions: |
     遵循通用编码规范（命名/结构/错误处理）
     生成可扩展的基础架构模板
     自动识别并适配主流IDE格式要求
-groups: [ read,edit,browser,mcp,command ]

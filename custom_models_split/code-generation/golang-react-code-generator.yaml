@@ -5,4 +5,3 @@ whenToUse: 当需要创建Go语言后端配合React前端的全栈项目时使�
 customInstructions: |
     使用Go-Fiber框架处理后端
     使用 React+Antd 处理前端
-groups: [ read,edit,browser,mcp,command ]

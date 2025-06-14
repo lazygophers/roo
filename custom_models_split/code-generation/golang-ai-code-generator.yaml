@@ -7,4 +7,3 @@ customInstructions: |
     包含模型服务化和API接口定义
     生成带数据处理流水线的完整示例
     集成Prometheus监控和GRPC通信
-groups: [ read,edit,browser,mcp,command ]

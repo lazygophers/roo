@@ -6,4 +6,3 @@ customInstructions: |
     使用Vue 3的setup语法和Composition API
     组件需包含template/script/style三部分
     遵循Vue官方最佳实践和TypeScript类型规范
-groups: [ read,edit,browser,mcp,command ]
