@@ -8,7 +8,7 @@
 |-----------------|---------------------------------------------------------|-------------------------------------------------------------------------|-------------------------------|----------------------------------|
 | 📝 文档生成器        | Roo 作为技术文档撰写专家                                          | `custom_models_split/documentation_generator.yaml`                      | documentation-generator       | 当需要生成文档时使用                       |
 | 📝 提示工程师        | Roo 作为提示词设计专家                                           | `custom_models_split/prompt_engineer.yaml`                              | prompt-engineer               | 当需要优化提示词时使用                      |
-| 📚 知识研究模式       | 领域知识体系构建和规律发现                                           | `custom_models_split/knowledge_research.yaml`                           | knowledge-research            | 当需要深入研究特定技术领域时使用                 |
+| 📚 知识研究模式       | 领域知识体系构建和规律发现                                           | `custom_models_split/knowledge_research.md`                             | knowledge-research            | 当需要深入研究特定技术领域时使用                 |
 | 🗂️ 知识库创建器      | 设计结构化知识库存储方案                                            | `custom_models_split/knowledge_base_creator.yaml`                       | knowledge-base-creator        | 当需要从零开始构建知识库体系时使用                |
 | 🕷️ 网页抓取解析器     | 使用Playwright/Puppeteer进行页面交互，支持HTML/XML解析和JSON数据提取      | `custom_models_split/web_scraper_parser.yaml`                           | web-scraper-parser            |
 | 💡 文章总结器        | 使用NLP技术生成文本摘要并提取关键信息                                    | `custom_models_split/article_summarizer.yaml`                           | article-summarizer            | 当需要快速提取长文档核心观点时使用                |
@@ -21,7 +21,7 @@
 | 🔍 深度研究模式       | 通过多源数据交叉验证和系统性分析解决复杂问题                                  | `custom_models_split/deep_research.yaml`                                | deep-research                 |
 | 💡 文章总结器        | 使用NLP技术生成文本摘要并提取关键信息                                    | `custom_models_split/article_summarizer.yaml`                           | article-summarizer            |
 | 🕷️ 网页抓取解析器     | 使用Playwright/Puppeteer进行页面交互，支持HTML/XML解析和JSON数据提取      | `custom_models_split/web_scraper_parser.yaml`                           | web-scraper-parser            | 当需要自动化获取和解析网页数据时使用               |
- 🔧 Git提交自动化助手   | 根据代码变更自动生成符合规范的提交信息                                     | `custom_models_split/git_auto_commit.yaml`                              | git-auto-commit               | 当需要快速生成规范化的提交信息、批量处理多个文件的提交等场景使用 |
+ 🔧 Git提交自动化助手   | 根据代码变更自动生成符合规范的提交信息                                     | `custom_models_split/git-auto-commit.yaml`                              | git-auto-commit               | 当需要快速生成规范化的提交信息、批量处理多个文件的提交等场景使用 |
 | 🔍 深度研究模式       | 通过多源数据交叉验证和系统性分析解决复杂问题                                  | `custom_models_split/deep_research.yaml`                                | deep-research                 | 当需要深度分析技术原理或进行跨领域研究时使用           |
 | 🐍 Go代码生成器      | 生成高效、符合Go语言规范的代码结构，支持标准库和常见框架，包含必要注释和文档                 | `custom_models_split/code_generator/golang_code_generator.yaml`         | golang-code-generator         | 当需要快速生成Go语言代码模板时使用               |
 | 🐍 Python代码生成器  | 生成符合PEP8规范的Python代码，集成标准库和流行框架，包含完整文档字符串                | `custom_models_split/code_generator/python_code_generator.yaml`         | python-code-generator         |
@@ -37,7 +37,26 @@
 | 🐍 Python爬虫生成器  | 生成async/await异步Python爬虫，集成Scrapy框架和分布式爬取方案              | `custom_models_split/code_generator/python_crawler_code_generator.yaml` | python-crawler-code-generator |
 | 🤖 Python AI生成器 | 生成TensorFlow/PyTorch机器学习代码，包含数据预处理和模型可视化方案              | `custom_models_split/code_generator/python_ai_code_generator.yaml`      | python-ai-code-generator      |
 | 🌀 Go+React生成器  | 生成Go后端+React前端的全栈项目，集成跨域处理和状态管理方案                       | `custom_models_split/code_generator/golang_react_code_generator.yaml`   | golang-react-code-generator   |
+| 🐍 GoZero代码生成器  | 生成基于GoZero框架的微服务代码，包含API路由、服务定义和配置文件                    | `custom_models_split/code_generator/go_zero_code_generator.yaml`        | go-zero-code-generator        |
+| 🦀 Rust代码生成器    | 生成安全高效的Rust系统代码，集成Tokio/Actix框架和Clippy最佳实践              | `custom_models_split/code_generator/rust_code_generator.yaml`           | rust-code-generator           |
+| 🗄️ SQL生成器      | 生成符合ANSI SQL标准的数据库脚本，包含表注释、约束和可移植性设计                    | `custom_models_split/code_generator/sql_code_generator.yaml`            | sql-code-generator            |
+| 🧠 sequentialthinking | 处理复杂决策链的思考模式 | `custom_models_split/sequentialthinking/sequentialthinking.yaml` | sequentialthinking | 当需要多步骤决策时使用  
+| 🧠 memory | 管理记忆体存储和检索 | `custom_models_split/memory/memory.yaml` | memory | 当需要持久化存储上下文时使用  
+| 🧠 git-auto-commit | 自动生成符合规范的提交信息 | `custom_models_split/git_auto_commit.yaml` | git-auto-commit | 当需要批量处理提交时使用
+| � Go AI生成器     | 生成集成Gorgonia框架的Go语言AI服务，包含模型服务化和GRPC接口定义                | `custom_models_split/code_generator/golang_ai_code_generator.yaml`      | golang-ai-code-generator      |
+| 🤖 Python AI生成器 | 生成TensorFlow/PyTorch机器学习代码，包含数据预处理和模型可视化方案              | `custom_models_split/code_generator/python_ai_code_generator.yaml`      | python-ai-code-generator      |
+| 📁 文档分类器        | 管理文档文件并将其分类到合适目录                                        | `custom_models_split/document-mover.yaml`                               | document-mover                | 当需要管理文档并自动分类时使用                  |
+| 📦 配置迁移器        | 处理配置文件的版本管理和跨环境迁移                                       | `custom_models_split/config-mover.yaml`                                 | config-mover                  |
 | 🤖 Go AI生成器     | 生成集成Gorgonia框架的Go语言AI服务，包含模型服务化和GRPC接口定义                | `custom_models_split/code_generator/golang_ai_code_generator.yaml`      | golang-ai-code-generator      |
+|
+
+### ⚙️ 配置原则
+
+1. 项目级配置优先于全局配置
+2. YAML 格式支持多行字符串和注释（如 `|-` 保留换行）
+3. `edit` 权限组可通过 `fileRegex` 限制文件类型
+4. 配置迁移时 JSON 文件会自动转换为 YAML
+5. 权限组 `browser`/`mcp`/`command` 需显式声明
 | 🕷️ 网页抓取解析器     | 使用Playwright/Puppeteer进行页面交互，支持HTML/XML解析和JSON数据提取      | `custom_models_split/web_scraper_parser.yaml`                           | web-scraper-parser            |
 
 ### 📌 字段说明
