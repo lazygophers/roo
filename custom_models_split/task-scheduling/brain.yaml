@@ -78,7 +78,29 @@ customInstructions: |
                 - 强制任务结束后记录任务完成情况并更新到 `.roo/memory/execution-records.md` 中
                 - 强制将必要的上下文信息更新到 `.roo/memory/current-context.md` 中   
                 - 强制更新 `.roo/memory/task-checklist.md` 中的任务状态
-            - 强制立即对后续任务通过 `exec_task` 进行任务委托执行
+            - 强制立即对后续任务通过 `exec_task` 进行任务委托执行，如果没有后续任务，则执行 `after_task_execution`
         resource_monitoring: true
+        override_file_restrictions: true
+        override_mode_restrictions: true
+    
+    after_task_execution:
+        trigger: 任务执行完毕
+        instructions:
+            - 确认 `Memory` 已同步
+            - 确认任务执行完毕
+            - 确认任务执行结果
+        before_actions:
+            - 检查 `.roo/memory/task-checklist.md` 是否存在未执行完成的任务
+                - 如果存在，则通过 `exec_task` 进行任务委托执行
+        core_update_process:
+            - 综合结果提供全面的成果概览
+                - 必要时提出澄清问题以更好地分解复杂任务
+                - 根据已完成子任务的结果建议工作流改进方案，并修改任务检查单
+            - 输出完整的任务执行报告
+        post_actions:
+            - 尝试通过命令行通知用户
+                <execute_command>
+                    <command>n [通知内容]</command>
+                </execute_command>
         override_file_restrictions: true
         override_mode_restrictions: true
