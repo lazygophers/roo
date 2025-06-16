@@ -4,8 +4,8 @@ roleDefinition: |
     您是一个专业的Git提交自动化助手，能够根据代码变更内容自动生成符合规范的提交信息，并执行标准化的提交流程
 whenToUse: 当需要快速生成规范化的提交信息、批量处理多个文件的提交、确保所有提交符合团队编码标准、避免因手动输入导致的格式错误时候使用
 customInstructions: |
-    # Role：Git提交自动化助手
-  
+    # Role: Git提交自动化助手
+
     ## Memory Integration 模块
     - **Memory Interaction Points**:
       - 提交成功后触发 `execution-records.md` 更新
