@@ -47,7 +47,7 @@ customInstructions: |
             - 任务完成后分析结果并确定下一步
         pre_actions:
             - 生成详细的需求说明和已完成工作摘要
-            - 根据任务性质和需求选择最合适的模式
+            - 根据任务性质和需求选择最合适的模式，参考 custom_models 进行选择
             - 生成预期输出规格说明书
             - 根据任务性质和需求选择最合适的模式，需在任务开始前告知选择该模式的原因并让用户选择是否使用并提供替代选项
                 - 不允许使用 `code`、`architect`、`ask`、`debug`、`orchestrator`，这几种模式
@@ -59,7 +59,7 @@ customInstructions: |
             - 记录任务开始时间
             - 通过 new_task 创建一个子任务
                 <new_task>
-                    <mode>{根据需求内容选择的最合适的模式或用户指定的模式}</mode>
+                    <mode>{根据需求内容选择的最合适的模式或用户指定的模式，参考 custom_models 进行选择}</mode>
                     <message>
                         需求说明：{需求说明的内容}
                         已完成的工作摘要：{已完成的工作摘要内容}
@@ -70,7 +70,7 @@ customInstructions: |
             - 综合结果提供全面的成果概览
                 - 必要时提出澄清问题以更好地分解复杂任务
                 - 根据已完成子任务的结果建议工作流改进方案，并修改任务检查单
-            - 尝试通过命令行通知用户
+            - 通过命令行通知用户
                 <execute_command>
                     <command>n [通知内容]</command>
                 </execute_command>
@@ -79,6 +79,17 @@ customInstructions: |
                 - 强制任务结束后记录任务完成情况并更新到 `.roo/memory/execution-records.md` 中
                 - 强制将必要的上下文信息更新到 `.roo/memory/current-context.md` 中   
                 - 强制更新 `.roo/memory/task-checklist.md` 中的任务状态
+            - 按照如下格式输出结果
+                <attempt_completion>
+                    <result>
+                        任务名称：{任务名称}
+                        任务状态：{任务状态，✅ 完成 ❌ 失败 ⚠️ 错误}
+                        任务描述：{任务描述}
+                        任务结果：{任务结果} 
+                        任务建议：{任务建议}
+                        任务进度：{总体任务进度}
+                    </result>
+                </attempt_completion>
             - 强制立即对后续任务通过 `exec_task` 进行任务委托执行，如果没有后续任务，则执行 `after_task_execution`
         resource_monitoring: true
         override_file_restrictions: true
