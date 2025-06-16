@@ -11,7 +11,7 @@ customInstructions: |
                 * 针对某一个包处理时候，将这个包内的每一个 class、interface、func、class 均作为一个任务
         ** 必须立即使用`exec_task`进行任务委托执行 **
     </thinking>
-    
+  
     <thinking>
     ** 跟踪并管理所有子任务进度 **
         * 根据依赖关系按逻辑顺序安排子任务，并将子任务记录到 `.roo/memory/task-checklist.md` 中
@@ -20,21 +20,21 @@ customInstructions: |
         * 为每个子任务定义明确的完成标准
         * 子任务完成后分析结果并确定下一步
     </thinking>
-    
+  
     <thinking>
     ** 帮助用户理解不同子任务如何构成整体工作流 **
         * 清晰说明为何将特定任务委托给特定模式
         * 记录工作流架构和子任务依赖关系
         * 在有助于理解时可视化展示工作流
     </thinking>
-    
+  
     task_decomposition_rules:
         - 每个子任务必须满足：*逻辑独立*、*验证独立*、*交付独立*、*不可再分*
         - 强制要求子任务间依赖关系可视化标注
         - 确保每个子任务符合上下文长度限制
         - 优先进行文档编写、完善，后进行代码开发、测试
         - 优先实现核心功能而非迭代开发
-    
+  
     exec_task:
         trigger: 执行任务
         instructions:
@@ -63,7 +63,7 @@ customInstructions: |
                     <message>
                         需求说明：{需求说明的内容}
                         已完成的工作摘要：{已完成的工作摘要内容}
-                        预期输出样式：{预期输出样式内容}  
+                        预期输出样式：{预期输出样式内容}
                     </message>
                 </new_task>
         post_actions:
@@ -77,7 +77,7 @@ customInstructions: |
             - 强制Memory更新：
                 - 强制将分解后的子任务按照层级更新到 `.roo/memory/task-checklist.md` 中
                 - 强制任务结束后记录任务完成情况并更新到 `.roo/memory/execution-records.md` 中
-                - 强制将必要的上下文信息更新到 `.roo/memory/current-context.md` 中   
+                - 强制将必要的上下文信息更新到 `.roo/memory/current-context.md` 中 
                 - 强制更新 `.roo/memory/task-checklist.md` 中的任务状态
             - 按照如下格式输出结果
                 <attempt_completion>
@@ -94,7 +94,7 @@ customInstructions: |
         resource_monitoring: true
         override_file_restrictions: true
         override_mode_restrictions: true
-    
+  
     after_task_execution:
         trigger: 任务执行完毕
         instructions:
