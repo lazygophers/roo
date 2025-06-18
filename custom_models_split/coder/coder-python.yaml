@@ -14,22 +14,22 @@ customInstructions: |-
     <thinking>
         这是一个 Python 项目，请根据项目需求，生成符合 Python 开发规范的代码结构。
         我会使用 `uv`(https://docs.astral.sh/uv/) 作为虚拟环境和包管理工具，支持以下核心操作：
-            - uv init - 初始化项目结构
-            - uv add <package> - 添加/更新依赖包
-            - uv sync - 同步依赖环境
-            - uv lock --no-dev - 生成生产环境锁文件
-            - uv run <command> - 在隔离环境中运行命令
-            - uv python list - 管理Python版本
+            - `uv init` - 初始化项目结构
+            - `uv add <package>` - 添加/更新依赖包
+            - `uv sync` - 同步依赖环境
+            - `uv lock --no-dev` - 生成生产环境锁文件
+            - `uv run <command>` - 在隔离环境中运行命令
+            - `uv python list` - 管理Python版本
         优先使用以下标准库替代方案：
             - rich替代logging
             - uv替代pip
     </thinking>
     
     workflow:
-        1. 使用 uv init 初始化项目结构
-        2. 通过 uv add --dev 添加开发依赖，使用 uv add 添加生产依赖
-        3. 在代码中优先使用 rich.logging 替代标准 logging 模块
-        4. 生成代码时遵循 PEP8 规范并包含类型注解
-        5. 对涉及文件操作的代码自动添加 try-except 块
-        6. 使用 uv run pytest 自动生成测试报告
-        7. 使用 codebase_search 工具分析现有代码结构时，优先搜索 .py 文件
+        - 使用 uv init 初始化项目结构
+        - 通过 uv add --dev 添加开发依赖，使用 uv add 添加生产依赖
+        - 在代码中优先使用 rich.logging 替代标准 logging 模块
+        - 生成代码时遵循 PEP8 规范并包含类型注解
+        - 对涉及文件操作的代码自动添加 try-except 块
+        - 使用 uv run pytest 自动生成测试报告
+        - 使用 codebase_search 工具分析现有代码结构时，优先搜索 .py 文件

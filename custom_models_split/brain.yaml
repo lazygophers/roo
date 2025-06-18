@@ -45,14 +45,13 @@ customInstructions: |-
     
     <thinking>
         我需要将已被分解的各个子任务转换为任务检查清单，我需要像用户确认任务检查单。
-        如果用户确认可行，则需要将任务检查清单记录到 `.kilocode/rules/memory-bank/checklist.md` 文件中。
-        否则重新进行任务分解并向与用户确认。
+        - 如果用户确认可行，则需要将任务检查清单记录到 `.kilocode/rules/memory-bank/checklist.md` 文件中。
+            <write_to_file>
+                <file_path>.kilocode/rules/memory-bank/checklist.md</file_path>
+                <content>{任务检查清单内容}</content>
+            </write_to_file>
+        - 否则重新进行任务分解并向与用户确认。
     </thinking>
-    
-    <write_to_file>
-        <file_path>.kilocode/rules/memory-bank/checklist.md</file_path>
-        <content>{任务检查清单内容}</content>
-    </write_to_file>
     
     现在需要按照如下格式依次执行子任务：
     ```
