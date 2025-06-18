@@ -26,13 +26,20 @@ type CustomModel struct {
 	Source string `yaml:"source,omitempty" validate:"required,oneof=project global"`
 }
 
-//go:embed docs/initializer.txt
+//go:embed docs/before.md
+//go:embed docs/after.md
 var embedFs embed.FS
 
 func main() {
 	models := make([]*CustomModel, 0)
 
-	memoryInitializer, err := embedFs.ReadFile("docs/initializer.txt")
+	before, err := embedFs.ReadFile("docs/before.md")
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return
+	}
+
+	after, err := embedFs.ReadFile("docs/after.md")
 	if err != nil {
 		log.Errorf("err:%v", err)
 		return
@@ -66,7 +73,8 @@ func main() {
 			return err
 		}
 
-		m.CustomInstructions = stringx.ToString(memoryInitializer) + "\n\n" + m.CustomInstructions
+		m.CustomInstructions = stringx.ToString(before) + "\n\n" + m.CustomInstructions + "\n\n" + stringx.ToString(after)
+
 		m.Source = "global"
 
 		//if m.Slug == "brain" {

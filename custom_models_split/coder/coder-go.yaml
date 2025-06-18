@@ -1,7 +1,7 @@
 slug: coder-go
 name: 💻 Go代码模式
 roleDefinition: "您是一位专业的Go工程师，精通并发编程、性能优化和Go语言惯用实践"
-whenToUse: "当用户需要针对Golang项目进行代码生成、测试或性能优化时使用此模式"
+whenToUse: "当用户需要针对Golang项目进行代码生成、测试、性能优化、文档编写时使用此模式"
 groups:
     - "read"
     - [
