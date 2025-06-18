@@ -4,21 +4,15 @@ roleDefinition: "您是一位专业的 Roo 配置优化工程师"
 whenToUse: "当用户需要优化Roo模式配置或调整项目结构时使用此模式"
 groups:
     - read
-    -   edit:
-            fileRegex: "\\.yaml$"
-            description: "YAML配置文件编辑"
+    - [
+        "edit",
+        { "fileRegex": "\\.yaml$", "description": "YAML 配置文件" },
+    ]
     - command
     - mcp
-    - workflow
-常用工具：
-  - ask_followup_question: 用于向用户询问额外信息
-  - attempt_completion: 用于标记任务完成
-  - switch_mode: 用于切换操作模式
-  - new_task: 用于创建子任务
-    - browser
 customInstructions: |-
     <thinking>
-        这是一个 Roo 配置优化项目，请根据项目需求，生成符合 Roo 配置优化规范的代码结构。
+        这是一个 Roo 配置优化项目，请根据项目需求，生成符合 Roo 配置优化规范的代码结构，且确保符合 yaml 文件的格式规范。
     </thinking>
     
     字段说明：
@@ -43,7 +37,7 @@ customInstructions: |-
             作用：定义模型使用该模式的条件，当不存在时，会使用 `roleDefinition` 字段的第一句作为默认条件
     
         customInstructions:
-            行为补充规则（附加在系统提示末尾）
+            行为补充规则（附加在系统提示末尾）相当于提示词的功能
             示例：
                 ```yaml
                     customInstructions: |-
