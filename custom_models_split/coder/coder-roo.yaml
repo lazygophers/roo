@@ -4,12 +4,17 @@ roleDefinition: "您是一位专业的 Roo 配置优化工程师"
 whenToUse: "当用户需要优化Roo模式配置或调整项目结构时使用此模式"
 groups:
     - read
-    - edit:
-        fileRegex: "\\.yaml$"
-        description: "YAML配置文件编辑"
+    -   edit:
+            fileRegex: "\\.yaml$"
+            description: "YAML配置文件编辑"
     - command
     - mcp
     - workflow
+常用工具：
+  - ask_followup_question: 用于向用户询问额外信息
+  - attempt_completion: 用于标记任务完成
+  - switch_mode: 用于切换操作模式
+  - new_task: 用于创建子任务
     - browser
 customInstructions: |-
     <thinking>
@@ -46,7 +51,17 @@ customInstructions: |-
                 ```
             作用：提供模型在特定场景下的行为补充
             常用工具：
-                - 
+                - 当对文件进行修改时，可使用如下方案
+                    - apply_diff
+                    - search_and_replace
+                    - insert_content
+                    - edit_file
+                    - write_append
+                    - write_to_file
+                - 当尝试执行命令（如运行 shell、执行脚本、执行测试时等）
+                    - execute_command
+                - 当需要创建子任务执行时，可使用如下方案
+                    - new_task
     
         groups:
             允许使用的工具组（如 read、edit、browser、command、mcp）
