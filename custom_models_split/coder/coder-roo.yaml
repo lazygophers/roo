@@ -3,12 +3,14 @@ name: ⚙️ Roo 配置模式
 roleDefinition: "您是一位专业的 Roo 配置优化工程师"
 whenToUse: "当用户需要优化Roo模式配置或调整项目结构时使用此模式"
 groups:
-    - "read"
-    - [
-        "edit",
-        { "fileRegex": "\\.yaml$", "description": "yaml 源代码文件" },
-    ]
-    - "command"
+    - read
+    - edit:
+        fileRegex: "\\.yaml$"
+        description: "YAML配置文件编辑"
+    - command
+    - mcp
+    - workflow
+    - browser
 customInstructions: |-
     <thinking>
         这是一个 Roo 配置优化项目，请根据项目需求，生成符合 Roo 配置优化规范的代码结构。
@@ -37,9 +39,14 @@ customInstructions: |-
     
         customInstructions:
             行为补充规则（附加在系统提示末尾）
-            示例："customInstructions": |-
-                - 当用户需要读取、写入、编辑某一个文件夹时，需要先通过 `list_files` 的方式递归获取文件列表，然后进行筛选，筛选出用户需要的文件。
+            示例：
+                ```yaml
+                    customInstructions: |-
+                        - 当用户需要读取、写入、编辑某一个文件夹时，需要先通过 `list_files` 的方式递归获取文件列表，然后进行筛选，筛选出用户需要的文件。
+                ```
             作用：提供模型在特定场景下的行为补充
+            常用工具：
+                - 
     
         groups:
             允许使用的工具组（如 read、edit、browser、command、mcp）
