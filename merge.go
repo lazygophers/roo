@@ -17,12 +17,13 @@ type CustomModel struct {
 	Name string `yaml:"name,omitempty" validate:"required"`
 
 	RoleDefinition string `yaml:"roleDefinition,omitempty" validate:"required"`
-	WhenToUse      string `yaml:"whenToUse,omitempty" validate:"required"`
+	WhenToUse      string `yaml:"whenToUse,omitempty"`
 
 	CustomInstructions string `yaml:"customInstructions,omitempty" validate:"required"`
 
-	Groups []string `yaml:"groups,omitempty" validate:"required,dive,oneof=read edit browser mcp command"`
-	Source string   `yaml:"source,omitempty" validate:"required,oneof=project global"`
+	//Groups []any `yaml:"groups,omitempty" validate:"required,dive,oneof=read edit browser mcp command"`
+	Groups any    `yaml:"groups,omitempty"`
+	Source string `yaml:"source,omitempty" validate:"required,oneof=project global"`
 }
 
 //go:embed docs/initializer.txt
@@ -37,7 +38,7 @@ func main() {
 		return
 	}
 
-	var brainModel *CustomModel
+	//var brainModel *CustomModel
 
 	err = filepath.WalkDir("./custom_models_split", func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
@@ -68,20 +69,16 @@ func main() {
 		m.CustomInstructions = stringx.ToString(memoryInitializer) + "\n\n" + m.CustomInstructions
 		m.Source = "global"
 
-		if m.Slug == "brain" {
-			brainModel = &m
-			m.Groups = []string{
-				"read",
-				"edit",
-			}
-		} else {
-			m.Groups = []string{
-				"read",
-				"edit",
-				"browser",
-				"mcp",
-				"command",
-			}
+		//if m.Slug == "brain" {
+		//	brainModel = &m
+		//}
+
+		m.Groups = []string{
+			"read",
+			"edit",
+			"command",
+			"browser",
+			"mcp",
 		}
 
 		err = utils.Validate(&m)
@@ -99,18 +96,18 @@ func main() {
 		return
 	}
 
-	{
-		brainModel.CustomInstructions += "\n\ncustom_models:"
-
-		for _, model := range models {
-			if model.Slug == "brain" {
-				continue
-			}
-
-			brainModel.CustomInstructions += "\n\t- 模式: " + model.Slug
-			brainModel.CustomInstructions += "\n\t  使用场景: " + model.WhenToUse
-		}
-	}
+	//{
+	//	brainModel.CustomInstructions += "\n\ncustom_models:"
+	//
+	//	for _, model := range models {
+	//		if model.Slug == "brain" {
+	//			continue
+	//		}
+	//
+	//		brainModel.CustomInstructions += "\n\t- 模式: " + model.Slug
+	//		brainModel.CustomInstructions += "\n\t  使用场景: " + model.WhenToUse
+	//	}
+	//}
 
 	models = candy.SortUsing(models, func(a, b *CustomModel) bool {
 		if a.Slug == "brain" {

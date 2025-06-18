@@ -3,7 +3,7 @@ module roo
 go 1.24.4
 
 require (
-	github.com/lazygophers/log v0.0.0-20250606031653-4b9764f07644
+	github.com/lazygophers/log v0.0.0-20250615130142-4e04852389de
 	github.com/lazygophers/utils v0.0.0-20250605071302-26760728bd7e
 	gopkg.in/yaml.v3 v3.0.1
 )
