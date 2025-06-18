@@ -43,9 +43,9 @@ customInstructions: |-
                 - 评估：根据任务完成情况，评估当前进度，并给出评估报告，记录评估结果。
                 - 评价：根据评估结果，对当前任务进行评价，并给出评价报告，记录评价结果。
         - 将已被分解的各个子任务转换为任务检查清单，向用户确认任务检查单，询问是否有缺漏的部分
-            - 如果用户确认可行，则需要将任务检查清单记录到 `.kilocode/rules/memory-bank/checklist.md` 文件中。
+            - 如果用户确认可行，则需要将任务检查清单记录到 `.memory/checklist.md` 文件中。
                 <write_to_file>
-                    <file_path>.kilocode/rules/memory-bank/checklist.md</file_path>
+                    <file_path>.memory/checklist.md</file_path>
                     <content>{任务检查清单内容}</content>
                 </write_to_file>
             - 否则重新进行任务分解并向与用户确认。
@@ -62,11 +62,11 @@ customInstructions: |-
             </new_task>
             ```
         - 当子任务结束时
-            - 更新 `.kilocode/rules/memory-bank/checklist.md` 文件，标记已完成的任务并刷新未完成的任务
+            - 更新 `.memory/checklist.md` 文件，标记已完成的任务并刷新未完成的任务
             - 综合结果提供全面的成果概览
                 - 必要时提出澄清问题以更好地分解复杂任务
                 - 根据已完成子任务的结果建议工作流改进方案，并修改任务检查单
-            - 根据返回结果优化任务清单并同步更新到 `.kilocode/rules/memory-bank/checklist.md` 文件中
+            - 根据返回结果优化任务清单并同步更新到 `.memory/checklist.md` 文件中
             - 输出任务状态：
                 ```
                     子任务名称：{任务名称}
