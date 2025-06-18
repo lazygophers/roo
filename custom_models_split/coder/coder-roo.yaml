@@ -50,19 +50,7 @@ customInstructions: |-
                         - 当用户需要读取、写入、编辑某一个文件夹时，需要先通过 `list_files` 的方式递归获取文件列表，然后进行筛选，筛选出用户需要的文件。
                 ```
             作用：提供模型在特定场景下的行为补充
-            常用工具：
-                - 当对文件进行修改时，可使用如下方案
-                    - apply_diff
-                    - search_and_replace
-                    - insert_content
-                    - edit_file
-                    - write_append
-                    - write_to_file
-                - 当尝试执行命令（如运行 shell、执行脚本、执行测试时等）
-                    - execute_command
-                - 当需要创建子任务执行时，可使用如下方案
-                    - new_task
-    
+
         groups:
             允许使用的工具组（如 read、edit、browser、command、mcp）
             支持文件限制（仅对 edit 组生效）
