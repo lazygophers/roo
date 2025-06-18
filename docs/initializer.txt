@@ -1,181 +1,38 @@
-* 根据存储体的当前状态，以'[Memory：启用]'或'[Memory：已禁用]'开始每次响应
-* 不要迎合我的任何错误观点，也不要尊敬我，不要委婉回答，必须严格评价我对问题的理解且审核我的问题是否足够精确，但注意，严格并不是挑刺，对于我说的正确答案要肯定，有问题的答案要严格指出并且逻辑清晰的指出问题所在，我们的目标是达到最高的沟通效率，但请用温柔的方式指出问题（如："非常对不起～主人的理解有一点小偏差呢～让我们一起来确认下细节吧～」）
-* 我会向您提供有关我的问题所需的信息，而您的职责是解决我的问题。在您的回答中使用适合所有级别的人的智能、简单和易于理解的语言将很有帮助。 用要点逐步解释您的解决方案很有帮助。 尽量避免过多的技术细节，但在必要时使用它们。 我希望您回复解决方案，而不是写任何解释。
-* 所有对文件的修改操作均应按照如下顺序尝试 search_and_replace、apply_diff、insert_content、edit_file、write_append、write_to_file 变更文件
-* 在需要进行决策时（如选择存储方案、数据库类型、架构框架等）请收集各个决策的优缺点等各种信息，通过 `ask_followup_question` 由我来进行决策
-* 为了任务的完成，请使用 `Memory` 进行信息存储和检索，请勿使用其他方式进行信息存储和检索。根据不同文件的类型定位，将相关信息存储到相关位置，在不需要时自行清理
-* 确保当前模式适合当前任务，如果不适合，请切换至 brain 模式选择合适的任务、拆解任务、调度执行，而非直接通过 switch_mode 切换模式
+<thinking>
+    * 根据存储体的当前状态，以'[Memory：启用]'或'[Memory：已禁用]'开始每次响应
+    * 所有对文件的修改操作均应按照如下顺序尝试 search_and_replace、apply_diff、insert_content、edit_file、write_append、write_to_file 变更文件
+    * 在需要进行决策时（如选择存储方案、数据库类型、架构框架等）请收集各个决策的优缺点等各种信息，通过 `ask_followup_question` 由我来进行决策
+    * 为了任务的完成，请使用 `memory-bank`(内容位于 `.kilocode/rules/memory-bank`) 进行信息存储和检索，请勿使用其他方式进行信息存储和检索。根据不同文件的类型定位，将相关信息存储到相关位置，在不需要时自行清理
+</thinking>
 
-**检查并更新`Memory`:**
-    * 首先通过 `directory_tree` 或 `list_files` 检查是否存在 `.memory` 文件夹
-* 如果存在，则通过 if_memory_bank_exists 加载 `Memory` 的内容
-* 如果不存，则通过 if_no_memory_bank 进行 `Memory` 初始化
+<thinking>
+    首先，我需要检查 memory-bank 是否存在，如果存在，则加载 memory-bank
+</thinking>
 
-if_no_memory_bank: |
-    1. ** 告知用户未找到记录存储，建议创建一个记录存储，已维护上下文 **
-    2. ** 询问用户是否需要初始化 **
-    3. ** 如果用户拒绝 **
-        <thinking>
-            我需要在没有记录存储功能的情况下继续执行任务
-        </thinking>
+<list_files>
+    <path>.kilocode/rules/memory-bank/</path>
+    <recursive>true</recursive>
+</list_files>
 
-        a. 告知用户不会创建存储库
-        b. 将状态设置为“[Memory：已禁用]”
-        c. 如果需要，使用当前上下文继续执行任务，或者如果没有提供任务，请使用 `ask_followup_question` 工具
+依次读取上述的所有文件，其中：
+- `checklist.md` 是一个任务检查清单，其中当前上下文的任务列表、任务信息
+- `context.md` 是一个上下文描述文件，其中包含当前上下文的描述信息，用于在多任务中接收任务背景
+- `product.md` 是一个产品描述文件，其中包含当前产品描述信息，用于在多任务中接收产品背景
 
-    4. ** 如果用户同意 **
-        <thinking>
-            我需要创建 `.memory` 目录和核心文件。我应该使用 write_to_file 来完成这项工作，并且每次写入一个文件，等待每个文件完成后的确认
-        </thinking>
+<thinking>
+    针对 memory-bank，我需要遵循以下的更新策略:
+    checkist:
+        更新时机：任务状态发生变化时
+        文件路径：.kilocode/rules/memory-bank/checklist.md
+        存储结构：任务简单清单
+    context:
+        更新时机：任务背景发生变化时或用户对当前任务有特殊需求时
+        文件路径：.kilocode/rules/memory-bank/context.md
+        存储结构：任务背景描述，分章节结构化的文档
+    product:
+        更新时机：产品背景发生变化时或用户对整个项目有特殊的需求时
+        文件路径：.kilocode/rules/memory-bank/product.md
+        存储结构：产品背景描述，分章节结构化的文档
+</thinking>
 
-    5. ** 检查 `README.md` **
-        - 创建记录存储前通过 `list_files` 检查是否存在 `README.md` 文件
-        - ** 如果存在 **
-            - 先阅读其内容
-        - ** 如果没有 **
-            - 跳过
-
-    <thinking>
-        我需要为存储库文件添加默认内容
-    </thinking>
-
-    a. 创建 `.memory` 目录，并使用 `initial_content` 创建文件：
-        - `task-checklist.md` - 任务检查清单
-        - `system-patterns.md` - 系统规则存储
-        - `execution-records.md` - 执行记录
-        - `current-context.md` - 当前上下文缓存
-    b. 创建 `.memory/knowledge` 目录，用于存储知识库
-    c. 将状态设置为"[Memory: 启用]"，并通知用户存储库已初始化且现在处于活动状态
-    d. 使用`Memory`中的上下文继续执行任务，如果没有提供任务，则使用 `ask_followup_question` 工具
-
-initial_content:
-    task-checklist.md: |
-        # 任务检查清单
-
-    system-patterns.md: |
-        # 系统行为模式
-
-        ## 编码模式
-
-        ## 架构模式
-
-        ## 测试模式
-
-        ## 文档模式
-
-    execution-records.md:|
-       # 执行记录
-
-    current-context.md:|
-        # 上下文信息
-
-        ## 当前重点
-
-        ## 最近的变化
-
-        ## 未决问题/议题
-
-if_memory_bank_exists:|
-    ** 读取 `.memory` 下的所有文件 **
-    <thinking>
-        我将要一次性读取 `.memory` 下的所有文件
-    </thinking>
-
-    <read_file>
-        <args>
-            <file>
-                <path>.memory/system-patterns.md</path>
-            </file>
-            <file>
-                <path>.memory/current-context.md</path>
-            </file>
-            <file>
-                <path>.memory/task-checklist.md</path>
-            </file>
-            <file>
-                <path>.memory/execution-records.md</path>
-            </file>
-        </args>
-    </read_file>
-
-    ** 读取 `.memory/knowledge` 下的所有文件 **
-    <thinking>
-        我将要一次性读取 `.memory/knowledge` 下的所有文件
-    </thinking>
-
-    <list_files>
-        <path>.memory/knowledge</path>
-        <recursive>true</recursive>
-    </list_files>
-
-    * 依次加载所有文件，并压缩
-
-memory_updates:
-    frequency: 当存在变更时，则更新`Memory`
-    system-patterns.md:
-        trigger: 当用户明确某一个针对项目、规范的需要时。Use your judgement.
-        action: |
-            <thinking>
-                我需要更新 system-patterns.md，添加简要总结和时间戳
-                使用 insert_content 来*追加*新模式，或者如果需要，使用 apply_diff 来修改现有条目。始终包含时间戳
-            </thinking>
-        format: "[YYYY-MM-DD HH:MM:SS] - [Description of Pattern/Change]"
-    current-context.md:
-        trigger: 当高级项目描述、目标、功能或整体架构发生显著变化时。Use your judgement.
-        action: |
-            <thinking>
-                我需要用简短的摘要和时间戳来更新 current-context.md
-                使用 insert_content 函数将内容*追加*到相关章节（例如“当前焦点”、“最近更改”和“未解决的问题/问题”），或根据需要使用 apply_diff 函数修改现有条目。请务必添加时间戳
-            </thinking>
-        format: "[YYYY-MM-DD HH:MM:SS] - [Summary of Change/Focus/Issue]"
-    task-checklist.md:
-        trigger: 当有新的任务或有任务状态变化时。Use your judgement.
-        action: |
-            <thinking>
-                有新的任务或任务状态变化，需要更新 task-checklist.md
-                使用 insert_content 来*追加*新信息，或者在必要时使用 apply_diff 来修改现有条目。
-            </thinking>
-        format:
-            状态变化时: "- [x] [任务详情]"
-            新增任务时: "- [ ] [任务详情]"
-    execution-records.md:
-        trigger: 当有新的任务执行记录时
-        action: |
-            <thinking>
-                有新的任务执行记录，需要更新 execution-records.md
-                使用 insert_content 来*追加*新信息，或者在必要时使用 apply_diff 来修改现有条目。时间戳和变更摘要将被作为脚注追加到文件末尾
-            </thinking>
-        format: "[YYYY-MM-DD HH:MM:SS] - [Summary of Change/Focus/Issue]"
-
-update_memory:
-    trigger: "^(更新 Memory)$"
-    instructions:
-        - "Halt Current Task: Stop current activity"
-        - "Acknowledge Command: '[Memory: 更新]'"
-        - "Review Chat History"
-    user_acknowledgement_text: '[Memory: 更新]'
-    core_update_process:
-        - 当前会话回顾
-            - 分析完整聊天历史
-            - 提取跨模式信息
-            - 追踪模式转换
-            - 映射活动关系
-        - 全面更新
-            - 从所有模式角度进行更新
-            - 保留不同模式下的语境
-            - 维护活动线程
-            - 文件模式交互
-        - 内存库同步
-            - 更新所有受影响的文件
-            - 确保跨模式一致性
-            - 保留活动背景
-            - 文件延续点
-    task_focus: 在更新期间，重点捕捉聊天会话*中提供的任何澄清、问题解答或上下文。这些信息应添加到相应的记忆库文件中，并使用其他模式的更新格式作为指导。 *请勿*试图总结整个项目或执行当前聊天范围之外的操作
-    cross-mode_updates: 在更新期间，确保捕获聊天会话中的所有相关信息并将其添加到记忆库中。这包括聊天过程中提供的任何说明、问题解答或上下文。以其他模式的更新格式为指导，将这些信息添加到相应的记忆库文件中
-    post_actions:
-        - `Memory`完全同步
-        - 保留所有模式上下文
-        - 会议可以安全结束
-        - 下一位助手将掌握完整的背景资料
-    override_file_restrictions: true
-    override_mode_restrictions: true
+language: zh-cn
