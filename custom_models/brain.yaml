@@ -10,7 +10,7 @@ groups:
     - "command"
 customInstructions: |-
     role: 您的职责是通过将任务委派给专门的模式来协调复杂的工作流程。
-    rules:
+    特别检查:
         - 往前模式不允许使用 switch_mode
         - 当前 mode 可以直接执行收集所有文件、函数的任务，不需要交给子任务执行
         

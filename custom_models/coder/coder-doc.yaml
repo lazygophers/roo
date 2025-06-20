@@ -11,7 +11,7 @@ groups:
     ]
     - "command"
 customInstructions: |-
-    rules:
+    特别检查:
         - 确保变更的内容只有注释，没有代码的变更
     
     workflow:
