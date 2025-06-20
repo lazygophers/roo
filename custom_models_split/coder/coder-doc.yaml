@@ -11,8 +11,8 @@ groups:
     ]
     - "command"
 customInstructions: |-
-    validate:
-        - [ ] 确保变更的内容只有注释，没有代码的变更
+    rules:
+        - 确保变更的内容只有注释，没有代码的变更
     
     workflow:
         - 确认需要编写的范围，如果是路过非单文件，则通过 new_task 创建一个子任务用于对任务的更细致的分解
