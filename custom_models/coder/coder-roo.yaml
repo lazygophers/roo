@@ -38,10 +38,18 @@ customInstructions: |-
     
         customInstructions:
             行为补充规则（附加在系统提示末尾）相当于提示词的功能
+            组成：
+                - thinking：放置于开头，由 <thinking> </thinking> 标签包裹，填写模型的基础设定，包括但不限于规则、限定等    
+                - workflow: 模型执行流程
             示例：
                 ```yaml
                     customInstructions: |-
-                        - 当用户需要读取、写入、编辑某一个文件夹时，需要先通过 `list_files` 的方式递归获取文件列表，然后进行筛选，筛选出用户需要的文件。
+                        <thinking>
+                            这是一个 Roo 配置优化项目，请根据项目需求，生成符合 Roo 配置优化规范的代码结构，且确保符合 yaml 文件的格式规范。
+                        </thinking>
+    
+                        workflow:
+                            - 创建一个名为 roo.yaml 的文件，并填写内容
                 ```
             作用：提供模型在特定场景下的行为补充
 
@@ -52,9 +60,4 @@ customInstructions: |-
                 `["edit", { "fileRegex": "\\.md$", "description": "Markdown files only" }]`
     
         source:
-            模型的作用范围（project、global）
-    
-        apiConfiguration:
-            模型参数配置（如 model、temperature）
-            示例：
-                `{"model": "gpt-4", "temperature": 0.2}`
+            模型的作用范围（global/project）
