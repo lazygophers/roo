@@ -26,20 +26,20 @@ type CustomModel struct {
 	Source string `yaml:"source,omitempty" validate:"required,oneof=project global"`
 }
 
-//go:embed docs/before.md
-//go:embed docs/after.md
+//go:embed models_hook/before.md
+//go:embed models_hook/after.md
 var embedFs embed.FS
 
 func main() {
 	models := make([]*CustomModel, 0)
 
-	before, err := embedFs.ReadFile("docs/before.md")
+	before, err := embedFs.ReadFile("models_hook/before.md")
 	if err != nil {
 		log.Errorf("err:%v", err)
 		return
 	}
 
-	after, err := embedFs.ReadFile("docs/after.md")
+	after, err := embedFs.ReadFile("models_hook/after.md")
 	if err != nil {
 		log.Errorf("err:%v", err)
 		return
@@ -47,7 +47,7 @@ func main() {
 
 	//var brainModel *CustomModel
 
-	err = filepath.WalkDir("./custom_models_split", func(path string, d fs.DirEntry, err error) error {
+	err = filepath.WalkDir("./custom_models", func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
 			log.Errorf("err:%v", err)
 			return err
