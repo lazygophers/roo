@@ -39,18 +39,47 @@
         - 任务、子任务完成时，通知任务完成详情
         - 需要用户抉择时，通知抉择详情
         - 任务进度发生变更时，通知任务进度
-    用法: 
-        ```
-        <execute_command>
-            <command>n <content> [title]</command>
-        </execute_command>
-        ```
-    参数:
-        content: 必填，通知内容
-        title:   可选，通知标题（默认为空）
-    样例：
-        - n "任务完成" "代码生成任务进度报告"
-        - n "任务进度 85%，预计还有 5 分钟完成" "代码生成任务进度报告"
+    通知优先级：fire-tts > n > fire-system
+    通知方式:
+        fire-tts:
+            用法: 
+                ```
+                <use_mcp_tool>
+                    <server_name>fire</server_name>
+                    <tool_name>notify_tts</tool_name>
+                    <arguments>
+                        {
+                          "content": "{通知内容}",
+                          "title": "{选填，通知标题}"
+                        }
+                    </arguments>
+                </use_mcp_tool>
+                ```
+        fire-system:
+            用法: 
+                ```
+                <use_mcp_tool>
+                    <server_name>fire</server_name>
+                    <tool_name>notify_system</tool_name>
+                    <arguments>
+                        {
+                          "content": "{通知内容}",
+                          "title": "{选填，通知标题}"
+                        }
+                    </arguments>
+                </use_mcp_tool>
+                ```
+        n:
+            用法: 
+                ```
+                <execute_command>
+                    <command>n <content> [title]</command>
+                </execute_command>
+                ```
+            参数:
+                content: 必填，通知内容
+                title:   可选，通知标题（默认为空）
+            样例：n "任务进度 85%，预计还有 5 分钟完成" "代码生成任务进度报告"
 memory-bank:
     files:
         checklist:
@@ -62,7 +91,7 @@ memory-bank:
             action:|-
                 <thinking>
                     任务清单、状态发生变化时，需要更新 `.memory/checklist.md`。
-                    文件以 *多级* *任务列表* 的格式记录任务检查清单。
+                    文件以 *表格* 记录任务检查清单。
                 </thinking>     
         context:
             path: ".memory/context.md"

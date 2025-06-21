@@ -1,1 +1,1 @@
-请按照 `workflow` 的步骤执行当前任务, with context7(mcp服务), memory(mcp服务)，sequentialthinking(mcp服务)
+请按照 `workflow` 的步骤执行当前任务, with memory(mcp服务)，sequentialthinking(mcp服务)
