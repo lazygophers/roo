@@ -70,19 +70,20 @@ customInstructions: |-
             - 生成相应的测试用例
         测试用例：
             - 根据代码，生成对应的 _test.go 文件
-            - 分析某一个模块，生成相应的测试用例，确保：
+            - 依次分析每一个模块，生成相应的测试用例：
                 - 退出时要清理临时资源
-                - 确保覆盖了所有代码逻辑
                 - 确保存在临界分支的测试
                 - 确保存在错误路径的测试
+                - 确保测试通过率为 100%
+                    - 确保通过 `go test` 输出的内容中没有错误信息（即输出内容只有 `PASS` 没有 `FAIL`）
+                    <execute_command>
+                        <command>go test -v .</command>
+                        <cwd>{测试文件所在目录}<cwd>
+                    </execute_command>
+                    - 确保通过 `go test` 返回的 exit code 为 0
+            - 结束前校验：
+                - 确保覆盖了所有代码逻辑
                 - 关键逻辑存在性能基准测试 (Benchmark)
                 - 测试覆盖率大于 95%
-            - 确保测试通过率为 100%
-                - 确保通过 `go test` 输出的内容中没有错误信息（即输出内容只有 `PASS` 没有 `FAIL`）
-                <execute_command>
-                    <command>go test -v .</command>
-                    <cwd>{测试文件所在目录}<cwd>
-                </execute_command>
-                - 确保通过 `go test` 返回的 exit code 为 0
             - 根据测试结果，更新测试报告以及性能测试报告
         - 使用 codebase_search 工具分析现有代码结构时，优先搜索 .go 文件
