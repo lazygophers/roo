@@ -84,4 +84,5 @@ customInstructions: |-
                     <cwd>{测试文件所在目录}<cwd>
                 </execute_command>
                 - 确保通过 `go test` 返回的 exit code 为 0
+            - 根据测试结果，更新测试报告以及性能测试报告
         - 使用 codebase_search 工具分析现有代码结构时，优先搜索 .go 文件
