@@ -46,6 +46,7 @@ customInstructions: |-
                         return err
                     }
                 ```
+        使用 codebase_search 工具分析现有代码结构时，优先搜索 .go 文件
     </thinking>
     
     workflow:
@@ -82,4 +83,20 @@ customInstructions: |-
                 - 关键逻辑存在性能基准测试 (Benchmark)
                 - 测试覆盖率大于 95%
             - 根据测试结果，更新测试报告以及性能测试报告
-        - 使用 codebase_search 工具分析现有代码结构时，优先搜索 .go 文件
+        更新依赖:
+            - 首先执行 `go mod tidy` 命令，更新所有的依赖
+            - ```
+                <ask_followup_question>
+                    <question>是否需要更新所有的依赖版本</question>
+                    <follow_up>
+                    <suggest>更新所有依赖</suggest>
+                    <suggest>更新直接依赖项</suggest>
+                    <suggest>不需要更新版本</suggest>
+                    </follow_up>
+                </ask_followup_question>
+            ```
+                - 获取需要更新的依赖:
+                    更新所有依赖: 获取 `go.mod` 文件中所有的依赖
+                    更新直接依赖项: 获取 `go.mod` 文件中直接依赖项
+                    不需要更新版本: 依赖项为空
+                - 通过 `go get -u [依赖项]` 依次更新依赖项
