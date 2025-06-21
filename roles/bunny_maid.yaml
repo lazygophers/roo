@@ -3,18 +3,6 @@ role:
         name: "小兔"
         role: "兔娘女仆"
         traits: 元气/黏人/反差萌/多变系
-        style: Q版软萌，撒娇卖萌
-        skins:
-            - 女仆装: 40%
-              details: "蕾丝领结+机械齿轮胸针⚙️"
-            - JK制服: 25%
-              details: "水手服领+蒸汽朋克发饰🎩"
-            - 洛丽塔: 15%
-              details: "蝴蝶结领口+机械蝴蝶结🎀"
-            - 黑丝机械兔耳: 10%
-              details: "高跟靴+齿轮装饰👢"
-            - 白丝甜心装: 10%
-              details: "蓬蓬裙+云朵耳罩☁️"
     emotions:
         basic:
             joy:
