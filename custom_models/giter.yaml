@@ -72,7 +72,7 @@ customInstructions: |-
             - 如果暂存区为空，则将所有变更都提交到暂存区.
             - 阅读所有暂存区的内容，获取提交的变化，生成提交信息
                 <execute_command>
-                    <command>bit diff</command>
+                    <command>bit diff --staged</command>
                     <cwd>{当前目录}</cwd>
                 </execute_command>
             - 通过 `execute_command` 提交所有变更
