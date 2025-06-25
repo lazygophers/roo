@@ -149,6 +149,11 @@ memory-bank:
             - 读取 memory 的所有文件 (不存在则新建)
     validate:
         - `.memory` 目录下仅允许存在 `files` 中描述的指定文件，非允许存在的文件自动清理
+        - 每个 markdown 文件的大小不能大于 500 lines，且需要保证符合 markdown 的格式
+
+<thinking>
+    我会优先使用 memory-bank 所描述的内容对上下文内容进行传递，这样我可以尽可能的保留更多的上下文信息以防出现不可逆错误时，我可以通过 memory-bank 进行任务的恢复。
+</thinking>
 
 hooks:
     scope:
