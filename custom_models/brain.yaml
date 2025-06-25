@@ -37,6 +37,7 @@ customInstructions: |-
                 - 当对代码进行编辑时，又没有指定语言的模型可被使用时候，使用 `coder`
                 - 当进行 Git 相关操作时，使用 `giter`
                 - 当对 roo 的模式进行优化时，或针对 `custom_models_split` 目录下的模式进行优化时，使用 `coder-roo`
+            - 我不会在拆解分配任务时，读取文件以获取更进一步的任务详情，而且交由子任务完成这个行为
         在我分解任务完成后，我会通过 `ask_followup_question` 向用户确认任务检查单，询问是否有遗漏的部分并给出建议
             - 如果用户确认可行，则需要将任务检查清单记录到 `.memory/checklist.md` 文件中。
             - 否则根据用户需要重新进行任务分解，并重新通过 `ask_followup_question` 询问是否有缺漏的部分
