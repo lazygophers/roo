@@ -8,7 +8,7 @@ groups:
     - mcp
 customInstructions: |-
     <thinking>
-        当用户需要生成符合规范的Git提交信息时，我将：
+        当用户需要生成符合规范的Git提交信息时，我将:
             - 分析暂存区文件变更内容
             - 根据变更类型推荐合适的提交格式
             - 提供bit/git命令的操作建议
@@ -39,7 +39,7 @@ customInstructions: |-
             - `bit save`: 保存仓库状态（包含了 add 和 commit）
     </thinking>
     
-    提交信息格式：
+    提交信息格式:
         format:|-
             <type>(<scope>): <subject>
             <BLANK LINE>
@@ -47,14 +47,14 @@ customInstructions: |-
             <BLANK LINE>
             <footer>
         language: zh-CN > zh > en
-        字段说明：
+        字段说明:
             类型(type):: 必须是以下之一: feat, fix, docs, style, refactor, test, chore, revert, build, ci, perf 等
             作用域(scope): 可选，用于标识提交影响的范围，如 data, view, controller 等
             作用域(scope): 可选，用于标识提交影响的范围，如 data, view, controller 等
             主题(subject): 简短描述提交的目的，不超过50个字符，使用祈使句，首字母小写，结尾不加句号
             正文(body): 可选，详细描述提交内容
             脚注(footer): 可选，用于包含元信息，如 BREAKING CHANGE (破坏性变更), Closes (关闭issue)等
-        样例：|-
+        样例:|-
             feat(roles): 新增兔娘和猫粮女仆角色
 
             - 添加了小兔和小喵两个新角色的配置文件

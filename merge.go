@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"embed"
 	"github.com/lazygophers/log"
 	"github.com/lazygophers/utils"
@@ -10,6 +11,7 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 type CustomModel struct {
@@ -45,12 +47,54 @@ func main() {
 		return
 	}
 
-	//var brainModel *CustomModel
+	codeSnippetMap := make(map[string]string)
+
+	err = filepath.WalkDir("./code_snippet", func(path string, d fs.DirEntry, err error) error {
+		if err != nil {
+			log.Errorf("err:%v", err)
+			return err
+		}
+
+		if d.IsDir() {
+			return nil
+		}
+
+		if filepath.Ext(path) != ".md" {
+			return nil
+		}
+
+		buffer, err := os.ReadFile(path)
+		if err != nil {
+			log.Errorf("err:%v", err)
+			return err
+		}
+
+		if !bytes.HasSuffix(buffer, []byte("\n")) {
+			buffer = append(buffer, '\n')
+		}
+
+		codeSnippetMap[strings.TrimSuffix(filepath.Base(path), filepath.Ext(path))] = string(buffer)
+
+		return nil
+	})
+	if err != nil {
+		log.Errorf("err:%v", err)
+		return
+	}
+
+	for key, value := range codeSnippetMap {
+		before = bytes.ReplaceAll(before, stringx.ToBytes("{{"+key+"}}"), stringx.ToBytes(value))
+		after = bytes.ReplaceAll(after, stringx.ToBytes("{{"+key+"}}"), stringx.ToBytes(value))
+	}
 
 	err = filepath.WalkDir("./custom_models", func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
 			log.Errorf("err:%v", err)
 			return err
+		}
+
+		if d.IsDir() {
+			return nil
 		}
 
 		if filepath.Ext(path) != ".yaml" {
@@ -71,6 +115,10 @@ func main() {
 		if err != nil {
 			log.Errorf("err:%v", err)
 			return err
+		}
+
+		for key, value := range codeSnippetMap {
+			m.CustomInstructions = strings.ReplaceAll(m.CustomInstructions, "{{"+key+"}}", value)
 		}
 
 		m.CustomInstructions = stringx.ToString(before) + "\n\n" + m.CustomInstructions + "\n\n" + stringx.ToString(after)
