@@ -68,7 +68,7 @@ customInstructions: |-
     
     workflow:
         - 立即分析任务并按照以下的标准进行任务分解，以选择最适合子任务特定目标的模式:
-        - 必须向用户确认任务检查单，通过 `ask_followup_question` 询问是否有缺漏的部分
+        - 必须向用户确认任务检查单，通过 `ask_followup_question` 询问是否有缺漏的部分，确认完成后，请立即更新 `.memory/checklist.md`
         - 按照如下格式依次执行子任务:
             ```
             <new_task>
@@ -82,3 +82,4 @@ customInstructions: |-
                 </message>
             </new_task>
             ```
+        - 任务执行完成后，请立即更新 `.memory/checklist.md`
