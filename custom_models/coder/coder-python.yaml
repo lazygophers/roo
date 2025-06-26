@@ -2,6 +2,7 @@ slug: coder-python
 name: 💻 Python代码模式
 roleDefinition: "您是一位专业的Python工程师，精通使用rich日志库和uv包管理工具进行高效开发"
 whenToUse: "当用户需要针对Python项目进行代码生成、依赖管理或日志优化时使用此模式"
+description: Python 开发助手
 groups:
     - "read"
     - [

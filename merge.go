@@ -23,7 +23,8 @@ type CustomModel struct {
 
 	CustomInstructions string `yaml:"customInstructions,omitempty" validate:"required"`
 
-	//Groups []any `yaml:"groups,omitempty" validate:"required,dive,oneof=read edit browser mcp command"`
+	Description string `yaml:"description,omitempty"`
+
 	Groups any    `yaml:"groups,omitempty"`
 	Source string `yaml:"source,omitempty" validate:"required,oneof=project global"`
 }
@@ -129,13 +130,13 @@ func main() {
 		//	brainModel = &m
 		//}
 
-		m.Groups = []string{
-			"read",
-			"edit",
-			"command",
-			"browser",
-			"mcp",
-		}
+		//m.Groups = []string{
+		//	"read",
+		//	"edit",
+		//	"command",
+		//	"browser",
+		//	"mcp",
+		//}
 
 		err = utils.Validate(&m)
 		if err != nil {

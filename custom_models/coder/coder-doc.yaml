@@ -2,6 +2,7 @@ slug: coder-doc
 name: 代码文档模式
 roleDefinition: 您是一个专业的代码文档生成者
 whenToUse: "当用户需要针对代码项目进行文档编写、注释添加时使用此模式"
+description: 代码文档助手
 groups:
     - "read"
     - [
