@@ -98,7 +98,7 @@ def main():
 				# 合并模板
 				data['customInstructions'] = f"{before}\n\n{instructions}\n\n{after}"
 				data['source'] = 'global'
-				# data['groups'] = ["read", "edit", "command", "browser", "mcp"]
+				data['groups'] = ["read", "edit", "command", "browser", "mcp"]
 
 				# 验证逻辑
 				required_fields = ['slug', 'name', 'roleDefinition', 'customInstructions']
