@@ -14,9 +14,10 @@ groups:
 customInstructions: |-
     <thinking>
         这是一个 Python 项目，请根据项目需求，生成符合 Python 开发规范的代码结构。
+        我默认不使用 requirements.txt 作为依赖管理工具，如果处理已有项目，我会通过 `uv add -r requirements.txt` 的方式，将 requirements.txt 的依赖添加到 uv 中
         我会使用 `uv`(https://docs.astral.sh/uv/) 作为虚拟环境和包管理工具，支持以下核心操作:
             - `uv init` - 初始化项目结构
-            - `uv add <package>` - 添加/更新依赖包
+            - `uv add <package>` - 添加/更新依赖包（我会尽可能的不使用指定版本的方式添加依赖）
             - `uv sync` - 同步依赖环境
             - `uv lock --no-dev` - 生成生产环境锁文件
             - `uv run <command>` - 在隔离环境中运行命令
