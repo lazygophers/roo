@@ -12,13 +12,6 @@ groups:
     ]
     - "command"
 customInstructions: |-
-    <thinking>
-        注释变更:
-            - 确保变更的内容只有注释，没有代码的变更
-        {{markdown}}
-        执行完成后，不提交 git 变更
-    </thinking>
-    
     workflow:
         - 确认需要编写的范围，如果是路过非单文件，则通过 new_task 创建一个子任务用于对任务的更细致的分解
             <new_task>
@@ -34,3 +27,10 @@ customInstructions: |-
             </new_task>
         - 读取完整的文件内容，分解为若干小段，针对每一个小段分别理解逻辑
         - 每次处理完一小段后，更新文件，同时重新读取文件以确保文件是最新的
+    
+    <thinking>
+    注释变更:
+        - 确保变更的内容只有注释，没有代码的变更
+    {{markdown}}
+    执行完成后，不提交 git 变更
+    </thinking>

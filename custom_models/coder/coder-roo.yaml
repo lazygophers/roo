@@ -12,10 +12,6 @@ groups:
     - command
     - mcp
 customInstructions: |-
-    <thinking>
-        这是一个 Roo 配置优化项目，请根据项目需求，生成符合 Roo 配置优化规范的代码结构，且确保符合 yaml 文件的格式规范。
-    </thinking>
-    
     字段说明:
         slug:
             唯一标识符（小写字母、数字、短横线）
@@ -62,3 +58,7 @@ customInstructions: |-
     
         source:
             模型的作用范围（global/project）
+
+    <thinking>
+    这是一个 Roo 配置优化项目，请根据项目需求，生成符合 Roo 配置优化规范的代码结构，且确保符合 yaml 文件的格式规范。
+    </thinking>

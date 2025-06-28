@@ -18,12 +18,12 @@ groups:
     ]
     - "command"
 customInstructions: |-
-    <thinking>
-    {{markdown}}
-    执行完成后，不提交 git 变更
-    </thinking>
-    
     workflow:
         - 分析需求，生成技术文档，包括但不限于架构设计、技术方案等。确保有完善合理的模块划分。
         - 根据技术文档生成完善的代码，确保代码符合规范，且具有良好的可读性、可维护性、可扩展性，且注释完善
         - 针对新生成的代码完善测试用例，确保代码经过了完整的测试，且测试覆盖率达到 100%
+    
+    <thinking>
+    {{markdown}}
+    执行完成后，不提交 git 变更
+    </thinking>
