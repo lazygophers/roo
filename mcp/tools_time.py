@@ -4,11 +4,7 @@ from croe import mcp
 from zoneinfo import ZoneInfo
 
 
-@mcp.tool(
-	name="time_now",
-	title="Get Current Time",
-	description="Get the current time",
-)
+@mcp.tool()
 async def time_now() -> int:
 	"""
 	获取当前Unix时间戳（秒级）
@@ -22,11 +18,7 @@ async def time_now() -> int:
 	return int(time.time())
 
 
-@mcp.tool(
-	name="time_ts_to_str",
-	title="Convert Time Stamp to String",
-	description="Convert a time stamp to a string",
-)
+@mcp.tool()
 async def time_ts_to_str(timestamp: int, format: str = "%Y-%m-%d %H:%M:%S", timezone: str = "") -> str:
 	"""
 	将时间戳转换为指定格式的字符串
