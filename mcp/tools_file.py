@@ -15,6 +15,7 @@ class FileInfo(BaseModel):
         created_at (int): 创建时间戳（秒）
         modified_at (int): 最后修改时间戳（秒）
     """
+
     path: str = Field(..., description="文件路径")
     size: int = Field(..., description="文件大小（字节）")
     is_dir: bool = Field(..., description="是否为目录类型")
@@ -236,7 +237,7 @@ async def edit_file(path: str, line_range: str = None) -> bool:
         lines = f.readlines()
     if line_range:
         start, end = line_range.split("-")
-        lines = lines[int(start):int(end)]
+        lines = lines[int(start) : int(end)]
     with open(path, "w") as f:
         f.writelines(lines)
     return True
@@ -256,7 +257,7 @@ async def append_file(path: str, content: str) -> bool:
     Raises:
         IOError: 文件写入异常时触发
     """
-    with open(path, 'a', encoding='utf8') as f:
+    with open(path, "a", encoding="utf8") as f:
         f.write(content)
         return True
 
