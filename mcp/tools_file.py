@@ -1,7 +1,17 @@
 import os
 import shutil
-
+from pydantic import BaseModel, Field
 from croe import mcp
+
+
+class FileInfo(BaseModel):
+	path: str = Field(..., description="The path to the file")
+	size: int = Field(..., description="The size of the file")
+	is_dir: bool = Field(..., description="Whether the file is a directory")
+
+	mode: int = Field(..., description="The mode of the file")
+	created_at: int = Field(..., description="The created at timestamp of the file")
+	modified_at: int = Field(..., description="The modified at timestamp of the file")
 
 
 @mcp.tool(
@@ -86,7 +96,7 @@ async def file_is_file(path: str) -> bool:
 
 
 @mcp.tool(
-	name="file_ln",
+	name="ln",
 	title="Create a symbolic link",
 	description="Create a symbolic link",
 )
@@ -96,7 +106,7 @@ async def ln(src: str, dest: str) -> bool:
 
 
 @mcp.tool(
-	name="file_mv",
+	name="mv",
 	title="Move a file or directory",
 	description="Move a file or directory",
 )
@@ -110,7 +120,7 @@ async def mv(src: str, dest: str) -> bool:
 
 
 @mcp.tool(
-	name="file_cp",
+	name="cp",
 	title="Copy a file or directory",
 	description="Copy a file or directory",
 )
@@ -123,7 +133,7 @@ async def copy(src: str, dest: str) -> bool:
 
 
 @mcp.tool(
-	name="file_edit",
+	name="edit_file",
 	title="Edit a file",
 	description="Edit a file",
 )
@@ -139,7 +149,7 @@ async def edit_file(path: str, line_range: str = None) -> bool:
 
 
 @mcp.tool(
-	name="file_append",
+	name="append_file",
 	title="Append content to a file",
 	description="Append content to a file",
 )
@@ -147,3 +157,40 @@ async def append_file(path: str, content: str) -> bool:
 	with open(path, 'a', encoding='utf8') as f:
 		f.write(content)
 	return True
+
+
+@mcp.tool(
+	name="list_files",
+	title="List files in a directory",
+	description="List files in a directory",
+)
+async def list_files(path: str, recursive: bool = False) -> list[FileInfo]:
+	files = []
+
+	for file in os.listdir(path):
+		files.append(await file_info(os.path.join(path, file)))
+
+		if os.path.isfile(os.path.join(path, file)):
+			continue
+		if not recursive:
+			continue
+
+		files.extend(await list_files(os.path.join(path, file), True))
+
+	return files
+
+
+@mcp.tool(
+	name="file_info",
+	title="File Info",
+	description="Get information about a file",
+)
+async def file_info(path: str) -> FileInfo:
+	return FileInfo(
+		path=path,
+		size=os.path.getsize(path),
+		is_dir=os.path.isdir(path),
+		mode=os.stat(path).st_mode,
+		created_at=int(os.path.getctime(path)),
+		modified_at=int(os.path.getmtime(path)),
+	)
