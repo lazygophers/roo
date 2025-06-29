@@ -2,14 +2,21 @@
 name = "lazygopher"
 version = "0.1.0"
 readme = "README.md"
-requires-python = ">=3.13"
+requires-python = ">=3.12"
 dependencies = [
     "appdirs>=1.4.4",
     "black>=25.1.0",
+    "coqui-tts>=0.26.2",
+    "langchain>=0.3.26",
     "mcp>=1.10.1",
     "psutil>=7.0.0",
+    "pydantic>=2.11.7",
     "pyinstaller>=6.14.1",
-    "pytest>=8.4.1",
+    "pync>=2.0.3",
+    "pyttsx3>=2.98",
     "requests>=2.32.4",
     "shutup>=0.2.0",
 ]
+
+[tool.uv.sources]
+coqui-tts = { git = "https://github.com/Luoxin/coqui-ai-TTS" }
