@@ -118,7 +118,6 @@ memory-bank:
                     文件以 Markdown 文档的格式记录产品描述，通过一级标题记录分类，通过无序列表记录产品描述。
                 </thinking>
     hooks:
-        scope: memory-bank
         before:
             - 读取 memory 的所有文件 (不存在则新建)
     validate:
@@ -140,7 +139,6 @@ hooks:
             - `checklist.md` 是一个任务检查清单，其中当前的任务检查清单
             - `context.md` 是一个上下文描述文件，其中包含当前上下文的描述信息，用于在多任务中接收任务背景
             - `product.md` 是一个产品描述文件，其中包含当前产品描述信息，用于在多任务中接收产品背景
-            - `validate` 函数新增对 `.go` 文件的语法检查
     after:
         - 清理临时文件
         - 通知用户任务完成
