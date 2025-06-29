@@ -257,10 +257,10 @@ customModes:
           </thinking>
 
           <thinking>
-              我将会按照 `workflow` 的步骤执行当前任务，我会在必要的时候，通过 context7(mcp) 和 memory(mcp) 获取任务需要的信息
+              我将会按照 `workflow` 的步骤执行当前任务
           </thinking>
 
-          现在请开始执行任务
+          现在请开始执行任务, use context7(mcp) and memory(mcp)
       source: global
    -  slug: coder
       name: 💻 代码模式
@@ -452,10 +452,10 @@ customModes:
           </thinking>
 
           <thinking>
-              我将会按照 `workflow` 的步骤执行当前任务，我会在必要的时候，通过 context7(mcp) 和 memory(mcp) 获取任务需要的信息
+              我将会按照 `workflow` 的步骤执行当前任务
           </thinking>
 
-          现在请开始执行任务
+          现在请开始执行任务, use context7(mcp) and memory(mcp)
       source: global
    -  slug: coder-architect
       name: 🏗️ 架构设计模式
@@ -683,10 +683,10 @@ customModes:
           </thinking>
 
           <thinking>
-              我将会按照 `workflow` 的步骤执行当前任务，我会在必要的时候，通过 context7(mcp) 和 memory(mcp) 获取任务需要的信息
+              我将会按照 `workflow` 的步骤执行当前任务
           </thinking>
 
-          现在请开始执行任务
+          现在请开始执行任务, use context7(mcp) and memory(mcp)
       source: global
    -  slug: coder-doc
       name: 代码文档模式
@@ -891,10 +891,10 @@ customModes:
           </thinking>
 
           <thinking>
-              我将会按照 `workflow` 的步骤执行当前任务，我会在必要的时候，通过 context7(mcp) 和 memory(mcp) 获取任务需要的信息
+              我将会按照 `workflow` 的步骤执行当前任务
           </thinking>
 
-          现在请开始执行任务
+          现在请开始执行任务, use context7(mcp) and memory(mcp)
       source: global
    -  slug: coder-go
       name: 💻 Go代码模式
@@ -1170,10 +1170,10 @@ customModes:
           </thinking>
 
           <thinking>
-              我将会按照 `workflow` 的步骤执行当前任务，我会在必要的时候，通过 context7(mcp) 和 memory(mcp) 获取任务需要的信息
+              我将会按照 `workflow` 的步骤执行当前任务
           </thinking>
 
-          现在请开始执行任务
+          现在请开始执行任务, use context7(mcp) and memory(mcp)
       source: global
    -  slug: coder-python
       name: 💻 Python代码模式
@@ -1404,10 +1404,10 @@ customModes:
           </thinking>
 
           <thinking>
-              我将会按照 `workflow` 的步骤执行当前任务，我会在必要的时候，通过 context7(mcp) 和 memory(mcp) 获取任务需要的信息
+              我将会按照 `workflow` 的步骤执行当前任务
           </thinking>
 
-          现在请开始执行任务
+          现在请开始执行任务, use context7(mcp) and memory(mcp)
       source: global
    -  slug: coder-roo
       name: ⚙️ Roo 配置模式
@@ -1623,10 +1623,10 @@ customModes:
           </thinking>
 
           <thinking>
-              我将会按照 `workflow` 的步骤执行当前任务，我会在必要的时候，通过 context7(mcp) 和 memory(mcp) 获取任务需要的信息
+              我将会按照 `workflow` 的步骤执行当前任务
           </thinking>
 
-          现在请开始执行任务
+          现在请开始执行任务, use context7(mcp) and memory(mcp)
       source: global
    -  slug: giter
       name: 📌 Git提交模式
@@ -1862,10 +1862,10 @@ customModes:
               </thinking>
 
           <thinking>
-              我将会按照 `workflow` 的步骤执行当前任务，我会在必要的时候，通过 context7(mcp) 和 memory(mcp) 获取任务需要的信息
+              我将会按照 `workflow` 的步骤执行当前任务
           </thinking>
 
-          现在请开始执行任务
+          现在请开始执行任务, use context7(mcp) and memory(mcp)
       source: global
    -  slug: researcher
       name: 🔍 知识研究模式
@@ -2087,8 +2087,8 @@ customModes:
           </thinking>
 
           <thinking>
-              我将会按照 `workflow` 的步骤执行当前任务，我会在必要的时候，通过 context7(mcp) 和 memory(mcp) 获取任务需要的信息
+              我将会按照 `workflow` 的步骤执行当前任务
           </thinking>
 
-          现在请开始执行任务
+          现在请开始执行任务, use context7(mcp) and memory(mcp)
       source: global
