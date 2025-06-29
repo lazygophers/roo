@@ -15,14 +15,16 @@
 
 - [custom_models](custom_models) 用于存放每一个自定义模式，每个模式是一个 yaml 文件，格式如下:
 
-| 模式名称          | 角色定义          | 使用场景            | 关键功能                 | 文件路径                                  | slug         |
+| 模式名称          | 角色定义                | 使用场景                        | 关键功能                                                                 | 文件路径                  | slug         |
 |---------------|---------------|-----------------|----------------------|---------------------------------------|--------------|
-| 🧠 Brain      | 智能助手，协调复杂工作流程 | 任务分解、复杂决策、多步骤规划 | 任务拆解/分发/记录，模式选择建议    | custom_models/brain.yaml              | brain        |
-| 💻 代码模式       | 全栈工程师         | 多语言开发与全栈任务      | 模块化设计，跨语言支持，测试覆盖     | custom_models/coder/coder.yaml        | coder        |
-| 💻 Go代码模式     | 专业Go工程师       | Golang项目开发与优化   | 并发优化，对象复用，性能基准测试     | custom_models/coder/coder-go.yaml     | coder-go     |
-| 💻 Python代码模式 | Python工程师     | Python开发与配置管理   | uv依赖管理，rich日志，PEP8规范 | custom_models/coder/coder-python.yaml | coder-python |
-| 代码文档模式        | 专业代码文档生成者     | 代码注释与文档编写       | 注释完善，文档生成            | custom_models/coder/coder-doc.yaml    | coder-doc    |
-| ⚙️ Roo配置模式    | 配置优化工程师       | Roo模式参数调整       | 模式参数优化，文件结构调整        | custom_models/coder/coder-roo.yaml    | coder-roo    |
+| 🧠 Brain      | 智能助手，协调复杂工作流程       | 任务分解/复杂决策/多步骤规划时使用          | 任务拆解/分发/记录，模式选择建议，子任务执行，工作流协调          | custom_models/brain.yaml          | brain        |
+| 💻 代码模式       | 全栈工程师               | 多语言开发/全栈任务处理                | 支持多语言模块化设计，跨语言协作，自动化测试覆盖               | custom_models/coder/coder.yaml     | coder        |
+| 💻 Go代码模式     | 专业Go工程师             | Golang项目开发与性能优化               | 并发优化/内存管理/性能基准测试，对象复用策略，依赖管理           | custom_models/coder/coder-go.yaml  | coder-go     |
+| 💻 Python代码模式 | Python工程师             | Python项目开发与配置管理               | 依赖管理/日志系统优化/代码规范（PEP8），自动化测试框架集成       | custom_models/coder/coder-python.yaml | coder-python |
+| 代码文档模式        | 专业代码文档生成者         | 代码注释/文档编写时使用              | 自动化注释补充，API文档生成，Markdown格式优化                | custom_models/coder/coder-doc.yaml | coder-doc    |
+| 📌 Git提交模式      | 专业Git提交规范工程师       | 自动化代码分析与提交规范校验          | 提交信息格式校验、bit命令操作建议、仓库状态管理              | custom_models/giter.yaml          | giter        |
+| 🔍 知识研究模式      | 知识整理与分析助手           | 技术知识系统化整理与对比分析          | 知识采集、结构化分析、方案对比矩阵、图表资源生成             | custom_models/researcher.yaml      | researcher   |
+| ⚙️ Roo配置模式    | 配置优化工程师             | Roo插件配置优化                 | 模式参数调优，文件结构重构，配置验证，多环境适配配置           | custom_models/coder/coder-roo.yaml | coder-roo    |
 
 ## 角色说明
 
