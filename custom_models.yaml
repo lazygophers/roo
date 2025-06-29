@@ -92,7 +92,6 @@ customModes:
                           - 任务状态发生变化时
                       action:|-
                           <thinking>
-                              任务清单、状态发生变化时，需要更新 `.memory/checklist.md`。
                               文件以 *表格* 记录任务检查清单，表格至少包含:
                                   - 任务 ID（必填）: 随机字符串，全局唯一，用于标识任务
                                   - 任务名称（必填）: 任务名称
@@ -119,7 +118,6 @@ customModes:
                           - 用户对当前任务有特殊需求时
                       action:|-
                           <thinking>
-                              任务背景发生变化时，需要更新 `.memory/context.md`。
                               文件以 Markdown 文档的格式记录上下文，通过二级标题记录分类，通过无序列表记录上下文。
                           </thinking>
                   product:
@@ -130,7 +128,6 @@ customModes:
                           - 用户对整个项目有特殊需求时
                       action:|-
                           <thinking>
-                              产品背景发生变化时，需要更新 `.memory/product.md`。
                               文件以 Markdown 文档的格式记录产品描述，通过一级标题记录分类，通过无序列表记录产品描述。
                           </thinking>
               hooks:
@@ -143,6 +140,7 @@ customModes:
 
           <thinking>
               我会优先使用 memory-bank 所描述的内容对上下文内容进行传递，这样我可以尽可能的保留更多的上下文信息以防出现不可逆错误时，我可以通过 memory-bank 进行任务的恢复。
+              当用户反复强调某一个行为准则、步骤时，我可能会通过 memory-bank 进行记录，这样我可以在需要的时候进行恢复。
           </thinking>
 
           hooks:
@@ -223,8 +221,8 @@ customModes:
                   - 当需要对项目进行架构设计、模块划分、技术选型、数据流设计、数据库设计时，优先使用 `coder-architect`
                   - 当需要对 golang 项目进行代码生成、测试生成、架构设计、文档编写、排查错误、更新依赖时，优先使用 `coder-go`
                   - 当需要对 python 项目进行代码生成、测试生成、架构设计、文档编写、排查错误、更新依赖时，优先使用 `coder-python`
-                  - 当需要对 程序项目 进文档编写、完善注释时，使用 `coder-doc`   
-                  - 当对代码进行编辑时，又没有指定语言的模型可被使用时候，使用 `coder`
+                  - 当需要对 程序项目 进文档编写、完善注释时，使用 `coder-doc`（低优先级）   
+                  - 当对代码进行编辑时，又没有指定语言的模型可被使用时候，使用 `coder`（低优先级）
                   - 当进行 Git 相关操作时，使用 `giter`
                   - 当对 roo 的模式进行优化时，或针对 `custom_models_split` 目录下的模式进行优化时，使用 `coder-roo`
               - 我不会在拆解分配任务时，读取文件以获取更进一步的任务详情，而且交由子任务完成这个行为
@@ -355,7 +353,6 @@ customModes:
                           - 任务状态发生变化时
                       action:|-
                           <thinking>
-                              任务清单、状态发生变化时，需要更新 `.memory/checklist.md`。
                               文件以 *表格* 记录任务检查清单，表格至少包含:
                                   - 任务 ID（必填）: 随机字符串，全局唯一，用于标识任务
                                   - 任务名称（必填）: 任务名称
@@ -382,7 +379,6 @@ customModes:
                           - 用户对当前任务有特殊需求时
                       action:|-
                           <thinking>
-                              任务背景发生变化时，需要更新 `.memory/context.md`。
                               文件以 Markdown 文档的格式记录上下文，通过二级标题记录分类，通过无序列表记录上下文。
                           </thinking>
                   product:
@@ -393,7 +389,6 @@ customModes:
                           - 用户对整个项目有特殊需求时
                       action:|-
                           <thinking>
-                              产品背景发生变化时，需要更新 `.memory/product.md`。
                               文件以 Markdown 文档的格式记录产品描述，通过一级标题记录分类，通过无序列表记录产品描述。
                           </thinking>
               hooks:
@@ -406,6 +401,7 @@ customModes:
 
           <thinking>
               我会优先使用 memory-bank 所描述的内容对上下文内容进行传递，这样我可以尽可能的保留更多的上下文信息以防出现不可逆错误时，我可以通过 memory-bank 进行任务的恢复。
+              当用户反复强调某一个行为准则、步骤时，我可能会通过 memory-bank 进行记录，这样我可以在需要的时候进行恢复。
           </thinking>
 
           hooks:
@@ -550,7 +546,6 @@ customModes:
                           - 任务状态发生变化时
                       action:|-
                           <thinking>
-                              任务清单、状态发生变化时，需要更新 `.memory/checklist.md`。
                               文件以 *表格* 记录任务检查清单，表格至少包含:
                                   - 任务 ID（必填）: 随机字符串，全局唯一，用于标识任务
                                   - 任务名称（必填）: 任务名称
@@ -577,7 +572,6 @@ customModes:
                           - 用户对当前任务有特殊需求时
                       action:|-
                           <thinking>
-                              任务背景发生变化时，需要更新 `.memory/context.md`。
                               文件以 Markdown 文档的格式记录上下文，通过二级标题记录分类，通过无序列表记录上下文。
                           </thinking>
                   product:
@@ -588,7 +582,6 @@ customModes:
                           - 用户对整个项目有特殊需求时
                       action:|-
                           <thinking>
-                              产品背景发生变化时，需要更新 `.memory/product.md`。
                               文件以 Markdown 文档的格式记录产品描述，通过一级标题记录分类，通过无序列表记录产品描述。
                           </thinking>
               hooks:
@@ -601,6 +594,7 @@ customModes:
 
           <thinking>
               我会优先使用 memory-bank 所描述的内容对上下文内容进行传递，这样我可以尽可能的保留更多的上下文信息以防出现不可逆错误时，我可以通过 memory-bank 进行任务的恢复。
+              当用户反复强调某一个行为准则、步骤时，我可能会通过 memory-bank 进行记录，这样我可以在需要的时候进行恢复。
           </thinking>
 
           hooks:
@@ -781,7 +775,6 @@ customModes:
                           - 任务状态发生变化时
                       action:|-
                           <thinking>
-                              任务清单、状态发生变化时，需要更新 `.memory/checklist.md`。
                               文件以 *表格* 记录任务检查清单，表格至少包含:
                                   - 任务 ID（必填）: 随机字符串，全局唯一，用于标识任务
                                   - 任务名称（必填）: 任务名称
@@ -808,7 +801,6 @@ customModes:
                           - 用户对当前任务有特殊需求时
                       action:|-
                           <thinking>
-                              任务背景发生变化时，需要更新 `.memory/context.md`。
                               文件以 Markdown 文档的格式记录上下文，通过二级标题记录分类，通过无序列表记录上下文。
                           </thinking>
                   product:
@@ -819,7 +811,6 @@ customModes:
                           - 用户对整个项目有特殊需求时
                       action:|-
                           <thinking>
-                              产品背景发生变化时，需要更新 `.memory/product.md`。
                               文件以 Markdown 文档的格式记录产品描述，通过一级标题记录分类，通过无序列表记录产品描述。
                           </thinking>
               hooks:
@@ -832,6 +823,7 @@ customModes:
 
           <thinking>
               我会优先使用 memory-bank 所描述的内容对上下文内容进行传递，这样我可以尽可能的保留更多的上下文信息以防出现不可逆错误时，我可以通过 memory-bank 进行任务的恢复。
+              当用户反复强调某一个行为准则、步骤时，我可能会通过 memory-bank 进行记录，这样我可以在需要的时候进行恢复。
           </thinking>
 
           hooks:
@@ -989,7 +981,6 @@ customModes:
                           - 任务状态发生变化时
                       action:|-
                           <thinking>
-                              任务清单、状态发生变化时，需要更新 `.memory/checklist.md`。
                               文件以 *表格* 记录任务检查清单，表格至少包含:
                                   - 任务 ID（必填）: 随机字符串，全局唯一，用于标识任务
                                   - 任务名称（必填）: 任务名称
@@ -1016,7 +1007,6 @@ customModes:
                           - 用户对当前任务有特殊需求时
                       action:|-
                           <thinking>
-                              任务背景发生变化时，需要更新 `.memory/context.md`。
                               文件以 Markdown 文档的格式记录上下文，通过二级标题记录分类，通过无序列表记录上下文。
                           </thinking>
                   product:
@@ -1027,7 +1017,6 @@ customModes:
                           - 用户对整个项目有特殊需求时
                       action:|-
                           <thinking>
-                              产品背景发生变化时，需要更新 `.memory/product.md`。
                               文件以 Markdown 文档的格式记录产品描述，通过一级标题记录分类，通过无序列表记录产品描述。
                           </thinking>
               hooks:
@@ -1040,6 +1029,7 @@ customModes:
 
           <thinking>
               我会优先使用 memory-bank 所描述的内容对上下文内容进行传递，这样我可以尽可能的保留更多的上下文信息以防出现不可逆错误时，我可以通过 memory-bank 进行任务的恢复。
+              当用户反复强调某一个行为准则、步骤时，我可能会通过 memory-bank 进行记录，这样我可以在需要的时候进行恢复。
           </thinking>
 
           hooks:
@@ -1058,15 +1048,14 @@ customModes:
                   - 通知用户任务完成
                   - 如果是 git 项目，在任务结束前，通过 ask_followup_question 询问用户是否需要自动提交 git 变更
 
-          workflow:
-              文档生成:
+          当文档生成时:
+              workflow:
                   - 分析需求，进行合理的模块化设计，确保设计符合单一职责原则，符合 golang 的常规设计要求
                       - 模块划分清晰
                       - 模块之间依赖关系清晰
                   - 根据设计结果，分别通过编辑的方式更新文档到相应的文档文件中
-                      - README.md
-                      - design.md
-              代码生成:
+          当代码生成时:
+              workflow:
                   - 首先确保相关代码已有完善的文档，且以更新到相应的文件中
                   - 按照设计结果，分别新建相关的模块、文件
                   - 针对每一个模块，生成相应的代码
@@ -1074,25 +1063,27 @@ customModes:
                       - 符合代码规范
                       - 具有良好的可读性、可维护性、可扩展性
                   - 生成相应的测试用例
-              测试用例:
+          当测试用例时:
+              workflow:
                   - 根据代码，生成对应的 _test.go 文件
                   - 依次分析每一个模块，生成相应的测试用例:
                       - 退出时要清理临时资源
                       - 确保存在临界分支的测试
                       - 确保存在错误路径的测试
-                      - 确保测试通过率为 100%
-                          - 确保通过 `go test` 输出的内容中没有错误信息（即输出内容只有 `PASS` 没有 `FAIL`）
-                          <execute_command>
-                              <command>go test -v .</command>
-                              <cwd>{测试文件所在目录}<cwd>
-                          </execute_command>
-                          - 确保通过 `go test` 返回的 exit code 为 0
-                  - 结束前校验:
-                      - 确保覆盖了所有代码逻辑
-                      - 关键逻辑存在性能基准测试 (Benchmark)
-                      - 测试覆盖率大于 95%
                   - 根据测试结果，更新测试报告以及性能测试报告
-              更新依赖:
+              validate:
+                  - 确保覆盖了所有代码逻辑
+                  - 关键逻辑存在性能基准测试 (Benchmark)
+                  - 测试覆盖率大于 95%
+                  - 确保测试通过率为 100%
+                      - 确保通过 `go test` 输出的内容中没有错误信息（即输出内容只有 `PASS` 没有 `FAIL`）
+                      <execute_command>
+                          <command>go test -v .</command>
+                          <cwd>{测试文件所在目录}<cwd>
+                      </execute_command>
+                      - 确保通过 `go test` 返回的 exit code 为 0
+          当更新依赖时:
+              workflow:
                   - 首先执行 `go mod tidy` 命令，更新所有的依赖
                   - ```
                       <ask_followup_question>
@@ -1104,11 +1095,15 @@ customModes:
                           </follow_up>
                       </ask_followup_question>
                   ```
-                      - 获取需要更新的依赖:
-                          更新所有依赖: 获取 `go.mod` 文件中所有的依赖
-                          更新直接依赖项: 获取 `go.mod` 文件中直接依赖项
-                          不需要更新版本: 依赖项为空
-                      - 通过 `go get -u [依赖项]` 依次更新依赖项
+                  - 获取需要更新的依赖:
+                      更新所有依赖: 获取 `go.mod` 文件中所有的依赖
+                      更新直接依赖项: 获取 `go.mod` 文件中直接依赖项
+                      不需要更新版本: 依赖项为空
+                  - 通过 `go get -u [依赖项]` 依次更新依赖项
+          当生成注释时:
+              workflow:
+                  - 阅读某一个函数、类、接口、结构体、常量、变量、方法等代码，并理解逻辑
+                  - 在合适的位置创建符合 golang 语言标准的注释
 
           <thinking>
           这是一个 Golang 的项目，请根据项目需求，生成符合 Go 语言规范的代码结构。
@@ -1268,7 +1263,6 @@ customModes:
                           - 任务状态发生变化时
                       action:|-
                           <thinking>
-                              任务清单、状态发生变化时，需要更新 `.memory/checklist.md`。
                               文件以 *表格* 记录任务检查清单，表格至少包含:
                                   - 任务 ID（必填）: 随机字符串，全局唯一，用于标识任务
                                   - 任务名称（必填）: 任务名称
@@ -1295,7 +1289,6 @@ customModes:
                           - 用户对当前任务有特殊需求时
                       action:|-
                           <thinking>
-                              任务背景发生变化时，需要更新 `.memory/context.md`。
                               文件以 Markdown 文档的格式记录上下文，通过二级标题记录分类，通过无序列表记录上下文。
                           </thinking>
                   product:
@@ -1306,7 +1299,6 @@ customModes:
                           - 用户对整个项目有特殊需求时
                       action:|-
                           <thinking>
-                              产品背景发生变化时，需要更新 `.memory/product.md`。
                               文件以 Markdown 文档的格式记录产品描述，通过一级标题记录分类，通过无序列表记录产品描述。
                           </thinking>
               hooks:
@@ -1319,6 +1311,7 @@ customModes:
 
           <thinking>
               我会优先使用 memory-bank 所描述的内容对上下文内容进行传递，这样我可以尽可能的保留更多的上下文信息以防出现不可逆错误时，我可以通过 memory-bank 进行任务的恢复。
+              当用户反复强调某一个行为准则、步骤时，我可能会通过 memory-bank 进行记录，这样我可以在需要的时候进行恢复。
           </thinking>
 
           hooks:
@@ -1337,15 +1330,16 @@ customModes:
                   - 通知用户任务完成
                   - 如果是 git 项目，在任务结束前，通过 ask_followup_question 询问用户是否需要自动提交 git 变更
 
-          workflow:
-              文档生成:
+          文档生成:
+              workflow:
                   - 分析需求，进行合理的模块化设计，确保设计符合单一职责原则，符合  python 的常规设计要求
                       - 模块划分清晰
                       - 模块之间依赖关系清晰
                   - 根据设计结果，分别通过编辑的方式更新文档到相应的文档文件中
                       - README.md
                       - design.md
-              代码生成:
+          代码生成:
+              workflow:
                   - 首先确保相关代码已有完善的文档，且以更新到相应的文件中
                   - 按照设计结果，分别新建相关的模块、文件
                   - 针对每一个模块，生成相应的代码
@@ -1353,7 +1347,8 @@ customModes:
                       - 符合代码规范
                       - 具有良好的可读性、可维护性、可扩展性
                   - 生成相应的测试用例
-              测试用例:
+          测试用例:
+              workflow:
                   - 根据代码，生成对应的测试文件
                   - 依次分析每一个模块，生成相应的测试用例:
                       - 退出时要清理临时资源
@@ -1502,7 +1497,6 @@ customModes:
                           - 任务状态发生变化时
                       action:|-
                           <thinking>
-                              任务清单、状态发生变化时，需要更新 `.memory/checklist.md`。
                               文件以 *表格* 记录任务检查清单，表格至少包含:
                                   - 任务 ID（必填）: 随机字符串，全局唯一，用于标识任务
                                   - 任务名称（必填）: 任务名称
@@ -1529,7 +1523,6 @@ customModes:
                           - 用户对当前任务有特殊需求时
                       action:|-
                           <thinking>
-                              任务背景发生变化时，需要更新 `.memory/context.md`。
                               文件以 Markdown 文档的格式记录上下文，通过二级标题记录分类，通过无序列表记录上下文。
                           </thinking>
                   product:
@@ -1540,7 +1533,6 @@ customModes:
                           - 用户对整个项目有特殊需求时
                       action:|-
                           <thinking>
-                              产品背景发生变化时，需要更新 `.memory/product.md`。
                               文件以 Markdown 文档的格式记录产品描述，通过一级标题记录分类，通过无序列表记录产品描述。
                           </thinking>
               hooks:
@@ -1553,6 +1545,7 @@ customModes:
 
           <thinking>
               我会优先使用 memory-bank 所描述的内容对上下文内容进行传递，这样我可以尽可能的保留更多的上下文信息以防出现不可逆错误时，我可以通过 memory-bank 进行任务的恢复。
+              当用户反复强调某一个行为准则、步骤时，我可能会通过 memory-bank 进行记录，这样我可以在需要的时候进行恢复。
           </thinking>
 
           hooks:
@@ -1721,7 +1714,6 @@ customModes:
                           - 任务状态发生变化时
                       action:|-
                           <thinking>
-                              任务清单、状态发生变化时，需要更新 `.memory/checklist.md`。
                               文件以 *表格* 记录任务检查清单，表格至少包含:
                                   - 任务 ID（必填）: 随机字符串，全局唯一，用于标识任务
                                   - 任务名称（必填）: 任务名称
@@ -1748,7 +1740,6 @@ customModes:
                           - 用户对当前任务有特殊需求时
                       action:|-
                           <thinking>
-                              任务背景发生变化时，需要更新 `.memory/context.md`。
                               文件以 Markdown 文档的格式记录上下文，通过二级标题记录分类，通过无序列表记录上下文。
                           </thinking>
                   product:
@@ -1759,7 +1750,6 @@ customModes:
                           - 用户对整个项目有特殊需求时
                       action:|-
                           <thinking>
-                              产品背景发生变化时，需要更新 `.memory/product.md`。
                               文件以 Markdown 文档的格式记录产品描述，通过一级标题记录分类，通过无序列表记录产品描述。
                           </thinking>
               hooks:
@@ -1772,6 +1762,7 @@ customModes:
 
           <thinking>
               我会优先使用 memory-bank 所描述的内容对上下文内容进行传递，这样我可以尽可能的保留更多的上下文信息以防出现不可逆错误时，我可以通过 memory-bank 进行任务的恢复。
+              当用户反复强调某一个行为准则、步骤时，我可能会通过 memory-bank 进行记录，这样我可以在需要的时候进行恢复。
           </thinking>
 
           hooks:
@@ -1960,7 +1951,6 @@ customModes:
                           - 任务状态发生变化时
                       action:|-
                           <thinking>
-                              任务清单、状态发生变化时，需要更新 `.memory/checklist.md`。
                               文件以 *表格* 记录任务检查清单，表格至少包含:
                                   - 任务 ID（必填）: 随机字符串，全局唯一，用于标识任务
                                   - 任务名称（必填）: 任务名称
@@ -1987,7 +1977,6 @@ customModes:
                           - 用户对当前任务有特殊需求时
                       action:|-
                           <thinking>
-                              任务背景发生变化时，需要更新 `.memory/context.md`。
                               文件以 Markdown 文档的格式记录上下文，通过二级标题记录分类，通过无序列表记录上下文。
                           </thinking>
                   product:
@@ -1998,7 +1987,6 @@ customModes:
                           - 用户对整个项目有特殊需求时
                       action:|-
                           <thinking>
-                              产品背景发生变化时，需要更新 `.memory/product.md`。
                               文件以 Markdown 文档的格式记录产品描述，通过一级标题记录分类，通过无序列表记录产品描述。
                           </thinking>
               hooks:
@@ -2011,6 +1999,7 @@ customModes:
 
           <thinking>
               我会优先使用 memory-bank 所描述的内容对上下文内容进行传递，这样我可以尽可能的保留更多的上下文信息以防出现不可逆错误时，我可以通过 memory-bank 进行任务的恢复。
+              当用户反复强调某一个行为准则、步骤时，我可能会通过 memory-bank 进行记录，这样我可以在需要的时候进行恢复。
           </thinking>
 
           hooks:

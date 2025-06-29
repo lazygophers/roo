@@ -12,15 +12,14 @@ groups:
     ]
     - "command"
 customInstructions: |-
-    workflow:
-        文档生成:
+    当文档生成时:
+        workflow:
             - 分析需求，进行合理的模块化设计，确保设计符合单一职责原则，符合 golang 的常规设计要求
                 - 模块划分清晰
                 - 模块之间依赖关系清晰
             - 根据设计结果，分别通过编辑的方式更新文档到相应的文档文件中
-                - README.md
-                - design.md
-        代码生成:
+    当代码生成时:
+        workflow:
             - 首先确保相关代码已有完善的文档，且以更新到相应的文件中
             - 按照设计结果，分别新建相关的模块、文件
             - 针对每一个模块，生成相应的代码
@@ -28,25 +27,27 @@ customInstructions: |-
                 - 符合代码规范
                 - 具有良好的可读性、可维护性、可扩展性
             - 生成相应的测试用例
-        测试用例:
+    当测试用例时:
+        workflow:
             - 根据代码，生成对应的 _test.go 文件
             - 依次分析每一个模块，生成相应的测试用例:
                 - 退出时要清理临时资源
                 - 确保存在临界分支的测试
                 - 确保存在错误路径的测试
-                - 确保测试通过率为 100%
-                    - 确保通过 `go test` 输出的内容中没有错误信息（即输出内容只有 `PASS` 没有 `FAIL`）
-                    <execute_command>
-                        <command>go test -v .</command>
-                        <cwd>{测试文件所在目录}<cwd>
-                    </execute_command>
-                    - 确保通过 `go test` 返回的 exit code 为 0
-            - 结束前校验:
-                - 确保覆盖了所有代码逻辑
-                - 关键逻辑存在性能基准测试 (Benchmark)
-                - 测试覆盖率大于 95%
             - 根据测试结果，更新测试报告以及性能测试报告
-        更新依赖:
+        validate:
+            - 确保覆盖了所有代码逻辑
+            - 关键逻辑存在性能基准测试 (Benchmark)
+            - 测试覆盖率大于 95%
+            - 确保测试通过率为 100%
+                - 确保通过 `go test` 输出的内容中没有错误信息（即输出内容只有 `PASS` 没有 `FAIL`）
+                <execute_command>
+                    <command>go test -v .</command>
+                    <cwd>{测试文件所在目录}<cwd>
+                </execute_command>
+                - 确保通过 `go test` 返回的 exit code 为 0
+    当更新依赖时:
+        workflow:
             - 首先执行 `go mod tidy` 命令，更新所有的依赖
             - ```
                 <ask_followup_question>
@@ -58,12 +59,16 @@ customInstructions: |-
                     </follow_up>
                 </ask_followup_question>
             ```
-                - 获取需要更新的依赖:
-                    更新所有依赖: 获取 `go.mod` 文件中所有的依赖
-                    更新直接依赖项: 获取 `go.mod` 文件中直接依赖项
-                    不需要更新版本: 依赖项为空
-                - 通过 `go get -u [依赖项]` 依次更新依赖项
-
+            - 获取需要更新的依赖:
+                更新所有依赖: 获取 `go.mod` 文件中所有的依赖
+                更新直接依赖项: 获取 `go.mod` 文件中直接依赖项
+                不需要更新版本: 依赖项为空
+            - 通过 `go get -u [依赖项]` 依次更新依赖项
+    当生成注释时:
+        workflow:
+            - 阅读某一个函数、类、接口、结构体、常量、变量、方法等代码，并理解逻辑
+            - 在合适的位置创建符合 golang 语言标准的注释
+    
     <thinking>
     这是一个 Golang 的项目，请根据项目需求，生成符合 Go 语言规范的代码结构。
     我会优先使用 `go mod tidy`的方案更新项目依赖的包，当我需要通过 `go get` 的方式获取包时，我不会指定版本。

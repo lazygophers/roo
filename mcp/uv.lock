@@ -477,6 +477,19 @@ wheels = [
 ]
 
 [[package]]
+name = "dataclasses-json"
+version = "0.6.7"
+source = { registry = "https://mirrors.bfsu.edu.cn/pypi/web/simple" }
+dependencies = [
+    { name = "marshmallow" },
+    { name = "typing-inspect" },
+]
+sdist = { url = "https://mirrors.bfsu.edu.cn/pypi/web/packages/64/a4/f71d9cf3a5ac257c993b5ca3f93df5f7fb395c725e7f1e6479d2514173c3/dataclasses_json-0.6.7.tar.gz", hash = "sha256:b6b3e528266ea45b9535223bc53ca645f5208833c29229e847b3f26a1cc55fc0" }
+wheels = [
+    { url = "https://mirrors.bfsu.edu.cn/pypi/web/packages/c3/be/d0d44e092656fe7a06b55e6103cbce807cdbdee17884a5367c68c9860853/dataclasses_json-0.6.7-py3-none-any.whl", hash = "sha256:0dbf33f26c8d5305befd61b39d2b3414e8a407bedc2834dea9b8d642666fb40a" },
+]
+
+[[package]]
 name = "dateparser"
 version = "1.1.8"
 source = { registry = "https://mirrors.bfsu.edu.cn/pypi/web/simple" }
@@ -1007,6 +1020,29 @@ wheels = [
 ]
 
 [[package]]
+name = "langchain-community"
+version = "0.3.26"
+source = { registry = "https://mirrors.bfsu.edu.cn/pypi/web/simple" }
+dependencies = [
+    { name = "aiohttp" },
+    { name = "dataclasses-json" },
+    { name = "httpx-sse" },
+    { name = "langchain" },
+    { name = "langchain-core" },
+    { name = "langsmith" },
+    { name = "numpy" },
+    { name = "pydantic-settings" },
+    { name = "pyyaml" },
+    { name = "requests" },
+    { name = "sqlalchemy" },
+    { name = "tenacity" },
+]
+sdist = { url = "https://mirrors.bfsu.edu.cn/pypi/web/packages/aa/15/69940212569e7d7ac7b486fba244701448e8685f79069b73206c44e96fde/langchain_community-0.3.26.tar.gz", hash = "sha256:49f9d71dc20bc42ccecd6875d02fafef1be0e211a0b22cecbd678f5fd3719487", size = 33235791, upload-time = "2025-06-20T22:32:41.727Z" }
+wheels = [
+    { url = "https://mirrors.bfsu.edu.cn/pypi/web/packages/44/8e/d3d201f648e8d09dc1072a734c4dc1f59455b91d7d162427256533bf5a87/langchain_community-0.3.26-py3-none-any.whl", hash = "sha256:b25a553ee9d44a6c02092a440da6c561a9312c7013ffc25365ac3f8694edb53a", size = 2529186, upload-time = "2025-06-20T22:32:39.738Z" },
+]
+
+[[package]]
 name = "langchain-core"
 version = "0.3.66"
 source = { registry = "https://mirrors.bfsu.edu.cn/pypi/web/simple" }
@@ -1075,6 +1111,7 @@ dependencies = [
     { name = "black" },
     { name = "coqui-tts" },
     { name = "langchain" },
+    { name = "langchain-community" },
     { name = "mcp" },
     { name = "psutil" },
     { name = "pydantic" },
@@ -1091,6 +1128,7 @@ requires-dist = [
     { name = "black", specifier = ">=25.1.0" },
     { name = "coqui-tts", git = "https://github.com/Luoxin/coqui-ai-TTS" },
     { name = "langchain", specifier = ">=0.3.26" },
+    { name = "langchain-community", specifier = ">=0.3.26" },
     { name = "mcp", specifier = ">=1.10.1" },
     { name = "psutil", specifier = ">=7.0.0" },
     { name = "pydantic", specifier = ">=2.11.7" },
@@ -1202,6 +1240,18 @@ wheels = [
     { url = "https://mirrors.bfsu.edu.cn/pypi/web/packages/0d/80/0985960e4b89922cb5a0bac0ed39c5b96cbc1a536a99f30e8c220a996ed9/MarkupSafe-3.0.2-cp313-cp313t-musllinux_1_2_x86_64.whl", hash = "sha256:131a3c7689c85f5ad20f9f6fb1b866f402c445b220c19fe4308c0b147ccd2ad9", size = 24098, upload-time = "2024-10-18T15:21:40.813Z" },
     { url = "https://mirrors.bfsu.edu.cn/pypi/web/packages/82/78/fedb03c7d5380df2427038ec8d973587e90561b2d90cd472ce9254cf348b/MarkupSafe-3.0.2-cp313-cp313t-win32.whl", hash = "sha256:ba8062ed2cf21c07a9e295d5b8a2a5ce678b913b45fdf68c32d95d6c1291e0b6", size = 15208, upload-time = "2024-10-18T15:21:41.814Z" },
     { url = "https://mirrors.bfsu.edu.cn/pypi/web/packages/4f/65/6079a46068dfceaeabb5dcad6d674f5f5c61a6fa5673746f42a9f4c233b3/MarkupSafe-3.0.2-cp313-cp313t-win_amd64.whl", hash = "sha256:e444a31f8db13eb18ada366ab3cf45fd4b31e4db1236a4448f68778c1d1a5a2f", size = 15739, upload-time = "2024-10-18T15:21:42.784Z" },
+]
+
+[[package]]
+name = "marshmallow"
+version = "3.26.1"
+source = { registry = "https://mirrors.bfsu.edu.cn/pypi/web/simple" }
+dependencies = [
+    { name = "packaging" },
+]
+sdist = { url = "https://mirrors.bfsu.edu.cn/pypi/web/packages/ab/5e/5e53d26b42ab75491cda89b871dab9e97c840bf12c63ec58a1919710cd06/marshmallow-3.26.1.tar.gz", hash = "sha256:e6d8affb6cb61d39d26402096dc0aee12d5a26d490a121f118d2e81dc0719dc6", size = 221825, upload-time = "2025-02-03T15:32:25.093Z" }
+wheels = [
+    { url = "https://mirrors.bfsu.edu.cn/pypi/web/packages/34/75/51952c7b2d3873b44a0028b1bd26a25078c18f92f256608e8d1dc61b39fd/marshmallow-3.26.1-py3-none-any.whl", hash = "sha256:3350409f20a70a7e4e11a27661187b77cdcaeb20abca41c1454fe33636bea09c", size = 50878, upload-time = "2025-02-03T15:32:22.295Z" },
 ]
 
 [[package]]
@@ -5354,6 +5404,19 @@ source = { registry = "https://mirrors.bfsu.edu.cn/pypi/web/simple" }
 sdist = { url = "https://mirrors.bfsu.edu.cn/pypi/web/packages/d1/bc/51647cd02527e87d05cb083ccc402f93e441606ff1f01739a62c8ad09ba5/typing_extensions-4.14.0.tar.gz", hash = "sha256:8676b788e32f02ab42d9e7c61324048ae4c6d844a399eebace3d4979d75ceef4", size = 107423, upload-time = "2025-06-02T14:52:11.399Z" }
 wheels = [
     { url = "https://mirrors.bfsu.edu.cn/pypi/web/packages/69/e0/552843e0d356fbb5256d21449fa957fa4eff3bbc135a74a691ee70c7c5da/typing_extensions-4.14.0-py3-none-any.whl", hash = "sha256:a1514509136dd0b477638fc68d6a91497af5076466ad0fa6c338e44e359944af", size = 43839, upload-time = "2025-06-02T14:52:10.026Z" },
+]
+
+[[package]]
+name = "typing-inspect"
+version = "0.9.0"
+source = { registry = "https://mirrors.bfsu.edu.cn/pypi/web/simple" }
+dependencies = [
+    { name = "mypy-extensions" },
+    { name = "typing-extensions" },
+]
+sdist = { url = "https://mirrors.bfsu.edu.cn/pypi/web/packages/dc/74/1789779d91f1961fa9438e9a8710cdae6bd138c80d7303996933d117264a/typing_inspect-0.9.0.tar.gz", hash = "sha256:b23fc42ff6f6ef6954e4852c1fb512cdd18dbea03134f91f856a95ccc9461f78" }
+wheels = [
+    { url = "https://mirrors.bfsu.edu.cn/pypi/web/packages/65/f3/107a22063bf27bdccf2024833d3445f4eea42b2e598abfbd46f6a63b6cb0/typing_inspect-0.9.0-py3-none-any.whl", hash = "sha256:9ee6fc59062311ef8547596ab6b955e1b8aa46242d854bfc78f4f6b0eff35f9f" },
 ]
 
 [[package]]

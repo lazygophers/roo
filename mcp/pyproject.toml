@@ -8,6 +8,7 @@ dependencies = [
     "black>=25.1.0",
     "coqui-tts>=0.26.2",
     "langchain>=0.3.26",
+    "langchain-community>=0.3.26",
     "mcp>=1.10.1",
     "psutil>=7.0.0",
     "pydantic>=2.11.7",

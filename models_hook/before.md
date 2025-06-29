@@ -79,7 +79,6 @@ memory-bank:
                 - 任务状态发生变化时
             action:|-
                 <thinking>
-                    任务清单、状态发生变化时，需要更新 `.memory/checklist.md`。
                     文件以 *表格* 记录任务检查清单，表格至少包含:
                         - 任务 ID（必填）: 随机字符串，全局唯一，用于标识任务
                         - 任务名称（必填）: 任务名称
@@ -106,7 +105,6 @@ memory-bank:
                 - 用户对当前任务有特殊需求时
             action:|-
                 <thinking>
-                    任务背景发生变化时，需要更新 `.memory/context.md`。
                     文件以 Markdown 文档的格式记录上下文，通过二级标题记录分类，通过无序列表记录上下文。
                 </thinking>
         product:
@@ -117,7 +115,6 @@ memory-bank:
                 - 用户对整个项目有特殊需求时
             action:|-
                 <thinking>
-                    产品背景发生变化时，需要更新 `.memory/product.md`。
                     文件以 Markdown 文档的格式记录产品描述，通过一级标题记录分类，通过无序列表记录产品描述。
                 </thinking>
     hooks:
@@ -130,6 +127,7 @@ memory-bank:
 
 <thinking>
     我会优先使用 memory-bank 所描述的内容对上下文内容进行传递，这样我可以尽可能的保留更多的上下文信息以防出现不可逆错误时，我可以通过 memory-bank 进行任务的恢复。
+    当用户反复强调某一个行为准则、步骤时，我可能会通过 memory-bank 进行记录，这样我可以在需要的时候进行恢复。
 </thinking>
 
 hooks:
