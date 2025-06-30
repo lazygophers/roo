@@ -8,12 +8,12 @@ class FileInfo(BaseModel):
     """文件元数据模型，包含绝对路径、大小、权限等信息.
 
     Attributes:
-        path (str): 文件绝对路径
-        size (int): 文件大小（字节）
-        is_dir (bool): 是否为目录类型
-        mode (int): Unix权限模式（十进制）
-        created_at (int): 创建时间戳（秒）
-        modified_at (int): 最后修改时间戳（秒）
+        path: str - 文件绝对路径
+        size: int - 文件大小（字节）
+        is_dir: bool - 是否为目录类型
+        mode: int - Unix权限模式（十进制）
+        created_at: int - 创建时间戳（秒）
+        modified_at: int - 最后修改时间戳（秒）
     """
 
     path: str = Field(..., description="文件绝对路径")

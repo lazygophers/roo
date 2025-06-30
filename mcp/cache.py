@@ -1,7 +1,17 @@
 import atexit
+import os.path
 import shelve
 import threading
 import time
+
+
+def mkdir(dir_path: str):
+    if dir_path == "":
+        return
+    mkdir(os.path.dirname(dir_path))
+    if os.path.exists(dir_path):
+        return
+    os.mkdir(dir_path)
 
 
 class Cache:
@@ -9,9 +19,12 @@ class Cache:
         self.filename = filename
         self.lock = threading.Lock()
         self.db = None
+        self.open()
 
     def open(self):
         """打开数据库"""
+        mkdir(os.path.dirname(self.filename))
+
         self.db = shelve.open(self.filename)
         atexit.register(self.close)
 
@@ -65,6 +78,13 @@ class Cache:
             if self.db is None:
                 raise RuntimeError("Database not opened")
             self.db.clear()
+
+    def exists(self, key) -> bool:
+        """检查键是否存在"""
+        with self.lock:
+            if self.db is None:
+                raise RuntimeError("Database not opened")
+            return key in self.db
 
     def _cleanup_expired(self):
         with self.lock:

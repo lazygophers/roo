@@ -1,5 +1,7 @@
-a = ["/1/1/", "/1/2/2"]
+from cache import Cache
 
-a = [i[2:] if i.startswith("/1") else i for i in a]
+cache = Cache("cache")
 
-print(a)
+# cache.set("key", "value", ttl=100)
+
+print(cache.get("key"))
