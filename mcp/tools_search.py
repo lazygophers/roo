@@ -1,4 +1,5 @@
 import random
+from pydantic import Field
 
 from langchain.utilities import SearxSearchWrapper
 
@@ -8,15 +9,10 @@ from croe import mcp
 
 @mcp.tool()
 async def search_searx(
-    query: str,
-    num_results: int = 10,
+    query: str = Field(description="要搜索的关键词"),
+    num_results: int = Field(description="要返回的搜索结果数量", default=20),
 ) -> list[dict]:
     """通过 Searx 进行搜索
-
-    Args:
-        query: The query to search for.
-        num_results: Limit the number of results to return.
-
     Returns:
         Dict with the following keys:
         {

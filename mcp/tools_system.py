@@ -4,6 +4,7 @@ import tempfile
 from pathlib import Path
 import appdirs
 import psutil
+from pydantic import Field
 
 from config import app_name
 from croe import mcp
@@ -12,7 +13,6 @@ from croe import mcp
 @mcp.tool()
 async def user_home_directory() -> str:
     """获取当前用户的主目录路径。
-
     Returns:
         str: 用户主目录的字符串表示
     """
@@ -22,7 +22,6 @@ async def user_home_directory() -> str:
 @mcp.tool()
 async def hostname() -> str:
     """获取当前系统的主机名（节点名）。
-
     Returns:
         str: 系统的主机名
     """
@@ -32,7 +31,6 @@ async def hostname() -> str:
 @mcp.tool()
 async def user_config_directory() -> str:
     """获取用户配置目录路径。
-
     Returns:
         str: 用户配置目录路径字符串
     """
@@ -47,7 +45,6 @@ async def user_cache_directory() -> str:
 @mcp.tool()
 async def temp_directory() -> str:
     """获取系统的临时目录路径。
-
     Returns:
         str: 系统的临时目录路径字符串
     """
@@ -57,7 +54,6 @@ async def temp_directory() -> str:
 @mcp.tool()
 async def os() -> str:
     """获取操作系统名称。
-
     Returns:
         str: 操作系统名称（如：Linux/Windows/Darwin）
     """
@@ -67,7 +63,6 @@ async def os() -> str:
 @mcp.tool()
 async def os_arch() -> str:
     """获取操作系统的架构。
-
     Returns:
         str: 系统架构（如：x86_64/aarch64）
     """
@@ -77,7 +72,6 @@ async def os_arch() -> str:
 @mcp.tool()
 async def os_version() -> str:
     """获取操作系统版本信息。
-
     Returns:
         str: 操作系统具体版本字符串
     """
@@ -97,7 +91,6 @@ async def cpu_count() -> int:
 @mcp.tool()
 async def cpu_freq() -> float:
     """获取当前CPU频率。
-
     Returns:
         float: 当前CPU频率（单位：MHz）
     """
@@ -117,7 +110,6 @@ async def cpu_percent() -> float:
 @mcp.tool()
 async def mem_total() -> int:
     """获取系统总内存容量。
-
     Returns:
         int: 总内存大小（单位：字节）
     """
@@ -127,7 +119,6 @@ async def mem_total() -> int:
 @mcp.tool()
 async def mem_percent() -> float:
     """获取当前内存使用百分比。
-
     Returns:
         float: 内存使用百分比（0.0-100.0）
     """
@@ -137,7 +128,6 @@ async def mem_percent() -> float:
 @mcp.tool()
 async def mem_used() -> int:
     """获取已使用的内存量。
-
     Returns:
         int: 已使用内存大小（单位：字节）
     """
@@ -147,7 +137,6 @@ async def mem_used() -> int:
 @mcp.tool()
 async def disk_total() -> int:
     """获取根目录所在磁盘的总空间大小。
-
     Returns:
         int: 磁盘总空间（单位：字节）
     """
@@ -155,12 +144,10 @@ async def disk_total() -> int:
 
 
 @mcp.tool()
-async def disk_usage(path: str = "") -> dict:
+async def disk_usage(
+    path: str = Field(description="要查询的目录路径", default="")
+) -> dict:
     """获取指定路径的磁盘使用情况。
-
-    Args:
-        path (str, optional): 要查询的路径，默认为空字符串（根目录）
-
     Returns:
         dict: 包含total、used、free等键的磁盘使用情况字典
     """
@@ -168,12 +155,10 @@ async def disk_usage(path: str = "") -> dict:
 
 
 @mcp.tool()
-async def disk_partitions(all: bool = False) -> list:
+async def disk_partitions(
+    all: bool = Field(description="是否返回所有分区信息", default=True)
+) -> list:
     """获取磁盘分区信息列表。
-
-    Args:
-        all (bool, optional): 是否包含所有分区，默认False
-
     Returns:
         list: 磁盘分区信息列表
     """
@@ -184,7 +169,6 @@ async def disk_partitions(all: bool = False) -> list:
 @mcp.tool()
 async def system_uptime() -> int:
     """获取系统持续运行时间。
-
     Returns:
         int: 系统启动以来的秒数
     """
@@ -195,7 +179,6 @@ async def system_uptime() -> int:
 @mcp.tool()
 async def network_interfaces() -> dict:
     """获取网络接口详细信息。
-
     Returns:
         dict: 网络接口名称到地址信息的映射字典
     """
@@ -206,7 +189,6 @@ async def network_interfaces() -> dict:
 @mcp.tool()
 async def running_processes() -> list:
     """获取当前运行中的进程列表及其资源使用情况。
-
     Returns:
         list: 进程信息字典列表，包含以下字段：
             - pid (int): 进程ID

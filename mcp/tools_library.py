@@ -1,4 +1,5 @@
 import os
+from pydantic import Field
 
 from cache import Cache
 from croe import mcp
@@ -27,7 +28,7 @@ library_map = {
 }
 
 
-async def fetch_with_cache(url: str) -> str:
+async def fetch_with_cache(url: str = Field(description="URL")) -> str:
     value = cache.get(url)
     if value is not None:
         return value
@@ -46,9 +47,6 @@ async def fetch_with_cache(url: str) -> str:
 async def library_list() -> list[str]:
     """
     根据 library 类型获取 library_id 列表
-
-    Args:
-
     Returns:
         list: 包含所有支持的 library_id
     """
@@ -57,13 +55,11 @@ async def library_list() -> list[str]:
 
 
 @mcp.tool()
-async def library_get(library_id: str) -> str:
+async def library_get(
+    library_id: str = Field(description="库标识，可通过 library_list 获取"),
+) -> str:
     """
     获取库的最新文档、源码
-
-    Args:
-        library_id: libray标识
-
     Returns:
         library 内容
     """
