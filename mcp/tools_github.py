@@ -2,6 +2,7 @@ import os.path
 import time
 
 from git import Repo, BadName, GitCommandError
+from pydantic import Field
 
 from cache import Cache
 from croe import mcp
@@ -12,18 +13,18 @@ cache = Cache(
 )  # 初始化缓存实例，用于存储仓库更新时间等信息
 
 
-async def get_github_repo(origin_name: str, repo_name: str) -> Repo:
+async def get_github_repo(
+    origin_name: str = Field(
+        description="GitHub用户名/组织名", examples=["lazygophers", "google"]
+    ),
+    repo_name: str = Field(
+        description="仓库名", examples=["tensorflow", "pytorch", "roo"]
+    ),
+) -> Repo:
     """
     获取或克隆GitHub仓库
-
-    Args:
-        origin_name: GitHub用户名/组织名
-        repo_name: 仓库名称
-
     Returns:
         Repo: 本地仓库实例，用于后续git操作
-    Raises:
-        GitCommandError: 当克隆或初始化仓库失败时抛出
     """
     cache_path = os.path.join("cache", "github", origin_name, repo_name)
     if not os.path.exists(cache_path):
@@ -39,24 +40,19 @@ async def get_github_repo(origin_name: str, repo_name: str) -> Repo:
 
 @mcp.tool()
 async def library_github_refresh(
-    origin_name: str, repo_name: str, branch: str = "master", force: bool = True
+    origin_name: str = Field(
+        description="GitHub用户名/组织名", examples=["lazygophers", "google"]
+    ),
+    repo_name: str = Field(
+        description="仓库名", examples=["tensorflow", "pytorch", "roo"]
+    ),
+    branch: str = Field(
+        description="分支名", default="master", examples=["master", "main", "dev"]
+    ),
+    force: bool = Field(description="是否强制刷新", default=True),
 ):
     """
     刷新GitHub仓库代码
-
-    Args:
-        origin_name: GitHub用户名/组织名
-        repo_name: 仓库名称
-        branch: 分支名称（默认master）
-        force: 是否强制刷新（默认True）
-
-    功能：
-        1. 检查分支是否存在
-        2. 非强制模式下每5分钟更新一次
-        3. 强制模式下强制拉取最新代码
-    Raises:
-        Exception: 当指定分支在远程不存在时抛出
-        GitCommandError: 当git pull操作失败时抛出
     """
     repo = await get_github_repo(origin_name, repo_name)
 
@@ -84,18 +80,18 @@ async def library_github_refresh(
 
 
 @mcp.tool()
-async def library_github_branches(origin_name: str, repo_name: str) -> list:
+async def library_github_branches(
+    origin_name: str = Field(
+        description="GitHub用户名/组织名", examples=["lazygophers", "google"]
+    ),
+    repo_name: str = Field(
+        description="仓库名", examples=["tensorflow", "pytorch", "roo"]
+    ),
+) -> list:
     """
     获取仓库所有分支列表
-
-    Args:
-        origin_name: GitHub用户名/组织名
-        repo_name: 仓库名称
-
     Returns:
         List[str]: 包含所有分支名称的字符串列表
-    Raises:
-        GitCommandError: 当仓库初始化失败时抛出
     """
     await library_github_refresh(origin_name, repo_name, force=False)
     repo = await get_github_repo(origin_name, repo_name)
@@ -105,22 +101,21 @@ async def library_github_branches(origin_name: str, repo_name: str) -> list:
 
 @mcp.tool()
 async def library_github_list_files(
-    origin_name: str, repo_name: str, path: str = ".", branch: str = "master"
+    origin_name: str = Field(
+        description="GitHub用户名/组织名", examples=["lazygophers", "google"]
+    ),
+    repo_name: str = Field(
+        description="仓库名", examples=["tensorflow", "pytorch", "roo"]
+    ),
+    path: str = Field(description="文件路径", examples=["src"]),
+    branch: str = Field(
+        description="分支名", default="master", examples=["master", "main", "dev"]
+    ),
 ) -> list:
     """
     列取仓库指定路径下的文件列表
-
-    Args:
-        origin_name: GitHub用户名/组织名
-        repo_name: 仓库名称
-        path: 需要列出的文件路径（默认根目录)
-        branch: 分支名称（默认master）
-
     Returns:
         List[Dict]: 包含文件名、路径、类型、大小的字典列表
-    Raises:
-        ValueError: 当分支不存在或没有提交记录时抛出
-        GitCommandError: 当git ls-tree命令执行失败时抛出
     """
     await library_github_refresh(origin_name, repo_name, force=False)
     repo = await get_github_repo(origin_name, repo_name)
@@ -185,22 +180,21 @@ async def library_github_list_files(
 
 @mcp.tool()
 async def library_github_read_file(
-    origin_name: str, repo_name: str, file_path: str, branch: str = "master"
+    origin_name: str = Field(
+        description="GitHub用户名/组织名", examples=["lazygophers", "google"]
+    ),
+    repo_name: str = Field(
+        description="仓库名", examples=["tensorflow", "pytorch", "roo"]
+    ),
+    file_path: str = Field(description="文件路径", examples=["README.md"]),
+    branch: str = Field(
+        description="分支名", default="master", examples=["master", "main", "dev"]
+    ),
 ):
     """
     读取仓库指定文件内容
-
-    Args:
-        origin_name: GitHub用户名/组织名
-        repo_name: 仓库名称
-        file_path: 文件路径
-        branch: 分支名称（默认master）
-
     Returns:
         bytes: 文件内容的原始字节流
-    Raises:
-        GitCommandError: 当git checkout失败时抛出
-        FileNotFoundError: 当指定文件路径不存在时抛出
     """
     await library_github_refresh(origin_name, repo_name, force=False)
     repo = await get_github_repo(origin_name, repo_name)
