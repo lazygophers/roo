@@ -6,6 +6,8 @@ import time
 from tinydb import TinyDB, Query
 
 from pydantic import Field, BaseModel
+
+from core.cache import mkdir
 from core.croe import mcp
 
 
@@ -123,7 +125,9 @@ class Task(BaseModel):
 class TaskManager(object):
     def __init__(self):
         self.lock = threading.Lock()
-        self.db = TinyDB(os.path.join("cache", "task", "manager"))
+        filename = os.path.join("cache", "task", "manager.json")
+        mkdir(os.path.dirname(filename))
+        self.db = TinyDB(filename)
         atexit.register(self.db.close)
 
     def add(self, task: Task) -> bool:
