@@ -5,11 +5,11 @@
 现在请开始执行任务, 并且使用如下工具:
 lazygophers(mcp):
     always use:
-        - library_get
+        - library_get，用于获取库信息
 context7(mcp):
     always use:
-        - sequentialthinking
-        - get-library-docs
+        - sequentialthinking，用于深度思考
+        - get-library-docs，用于获取库信息
 sequentialthinking(mcp):
     always use:
-        - sequentialthinking
+        - sequentialthinking，用于深度思考

@@ -14,6 +14,7 @@ cache = Cache(
 
 library_map = {
     # golang
+    "golang/风格指南": "file://library/document/golang/guide.md",
     ## google
     "golang/google/best-practices": "https://cdn.jsdelivr.net/gh/google/styleguide@master/go/best-practices.md",
     "golang/google/decisions": "https://cdn.jsdelivr.net/gh/google/styleguide@master/go/decisions.md",
@@ -22,9 +23,12 @@ library_map = {
     ## uber
     "golang/uber/guide": "https://cdn.jsdelivr.net/gh/uber-go/guide@master/style.md",
     # python
+    "python/风格指南": "file://library/document/python/guide.md",
     ## google
     "python/google/guide": "https://cdn.jsdelivr.net/gh/google/styleguide@master/pyguide.md",
     "python/google/lintrc": "https://cdn.jsdelivr.net/gh/google/styleguide@gh-pages/pylintrc",
+    # markdown
+    "markdown/风格指南": "file://library/document/markdown/guide.md",
 }
 
 

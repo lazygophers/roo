@@ -257,14 +257,14 @@ customModes:
           现在请开始执行任务, 并且使用如下工具:
           lazygophers(mcp):
               always use:
-                  - library_get
+                  - library_get，用于获取库信息
           context7(mcp):
               always use:
-                  - sequentialthinking
-                  - get-library-docs
+                  - sequentialthinking，用于深度思考
+                  - get-library-docs，用于获取库信息
           sequentialthinking(mcp):
               always use:
-                  - sequentialthinking
+                  - sequentialthinking，用于深度思考
       source: global
    -  slug: coder
       name: 💻 代码模式
@@ -458,14 +458,14 @@ customModes:
           现在请开始执行任务, 并且使用如下工具:
           lazygophers(mcp):
               always use:
-                  - library_get
+                  - library_get，用于获取库信息
           context7(mcp):
               always use:
-                  - sequentialthinking
-                  - get-library-docs
+                  - sequentialthinking，用于深度思考
+                  - get-library-docs，用于获取库信息
           sequentialthinking(mcp):
               always use:
-                  - sequentialthinking
+                  - sequentialthinking，用于深度思考
       source: global
    -  slug: coder-architect
       name: 🏗️ 架构设计模式
@@ -695,14 +695,14 @@ customModes:
           现在请开始执行任务, 并且使用如下工具:
           lazygophers(mcp):
               always use:
-                  - library_get
+                  - library_get，用于获取库信息
           context7(mcp):
               always use:
-                  - sequentialthinking
-                  - get-library-docs
+                  - sequentialthinking，用于深度思考
+                  - get-library-docs，用于获取库信息
           sequentialthinking(mcp):
               always use:
-                  - sequentialthinking
+                  - sequentialthinking，用于深度思考
       source: global
    -  slug: coder-doc
       name: 代码文档模式
@@ -909,14 +909,14 @@ customModes:
           现在请开始执行任务, 并且使用如下工具:
           lazygophers(mcp):
               always use:
-                  - library_get
+                  - library_get，用于获取库信息
           context7(mcp):
               always use:
-                  - sequentialthinking
-                  - get-library-docs
+                  - sequentialthinking，用于深度思考
+                  - get-library-docs，用于获取库信息
           sequentialthinking(mcp):
               always use:
-                  - sequentialthinking
+                  - sequentialthinking，用于深度思考
       source: global
    -  slug: coder-go
       name: 💻 Go代码模式
@@ -1197,14 +1197,14 @@ customModes:
           现在请开始执行任务, 并且使用如下工具:
           lazygophers(mcp):
               always use:
-                  - library_get
+                  - library_get，用于获取库信息
           context7(mcp):
               always use:
-                  - sequentialthinking
-                  - get-library-docs
+                  - sequentialthinking，用于深度思考
+                  - get-library-docs，用于获取库信息
           sequentialthinking(mcp):
               always use:
-                  - sequentialthinking
+                  - sequentialthinking，用于深度思考
       source: global
    -  slug: coder-python
       name: 💻 Python代码模式
@@ -1439,14 +1439,14 @@ customModes:
           现在请开始执行任务, 并且使用如下工具:
           lazygophers(mcp):
               always use:
-                  - library_get
+                  - library_get，用于获取库信息
           context7(mcp):
               always use:
-                  - sequentialthinking
-                  - get-library-docs
+                  - sequentialthinking，用于深度思考
+                  - get-library-docs，用于获取库信息
           sequentialthinking(mcp):
               always use:
-                  - sequentialthinking
+                  - sequentialthinking，用于深度思考
       source: global
    -  slug: coder-roo
       name: ⚙️ Roo 配置模式
@@ -1664,14 +1664,14 @@ customModes:
           现在请开始执行任务, 并且使用如下工具:
           lazygophers(mcp):
               always use:
-                  - library_get
+                  - library_get，用于获取库信息
           context7(mcp):
               always use:
-                  - sequentialthinking
-                  - get-library-docs
+                  - sequentialthinking，用于深度思考
+                  - get-library-docs，用于获取库信息
           sequentialthinking(mcp):
               always use:
-                  - sequentialthinking
+                  - sequentialthinking，用于深度思考
       source: global
    -  slug: giter
       name: 📌 Git提交模式
@@ -1909,14 +1909,14 @@ customModes:
           现在请开始执行任务, 并且使用如下工具:
           lazygophers(mcp):
               always use:
-                  - library_get
+                  - library_get，用于获取库信息
           context7(mcp):
               always use:
-                  - sequentialthinking
-                  - get-library-docs
+                  - sequentialthinking，用于深度思考
+                  - get-library-docs，用于获取库信息
           sequentialthinking(mcp):
               always use:
-                  - sequentialthinking
+                  - sequentialthinking，用于深度思考
       source: global
    -  slug: researcher
       name: 🔍 知识研究模式
@@ -2140,12 +2140,12 @@ customModes:
           现在请开始执行任务, 并且使用如下工具:
           lazygophers(mcp):
               always use:
-                  - library_get
+                  - library_get，用于获取库信息
           context7(mcp):
               always use:
-                  - sequentialthinking
-                  - get-library-docs
+                  - sequentialthinking，用于深度思考
+                  - get-library-docs，用于获取库信息
           sequentialthinking(mcp):
               always use:
-                  - sequentialthinking
+                  - sequentialthinking，用于深度思考
       source: global

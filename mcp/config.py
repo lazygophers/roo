@@ -40,7 +40,6 @@ import appdirs
 
 models_path = os.path.join(appdirs.user_config_dir(appname=app_name), "models")
 
-
 for key in proxies:
     os.environ["{}_PROXY".format(key.upper())] = proxies[key]
 os.environ["COQUI_TOS_AGREED"] = "1"
