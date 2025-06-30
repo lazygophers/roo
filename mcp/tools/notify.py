@@ -1,4 +1,4 @@
-from croe import mcp
+from core.croe import mcp
 from pync import Notifier
 import pyttsx3
 from pydantic import Field

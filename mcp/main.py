@@ -2,7 +2,7 @@ import shutup
 
 shutup.please()
 
-from croe import mcp
+from core.croe import mcp
 from tools import *
 
 if __name__ == "__main__":

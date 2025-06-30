@@ -1,7 +1,9 @@
-from cache import Cache
+from tinydb import TinyDB, Query
 
-cache = Cache("cache")
+db = TinyDB("db.json")
 
-# cache.set("key", "value", ttl=100)
+db.insert({"name": "John", "age": 25})
+db.insert({"name": "Mike", "age": 30})
+db.insert({"name": "Mary", "age": 28})
 
-print(cache.get("key"))
+print(db.search(Query().name == "John"))

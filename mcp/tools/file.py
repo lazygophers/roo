@@ -1,7 +1,7 @@
 import os
 import shutil
 from pydantic import BaseModel, Field
-from croe import mcp
+from core.croe import mcp
 
 
 class FileInfo(BaseModel):

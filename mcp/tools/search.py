@@ -3,8 +3,8 @@ from pydantic import Field
 
 from langchain.utilities import SearxSearchWrapper
 
-from config import searx_hosts
-from croe import mcp
+from core.config import searx_hosts
+from core.croe import mcp
 
 
 @mcp.tool()

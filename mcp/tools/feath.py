@@ -1,5 +1,5 @@
-from config import proxies
-from croe import mcp
+from core.config import proxies
+from core.croe import mcp
 import requests
 from pydantic import Field
 

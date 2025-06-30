@@ -1,4 +1,4 @@
-from croe import mcp
+from core.croe import mcp
 import subprocess
 from pydantic import Field
 

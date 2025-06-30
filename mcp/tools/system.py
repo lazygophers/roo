@@ -6,8 +6,8 @@ import appdirs
 import psutil
 from pydantic import Field
 
-from config import app_name
-from croe import mcp
+from core.config import app_name
+from core.croe import mcp
 
 
 @mcp.tool()
