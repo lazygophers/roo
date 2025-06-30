@@ -1,5 +1,4 @@
 from mcp.server.fastmcp import FastMCP
-
 from config import http_port
 
 mcp = FastMCP(
