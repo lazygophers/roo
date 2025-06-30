@@ -16,44 +16,34 @@ class FileInfo(BaseModel):
         modified_at: int - 最后修改时间戳（秒）
     """
 
-    path: str = Field(..., description="文件绝对路径")
-    size: int = Field(..., description="文件大小（字节）")
-    is_dir: bool = Field(..., description="是否为目录类型")
-    mode: int = Field(..., description="Unix文件权限模式（十进制表示）")
-    created_at: int = Field(..., description="文件创建时间的时间戳（以秒为单位）")
-    modified_at: int = Field(..., description="文件最后修改时间的时间戳（以秒为单位）")
+    path: str = Field(description="文件绝对路径")
+    size: int = Field(description="文件大小（字节）")
+    is_dir: bool = Field(description="是否为目录类型")
+    mode: int = Field(description="Unix文件权限模式（十进制表示）")
+    created_at: int = Field(description="文件创建时间的时间戳（以秒为单位）")
+    modified_at: int = Field(description="文件最后修改时间的时间戳（以秒为单位）")
 
 
 @mcp.tool()
-async def read_file(file_path: str) -> str:
-    """异步读取文件内容.
-
-    Args:
-        file_path (str): 需要读取的文件绝对路径
-
+async def read_file(
+    file_path: str = Field(description="需要读取的文件绝对路径"),
+) -> str:
+    """异步读取文件内容
     Returns:
         str: 文件内容字符串（失败时抛出异常）
-
-    Raises:
-        FileNotFoundError: 文件不存在时触发
     """
     with open(file_path, "r") as f:
         return f.read()
 
 
 @mcp.tool()
-async def write_file(file_path: str, content: str) -> bool:
-    """异步写入文件内容.
-
-    Args:
-        file_path (str): 需要写入的文件绝对路径
-        content (str): 要写入的文件内容
-
+async def write_file(
+    file_path: str = Field(description="需要写入的文件绝对路径"),
+    content: str = Field(description="要写入的内容"),
+) -> bool:
+    """写入文件内容
     Returns:
         bool: 写入是否成功
-
-    Raises:
-        IOError: 文件写入异常时触发
     """
     with open(file_path, "w") as f:
         f.write(content)
@@ -61,18 +51,12 @@ async def write_file(file_path: str, content: str) -> bool:
 
 
 @mcp.tool()
-async def delete_file(file_path: str) -> bool:
-    """异步删除文件.
-
-    Args:
-        file_path (str): 需要删除的文件绝对路径
-
+async def delete_file(
+    file_path: str = Field(description="需要删除的文件绝对路径"),
+) -> bool:
+    """删除文件
     Returns:
         bool: 删除是否成功
-
-    Raises:
-        FileNotFoundError: 文件不存在时触发
-        PermissionError: 权限不足时触发
     """
     try:
         os.remove(file_path)
@@ -82,48 +66,28 @@ async def delete_file(file_path: str) -> bool:
 
 
 @mcp.tool()
-async def mkdir(dir_path: str) -> bool:
-    """创建指定绝对路径的目录.
-
-    Args:
-        dir_path (str): 需要创建的目录绝对路径
-
+async def mkdir(dir_path: str = Field(description="需要创建的目录绝对路径")) -> bool:
+    """创建指定绝对路径的目录
     Returns:
         bool: 目录创建是否成功
-
-    Raises:
-        FileExistsError: 当目录已存在时触发
-        PermissionError: 当权限不足时触发
     """
     os.mkdir(dir_path)
     return True
 
 
 @mcp.tool()
-async def rmdir(dir_path: str) -> bool:
-    """删除指定绝对路径的空目录.
-
-    Args:
-        dir_path (str): 需要删除的目录绝对路径
-
+async def rmdir(dir_path: str = Field(description="需要删除的目录绝对路径")) -> bool:
+    """删除指定绝对路径的空目录
     Returns:
         bool: 目录删除是否成功
-
-    Raises:
-        FileNotFoundError: 当目录不存在时触发
-        OSError: 当目录非空或权限不足时触发
     """
     os.rmdir(dir_path)
     return True
 
 
 @mcp.tool()
-async def file_exists(path: str) -> bool:
-    """检查指定绝对路径是否存在.
-
-    Args:
-        path (str): 需要检查的文件/目录绝对路径
-
+async def file_exists(path: str = Field(description="需要检查的绝对路径")) -> bool:
+    """检查指定绝对路径是否存在
     Returns:
         bool: 绝对路径存在时返回True，否则返回False
     """
@@ -131,12 +95,8 @@ async def file_exists(path: str) -> bool:
 
 
 @mcp.tool()
-async def file_is_dir(path: str) -> bool:
+async def file_is_dir(path: str = Field(description="需要检查的绝对路径")) -> bool:
     """检查指定绝对路径是否为目录.
-
-    Args:
-        path (str): 需要检查的绝对路径
-
     Returns:
         bool: 绝对路径存在且为目录时返回True
     """
@@ -144,12 +104,8 @@ async def file_is_dir(path: str) -> bool:
 
 
 @mcp.tool()
-async def file_is_file(path: str) -> bool:
-    """检查指定绝对路径是否为文件.
-
-    Args:
-        path (str): 需要检查的绝对路径
-
+async def file_is_file(path: str = Field(description="需要检查的绝对路径")) -> bool:
+    """检查指定绝对路径是否为文件
     Returns:
         bool: 绝对路径存在且为文件时返回True
     """
@@ -157,37 +113,26 @@ async def file_is_file(path: str) -> bool:
 
 
 @mcp.tool()
-async def ln(src: str, dest: str) -> bool:
-    """创建符号链接.
-
-    Args:
-        src (str): 源文件绝对路径
-        dest (str): 目标链接绝对路径
-
+async def ln(
+    src: str = Field(description="源文件绝对路径"),
+    dest: str = Field(description="目标文件绝对路径"),
+) -> bool:
+    """创建符号链接
     Returns:
         bool: 符号链接创建是否成功
-
-    Raises:
-        OSError: 当操作失败时触发
     """
     os.symlink(src, dest)
     return True
 
 
 @mcp.tool()
-async def mv(src: str, dest: str) -> bool:
-    """移动/重命名文件或目录.
-
-    Args:
-        src (str): 源绝对路径
-        dest (str): 目标绝对路径
-
+async def mv(
+    src: str = Field(description="源绝对路径"),
+    dest: str = Field(description="目标绝对路径"),
+) -> bool:
+    """移动/重命名文件或目录
     Returns:
         bool: 移动操作是否成功
-
-    Raises:
-        FileNotFoundError: 当源绝对路径不存在时触发
-        FileExistsError: 当目标绝对路径已存在时触发
     """
     try:
         os.rename(src, dest)
@@ -198,19 +143,13 @@ async def mv(src: str, dest: str) -> bool:
 
 
 @mcp.tool()
-async def cp(src: str, dest: str) -> bool:
-    """复制文件或目录.
-
-    Args:
-        src (str): 源绝对路径
-        dest (str): 目标绝对路径
-
+async def cp(
+    src: str = Field(description="源绝对路径"),
+    dest: str = Field(description="目标绝对路径"),
+) -> bool:
+    """复制文件或目录
     Returns:
         bool: 复制操作是否成功
-
-    Raises:
-        FileNotFoundError: 当源绝对路径不存在时触发
-        FileExistsError: 当目标绝对路径已存在时触发
     """
     try:
         shutil.copytree(src, dest)
@@ -220,18 +159,13 @@ async def cp(src: str, dest: str) -> bool:
 
 
 @mcp.tool()
-async def edit_file(path: str, line_range: str = None) -> bool:
-    """编辑文件内容（可指定行范围）.
-
-    Args:
-        path (str): 文件绝对路径
-        line_range (str, optional): 行范围字符串（如"1-3"），默认保留全部内容
-
+async def edit_file(
+    path: str = Field(description="文件绝对路径"),
+    line_range: str = Field(description="行范围", examples=["1-10"]),
+) -> bool:
+    """编辑文件内容（可指定行范围）
     Returns:
         bool: 文件编辑是否成功
-
-    Raises:
-        FileNotFoundError: 当文件不存在时触发
     """
     with open(path, "r") as f:
         lines = f.readlines()
@@ -244,18 +178,13 @@ async def edit_file(path: str, line_range: str = None) -> bool:
 
 
 @mcp.tool()
-async def append_file(path: str, content: str) -> bool:
-    """异步追加内容到文件末尾.
-
-    Args:
-        path (str): 文件绝对路径
-        content (str): 要追加的内容字符串
-
+async def append_file(
+    path: str = Field(description="文件绝对路径"),
+    content: str = Field(description="追加的内容"),
+) -> bool:
+    """异步追加内容到文件末尾
     Returns:
         bool: 追加操作是否成功
-
-    Raises:
-        IOError: 文件写入异常时触发
     """
     with open(path, "a", encoding="utf8") as f:
         f.write(content)
@@ -263,15 +192,13 @@ async def append_file(path: str, content: str) -> bool:
 
 
 @mcp.tool()
-async def list_files(path: str, recursive: bool = False) -> list[str]:
-    """递归列出目录内容（含子目录）.
-
-    Args:
-        path (str): 需要遍历的目录绝对路径
-        recursive (bool, optional): 是否递归子目录，默认False
-
+async def list_files(
+    path: str = Field(description="目录绝对路径"),
+    recursive: bool = Field(description="是否递归列出子目录", default=False),
+) -> list[str]:
+    """递归列出目录内容
     Returns:
-        list[FileInfo]: 包含所有文件信息的列表对象
+        list[str]: 包含所有文件信息的列表对象
     """
     files = []
 
@@ -289,12 +216,8 @@ async def list_files(path: str, recursive: bool = False) -> list[str]:
 
 
 @mcp.tool()
-async def file_info(path: str) -> FileInfo:
-    """获取指定绝对路径的文件元数据信息.
-
-    Args:
-        path (str): 需要分析的文件/目录绝对路径
-
+async def file_info(path: str = Field(description="文件绝对路径")) -> FileInfo:
+    """获取指定绝对路径的文件元数据信息
     Returns:
         path (str): 文件绝对路径
         size (int): 文件大小（字节）
@@ -302,10 +225,6 @@ async def file_info(path: str) -> FileInfo:
         mode (int): Unix权限模式（十进制）
         created_at (int): 创建时间戳（秒）
         modified_at (int): 最后修改时间戳（秒）
-
-    Raises:
-        FileNotFoundError: 当指定绝对路径不存在时触发
-        PermissionError: 当没有访问权限时触发
     """
     return FileInfo(
         path=path,
