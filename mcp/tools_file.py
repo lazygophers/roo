@@ -263,7 +263,7 @@ async def append_file(path: str, content: str) -> bool:
 
 
 @mcp.tool()
-async def list_files(path: str, recursive: bool = False) -> list[FileInfo]:
+async def list_files(path: str, recursive: bool = False) -> list[str]:
     """递归列出目录内容（含子目录）.
 
     Args:
@@ -276,7 +276,7 @@ async def list_files(path: str, recursive: bool = False) -> list[FileInfo]:
     files = []
 
     for file in os.listdir(path):
-        files.append(await file_info(os.path.join(path, file)))
+        files.append(os.path.join(path, file))
 
         if os.path.isfile(os.path.join(path, file)):
             continue

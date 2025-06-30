@@ -4,3 +4,6 @@ from tools_time import *
 from tools_feath import *
 from tools_search import *
 from tools_notify import *
+from tools_library import *
+from tools_bash import *
+from tools_github import *
