@@ -25,7 +25,7 @@ class Cache:
         """打开数据库"""
         mkdir(os.path.dirname(self.filename))
 
-        self.db = shelve.open(self.filename)
+        self.db = shelve.open(self.filename, writeback=True)
         atexit.register(self.close)
 
     def close(self):
