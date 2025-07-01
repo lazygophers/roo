@@ -17,6 +17,7 @@ dependencies = [
     "pync>=2.0.3",
     "pyttsx3>=2.98",
     "requests>=2.32.4",
+    "rich>=14.0.0",
     "shutup>=0.2.0",
     "tinydb>=4.8.2",
     "uv>=0.7.17",

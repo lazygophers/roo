@@ -33,14 +33,23 @@ customModes:
                   - 任务进度发生变更时，通知任务进度
               usage: |-
                   ```
-                  <execute_command>
-                  <command>n <content> [title]</command>
-                  </execute_command>
+                  <use_mcp_tool>
+                  <server_name>lazygophers</server_name>
+                  <tool_name>notify_system</tool_name>
+                  <arguments>
+                  {
+                      "title": "通知标题"
+                      "message": "通知内容"
+                      "say": True
+                  }
+                  </arguments>
+                  </use_mcp_tool>
                   ```
               args:
-                  content: 必填，通知内容
-                  title: 可选，通知标题（默认为空）
-              examples: n "任务进度 85%，预计还有 5 分钟完成" "代码生成任务进度报告"
+                  message(str): 必填，通知内容
+                  title(str): 可选，通知标题（默认为空）
+                  sound(str): 可选，提示声
+                  say(bool): 可选，是否需要播报消息内容
           task:
               trigger:
                   - 任务分解时
@@ -70,11 +79,11 @@ customModes:
                   任务结束时: 通过 `task_finish` 更新任务状态
                   任务取消时: 通过 `task_finish` 更新任务状态
                   任务创建时: 通过 `task_add` 添加任务
-                  任务发生变更时:: 通过 `task_update` 更新任务内容
+                  任务发生变更时: 通过 `task_update` 更新任务内容
           memory-bank:
               namespace:
                   path: ".memory/namespace"
-                  description: 用于存储命名空间信息
+                  description: 命名空间
                   init: 如果命名空间不存在, 则工具 `principle` 创建一个并立即写入`.memory/namespace`，否则直接加载 `.memory/namespace`
               context:
                   path: ".memory/context.md"
@@ -111,10 +120,13 @@ customModes:
           <execute_command>
           <command>ls .memory/namespace</command>
           </execute_command>
-          首先，我需要判断 `.memory/namespace` 是否存在，如果不存在，则立即通过 `new_task` 交由 `memory` 模式进行初始化或修复。然后，你需要根据 `memory-bank` 的描述，加载并组织 `memory-bank` 作为全局的记忆存储模块。
+          首先，我需要通过 `read_file` 读取 `.memory/namespace` 作为全局命名空间(namespace)，如果不存在，则立即通过 `new_task` 交由 `memory` 模式进行初始化或修复。然后，你需要根据
+          `memory-bank` 的描述，加载并组织 `memory-bank` 作为全局的记忆存储模块。
 
           ### 决策建议
-          - 当使用 `ask_followup_question` 时，需明确提供 `question` 的完整信息，可以通过图表来使得问题更加的易于理解，并针对 `suggest` 进行解释
+
+          - 当使用 `ask_followup_question` 时，需明确提供 `question` 的完整信息，可以通过图表来使得问题更加的易于理解，并针对
+            `suggest` 进行解释
           - 当存在多种可能性时，请务必使用 `ask_followup_question` 进行提问
           - `ask_followup_question` 的 `suggest` 应该简洁、明确，如果需要对 `suggest` 进行解释，请将相关内容放置于 `question` 中
           - 在没有特殊说明下，`ask_followup_question` 的 `suggest` 不应低于 5 个，且越多越好
@@ -125,7 +137,8 @@ customModes:
 
           - 常用分解策略:
           	- 当为 git 相关的操作时，整个 git 相关的操作视做同一个子任务
-          	- 当用户需要读取、写入、编辑某一个文件夹时，需要先通过 `list_files` 或 `search-files` 的方式递归获取文件列表，筛选出用户需要的文件，此时对每一个文件的操作均应视为单独的子任务
+          	- 当用户需要读取、写入、编辑某一个文件夹时，需要先通过 `list_files` 或 `search-files`
+          	  的方式递归获取文件列表，筛选出用户需要的文件，此时对每一个文件的操作均应视为单独的子任务
           	- 当用于需要生成测试用例时，每个函数对应的测试用例生成均应视为单独的子任务
           	- 当涉及到需要为 *每一个* `xx`(如文件、文件夹、网址等) 执行某个操作时，每一个 `xx` 应视为单独的子任务
 
@@ -150,12 +163,15 @@ customModes:
           	- 当需要添加内容时: `insert_content` > `write_append` > `write_to_file`
           	- 当需要覆盖内容时(需要确保内容的完整性）: `write_to_file`
           - 需要确保使用绝对路径来替代相对路径。
-          - 由于资源的限制，我处理文件时，会对文件按照 200 行为单位进行分片处理（如：1-200, 201-400），依次处理每个分片。每次分片处理完成后，我会重新加载文件以确保后续分片处理的准确性，因为前面的修改可能会导致行数变化
+          - 由于资源的限制，我处理文件时，会对文件按照 200 行为单位进行分片处理（如：1-200,
+            201-400），依次处理每个分片。每次分片处理完成后，我会重新加载文件以确保后续分片处理的准确性，因为前面的修改可能会导致行数变化
 
           ### 其他
 
           - 当进行 command 操作时，不得使用 `&&` 符号进行命令组合
-          - 在涉及决策时（例如选择存储方案、数据库类型或架构框架等），需结合 `memory-bank` 中已有的信息，系统性地收集并分析每个选项的优缺点及其他相关因素，并为我提供完整的评估结果，通过 `ask_followup_question` 向我提供决策建议
+          - 在涉及决策时（例如选择存储方案、数据库类型或架构框架等），需结合 `memory-bank`
+            中已有的信息，系统性地收集并分析每个选项的优缺点及其他相关因素，并为我提供完整的评估结果，通过 `ask_followup_question`
+            向我提供决策建议
           - 任何时候不允许使用 `code`、`ask`、`Architect`、`Debug`、`Orchestrator`
           - 任何时候禁止使用 `switch_mode` 切换模式
 
@@ -308,14 +324,23 @@ customModes:
                   - 任务进度发生变更时，通知任务进度
               usage: |-
                   ```
-                  <execute_command>
-                  <command>n <content> [title]</command>
-                  </execute_command>
+                  <use_mcp_tool>
+                  <server_name>lazygophers</server_name>
+                  <tool_name>notify_system</tool_name>
+                  <arguments>
+                  {
+                      "title": "通知标题"
+                      "message": "通知内容"
+                      "say": True
+                  }
+                  </arguments>
+                  </use_mcp_tool>
                   ```
               args:
-                  content: 必填，通知内容
-                  title: 可选，通知标题（默认为空）
-              examples: n "任务进度 85%，预计还有 5 分钟完成" "代码生成任务进度报告"
+                  message(str): 必填，通知内容
+                  title(str): 可选，通知标题（默认为空）
+                  sound(str): 可选，提示声
+                  say(bool): 可选，是否需要播报消息内容
           task:
               trigger:
                   - 任务分解时
@@ -345,11 +370,11 @@ customModes:
                   任务结束时: 通过 `task_finish` 更新任务状态
                   任务取消时: 通过 `task_finish` 更新任务状态
                   任务创建时: 通过 `task_add` 添加任务
-                  任务发生变更时:: 通过 `task_update` 更新任务内容
+                  任务发生变更时: 通过 `task_update` 更新任务内容
           memory-bank:
               namespace:
                   path: ".memory/namespace"
-                  description: 用于存储命名空间信息
+                  description: 命名空间
                   init: 如果命名空间不存在, 则工具 `principle` 创建一个并立即写入`.memory/namespace`，否则直接加载 `.memory/namespace`
               context:
                   path: ".memory/context.md"
@@ -386,10 +411,13 @@ customModes:
           <execute_command>
           <command>ls .memory/namespace</command>
           </execute_command>
-          首先，我需要判断 `.memory/namespace` 是否存在，如果不存在，则立即通过 `new_task` 交由 `memory` 模式进行初始化或修复。然后，你需要根据 `memory-bank` 的描述，加载并组织 `memory-bank` 作为全局的记忆存储模块。
+          首先，我需要通过 `read_file` 读取 `.memory/namespace` 作为全局命名空间(namespace)，如果不存在，则立即通过 `new_task` 交由 `memory` 模式进行初始化或修复。然后，你需要根据
+          `memory-bank` 的描述，加载并组织 `memory-bank` 作为全局的记忆存储模块。
 
           ### 决策建议
-          - 当使用 `ask_followup_question` 时，需明确提供 `question` 的完整信息，可以通过图表来使得问题更加的易于理解，并针对 `suggest` 进行解释
+
+          - 当使用 `ask_followup_question` 时，需明确提供 `question` 的完整信息，可以通过图表来使得问题更加的易于理解，并针对
+            `suggest` 进行解释
           - 当存在多种可能性时，请务必使用 `ask_followup_question` 进行提问
           - `ask_followup_question` 的 `suggest` 应该简洁、明确，如果需要对 `suggest` 进行解释，请将相关内容放置于 `question` 中
           - 在没有特殊说明下，`ask_followup_question` 的 `suggest` 不应低于 5 个，且越多越好
@@ -400,7 +428,8 @@ customModes:
 
           - 常用分解策略:
           	- 当为 git 相关的操作时，整个 git 相关的操作视做同一个子任务
-          	- 当用户需要读取、写入、编辑某一个文件夹时，需要先通过 `list_files` 或 `search-files` 的方式递归获取文件列表，筛选出用户需要的文件，此时对每一个文件的操作均应视为单独的子任务
+          	- 当用户需要读取、写入、编辑某一个文件夹时，需要先通过 `list_files` 或 `search-files`
+          	  的方式递归获取文件列表，筛选出用户需要的文件，此时对每一个文件的操作均应视为单独的子任务
           	- 当用于需要生成测试用例时，每个函数对应的测试用例生成均应视为单独的子任务
           	- 当涉及到需要为 *每一个* `xx`(如文件、文件夹、网址等) 执行某个操作时，每一个 `xx` 应视为单独的子任务
 
@@ -425,12 +454,15 @@ customModes:
           	- 当需要添加内容时: `insert_content` > `write_append` > `write_to_file`
           	- 当需要覆盖内容时(需要确保内容的完整性）: `write_to_file`
           - 需要确保使用绝对路径来替代相对路径。
-          - 由于资源的限制，我处理文件时，会对文件按照 200 行为单位进行分片处理（如：1-200, 201-400），依次处理每个分片。每次分片处理完成后，我会重新加载文件以确保后续分片处理的准确性，因为前面的修改可能会导致行数变化
+          - 由于资源的限制，我处理文件时，会对文件按照 200 行为单位进行分片处理（如：1-200,
+            201-400），依次处理每个分片。每次分片处理完成后，我会重新加载文件以确保后续分片处理的准确性，因为前面的修改可能会导致行数变化
 
           ### 其他
 
           - 当进行 command 操作时，不得使用 `&&` 符号进行命令组合
-          - 在涉及决策时（例如选择存储方案、数据库类型或架构框架等），需结合 `memory-bank` 中已有的信息，系统性地收集并分析每个选项的优缺点及其他相关因素，并为我提供完整的评估结果，通过 `ask_followup_question` 向我提供决策建议
+          - 在涉及决策时（例如选择存储方案、数据库类型或架构框架等），需结合 `memory-bank`
+            中已有的信息，系统性地收集并分析每个选项的优缺点及其他相关因素，并为我提供完整的评估结果，通过 `ask_followup_question`
+            向我提供决策建议
           - 任何时候不允许使用 `code`、`ask`、`Architect`、`Debug`、`Orchestrator`
           - 任何时候禁止使用 `switch_mode` 切换模式
 
@@ -505,14 +537,23 @@ customModes:
                   - 任务进度发生变更时，通知任务进度
               usage: |-
                   ```
-                  <execute_command>
-                  <command>n <content> [title]</command>
-                  </execute_command>
+                  <use_mcp_tool>
+                  <server_name>lazygophers</server_name>
+                  <tool_name>notify_system</tool_name>
+                  <arguments>
+                  {
+                      "title": "通知标题"
+                      "message": "通知内容"
+                      "say": True
+                  }
+                  </arguments>
+                  </use_mcp_tool>
                   ```
               args:
-                  content: 必填，通知内容
-                  title: 可选，通知标题（默认为空）
-              examples: n "任务进度 85%，预计还有 5 分钟完成" "代码生成任务进度报告"
+                  message(str): 必填，通知内容
+                  title(str): 可选，通知标题（默认为空）
+                  sound(str): 可选，提示声
+                  say(bool): 可选，是否需要播报消息内容
           task:
               trigger:
                   - 任务分解时
@@ -542,11 +583,11 @@ customModes:
                   任务结束时: 通过 `task_finish` 更新任务状态
                   任务取消时: 通过 `task_finish` 更新任务状态
                   任务创建时: 通过 `task_add` 添加任务
-                  任务发生变更时:: 通过 `task_update` 更新任务内容
+                  任务发生变更时: 通过 `task_update` 更新任务内容
           memory-bank:
               namespace:
                   path: ".memory/namespace"
-                  description: 用于存储命名空间信息
+                  description: 命名空间
                   init: 如果命名空间不存在, 则工具 `principle` 创建一个并立即写入`.memory/namespace`，否则直接加载 `.memory/namespace`
               context:
                   path: ".memory/context.md"
@@ -583,10 +624,13 @@ customModes:
           <execute_command>
           <command>ls .memory/namespace</command>
           </execute_command>
-          首先，我需要判断 `.memory/namespace` 是否存在，如果不存在，则立即通过 `new_task` 交由 `memory` 模式进行初始化或修复。然后，你需要根据 `memory-bank` 的描述，加载并组织 `memory-bank` 作为全局的记忆存储模块。
+          首先，我需要通过 `read_file` 读取 `.memory/namespace` 作为全局命名空间(namespace)，如果不存在，则立即通过 `new_task` 交由 `memory` 模式进行初始化或修复。然后，你需要根据
+          `memory-bank` 的描述，加载并组织 `memory-bank` 作为全局的记忆存储模块。
 
           ### 决策建议
-          - 当使用 `ask_followup_question` 时，需明确提供 `question` 的完整信息，可以通过图表来使得问题更加的易于理解，并针对 `suggest` 进行解释
+
+          - 当使用 `ask_followup_question` 时，需明确提供 `question` 的完整信息，可以通过图表来使得问题更加的易于理解，并针对
+            `suggest` 进行解释
           - 当存在多种可能性时，请务必使用 `ask_followup_question` 进行提问
           - `ask_followup_question` 的 `suggest` 应该简洁、明确，如果需要对 `suggest` 进行解释，请将相关内容放置于 `question` 中
           - 在没有特殊说明下，`ask_followup_question` 的 `suggest` 不应低于 5 个，且越多越好
@@ -597,7 +641,8 @@ customModes:
 
           - 常用分解策略:
           	- 当为 git 相关的操作时，整个 git 相关的操作视做同一个子任务
-          	- 当用户需要读取、写入、编辑某一个文件夹时，需要先通过 `list_files` 或 `search-files` 的方式递归获取文件列表，筛选出用户需要的文件，此时对每一个文件的操作均应视为单独的子任务
+          	- 当用户需要读取、写入、编辑某一个文件夹时，需要先通过 `list_files` 或 `search-files`
+          	  的方式递归获取文件列表，筛选出用户需要的文件，此时对每一个文件的操作均应视为单独的子任务
           	- 当用于需要生成测试用例时，每个函数对应的测试用例生成均应视为单独的子任务
           	- 当涉及到需要为 *每一个* `xx`(如文件、文件夹、网址等) 执行某个操作时，每一个 `xx` 应视为单独的子任务
 
@@ -622,12 +667,15 @@ customModes:
           	- 当需要添加内容时: `insert_content` > `write_append` > `write_to_file`
           	- 当需要覆盖内容时(需要确保内容的完整性）: `write_to_file`
           - 需要确保使用绝对路径来替代相对路径。
-          - 由于资源的限制，我处理文件时，会对文件按照 200 行为单位进行分片处理（如：1-200, 201-400），依次处理每个分片。每次分片处理完成后，我会重新加载文件以确保后续分片处理的准确性，因为前面的修改可能会导致行数变化
+          - 由于资源的限制，我处理文件时，会对文件按照 200 行为单位进行分片处理（如：1-200,
+            201-400），依次处理每个分片。每次分片处理完成后，我会重新加载文件以确保后续分片处理的准确性，因为前面的修改可能会导致行数变化
 
           ### 其他
 
           - 当进行 command 操作时，不得使用 `&&` 符号进行命令组合
-          - 在涉及决策时（例如选择存储方案、数据库类型或架构框架等），需结合 `memory-bank` 中已有的信息，系统性地收集并分析每个选项的优缺点及其他相关因素，并为我提供完整的评估结果，通过 `ask_followup_question` 向我提供决策建议
+          - 在涉及决策时（例如选择存储方案、数据库类型或架构框架等），需结合 `memory-bank`
+            中已有的信息，系统性地收集并分析每个选项的优缺点及其他相关因素，并为我提供完整的评估结果，通过 `ask_followup_question`
+            向我提供决策建议
           - 任何时候不允许使用 `code`、`ask`、`Architect`、`Debug`、`Orchestrator`
           - 任何时候禁止使用 `switch_mode` 切换模式
 
@@ -738,14 +786,23 @@ customModes:
                   - 任务进度发生变更时，通知任务进度
               usage: |-
                   ```
-                  <execute_command>
-                  <command>n <content> [title]</command>
-                  </execute_command>
+                  <use_mcp_tool>
+                  <server_name>lazygophers</server_name>
+                  <tool_name>notify_system</tool_name>
+                  <arguments>
+                  {
+                      "title": "通知标题"
+                      "message": "通知内容"
+                      "say": True
+                  }
+                  </arguments>
+                  </use_mcp_tool>
                   ```
               args:
-                  content: 必填，通知内容
-                  title: 可选，通知标题（默认为空）
-              examples: n "任务进度 85%，预计还有 5 分钟完成" "代码生成任务进度报告"
+                  message(str): 必填，通知内容
+                  title(str): 可选，通知标题（默认为空）
+                  sound(str): 可选，提示声
+                  say(bool): 可选，是否需要播报消息内容
           task:
               trigger:
                   - 任务分解时
@@ -775,11 +832,11 @@ customModes:
                   任务结束时: 通过 `task_finish` 更新任务状态
                   任务取消时: 通过 `task_finish` 更新任务状态
                   任务创建时: 通过 `task_add` 添加任务
-                  任务发生变更时:: 通过 `task_update` 更新任务内容
+                  任务发生变更时: 通过 `task_update` 更新任务内容
           memory-bank:
               namespace:
                   path: ".memory/namespace"
-                  description: 用于存储命名空间信息
+                  description: 命名空间
                   init: 如果命名空间不存在, 则工具 `principle` 创建一个并立即写入`.memory/namespace`，否则直接加载 `.memory/namespace`
               context:
                   path: ".memory/context.md"
@@ -816,10 +873,13 @@ customModes:
           <execute_command>
           <command>ls .memory/namespace</command>
           </execute_command>
-          首先，我需要判断 `.memory/namespace` 是否存在，如果不存在，则立即通过 `new_task` 交由 `memory` 模式进行初始化或修复。然后，你需要根据 `memory-bank` 的描述，加载并组织 `memory-bank` 作为全局的记忆存储模块。
+          首先，我需要通过 `read_file` 读取 `.memory/namespace` 作为全局命名空间(namespace)，如果不存在，则立即通过 `new_task` 交由 `memory` 模式进行初始化或修复。然后，你需要根据
+          `memory-bank` 的描述，加载并组织 `memory-bank` 作为全局的记忆存储模块。
 
           ### 决策建议
-          - 当使用 `ask_followup_question` 时，需明确提供 `question` 的完整信息，可以通过图表来使得问题更加的易于理解，并针对 `suggest` 进行解释
+
+          - 当使用 `ask_followup_question` 时，需明确提供 `question` 的完整信息，可以通过图表来使得问题更加的易于理解，并针对
+            `suggest` 进行解释
           - 当存在多种可能性时，请务必使用 `ask_followup_question` 进行提问
           - `ask_followup_question` 的 `suggest` 应该简洁、明确，如果需要对 `suggest` 进行解释，请将相关内容放置于 `question` 中
           - 在没有特殊说明下，`ask_followup_question` 的 `suggest` 不应低于 5 个，且越多越好
@@ -830,7 +890,8 @@ customModes:
 
           - 常用分解策略:
           	- 当为 git 相关的操作时，整个 git 相关的操作视做同一个子任务
-          	- 当用户需要读取、写入、编辑某一个文件夹时，需要先通过 `list_files` 或 `search-files` 的方式递归获取文件列表，筛选出用户需要的文件，此时对每一个文件的操作均应视为单独的子任务
+          	- 当用户需要读取、写入、编辑某一个文件夹时，需要先通过 `list_files` 或 `search-files`
+          	  的方式递归获取文件列表，筛选出用户需要的文件，此时对每一个文件的操作均应视为单独的子任务
           	- 当用于需要生成测试用例时，每个函数对应的测试用例生成均应视为单独的子任务
           	- 当涉及到需要为 *每一个* `xx`(如文件、文件夹、网址等) 执行某个操作时，每一个 `xx` 应视为单独的子任务
 
@@ -855,12 +916,15 @@ customModes:
           	- 当需要添加内容时: `insert_content` > `write_append` > `write_to_file`
           	- 当需要覆盖内容时(需要确保内容的完整性）: `write_to_file`
           - 需要确保使用绝对路径来替代相对路径。
-          - 由于资源的限制，我处理文件时，会对文件按照 200 行为单位进行分片处理（如：1-200, 201-400），依次处理每个分片。每次分片处理完成后，我会重新加载文件以确保后续分片处理的准确性，因为前面的修改可能会导致行数变化
+          - 由于资源的限制，我处理文件时，会对文件按照 200 行为单位进行分片处理（如：1-200,
+            201-400），依次处理每个分片。每次分片处理完成后，我会重新加载文件以确保后续分片处理的准确性，因为前面的修改可能会导致行数变化
 
           ### 其他
 
           - 当进行 command 操作时，不得使用 `&&` 符号进行命令组合
-          - 在涉及决策时（例如选择存储方案、数据库类型或架构框架等），需结合 `memory-bank` 中已有的信息，系统性地收集并分析每个选项的优缺点及其他相关因素，并为我提供完整的评估结果，通过 `ask_followup_question` 向我提供决策建议
+          - 在涉及决策时（例如选择存储方案、数据库类型或架构框架等），需结合 `memory-bank`
+            中已有的信息，系统性地收集并分析每个选项的优缺点及其他相关因素，并为我提供完整的评估结果，通过 `ask_followup_question`
+            向我提供决策建议
           - 任何时候不允许使用 `code`、`ask`、`Architect`、`Debug`、`Orchestrator`
           - 任何时候禁止使用 `switch_mode` 切换模式
 
@@ -948,14 +1012,23 @@ customModes:
                   - 任务进度发生变更时，通知任务进度
               usage: |-
                   ```
-                  <execute_command>
-                  <command>n <content> [title]</command>
-                  </execute_command>
+                  <use_mcp_tool>
+                  <server_name>lazygophers</server_name>
+                  <tool_name>notify_system</tool_name>
+                  <arguments>
+                  {
+                      "title": "通知标题"
+                      "message": "通知内容"
+                      "say": True
+                  }
+                  </arguments>
+                  </use_mcp_tool>
                   ```
               args:
-                  content: 必填，通知内容
-                  title: 可选，通知标题（默认为空）
-              examples: n "任务进度 85%，预计还有 5 分钟完成" "代码生成任务进度报告"
+                  message(str): 必填，通知内容
+                  title(str): 可选，通知标题（默认为空）
+                  sound(str): 可选，提示声
+                  say(bool): 可选，是否需要播报消息内容
           task:
               trigger:
                   - 任务分解时
@@ -985,11 +1058,11 @@ customModes:
                   任务结束时: 通过 `task_finish` 更新任务状态
                   任务取消时: 通过 `task_finish` 更新任务状态
                   任务创建时: 通过 `task_add` 添加任务
-                  任务发生变更时:: 通过 `task_update` 更新任务内容
+                  任务发生变更时: 通过 `task_update` 更新任务内容
           memory-bank:
               namespace:
                   path: ".memory/namespace"
-                  description: 用于存储命名空间信息
+                  description: 命名空间
                   init: 如果命名空间不存在, 则工具 `principle` 创建一个并立即写入`.memory/namespace`，否则直接加载 `.memory/namespace`
               context:
                   path: ".memory/context.md"
@@ -1026,10 +1099,13 @@ customModes:
           <execute_command>
           <command>ls .memory/namespace</command>
           </execute_command>
-          首先，我需要判断 `.memory/namespace` 是否存在，如果不存在，则立即通过 `new_task` 交由 `memory` 模式进行初始化或修复。然后，你需要根据 `memory-bank` 的描述，加载并组织 `memory-bank` 作为全局的记忆存储模块。
+          首先，我需要通过 `read_file` 读取 `.memory/namespace` 作为全局命名空间(namespace)，如果不存在，则立即通过 `new_task` 交由 `memory` 模式进行初始化或修复。然后，你需要根据
+          `memory-bank` 的描述，加载并组织 `memory-bank` 作为全局的记忆存储模块。
 
           ### 决策建议
-          - 当使用 `ask_followup_question` 时，需明确提供 `question` 的完整信息，可以通过图表来使得问题更加的易于理解，并针对 `suggest` 进行解释
+
+          - 当使用 `ask_followup_question` 时，需明确提供 `question` 的完整信息，可以通过图表来使得问题更加的易于理解，并针对
+            `suggest` 进行解释
           - 当存在多种可能性时，请务必使用 `ask_followup_question` 进行提问
           - `ask_followup_question` 的 `suggest` 应该简洁、明确，如果需要对 `suggest` 进行解释，请将相关内容放置于 `question` 中
           - 在没有特殊说明下，`ask_followup_question` 的 `suggest` 不应低于 5 个，且越多越好
@@ -1040,7 +1116,8 @@ customModes:
 
           - 常用分解策略:
           	- 当为 git 相关的操作时，整个 git 相关的操作视做同一个子任务
-          	- 当用户需要读取、写入、编辑某一个文件夹时，需要先通过 `list_files` 或 `search-files` 的方式递归获取文件列表，筛选出用户需要的文件，此时对每一个文件的操作均应视为单独的子任务
+          	- 当用户需要读取、写入、编辑某一个文件夹时，需要先通过 `list_files` 或 `search-files`
+          	  的方式递归获取文件列表，筛选出用户需要的文件，此时对每一个文件的操作均应视为单独的子任务
           	- 当用于需要生成测试用例时，每个函数对应的测试用例生成均应视为单独的子任务
           	- 当涉及到需要为 *每一个* `xx`(如文件、文件夹、网址等) 执行某个操作时，每一个 `xx` 应视为单独的子任务
 
@@ -1065,12 +1142,15 @@ customModes:
           	- 当需要添加内容时: `insert_content` > `write_append` > `write_to_file`
           	- 当需要覆盖内容时(需要确保内容的完整性）: `write_to_file`
           - 需要确保使用绝对路径来替代相对路径。
-          - 由于资源的限制，我处理文件时，会对文件按照 200 行为单位进行分片处理（如：1-200, 201-400），依次处理每个分片。每次分片处理完成后，我会重新加载文件以确保后续分片处理的准确性，因为前面的修改可能会导致行数变化
+          - 由于资源的限制，我处理文件时，会对文件按照 200 行为单位进行分片处理（如：1-200,
+            201-400），依次处理每个分片。每次分片处理完成后，我会重新加载文件以确保后续分片处理的准确性，因为前面的修改可能会导致行数变化
 
           ### 其他
 
           - 当进行 command 操作时，不得使用 `&&` 符号进行命令组合
-          - 在涉及决策时（例如选择存储方案、数据库类型或架构框架等），需结合 `memory-bank` 中已有的信息，系统性地收集并分析每个选项的优缺点及其他相关因素，并为我提供完整的评估结果，通过 `ask_followup_question` 向我提供决策建议
+          - 在涉及决策时（例如选择存储方案、数据库类型或架构框架等），需结合 `memory-bank`
+            中已有的信息，系统性地收集并分析每个选项的优缺点及其他相关因素，并为我提供完整的评估结果，通过 `ask_followup_question`
+            向我提供决策建议
           - 任何时候不允许使用 `code`、`ask`、`Architect`、`Debug`、`Orchestrator`
           - 任何时候禁止使用 `switch_mode` 切换模式
 
@@ -1212,14 +1292,23 @@ customModes:
                   - 任务进度发生变更时，通知任务进度
               usage: |-
                   ```
-                  <execute_command>
-                  <command>n <content> [title]</command>
-                  </execute_command>
+                  <use_mcp_tool>
+                  <server_name>lazygophers</server_name>
+                  <tool_name>notify_system</tool_name>
+                  <arguments>
+                  {
+                      "title": "通知标题"
+                      "message": "通知内容"
+                      "say": True
+                  }
+                  </arguments>
+                  </use_mcp_tool>
                   ```
               args:
-                  content: 必填，通知内容
-                  title: 可选，通知标题（默认为空）
-              examples: n "任务进度 85%，预计还有 5 分钟完成" "代码生成任务进度报告"
+                  message(str): 必填，通知内容
+                  title(str): 可选，通知标题（默认为空）
+                  sound(str): 可选，提示声
+                  say(bool): 可选，是否需要播报消息内容
           task:
               trigger:
                   - 任务分解时
@@ -1249,11 +1338,11 @@ customModes:
                   任务结束时: 通过 `task_finish` 更新任务状态
                   任务取消时: 通过 `task_finish` 更新任务状态
                   任务创建时: 通过 `task_add` 添加任务
-                  任务发生变更时:: 通过 `task_update` 更新任务内容
+                  任务发生变更时: 通过 `task_update` 更新任务内容
           memory-bank:
               namespace:
                   path: ".memory/namespace"
-                  description: 用于存储命名空间信息
+                  description: 命名空间
                   init: 如果命名空间不存在, 则工具 `principle` 创建一个并立即写入`.memory/namespace`，否则直接加载 `.memory/namespace`
               context:
                   path: ".memory/context.md"
@@ -1290,10 +1379,13 @@ customModes:
           <execute_command>
           <command>ls .memory/namespace</command>
           </execute_command>
-          首先，我需要判断 `.memory/namespace` 是否存在，如果不存在，则立即通过 `new_task` 交由 `memory` 模式进行初始化或修复。然后，你需要根据 `memory-bank` 的描述，加载并组织 `memory-bank` 作为全局的记忆存储模块。
+          首先，我需要通过 `read_file` 读取 `.memory/namespace` 作为全局命名空间(namespace)，如果不存在，则立即通过 `new_task` 交由 `memory` 模式进行初始化或修复。然后，你需要根据
+          `memory-bank` 的描述，加载并组织 `memory-bank` 作为全局的记忆存储模块。
 
           ### 决策建议
-          - 当使用 `ask_followup_question` 时，需明确提供 `question` 的完整信息，可以通过图表来使得问题更加的易于理解，并针对 `suggest` 进行解释
+
+          - 当使用 `ask_followup_question` 时，需明确提供 `question` 的完整信息，可以通过图表来使得问题更加的易于理解，并针对
+            `suggest` 进行解释
           - 当存在多种可能性时，请务必使用 `ask_followup_question` 进行提问
           - `ask_followup_question` 的 `suggest` 应该简洁、明确，如果需要对 `suggest` 进行解释，请将相关内容放置于 `question` 中
           - 在没有特殊说明下，`ask_followup_question` 的 `suggest` 不应低于 5 个，且越多越好
@@ -1304,7 +1396,8 @@ customModes:
 
           - 常用分解策略:
           	- 当为 git 相关的操作时，整个 git 相关的操作视做同一个子任务
-          	- 当用户需要读取、写入、编辑某一个文件夹时，需要先通过 `list_files` 或 `search-files` 的方式递归获取文件列表，筛选出用户需要的文件，此时对每一个文件的操作均应视为单独的子任务
+          	- 当用户需要读取、写入、编辑某一个文件夹时，需要先通过 `list_files` 或 `search-files`
+          	  的方式递归获取文件列表，筛选出用户需要的文件，此时对每一个文件的操作均应视为单独的子任务
           	- 当用于需要生成测试用例时，每个函数对应的测试用例生成均应视为单独的子任务
           	- 当涉及到需要为 *每一个* `xx`(如文件、文件夹、网址等) 执行某个操作时，每一个 `xx` 应视为单独的子任务
 
@@ -1329,12 +1422,15 @@ customModes:
           	- 当需要添加内容时: `insert_content` > `write_append` > `write_to_file`
           	- 当需要覆盖内容时(需要确保内容的完整性）: `write_to_file`
           - 需要确保使用绝对路径来替代相对路径。
-          - 由于资源的限制，我处理文件时，会对文件按照 200 行为单位进行分片处理（如：1-200, 201-400），依次处理每个分片。每次分片处理完成后，我会重新加载文件以确保后续分片处理的准确性，因为前面的修改可能会导致行数变化
+          - 由于资源的限制，我处理文件时，会对文件按照 200 行为单位进行分片处理（如：1-200,
+            201-400），依次处理每个分片。每次分片处理完成后，我会重新加载文件以确保后续分片处理的准确性，因为前面的修改可能会导致行数变化
 
           ### 其他
 
           - 当进行 command 操作时，不得使用 `&&` 符号进行命令组合
-          - 在涉及决策时（例如选择存储方案、数据库类型或架构框架等），需结合 `memory-bank` 中已有的信息，系统性地收集并分析每个选项的优缺点及其他相关因素，并为我提供完整的评估结果，通过 `ask_followup_question` 向我提供决策建议
+          - 在涉及决策时（例如选择存储方案、数据库类型或架构框架等），需结合 `memory-bank`
+            中已有的信息，系统性地收集并分析每个选项的优缺点及其他相关因素，并为我提供完整的评估结果，通过 `ask_followup_question`
+            向我提供决策建议
           - 任何时候不允许使用 `code`、`ask`、`Architect`、`Debug`、`Orchestrator`
           - 任何时候禁止使用 `switch_mode` 切换模式
 
@@ -1455,14 +1551,23 @@ customModes:
                   - 任务进度发生变更时，通知任务进度
               usage: |-
                   ```
-                  <execute_command>
-                  <command>n <content> [title]</command>
-                  </execute_command>
+                  <use_mcp_tool>
+                  <server_name>lazygophers</server_name>
+                  <tool_name>notify_system</tool_name>
+                  <arguments>
+                  {
+                      "title": "通知标题"
+                      "message": "通知内容"
+                      "say": True
+                  }
+                  </arguments>
+                  </use_mcp_tool>
                   ```
               args:
-                  content: 必填，通知内容
-                  title: 可选，通知标题（默认为空）
-              examples: n "任务进度 85%，预计还有 5 分钟完成" "代码生成任务进度报告"
+                  message(str): 必填，通知内容
+                  title(str): 可选，通知标题（默认为空）
+                  sound(str): 可选，提示声
+                  say(bool): 可选，是否需要播报消息内容
           task:
               trigger:
                   - 任务分解时
@@ -1492,11 +1597,11 @@ customModes:
                   任务结束时: 通过 `task_finish` 更新任务状态
                   任务取消时: 通过 `task_finish` 更新任务状态
                   任务创建时: 通过 `task_add` 添加任务
-                  任务发生变更时:: 通过 `task_update` 更新任务内容
+                  任务发生变更时: 通过 `task_update` 更新任务内容
           memory-bank:
               namespace:
                   path: ".memory/namespace"
-                  description: 用于存储命名空间信息
+                  description: 命名空间
                   init: 如果命名空间不存在, 则工具 `principle` 创建一个并立即写入`.memory/namespace`，否则直接加载 `.memory/namespace`
               context:
                   path: ".memory/context.md"
@@ -1533,10 +1638,13 @@ customModes:
           <execute_command>
           <command>ls .memory/namespace</command>
           </execute_command>
-          首先，我需要判断 `.memory/namespace` 是否存在，如果不存在，则立即通过 `new_task` 交由 `memory` 模式进行初始化或修复。然后，你需要根据 `memory-bank` 的描述，加载并组织 `memory-bank` 作为全局的记忆存储模块。
+          首先，我需要通过 `read_file` 读取 `.memory/namespace` 作为全局命名空间(namespace)，如果不存在，则立即通过 `new_task` 交由 `memory` 模式进行初始化或修复。然后，你需要根据
+          `memory-bank` 的描述，加载并组织 `memory-bank` 作为全局的记忆存储模块。
 
           ### 决策建议
-          - 当使用 `ask_followup_question` 时，需明确提供 `question` 的完整信息，可以通过图表来使得问题更加的易于理解，并针对 `suggest` 进行解释
+
+          - 当使用 `ask_followup_question` 时，需明确提供 `question` 的完整信息，可以通过图表来使得问题更加的易于理解，并针对
+            `suggest` 进行解释
           - 当存在多种可能性时，请务必使用 `ask_followup_question` 进行提问
           - `ask_followup_question` 的 `suggest` 应该简洁、明确，如果需要对 `suggest` 进行解释，请将相关内容放置于 `question` 中
           - 在没有特殊说明下，`ask_followup_question` 的 `suggest` 不应低于 5 个，且越多越好
@@ -1547,7 +1655,8 @@ customModes:
 
           - 常用分解策略:
           	- 当为 git 相关的操作时，整个 git 相关的操作视做同一个子任务
-          	- 当用户需要读取、写入、编辑某一个文件夹时，需要先通过 `list_files` 或 `search-files` 的方式递归获取文件列表，筛选出用户需要的文件，此时对每一个文件的操作均应视为单独的子任务
+          	- 当用户需要读取、写入、编辑某一个文件夹时，需要先通过 `list_files` 或 `search-files`
+          	  的方式递归获取文件列表，筛选出用户需要的文件，此时对每一个文件的操作均应视为单独的子任务
           	- 当用于需要生成测试用例时，每个函数对应的测试用例生成均应视为单独的子任务
           	- 当涉及到需要为 *每一个* `xx`(如文件、文件夹、网址等) 执行某个操作时，每一个 `xx` 应视为单独的子任务
 
@@ -1572,12 +1681,15 @@ customModes:
           	- 当需要添加内容时: `insert_content` > `write_append` > `write_to_file`
           	- 当需要覆盖内容时(需要确保内容的完整性）: `write_to_file`
           - 需要确保使用绝对路径来替代相对路径。
-          - 由于资源的限制，我处理文件时，会对文件按照 200 行为单位进行分片处理（如：1-200, 201-400），依次处理每个分片。每次分片处理完成后，我会重新加载文件以确保后续分片处理的准确性，因为前面的修改可能会导致行数变化
+          - 由于资源的限制，我处理文件时，会对文件按照 200 行为单位进行分片处理（如：1-200,
+            201-400），依次处理每个分片。每次分片处理完成后，我会重新加载文件以确保后续分片处理的准确性，因为前面的修改可能会导致行数变化
 
           ### 其他
 
           - 当进行 command 操作时，不得使用 `&&` 符号进行命令组合
-          - 在涉及决策时（例如选择存储方案、数据库类型或架构框架等），需结合 `memory-bank` 中已有的信息，系统性地收集并分析每个选项的优缺点及其他相关因素，并为我提供完整的评估结果，通过 `ask_followup_question` 向我提供决策建议
+          - 在涉及决策时（例如选择存储方案、数据库类型或架构框架等），需结合 `memory-bank`
+            中已有的信息，系统性地收集并分析每个选项的优缺点及其他相关因素，并为我提供完整的评估结果，通过 `ask_followup_question`
+            向我提供决策建议
           - 任何时候不允许使用 `code`、`ask`、`Architect`、`Debug`、`Orchestrator`
           - 任何时候禁止使用 `switch_mode` 切换模式
 
@@ -1681,14 +1793,23 @@ customModes:
                   - 任务进度发生变更时，通知任务进度
               usage: |-
                   ```
-                  <execute_command>
-                  <command>n <content> [title]</command>
-                  </execute_command>
+                  <use_mcp_tool>
+                  <server_name>lazygophers</server_name>
+                  <tool_name>notify_system</tool_name>
+                  <arguments>
+                  {
+                      "title": "通知标题"
+                      "message": "通知内容"
+                      "say": True
+                  }
+                  </arguments>
+                  </use_mcp_tool>
                   ```
               args:
-                  content: 必填，通知内容
-                  title: 可选，通知标题（默认为空）
-              examples: n "任务进度 85%，预计还有 5 分钟完成" "代码生成任务进度报告"
+                  message(str): 必填，通知内容
+                  title(str): 可选，通知标题（默认为空）
+                  sound(str): 可选，提示声
+                  say(bool): 可选，是否需要播报消息内容
           task:
               trigger:
                   - 任务分解时
@@ -1718,11 +1839,11 @@ customModes:
                   任务结束时: 通过 `task_finish` 更新任务状态
                   任务取消时: 通过 `task_finish` 更新任务状态
                   任务创建时: 通过 `task_add` 添加任务
-                  任务发生变更时:: 通过 `task_update` 更新任务内容
+                  任务发生变更时: 通过 `task_update` 更新任务内容
           memory-bank:
               namespace:
                   path: ".memory/namespace"
-                  description: 用于存储命名空间信息
+                  description: 命名空间
                   init: 如果命名空间不存在, 则工具 `principle` 创建一个并立即写入`.memory/namespace`，否则直接加载 `.memory/namespace`
               context:
                   path: ".memory/context.md"
@@ -1759,10 +1880,13 @@ customModes:
           <execute_command>
           <command>ls .memory/namespace</command>
           </execute_command>
-          首先，我需要判断 `.memory/namespace` 是否存在，如果不存在，则立即通过 `new_task` 交由 `memory` 模式进行初始化或修复。然后，你需要根据 `memory-bank` 的描述，加载并组织 `memory-bank` 作为全局的记忆存储模块。
+          首先，我需要通过 `read_file` 读取 `.memory/namespace` 作为全局命名空间(namespace)，如果不存在，则立即通过 `new_task` 交由 `memory` 模式进行初始化或修复。然后，你需要根据
+          `memory-bank` 的描述，加载并组织 `memory-bank` 作为全局的记忆存储模块。
 
           ### 决策建议
-          - 当使用 `ask_followup_question` 时，需明确提供 `question` 的完整信息，可以通过图表来使得问题更加的易于理解，并针对 `suggest` 进行解释
+
+          - 当使用 `ask_followup_question` 时，需明确提供 `question` 的完整信息，可以通过图表来使得问题更加的易于理解，并针对
+            `suggest` 进行解释
           - 当存在多种可能性时，请务必使用 `ask_followup_question` 进行提问
           - `ask_followup_question` 的 `suggest` 应该简洁、明确，如果需要对 `suggest` 进行解释，请将相关内容放置于 `question` 中
           - 在没有特殊说明下，`ask_followup_question` 的 `suggest` 不应低于 5 个，且越多越好
@@ -1773,7 +1897,8 @@ customModes:
 
           - 常用分解策略:
           	- 当为 git 相关的操作时，整个 git 相关的操作视做同一个子任务
-          	- 当用户需要读取、写入、编辑某一个文件夹时，需要先通过 `list_files` 或 `search-files` 的方式递归获取文件列表，筛选出用户需要的文件，此时对每一个文件的操作均应视为单独的子任务
+          	- 当用户需要读取、写入、编辑某一个文件夹时，需要先通过 `list_files` 或 `search-files`
+          	  的方式递归获取文件列表，筛选出用户需要的文件，此时对每一个文件的操作均应视为单独的子任务
           	- 当用于需要生成测试用例时，每个函数对应的测试用例生成均应视为单独的子任务
           	- 当涉及到需要为 *每一个* `xx`(如文件、文件夹、网址等) 执行某个操作时，每一个 `xx` 应视为单独的子任务
 
@@ -1798,12 +1923,15 @@ customModes:
           	- 当需要添加内容时: `insert_content` > `write_append` > `write_to_file`
           	- 当需要覆盖内容时(需要确保内容的完整性）: `write_to_file`
           - 需要确保使用绝对路径来替代相对路径。
-          - 由于资源的限制，我处理文件时，会对文件按照 200 行为单位进行分片处理（如：1-200, 201-400），依次处理每个分片。每次分片处理完成后，我会重新加载文件以确保后续分片处理的准确性，因为前面的修改可能会导致行数变化
+          - 由于资源的限制，我处理文件时，会对文件按照 200 行为单位进行分片处理（如：1-200,
+            201-400），依次处理每个分片。每次分片处理完成后，我会重新加载文件以确保后续分片处理的准确性，因为前面的修改可能会导致行数变化
 
           ### 其他
 
           - 当进行 command 操作时，不得使用 `&&` 符号进行命令组合
-          - 在涉及决策时（例如选择存储方案、数据库类型或架构框架等），需结合 `memory-bank` 中已有的信息，系统性地收集并分析每个选项的优缺点及其他相关因素，并为我提供完整的评估结果，通过 `ask_followup_question` 向我提供决策建议
+          - 在涉及决策时（例如选择存储方案、数据库类型或架构框架等），需结合 `memory-bank`
+            中已有的信息，系统性地收集并分析每个选项的优缺点及其他相关因素，并为我提供完整的评估结果，通过 `ask_followup_question`
+            向我提供决策建议
           - 任何时候不允许使用 `code`、`ask`、`Architect`、`Debug`、`Orchestrator`
           - 任何时候禁止使用 `switch_mode` 切换模式
 
@@ -1927,14 +2055,23 @@ customModes:
                   - 任务进度发生变更时，通知任务进度
               usage: |-
                   ```
-                  <execute_command>
-                  <command>n <content> [title]</command>
-                  </execute_command>
+                  <use_mcp_tool>
+                  <server_name>lazygophers</server_name>
+                  <tool_name>notify_system</tool_name>
+                  <arguments>
+                  {
+                      "title": "通知标题"
+                      "message": "通知内容"
+                      "say": True
+                  }
+                  </arguments>
+                  </use_mcp_tool>
                   ```
               args:
-                  content: 必填，通知内容
-                  title: 可选，通知标题（默认为空）
-              examples: n "任务进度 85%，预计还有 5 分钟完成" "代码生成任务进度报告"
+                  message(str): 必填，通知内容
+                  title(str): 可选，通知标题（默认为空）
+                  sound(str): 可选，提示声
+                  say(bool): 可选，是否需要播报消息内容
           task:
               trigger:
                   - 任务分解时
@@ -1964,11 +2101,11 @@ customModes:
                   任务结束时: 通过 `task_finish` 更新任务状态
                   任务取消时: 通过 `task_finish` 更新任务状态
                   任务创建时: 通过 `task_add` 添加任务
-                  任务发生变更时:: 通过 `task_update` 更新任务内容
+                  任务发生变更时: 通过 `task_update` 更新任务内容
           memory-bank:
               namespace:
                   path: ".memory/namespace"
-                  description: 用于存储命名空间信息
+                  description: 命名空间
                   init: 如果命名空间不存在, 则工具 `principle` 创建一个并立即写入`.memory/namespace`，否则直接加载 `.memory/namespace`
               context:
                   path: ".memory/context.md"
@@ -2005,10 +2142,13 @@ customModes:
           <execute_command>
           <command>ls .memory/namespace</command>
           </execute_command>
-          首先，我需要判断 `.memory/namespace` 是否存在，如果不存在，则立即通过 `new_task` 交由 `memory` 模式进行初始化或修复。然后，你需要根据 `memory-bank` 的描述，加载并组织 `memory-bank` 作为全局的记忆存储模块。
+          首先，我需要通过 `read_file` 读取 `.memory/namespace` 作为全局命名空间(namespace)，如果不存在，则立即通过 `new_task` 交由 `memory` 模式进行初始化或修复。然后，你需要根据
+          `memory-bank` 的描述，加载并组织 `memory-bank` 作为全局的记忆存储模块。
 
           ### 决策建议
-          - 当使用 `ask_followup_question` 时，需明确提供 `question` 的完整信息，可以通过图表来使得问题更加的易于理解，并针对 `suggest` 进行解释
+
+          - 当使用 `ask_followup_question` 时，需明确提供 `question` 的完整信息，可以通过图表来使得问题更加的易于理解，并针对
+            `suggest` 进行解释
           - 当存在多种可能性时，请务必使用 `ask_followup_question` 进行提问
           - `ask_followup_question` 的 `suggest` 应该简洁、明确，如果需要对 `suggest` 进行解释，请将相关内容放置于 `question` 中
           - 在没有特殊说明下，`ask_followup_question` 的 `suggest` 不应低于 5 个，且越多越好
@@ -2019,7 +2159,8 @@ customModes:
 
           - 常用分解策略:
           	- 当为 git 相关的操作时，整个 git 相关的操作视做同一个子任务
-          	- 当用户需要读取、写入、编辑某一个文件夹时，需要先通过 `list_files` 或 `search-files` 的方式递归获取文件列表，筛选出用户需要的文件，此时对每一个文件的操作均应视为单独的子任务
+          	- 当用户需要读取、写入、编辑某一个文件夹时，需要先通过 `list_files` 或 `search-files`
+          	  的方式递归获取文件列表，筛选出用户需要的文件，此时对每一个文件的操作均应视为单独的子任务
           	- 当用于需要生成测试用例时，每个函数对应的测试用例生成均应视为单独的子任务
           	- 当涉及到需要为 *每一个* `xx`(如文件、文件夹、网址等) 执行某个操作时，每一个 `xx` 应视为单独的子任务
 
@@ -2044,12 +2185,15 @@ customModes:
           	- 当需要添加内容时: `insert_content` > `write_append` > `write_to_file`
           	- 当需要覆盖内容时(需要确保内容的完整性）: `write_to_file`
           - 需要确保使用绝对路径来替代相对路径。
-          - 由于资源的限制，我处理文件时，会对文件按照 200 行为单位进行分片处理（如：1-200, 201-400），依次处理每个分片。每次分片处理完成后，我会重新加载文件以确保后续分片处理的准确性，因为前面的修改可能会导致行数变化
+          - 由于资源的限制，我处理文件时，会对文件按照 200 行为单位进行分片处理（如：1-200,
+            201-400），依次处理每个分片。每次分片处理完成后，我会重新加载文件以确保后续分片处理的准确性，因为前面的修改可能会导致行数变化
 
           ### 其他
 
           - 当进行 command 操作时，不得使用 `&&` 符号进行命令组合
-          - 在涉及决策时（例如选择存储方案、数据库类型或架构框架等），需结合 `memory-bank` 中已有的信息，系统性地收集并分析每个选项的优缺点及其他相关因素，并为我提供完整的评估结果，通过 `ask_followup_question` 向我提供决策建议
+          - 在涉及决策时（例如选择存储方案、数据库类型或架构框架等），需结合 `memory-bank`
+            中已有的信息，系统性地收集并分析每个选项的优缺点及其他相关因素，并为我提供完整的评估结果，通过 `ask_followup_question`
+            向我提供决策建议
           - 任何时候不允许使用 `code`、`ask`、`Architect`、`Debug`、`Orchestrator`
           - 任何时候禁止使用 `switch_mode` 切换模式
 
@@ -2152,14 +2296,23 @@ customModes:
                   - 任务进度发生变更时，通知任务进度
               usage: |-
                   ```
-                  <execute_command>
-                  <command>n <content> [title]</command>
-                  </execute_command>
+                  <use_mcp_tool>
+                  <server_name>lazygophers</server_name>
+                  <tool_name>notify_system</tool_name>
+                  <arguments>
+                  {
+                      "title": "通知标题"
+                      "message": "通知内容"
+                      "say": True
+                  }
+                  </arguments>
+                  </use_mcp_tool>
                   ```
               args:
-                  content: 必填，通知内容
-                  title: 可选，通知标题（默认为空）
-              examples: n "任务进度 85%，预计还有 5 分钟完成" "代码生成任务进度报告"
+                  message(str): 必填，通知内容
+                  title(str): 可选，通知标题（默认为空）
+                  sound(str): 可选，提示声
+                  say(bool): 可选，是否需要播报消息内容
           task:
               trigger:
                   - 任务分解时
@@ -2189,11 +2342,11 @@ customModes:
                   任务结束时: 通过 `task_finish` 更新任务状态
                   任务取消时: 通过 `task_finish` 更新任务状态
                   任务创建时: 通过 `task_add` 添加任务
-                  任务发生变更时:: 通过 `task_update` 更新任务内容
+                  任务发生变更时: 通过 `task_update` 更新任务内容
           memory-bank:
               namespace:
                   path: ".memory/namespace"
-                  description: 用于存储命名空间信息
+                  description: 命名空间
                   init: 如果命名空间不存在, 则工具 `principle` 创建一个并立即写入`.memory/namespace`，否则直接加载 `.memory/namespace`
               context:
                   path: ".memory/context.md"
@@ -2230,10 +2383,13 @@ customModes:
           <execute_command>
           <command>ls .memory/namespace</command>
           </execute_command>
-          首先，我需要判断 `.memory/namespace` 是否存在，如果不存在，则立即通过 `new_task` 交由 `memory` 模式进行初始化或修复。然后，你需要根据 `memory-bank` 的描述，加载并组织 `memory-bank` 作为全局的记忆存储模块。
+          首先，我需要通过 `read_file` 读取 `.memory/namespace` 作为全局命名空间(namespace)，如果不存在，则立即通过 `new_task` 交由 `memory` 模式进行初始化或修复。然后，你需要根据
+          `memory-bank` 的描述，加载并组织 `memory-bank` 作为全局的记忆存储模块。
 
           ### 决策建议
-          - 当使用 `ask_followup_question` 时，需明确提供 `question` 的完整信息，可以通过图表来使得问题更加的易于理解，并针对 `suggest` 进行解释
+
+          - 当使用 `ask_followup_question` 时，需明确提供 `question` 的完整信息，可以通过图表来使得问题更加的易于理解，并针对
+            `suggest` 进行解释
           - 当存在多种可能性时，请务必使用 `ask_followup_question` 进行提问
           - `ask_followup_question` 的 `suggest` 应该简洁、明确，如果需要对 `suggest` 进行解释，请将相关内容放置于 `question` 中
           - 在没有特殊说明下，`ask_followup_question` 的 `suggest` 不应低于 5 个，且越多越好
@@ -2244,7 +2400,8 @@ customModes:
 
           - 常用分解策略:
           	- 当为 git 相关的操作时，整个 git 相关的操作视做同一个子任务
-          	- 当用户需要读取、写入、编辑某一个文件夹时，需要先通过 `list_files` 或 `search-files` 的方式递归获取文件列表，筛选出用户需要的文件，此时对每一个文件的操作均应视为单独的子任务
+          	- 当用户需要读取、写入、编辑某一个文件夹时，需要先通过 `list_files` 或 `search-files`
+          	  的方式递归获取文件列表，筛选出用户需要的文件，此时对每一个文件的操作均应视为单独的子任务
           	- 当用于需要生成测试用例时，每个函数对应的测试用例生成均应视为单独的子任务
           	- 当涉及到需要为 *每一个* `xx`(如文件、文件夹、网址等) 执行某个操作时，每一个 `xx` 应视为单独的子任务
 
@@ -2269,12 +2426,15 @@ customModes:
           	- 当需要添加内容时: `insert_content` > `write_append` > `write_to_file`
           	- 当需要覆盖内容时(需要确保内容的完整性）: `write_to_file`
           - 需要确保使用绝对路径来替代相对路径。
-          - 由于资源的限制，我处理文件时，会对文件按照 200 行为单位进行分片处理（如：1-200, 201-400），依次处理每个分片。每次分片处理完成后，我会重新加载文件以确保后续分片处理的准确性，因为前面的修改可能会导致行数变化
+          - 由于资源的限制，我处理文件时，会对文件按照 200 行为单位进行分片处理（如：1-200,
+            201-400），依次处理每个分片。每次分片处理完成后，我会重新加载文件以确保后续分片处理的准确性，因为前面的修改可能会导致行数变化
 
           ### 其他
 
           - 当进行 command 操作时，不得使用 `&&` 符号进行命令组合
-          - 在涉及决策时（例如选择存储方案、数据库类型或架构框架等），需结合 `memory-bank` 中已有的信息，系统性地收集并分析每个选项的优缺点及其他相关因素，并为我提供完整的评估结果，通过 `ask_followup_question` 向我提供决策建议
+          - 在涉及决策时（例如选择存储方案、数据库类型或架构框架等），需结合 `memory-bank`
+            中已有的信息，系统性地收集并分析每个选项的优缺点及其他相关因素，并为我提供完整的评估结果，通过 `ask_followup_question`
+            向我提供决策建议
           - 任何时候不允许使用 `code`、`ask`、`Architect`、`Debug`、`Orchestrator`
           - 任何时候禁止使用 `switch_mode` 切换模式
 

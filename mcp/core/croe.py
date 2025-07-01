@@ -8,4 +8,5 @@ mcp = FastMCP(
     json_response=True,
     host="0.0.0.0",
     port=http_port,
+    log_level="DEBUG",
 )

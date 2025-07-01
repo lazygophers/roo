@@ -1,4 +1,4 @@
-from core.config import proxies
+from core import log
 from core.croe import mcp
 import requests
 from pydantic import Field
@@ -20,7 +20,8 @@ async def fetch_markdown(
     Returns:
         str: 响应的Markdown文本内容
     """
-    return requests.request(
+    log.info(f"正在请求URL: {url}")
+    response = requests.request(
         method=method,
         url=url,
         params=params,
@@ -30,8 +31,12 @@ async def fetch_markdown(
         json=json,
         timeout=timeout,
         allow_redirects=allow_redirects,
-        proxies=proxies,
-    ).text
+    )
+    if response.status_code == 200:
+        return response.text
+    else:
+        log.error(f"请求失败，状态码: {response.status_code}")
+        raise Exception("请求失败，状态码:{}".format(response.status_code))
 
 
 @mcp.tool()
@@ -50,7 +55,8 @@ async def fetch_rss(
     Returns:
         str: RSS订阅内容的原始字符串
     """
-    return requests.request(
+    log.info(f"正在请求URL: {url}")
+    response = requests.request(
         method=method,
         url=url,
         params=params,
@@ -60,8 +66,12 @@ async def fetch_rss(
         json=json,
         timeout=timeout,
         allow_redirects=allow_redirects,
-        proxies=proxies,
-    ).text
+    )
+    if response.status_code == 200:
+        return response.text
+    else:
+        log.error(f"请求失败，状态码: {response.status_code}")
+        raise Exception("请求失败，状态码:{}".format(response.status_code))
 
 
 @mcp.tool()
@@ -80,7 +90,8 @@ async def fetch_html(
     Returns:
         str: HTML页面的原始文本内容
     """
-    return requests.request(
+    log.info(f"正在请求URL: {url}")
+    response = requests.request(
         method=method,
         url=url,
         params=params,
@@ -90,8 +101,12 @@ async def fetch_html(
         json=json,
         timeout=timeout,
         allow_redirects=allow_redirects,
-        proxies=proxies,
-    ).text
+    )
+    if response.status_code == 200:
+        return response.text
+    else:
+        log.error(f"请求失败，状态码: {response.status_code}")
+        raise Exception("请求失败，状态码:{}".format(response.status_code))
 
 
 @mcp.tool()
@@ -110,7 +125,8 @@ async def fetch_json(
     Returns:
         dict: 解析后的JSON数据对象
     """
-    return requests.request(
+    log.info(f"正在请求URL: {url}")
+    response = requests.request(
         method=method,
         url=url,
         params=params,
@@ -120,8 +136,12 @@ async def fetch_json(
         json=json,
         timeout=timeout,
         allow_redirects=allow_redirects,
-        proxies=proxies,
-    ).json()
+    )
+    if response.status_code == 200:
+        return response.json()
+    else:
+        log.error(f"请求失败，状态码: {response.status_code}")
+        raise Exception("请求失败，状态码:{}".format(response.status_code))
 
 
 @mcp.tool()
@@ -146,6 +166,7 @@ async def fetch(
             - cookies (dict): 响应cookies（字典格式）
             - content_type (str): 内容类型（取自Content-Type头部）
     """
+    log.info(f"正在请求URL: {url}")
     response = requests.request(
         method=method,
         url=url,
@@ -156,8 +177,8 @@ async def fetch(
         json=json,
         timeout=timeout,
         allow_redirects=allow_redirects,
-        proxies=proxies,
     )
+    log.info(f"响应状态码: {response.status_code}")
     return {
         "url": response.url,
         "headers": dict(response.headers),
