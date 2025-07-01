@@ -136,9 +136,10 @@ class TaskManager(object):
 
         with self.lock:
             table = self.db.table(task.namespace)
-            if table.search(Query().task_id == task.task_id).__len__() > 0:
+            if table.contains(Query().task_id == task.task_id):
                 return False
             table.insert(task.dict())
+            self.db.commit()
             return True
 
     def get(self, namespace: str, task_id: str) -> Task:
@@ -160,12 +161,13 @@ class TaskManager(object):
         with self.lock:
             table = self.db.table(namespace)
             table.remove(Query().task_id == task_id)
+            self.db.commit()
             return True
 
     def clear(self, namespace: str) -> bool:
         with self.lock:
             table = self.db.table(namespace)
-            table.remove()
+            table.truncate()
             return True
 
     def update(self, task: Task) -> bool:
@@ -175,7 +177,13 @@ class TaskManager(object):
                 task.dict(),
                 Query().task_id == task.task_id,
             )
+            self.db.commit()
             return True
+
+    def exists(self, namespace: str, task_id: str) -> bool:
+        with self.lock:
+            table = self.db.table(namespace)
+            return table.contains(Query().task_id == task_id)
 
 
 manager = TaskManager()
@@ -394,3 +402,19 @@ async def task_finish(
     task.finished_at = int(time.time())
     task.status = status
     manager.update(task)
+
+
+@mcp.tool()
+async def task_exist(
+    namespace: str = Field(
+        description="命名空间",
+        examples=["github.com/lazygophers/utils", "github.com/lazygophers/log"],
+    ),
+    task_id: str = Field(
+        description="任务ID, namespace下唯一",
+    ),
+) -> bool:
+    """
+    任务是否存在
+    """
+    return manager.exist(namespace, task_id)
