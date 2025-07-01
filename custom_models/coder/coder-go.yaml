@@ -25,7 +25,7 @@ customInstructions: |-
         <arguments>
         {
             "library_id": golang/风格指南,
-            }
+        }
         </arguments>
     </use_mcp_tool>
     ```
