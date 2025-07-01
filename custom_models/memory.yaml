@@ -15,6 +15,7 @@ customInstructions: |-
   </execute_command>
 
   workflow:
+    - 首先读取 `.memory/namespace` 的内容，如果存在，则跳过当前的 workflow
     - 确认是否存在 `.memory` 目录，如果不存在，请创建一个空的 `.memory` 目录
     - 确认是否存在 `.memory/namespace` 文件，如果不存在，则需要创建一个空的 `.memory/namespace` 文件
       - 如果 `.memory/namespace` 为空，则尝试生成新的 namespace
@@ -27,15 +28,15 @@ customInstructions: |-
       > 当存在新任务时，自动清空规则内容
 
       ## 任务目标
-
+      *
       ## 任务描述
-
+      * 
       ## 任务要求
-
+      * 
       ## 任务步骤
-
+      *
       ## 验收标准
-
+      *
       ```
     - 确认是否存在 `.memory/product.md` 文件，如果不存在，则需要创建一个空的 `.memory/product.md` 文件
       - 如果 `.memory/product.md` 为空，则尝试生成新的 product.md
@@ -44,15 +45,15 @@ customInstructions: |-
       > 项目目标，允许手动更改
 
       ## 项目描述
-
+      *
       ## 项目要求
-
+      *
       ## 编码规范（如果存在）
-
+      *
       ## 测试规范（如果存在）
-
+      *
       ## 文档规范（如果存在）
-
+      *
       ## 持续集成规范（如果存在）
-
+      *
       ```

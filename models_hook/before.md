@@ -48,6 +48,7 @@ task:
         started_at(str): 任务开始时间
         finished_at(str): 任务完成时间
         parent_task_id(str): 父任务ID
+        order(int): 任务顺序，数字越小越靠前
     init: 通过 `task_list` 加载现存的任务清单
     update_strategy:
         任务分解时: 通过`task_add` 添加子任务、通过 `task_update` 更新任务内容
@@ -67,7 +68,7 @@ memory-bank:
             tigger:
                 - 当前任务背景发生变化时
                 - 用户对当前任务有特殊需求时
-            action: 更新 `.memory/context.md`
+            action: 总结内容，并在 * 更新 `.memory/context.md`
     product:
         path: ".memory/product.md"
         description: 项目描述
@@ -76,7 +77,7 @@ memory-bank:
             trigger:
                 - 项目背景发生变化时
                 - 用户对整个项目有特殊需求时
-            action: 更新 `.memory/product.md`
+            action: 总结内容，并在 * 更新 `.memory/product.md`
     validate:
         - 每个 markdown 文件的大小不能大于 500 lines，超过时自动压缩
 hooks:
@@ -92,10 +93,9 @@ hooks:
 ```
 
 <execute_command>
-<command>ls .memory</command>
+<command>ls .memory/namespace</command>
 </execute_command>
-首先，我需要判断 `memory-bank` 是否存在，如果不存在或有缺失，则立即通过 `new_task` 交由 `memory` 模式进行初始化或修复。然后，你需要根据
-`memory-bank` 的描述，加载并组织 `memory-bank` 作为全局的记忆存储模块。
+首先，我需要判断 `memory-bank` 是否存在，如果 `.memory/namespace` 不存在，则立即通过 `new_task` 交由 `memory` 模式进行初始化或修复。然后，你需要根据 `memory-bank` 的描述，加载并组织 `memory-bank` 作为全局的记忆存储模块。
 
 ### 任务调度和任务分解
 

@@ -67,6 +67,11 @@ class Task(BaseModel):
         default=None,
     )
 
+    order: int = Field(
+        description="任务排序",
+        default=0,
+    )
+
     def merge(self, task: dict):
         if task is None:
             return
@@ -107,6 +112,9 @@ class Task(BaseModel):
         if task.updated_at is not None:
             self.updated_at = task.updated_at
 
+        if task.order is not None:
+            self.order = task.order
+
     def dict(self):
         return {
             "task_id": self.task_id,
@@ -119,6 +127,7 @@ class Task(BaseModel):
             "started_at": self.started_at,
             "finished_at": self.finished_at,
             "perent_task_id": self.perent_task_id,
+            "order": self.order,
         }
 
 
@@ -139,7 +148,6 @@ class TaskManager(object):
             if table.contains(Query().task_id == task.task_id):
                 return False
             table.insert(task.dict())
-            self.db.commit()
             return True
 
     def get(self, namespace: str, task_id: str) -> Task:
@@ -161,13 +169,11 @@ class TaskManager(object):
         with self.lock:
             table = self.db.table(namespace)
             table.remove(Query().task_id == task_id)
-            self.db.commit()
             return True
 
     def clear(self, namespace: str) -> bool:
         with self.lock:
-            table = self.db.table(namespace)
-            table.truncate()
+            self.db.drop_table(namespace)
             return True
 
     def update(self, task: Task) -> bool:
@@ -177,7 +183,6 @@ class TaskManager(object):
                 task.dict(),
                 Query().task_id == task.task_id,
             )
-            self.db.commit()
             return True
 
     def exists(self, namespace: str, task_id: str) -> bool:
@@ -228,6 +233,10 @@ async def task_add(
         description="父任务ID",
         default=None,
     ),
+    order: int = Field(
+        description="任务排序",
+        default=None,
+    ),
 ) -> bool:
     """
     添加一个任务
@@ -246,7 +255,9 @@ async def task_list(
     """
     列出命名空间下的所有任务
     """
-    return manager.list(namespace)
+    tasks = manager.list(namespace)
+    tasks.sort(reverse=False, key=lambda x: x.order)
+    return tasks
 
 
 @mcp.tool()
@@ -347,6 +358,10 @@ async def task_update(
     ),
     perent_task_id: str = Field(
         description="父任务ID",
+        default=None,
+    ),
+    order: int = Field(
+        description="任务排序",
         default=None,
     ),
 ):
