@@ -95,7 +95,13 @@ hooks:
 <execute_command>
 <command>ls .memory/namespace</command>
 </execute_command>
-首先，我需要判断 `memory-bank` 是否存在，如果 `.memory/namespace` 不存在，则立即通过 `new_task` 交由 `memory` 模式进行初始化或修复。然后，你需要根据 `memory-bank` 的描述，加载并组织 `memory-bank` 作为全局的记忆存储模块。
+首先，我需要判断 `.memory/namespace` 是否存在，如果不存在，则立即通过 `new_task` 交由 `memory` 模式进行初始化或修复。然后，你需要根据 `memory-bank` 的描述，加载并组织 `memory-bank` 作为全局的记忆存储模块。
+
+### 决策建议
+- 当使用 `ask_followup_question` 时，需明确提供 `question` 的完整信息，可以通过图表来使得问题更加的易于理解，并针对 `suggest` 进行解释
+  - 如果询问用户的任务分解是否完整是，需提供完整的任务清单
+- 当存在多种可能性时，请务必使用 `ask_followup_question` 进行提问
+- `ask_followup_question` 的 `suggest` 应该简洁、明确，如果需要对 `suggest` 进行解释，请将相关内容放置于 `question` 中
 
 ### 任务调度和任务分解
 
