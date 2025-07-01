@@ -5,7 +5,8 @@
 ### 格式化要求
 
 - 所有代码必须通过 `gofmt -s` 格式化
-- 行长度建议不超过100字符，超过时优先重构逻辑
+- 行长度建议不超过120字符，超过时优先重构逻辑
+- 缩进使用Tab(四个空格)
 
 ### 注释规范
 
@@ -41,6 +42,14 @@ func Connect(host string) (*Connection, error) { ... }
 var ErrNotFound = errors.New("资源未找到")
 
 func ReadFile(path string) ([]byte, error) {
+    _, err := os.Stat(path)
+    if err != nil {
+        if os.IsNotExist(err) {
+            return nil, ErrNotFound
+        }
+        log.Errorf("err:%s", err)
+        return nil, err
+    }
     if _, err := os.Stat(path); os.IsNotExist(err) {
         return nil, fmt.Errorf("文件不存在: %w", ErrNotFound)
     }
@@ -76,16 +85,19 @@ func worker(stopChan <-chan struct{}) {
         select {
         case <-stopChan:
             return
-        case <-# **Go语言编程规范**
+        case <-ticker.C:
+            // 处理逻辑
+        }
+    }
+}
+
 ```
 
 ## **1. 代码风格**
 
 ### **1.1 格式化**
 
-- 所有代码必须通过`gofmt`或`goimports`格式化
-- 行长度不超过120字符，超过时优先重构逻辑
-- 缩进使用**4个空格**（禁止Tab键）
+- 所有代码必须通过`gofmt -s`格式化
 
 ### **1.2 注释规范**
 
@@ -144,13 +156,15 @@ func (e *HTTPError) Error() string {
 func ReadFile(path string) ([]byte, error) {
     f, err := os.Open(path)
     if err != nil {
-        return nil, fmt.Errorf("open file: %w", err)
+        log.Errorf("err:%s", err)
+        return nil, err
     }
     defer f.Close()
 
     data, err := io.ReadAll(f)
     if err != nil {
-        return nil, fmt.Errorf("read file: %w", err)
+        log.Errorf("err:%s", err)
+        return nil, err
     }
     return data, nil
 }
@@ -264,4 +278,3 @@ func BenchmarkAdd(b *testing.B) {
         Add(1, 2)
     }
 }
-```

@@ -12,6 +12,26 @@ groups:
     ]
     - "command"
 customInstructions: |-
+    你会优先使用 `go mod tidy`的方案更新项目依赖的包，当你需要通过 `go get` 的方式获取包时，你不会指定版本。
+    你会优先使用标准库的代码来创建代码。但依然会优先使用如下模块:
+        - github.com/lazygophers/log
+        - github.com/lazygophers/utils/json
+    {{markdown}}
+    当需要编写 golang 时，通过如下工具获取编写规范
+    ```
+    <use_mcp_tool>
+        <server_name>lazygophers</server_name>
+        <tool_name>library_get</tool_name>
+        <arguments>
+        {
+            "library_id": golang/风格指南,
+            }
+        </arguments>
+    </use_mcp_tool>
+    ```
+    当你需要完善注释时，你会先读取文件，按照函数维度拆分，为每一个函数分别添加注释，你不会为文件添加注释
+    使用 codebase_search 工具分析现有代码结构时，优先搜索 .go 文件
+    
     当文档生成时:
         workflow:
             - 分析需求，进行合理的模块化设计，确保设计符合单一职责原则，符合 golang 的常规设计要求
@@ -68,43 +88,3 @@ customInstructions: |-
         workflow:
             - 阅读某一个函数、类、接口、结构体、常量、变量、方法等代码，并理解逻辑
             - 在合适的位置创建符合 golang 语言标准的注释
-    
-    这是一个 Golang 的项目，请根据项目需求，生成符合 Go 语言规范的代码结构。
-    你会优先使用 `go mod tidy`的方案更新项目依赖的包，当你需要通过 `go get` 的方式获取包时，你不会指定版本。
-    你会优先使用标准库的代码来创建代码。但依然会优先使用如下模块:
-        - github.com/lazygophers/log
-        - github.com/lazygophers/utils/json
-    严格遵循现代 Go 语言规范，重点关注:
-        - 格式化规范:使用 gofmt + goimports 统一格式化
-        - 接口设计规范:
-            * 单一方法接口强制使用 -er 后缀（如 Reader/Writer）
-            * 多方法接口使用组合式命名（如 ReadCloser）
-        - 并发安全规范:
-            * 高频创建的 goroutine 必须使用 worker pool 模式
-            * 锁粒度必须最小
-        - 性能优化规范:
-            * 内存敏感场景必须实现 sync.Pool 对象复用
-            * 高频分配场景需预分配 slice/map 容量
-        - 测试验证规范:
-            * 所有公共API必须包含性能基准测试（Benchmark）
-            * 关键错误路径必须包含针对性测试用例
-        - 尽可能的避免使用断言
-    注释变更:
-        - 确保变更的内容只有注释，没有代码的变更
-        - 注释尽可能的言简意赅，但在遇到核心功能核心函数时，需要尽可能的详细，必要时添加图表加以说明
-    {{markdown}}
-    生成代码:
-        - 所有 public 类型/函数都有 godoc 注释以及对应的完善的测试用例
-        - 单个函数不超过 50 行（特殊逻辑可例外）
-        - for-select 分离模式使用
-        - error 处理规范:
-            ```go
-                value, err := [func call]
-                if err != nil {
-                    log.Errorf("err:%s", err)
-                    return err
-                }
-            ```
-    当你需要完善注释时，你会先读取文件，按照函数维度拆分，为每一个函数分别添加注释，你不会为文件添加注释
-    使用 codebase_search 工具分析现有代码结构时，优先搜索 .go 文件
-    执行完成后，不提交 git 变更

@@ -52,8 +52,6 @@
     - 当我进行 command 操作时，我不会使用 `&&` 符号进行命令组合
 </thinking>
 
-特别检查:
-    - 根据存储体的当前状态，以'[Memory:启用]'或'[Memory:已禁用]'开始每次响应
 输出语言: zh-cn
 消息通知:
     通知时机（任一一个条件触发）:
@@ -69,7 +67,20 @@
         content: 必填，通知内容
         title:  可选，通知标题（默认为空）
     样例:n "任务进度 85%，预计还有 5 分钟完成" "代码生成任务进度报告"
+
 memory-bank:
+    task:
+        trigger:
+            - 任务分解时
+            - 任务分解完成时
+            - 任务开始时
+            - 任务结束时
+            - 任务取消时
+        description: 任务管理，用于管理任务
+        action:|-
+            <thinking>
+                我将会使用lazygophers的任务管理模块(以 `task_` 开头的工具，如 `task_add`、`task_list`、`task_update`、`task_get`、`task_remove`、`task_clear`) 来进行任务管理，确保及时的获取、更新、删除、查询任务信息
+            </thinking>
     files:
         context:
             path: ".memory/context.md"
@@ -98,10 +109,7 @@ memory-bank:
         - `.memory` 目录下仅允许存在 `files` 中描述的指定文件，非允许存在的文件自动清理
         - 每个 markdown 文件的大小不能大于 500 lines，且需要保证符合 markdown 的格式
 
-<thinking>
-    我会优先使用 memory-bank 所描述的内容对上下文内容进行传递，这样我可以尽可能的保留更多的上下文信息以防出现不可逆错误时，我可以通过 memory-bank 进行任务的恢复。
-    当用户反复强调某一个行为准则、步骤时，我可能会通过 memory-bank 进行记录，这样我可以在需要的时候进行恢复。
-</thinking>
+请使用 memory-bank 进行任务管理和上下文信息管理
 
 hooks:
     scope:

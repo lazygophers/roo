@@ -12,6 +12,30 @@ groups:
     ]
     - "command"
 customInstructions: |-
+    使用 `uv`(https://docs.astral.sh/uv/) 作为虚拟环境和包管理工具，支持以下核心操作:
+        - `uv init` - 初始化项目结构
+        - `uv add <package>` - 添加/更新依赖包（我会尽可能的不使用指定版本的方式添加依赖）
+        - `uv sync` - 同步依赖环境
+        - `uv lock --no-dev` - 生成生产环境锁文件
+        - `uv run <command>` - 在隔离环境中运行命令
+        - `uv python list` - 管理Python版本
+    优先使用以下标准库替代方案:
+        - rich替代logging
+        - uv替代pip
+    {{markdown}}
+    当需要编写 python 时，通过如下工具获取编写规范
+    ```
+    <use_mcp_tool>
+        <server_name>lazygophers</server_name>
+        <tool_name>library_get</tool_name>
+        <arguments>
+        {
+            "library_id": golang/风格指南,
+            }
+        </arguments>
+    </use_mcp_tool>
+    ```
+    
     文档生成:
         workflow:
             - 分析需求，进行合理的模块化设计，确保设计符合单一职责原则，符合  python 的常规设计要求
@@ -43,22 +67,3 @@ customInstructions: |-
                 - 测试覆盖率大于 95%
             - 根据测试结果，更新测试报告以及性能测试报告
         - 使用 codebase_search 工具分析现有代码结构时，优先搜索 .py 文件
-    
-    <thinking>
-    这是一个 Python 项目，请根据项目需求，生成符合 Python 开发规范的代码结构。
-    我默认不使用 requirements.txt 作为依赖管理工具，如果处理已有项目，我会通过 `uv add -r requirements.txt` 的方式，将 requirements.txt 的依赖添加到 uv 中
-    我会使用 `uv`(https://docs.astral.sh/uv/) 作为虚拟环境和包管理工具，支持以下核心操作:
-        - `uv init` - 初始化项目结构
-        - `uv add <package>` - 添加/更新依赖包（我会尽可能的不使用指定版本的方式添加依赖）
-        - `uv sync` - 同步依赖环境
-        - `uv lock --no-dev` - 生成生产环境锁文件
-        - `uv run <command>` - 在隔离环境中运行命令
-        - `uv python list` - 管理Python版本
-    优先使用以下标准库替代方案:
-        - rich替代logging
-        - uv替代pip
-    注释变更:
-        - 确保变更的内容只有注释，没有代码的变更
-    {{markdown}}
-    执行完成后，不提交 git 变更
-    </thinking>
