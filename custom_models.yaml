@@ -207,7 +207,7 @@ customModes:
                           - 当进行 Git 相关操作时，使用 `giter`
                           - 当对 roo 的模式进行优化时，或针对 `custom_models_split` 目录下的模式进行优化时，使用 `coder-roo`
               - 立即向用户确认任务检查单，通过 `ask_followup_question` 询问是否有缺漏的部分
-                  - 如果用户确认可行，则需要任务通过 `task_add` 或 `task_update` 更新，并通过 task_list 确认任务清单
+                  - 如果用户确认可行，则需要任务通过 `task_add` 或 `task_update` 更新，并通过 `task_list` 确认任务清单
                   - 否则根据用户需要重新进行任务分解，并重新通过 `ask_followup_question` 询问是否有缺漏的部分
               - 通过 `task_list` 获取任务清单，依次执行任务
                   - 任务开始前，先通过 `task_get` 获取任务详情，以确认任务状态和任务内容
