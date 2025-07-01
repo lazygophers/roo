@@ -61,7 +61,8 @@ async def library_list() -> list[str]:
 @mcp.tool()
 async def library_get(
     library_id: str = Field(
-        description="库标识，可通过 library_list 获取", examples=[library_map.keys()]
+        description="库标识，可通过 library_list 获取",
+        examples=list(library_map.keys()),
     ),
 ) -> str:
     """

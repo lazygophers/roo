@@ -171,10 +171,6 @@ class TaskManager(object):
     def update(self, task: Task) -> bool:
         with self.lock:
             table = self.db.table(task.namespace)
-            old_task = table.search(Query().task_id == task.task_id)
-            if task.__len__() > 0:
-                task.merge(old_task[0])
-
             table.update(
                 task.dict(),
                 Query().task_id == task.task_id,
@@ -350,3 +346,51 @@ async def task_update(
     更新一个任务
     """
     return manager.update(Task(**locals()))
+
+
+@mcp.tool()
+async def task_start(
+    namespace: str = Field(
+        description="命名空间",
+        examples=["github.com/lazygophers/utils", "github.com/lazygophers/log"],
+    ),
+    task_id: str = Field(
+        description="任务ID, namespace下唯一",
+        examples=["go-code-add-1", "pyton-test-add-1,"],
+    ),
+    status: str = Field(
+        description="任务状态",
+        examples=["todo", "doing", "done", "retry"],
+    ),
+):
+    """
+    任务开始
+    """
+    task = manager.get(namespace, task_id)
+    task.started_at = int(time.time())
+    task.status = status
+    manager.update(task)
+
+
+@mcp.tool()
+async def task_finish(
+    namespace: str = Field(
+        description="命名空间",
+        examples=["github.com/lazygophers/utils", "github.com/lazygophers/log"],
+    ),
+    task_id: str = Field(
+        description="任务ID, namespace下唯一",
+        examples=["go-code-add-1", "pyton-test-add-1,"],
+    ),
+    status: str = Field(
+        description="任务状态",
+        examples=["todo", "doing", "done", "retry"],
+    ),
+):
+    """
+    任务完成
+    """
+    task = manager.get(namespace, task_id)
+    task.finished_at = int(time.time())
+    task.status = status
+    manager.update(task)

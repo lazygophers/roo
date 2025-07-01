@@ -77,31 +77,43 @@ memory-bank:
             - 任务结束时
             - 任务取消时
         description: 任务管理，用于管理任务
+        fields:
+            namespace(str): 命名空间，用于标识任务所属的库、文件夹等
+            task_id(str): 任务ID, namespace下唯一
+            name(str): 任务名称
+            desc(str): 任务描述
+            task_type(str): 任务类型
+            priority(int): 优先级(1-5), 默认 3
+            status(str): 任务状态，默认为 "pending"
+            created_at(str): 任务创建时间
+            started_at(str): 任务开始时间
+            finished_at(str): 任务完成时间
+            parent_task_id(str): 父任务ID
+        update_strategy:
+            任务分解时: 通过`task_add` 添加子任务
+            任务分解完成时: 通过`task_list` 确认任务清单
+            任务开始时: 通过 `task_start` 更新任务状态
+            任务结束时: 通过 `task_finish` 更新任务状态
+    context:
+        path: ".memory/context.md"
+        description: 任务上下文
+        trigger:
+            - 任务背景发生变化时
+            - 用户对当前任务有特殊需求时
         action:|-
             <thinking>
-                我将会使用lazygophers的任务管理模块(以 `task_` 开头的工具，如 `task_add`、`task_list`、`task_update`、`task_get`、`task_remove`、`task_clear`) 来进行任务管理，确保及时的获取、更新、删除、查询任务信息
+                文件以 Markdown 文档的格式记录上下文，通过二级标题记录分类，通过无序列表记录上下文。
             </thinking>
-    files:
-        context:
-            path: ".memory/context.md"
-            description: 任务上下文
-            trigger:
-                - 任务背景发生变化时
-                - 用户对当前任务有特殊需求时
-            action:|-
-                <thinking>
-                    文件以 Markdown 文档的格式记录上下文，通过二级标题记录分类，通过无序列表记录上下文。
-                </thinking>
-        product:
-            path: ".memory/product.md"
-            description: 产品描述
-            trigger:
-                - 产品背景发生变化时
-                - 用户对整个项目有特殊需求时
-            action:|-
-                <thinking>
-                    文件以 Markdown 文档的格式记录产品描述，通过一级标题记录分类，通过无序列表记录产品描述。
-                </thinking>
+    product:
+        path: ".memory/product.md"
+        description: 产品描述
+        trigger:
+            - 产品背景发生变化时
+            - 用户对整个项目有特殊需求时
+        action:|-
+            <thinking>
+                文件以 Markdown 文档的格式记录产品描述，通过一级标题记录分类，通过无序列表记录产品描述。
+            </thinking>
     hooks:
         before:
             - 读取 memory 的所有文件 (不存在则新建)
