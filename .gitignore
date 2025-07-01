@@ -2,4 +2,5 @@
 .vscode/
 .DS_Store
 .memory/
-/mcp/cache/
+mcp/cache/
+__pycache__/
