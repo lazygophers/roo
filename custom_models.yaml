@@ -73,7 +73,7 @@ customModes:
                   order(int): 任务顺序，数字越小越靠前
               init: 通过 `task_list` 加载现存的任务清单
               update_strategy:
-                  任务分解时: 通过`task_add` 添加子任务、通过 `task_update` 更新任务内容
+                  任务分解时: 通过`task_replace` 覆盖任务清单
                   任务分解完成时: 通过`task_list` 确认任务清单
                   任务开始时: 通过 `task_start` 更新任务状态
                   任务结束时: 通过 `task_finish` 更新任务状态
@@ -232,7 +232,7 @@ customModes:
                           </follow_up>
                       <ask_followup_question>
                   ```
-                  - 如果用户确认可行，则需要任务通过 `task_add` 或 `task_update` 更新，并通过 `task_list` 确认任务清单
+                  - 如果用户确认可行，则需要任务通过 `task_replace` 覆盖任务清单，并通过 `task_list` 确认任务清单
                   - 否则根据用户需要重新进行任务分解，并重新通过 `ask_followup_question` 询问是否有缺漏的部分
               - 通过 `task_list` 获取任务清单，依次执行任务
                   - 任务开始前，先通过 `task_get` 获取任务详情，以确认任务状态和任务内容
@@ -364,7 +364,7 @@ customModes:
                   order(int): 任务顺序，数字越小越靠前
               init: 通过 `task_list` 加载现存的任务清单
               update_strategy:
-                  任务分解时: 通过`task_add` 添加子任务、通过 `task_update` 更新任务内容
+                  任务分解时: 通过`task_replace` 覆盖任务清单
                   任务分解完成时: 通过`task_list` 确认任务清单
                   任务开始时: 通过 `task_start` 更新任务状态
                   任务结束时: 通过 `task_finish` 更新任务状态
@@ -577,7 +577,7 @@ customModes:
                   order(int): 任务顺序，数字越小越靠前
               init: 通过 `task_list` 加载现存的任务清单
               update_strategy:
-                  任务分解时: 通过`task_add` 添加子任务、通过 `task_update` 更新任务内容
+                  任务分解时: 通过`task_replace` 覆盖任务清单
                   任务分解完成时: 通过`task_list` 确认任务清单
                   任务开始时: 通过 `task_start` 更新任务状态
                   任务结束时: 通过 `task_finish` 更新任务状态
@@ -826,7 +826,7 @@ customModes:
                   order(int): 任务顺序，数字越小越靠前
               init: 通过 `task_list` 加载现存的任务清单
               update_strategy:
-                  任务分解时: 通过`task_add` 添加子任务、通过 `task_update` 更新任务内容
+                  任务分解时: 通过`task_replace` 覆盖任务清单
                   任务分解完成时: 通过`task_list` 确认任务清单
                   任务开始时: 通过 `task_start` 更新任务状态
                   任务结束时: 通过 `task_finish` 更新任务状态
@@ -1052,7 +1052,7 @@ customModes:
                   order(int): 任务顺序，数字越小越靠前
               init: 通过 `task_list` 加载现存的任务清单
               update_strategy:
-                  任务分解时: 通过`task_add` 添加子任务、通过 `task_update` 更新任务内容
+                  任务分解时: 通过`task_replace` 覆盖任务清单
                   任务分解完成时: 通过`task_list` 确认任务清单
                   任务开始时: 通过 `task_start` 更新任务状态
                   任务结束时: 通过 `task_finish` 更新任务状态
@@ -1332,7 +1332,7 @@ customModes:
                   order(int): 任务顺序，数字越小越靠前
               init: 通过 `task_list` 加载现存的任务清单
               update_strategy:
-                  任务分解时: 通过`task_add` 添加子任务、通过 `task_update` 更新任务内容
+                  任务分解时: 通过`task_replace` 覆盖任务清单
                   任务分解完成时: 通过`task_list` 确认任务清单
                   任务开始时: 通过 `task_start` 更新任务状态
                   任务结束时: 通过 `task_finish` 更新任务状态
@@ -1591,7 +1591,7 @@ customModes:
                   order(int): 任务顺序，数字越小越靠前
               init: 通过 `task_list` 加载现存的任务清单
               update_strategy:
-                  任务分解时: 通过`task_add` 添加子任务、通过 `task_update` 更新任务内容
+                  任务分解时: 通过`task_replace` 覆盖任务清单
                   任务分解完成时: 通过`task_list` 确认任务清单
                   任务开始时: 通过 `task_start` 更新任务状态
                   任务结束时: 通过 `task_finish` 更新任务状态
@@ -1833,7 +1833,7 @@ customModes:
                   order(int): 任务顺序，数字越小越靠前
               init: 通过 `task_list` 加载现存的任务清单
               update_strategy:
-                  任务分解时: 通过`task_add` 添加子任务、通过 `task_update` 更新任务内容
+                  任务分解时: 通过`task_replace` 覆盖任务清单
                   任务分解完成时: 通过`task_list` 确认任务清单
                   任务开始时: 通过 `task_start` 更新任务状态
                   任务结束时: 通过 `task_finish` 更新任务状态
@@ -2095,7 +2095,7 @@ customModes:
                   order(int): 任务顺序，数字越小越靠前
               init: 通过 `task_list` 加载现存的任务清单
               update_strategy:
-                  任务分解时: 通过`task_add` 添加子任务、通过 `task_update` 更新任务内容
+                  任务分解时: 通过`task_replace` 覆盖任务清单
                   任务分解完成时: 通过`task_list` 确认任务清单
                   任务开始时: 通过 `task_start` 更新任务状态
                   任务结束时: 通过 `task_finish` 更新任务状态
@@ -2336,7 +2336,7 @@ customModes:
                   order(int): 任务顺序，数字越小越靠前
               init: 通过 `task_list` 加载现存的任务清单
               update_strategy:
-                  任务分解时: 通过`task_add` 添加子任务、通过 `task_update` 更新任务内容
+                  任务分解时: 通过`task_replace` 覆盖任务清单
                   任务分解完成时: 通过`task_list` 确认任务清单
                   任务开始时: 通过 `task_start` 更新任务状态
                   任务结束时: 通过 `task_finish` 更新任务状态

@@ -2,6 +2,7 @@ import atexit
 import os.path
 import threading
 import time
+from typing import Mapping
 
 from tinydb import TinyDB, Query
 
@@ -11,7 +12,10 @@ from core.cache import mkdir
 from core.croe import mcp
 
 
-class Task(BaseModel):
+class Task(BaseModel, Query, Mapping):
+    def __len__(self):
+        return len(self.dict().keys())
+
     namespace: str = Field(
         description="命名空间",
         examples=["github.com/lazygophers/utils", "github.com/lazygophers/log"],
@@ -150,6 +154,17 @@ class TaskManager(object):
             table.insert(task.dict())
             return True
 
+    def replace(self, namespace: str, tasks: list[Task]) -> bool:
+        for task in tasks:
+            task.namespace = namespace
+            task.created_at = int(time.time())
+
+        with self.lock:
+            table = self.db.table(namespace)
+            table.truncate()
+            table.insert_multiple(tasks)
+            return True
+
     def get(self, namespace: str, task_id: str) -> Task:
         with self.lock:
             table = self.db.table(namespace)
@@ -243,6 +258,20 @@ async def task_add(
     """
 
     manager.add(Task(**locals()))
+
+
+@mcp.tool()
+async def task_replace(
+    namespace: str = Field(
+        description="命名空间",
+        examples=["github.com/lazygophers/utils", "github.com/lazygophers/log"],
+    ),
+    tasks: list[Task] = Field(description="任务列表"),
+):
+    """
+    替换命名空间下的所有任务
+    """
+    manager.replace(namespace, tasks)
 
 
 @mcp.tool()

@@ -60,7 +60,7 @@ task:
         order(int): 任务顺序，数字越小越靠前
     init: 通过 `task_list` 加载现存的任务清单
     update_strategy:
-        任务分解时: 通过`task_add` 添加子任务、通过 `task_update` 更新任务内容
+        任务分解时: 通过`task_replace` 覆盖任务清单
         任务分解完成时: 通过`task_list` 确认任务清单
         任务开始时: 通过 `task_start` 更新任务状态
         任务结束时: 通过 `task_finish` 更新任务状态
