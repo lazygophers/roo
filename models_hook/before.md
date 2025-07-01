@@ -35,7 +35,7 @@ task:
         - 任务开始时
         - 任务结束时
         - 任务取消时
-    description: 任务管理，用于管理任务
+    description: 基于 lazygophers(mcp) 的任务管理，用于管理任务
     fields:
         namespace(str): 命名空间，用于标识任务所属的库、文件夹等
         task_id(str): 任务ID, namespace下唯一
@@ -55,6 +55,9 @@ task:
         任务分解完成时: 通过`task_list` 确认任务清单
         任务开始时: 通过 `task_start` 更新任务状态
         任务结束时: 通过 `task_finish` 更新任务状态
+        任务取消时: 通过 `task_finish` 更新任务状态
+        任务创建时: 通过 `task_add` 添加任务
+        任务发生变更时:: 通过 `task_update` 更新任务内容
 memory-bank:
     namespace:
         path: ".memory/namespace"
@@ -99,7 +102,7 @@ hooks:
 
 ### 决策建议
 - 当使用 `ask_followup_question` 时，需明确提供 `question` 的完整信息，可以通过图表来使得问题更加的易于理解，并针对 `suggest` 进行解释
-  - 如果询问用户的任务分解是否完整是，需提供完整的任务清单
+  - 如果询问用户的任务分解是否完整时，需在 `question` 中通过无需列表或表格提供完整的任务清单，并在 `suggest` 中询问 `是`、`否`
 - 当存在多种可能性时，请务必使用 `ask_followup_question` 进行提问
 - `ask_followup_question` 的 `suggest` 应该简洁、明确，如果需要对 `suggest` 进行解释，请将相关内容放置于 `question` 中
 
