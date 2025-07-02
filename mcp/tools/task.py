@@ -11,6 +11,18 @@ from pydantic import Field, BaseModel
 from core.cache import mkdir
 from core.croe import mcp
 
+task_state_examples = ["待执行", "执行中", "已完成", "已取消", "已失败", "等待重试"]
+task_type_examples = [
+    "搜索",
+    "研究",
+    "存储",
+    "通知",
+    "测试",
+    "文档",
+    "优化",
+    "修复",
+    "其他",
+]
 
 
 class Task(BaseModel, Query, Mapping):
@@ -28,18 +40,8 @@ class Task(BaseModel, Query, Mapping):
     )
     task_type: str = Field(
         description="任务类型",
-        examples=[
-            "add",
-            "test",
-            "fix",
-            "doc",
-            "refactor",
-            "style",
-            "perf",
-            "ci",
-            "chore",
-        ],
-        default="",
+        examples=task_type_examples,
+        default="其它",
     )
     priority: int = Field(
         description="任务优先级",
@@ -49,8 +51,8 @@ class Task(BaseModel, Query, Mapping):
 
     status: str = Field(
         description="任务状态",
-        examples=["todo", "doing", "done", "retry"],
-        default="todo",
+        examples=task_state_examples,
+        default=task_state_examples[0],
     )
 
     created_at: int = Field(
@@ -102,7 +104,7 @@ class TaskManager(object):
 
     def add(self, namespace: str, task: Task) -> bool:
         task.created_at = int(time.time())
-        task.status = "todo"
+        task.status = task_state_examples[0]
 
         with self.lock:
             table = self.db.table(namespace)
@@ -182,17 +184,7 @@ async def task_add(
     ),
     task_type: str = Field(
         description="任务类型",
-        examples=[
-            "add",
-            "test",
-            "fix",
-            "doc",
-            "refactor",
-            "style",
-            "perf",
-            "ci",
-            "chore",
-        ],
+        examples=task_type_examples,
     ),
     priority: int = Field(
         description="任务优先级",
@@ -328,7 +320,7 @@ async def task_start(
     ),
     status: str = Field(
         description="任务状态",
-        examples=["todo", "doing", "done", "retry"],
+        examples=task_state_examples,
     ),
 ):
     """
@@ -352,7 +344,7 @@ async def task_finish(
     ),
     status: str = Field(
         description="任务状态",
-        examples=["todo", "doing", "done", "retry"],
+        examples=task_state_examples,
     ),
 ):
     """
