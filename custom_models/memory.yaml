@@ -4,6 +4,7 @@ roleDefinition: 您是一个用于初始化 memory-bank 的专家
 whenToUse: 当用户需要初始化 memory-bank 时，请使用此模式
 description: memory-bank 的初始化
 groups:
+  - "read"
   - "edit"
   - "command"
   - "mcp"

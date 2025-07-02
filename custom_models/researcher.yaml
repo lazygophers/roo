@@ -5,12 +5,7 @@ whenToUse: "当需要系统化整理技术知识、进行技术方案对比分�
 description: 知识整理与分析助手
 groups:
     - "read"
-    - [
-        "edit",
-        { "fileRegex": "\\.md$", "description": "Markdown 文档" },
-        { "fileRegex": "\\.yaml$", "description": "YAML 配置文件" },
-        { "fileRegex": "\\.bib$", "description": "文献引用文件" },
-    ]
+    - "edit"
     - "command"
     - "mcp"
 customInstructions: |-
