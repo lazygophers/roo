@@ -1,3 +1,5 @@
+from typing import Any
+
 from tools.file import *
 from tools.system import *
 from tools.time import *

@@ -16,10 +16,6 @@ class Task(BaseModel, Query, Mapping):
     def __len__(self):
         return len(self.dict().keys())
 
-    namespace: str = Field(
-        description="命名空间",
-        examples=["github.com/lazygophers/utils", "github.com/lazygophers/log"],
-    )
     task_id: str = Field(
         description="任务ID, namespace下唯一",
         examples=["go-code-add-1", "pyton-test-add-1"],
@@ -58,12 +54,15 @@ class Task(BaseModel, Query, Mapping):
 
     created_at: int = Field(
         description="任务创建时间",
+        default=None,
     )
     started_at: int = Field(
         description="任务开始时间",
+        default=None,
     )
     finished_at: int = Field(
         description="任务完成时间",
+        default=None,
     )
 
     perent_task_id: str = Field(
@@ -143,12 +142,12 @@ class TaskManager(object):
         self.db = TinyDB(filename)
         atexit.register(self.db.close)
 
-    def add(self, task: Task) -> bool:
+    def add(self, namespace: str, task: Task) -> bool:
         task.created_at = int(time.time())
         task.status = "todo"
 
         with self.lock:
-            table = self.db.table(task.namespace)
+            table = self.db.table(namespace)
             if table.contains(Query().task_id == task.task_id):
                 return False
             table.insert(task.dict())
@@ -191,9 +190,9 @@ class TaskManager(object):
             self.db.drop_table(namespace)
             return True
 
-    def update(self, task: Task) -> bool:
+    def update(self, namespace: str, task: Task) -> bool:
         with self.lock:
-            table = self.db.table(task.namespace)
+            table = self.db.table(namespace)
             table.update(
                 task.dict(),
                 Query().task_id == task.task_id,
@@ -342,57 +341,7 @@ async def task_update(
         description="命名空间",
         examples=["github.com/lazygophers/utils", "github.com/lazygophers/log"],
     ),
-    task_id: str = Field(
-        description="任务ID, namespace下唯一",
-        examples=["go-code-add-1", "pyton-test-add-1,"],
-    ),
-    name: str = Field(description="任务名称", examples=["为 add 函数添加测试"]),
-    desc: str = Field(
-        description="任务描述",
-        default=None,
-    ),
-    task_type: str = Field(
-        description="任务类型",
-        examples=[
-            "add",
-            "test",
-            "fix",
-            "doc",
-            "refactor",
-            "style",
-            "perf",
-            "ci",
-            "chore",
-        ],
-        default=None,
-    ),
-    priority: int = Field(
-        description="任务优先级",
-        examples=[1, 2, 3, 4, 5],
-        default=3,
-    ),
-    status: str = Field(
-        description="任务状态",
-        examples=["todo", "doing", "done", "retry"],
-        default="todo",
-    ),
-    created_at: int = Field(
-        description="任务创建时间",
-    ),
-    started_at: int = Field(
-        description="任务开始时间",
-    ),
-    finished_at: int = Field(
-        description="任务完成时间",
-    ),
-    perent_task_id: str = Field(
-        description="父任务ID",
-        default=None,
-    ),
-    order: int = Field(
-        description="任务排序",
-        default=None,
-    ),
+    task: Task = Field(description="任务"),
 ):
     """
     更新一个任务
@@ -461,4 +410,4 @@ async def task_exist(
     """
     任务是否存在
     """
-    return manager.exist(namespace, task_id)
+    return manager.exists(namespace, task_id)

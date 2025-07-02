@@ -4,7 +4,6 @@ shutup.please()
 
 from core.config import http_port
 import anyio
-from starlette.middleware import Middleware
 from core.croe import mcp
 from tools import *
 

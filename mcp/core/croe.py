@@ -1,4 +1,5 @@
 from mcp.server.fastmcp import FastMCP
+
 from core.config import http_port, app_name
 
 mcp = FastMCP(
