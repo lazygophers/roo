@@ -6,9 +6,7 @@ customModes:
       description: 智能中枢
       groups:
          -  read
-         -  edit
          -  command
-         -  browser
          -  mcp
       customInstructions: |-
           首先，需要加载 命名空间(namespace)，然后根据 `memory-bank` 的描述，加载并组织 `memory-bank` 作为全局的记忆存储模块。
@@ -360,7 +358,6 @@ customModes:
          -  read
          -  edit
          -  command
-         -  browser
          -  mcp
       customInstructions: |-
           首先，需要加载 命名空间(namespace)，然后根据 `memory-bank` 的描述，加载并组织 `memory-bank` 作为全局的记忆存储模块。
@@ -683,9 +680,8 @@ customModes:
       description: Roo 模式配置助手
       groups:
          -  read
-         -  edit
+         -  [edit, {fileRegex: \.yaml$, description: YAML 配置文件}]
          -  command
-         -  browser
          -  mcp
       customInstructions: |-
           首先，需要加载 命名空间(namespace)，然后根据 `memory-bank` 的描述，加载并组织 `memory-bank` 作为全局的记忆存储模块。
@@ -992,7 +988,6 @@ customModes:
          -  read
          -  edit
          -  command
-         -  browser
          -  mcp
       customInstructions: |-
           首先，需要加载 命名空间(namespace)，然后根据 `memory-bank` 的描述，加载并组织 `memory-bank` 作为全局的记忆存储模块。
@@ -1311,10 +1306,8 @@ customModes:
       whenToUse: 当用户需要自动化代码分析和提交规范校验时使用此模式
       description: Git 助手
       groups:
-         -  read
-         -  edit
          -  command
-         -  browser
+         -  read
          -  mcp
       customInstructions: |-
           首先，需要加载 命名空间(namespace)，然后根据 `memory-bank` 的描述，加载并组织 `memory-bank` 作为全局的记忆存储模块。
@@ -1641,7 +1634,6 @@ customModes:
          -  read
          -  edit
          -  command
-         -  browser
          -  mcp
       customInstructions: |-
           首先，需要加载 命名空间(namespace)，然后根据 `memory-bank` 的描述，加载并组织 `memory-bank` 作为全局的记忆存储模块。
@@ -1947,7 +1939,6 @@ customModes:
          -  read
          -  edit
          -  command
-         -  browser
          -  mcp
       customInstructions: |-
           首先，需要加载 命名空间(namespace)，然后根据 `memory-bank` 的描述，加载并组织 `memory-bank` 作为全局的记忆存储模块。
