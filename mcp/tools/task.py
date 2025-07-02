@@ -96,7 +96,7 @@ class TaskManager(object):
         self.lock = threading.Lock()
         filename = os.path.join("cache", "task", "manager.json")
         mkdir(os.path.dirname(filename))
-        self.db = TinyDB(filename)
+        self.db = TinyDB(filename, encoding="utf-8")
         atexit.register(self.db.close)
 
     def add(self, namespace: str, task: Task) -> bool:
