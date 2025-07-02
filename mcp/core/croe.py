@@ -1,8 +1,8 @@
 from mcp.server.fastmcp import FastMCP
-from core.config import http_port
+from core.config import http_port, app_name
 
 mcp = FastMCP(
-    name="fire",
+    name=app_name,
     stateless_http=True,
     sse_http=True,
     json_response=True,

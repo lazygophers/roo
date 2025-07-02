@@ -6,7 +6,6 @@ requires-python = ">=3.12"
 dependencies = [
     "appdirs>=1.4.4",
     "black>=25.1.0",
-    "coqui-tts>=0.26.2",
     "gitpython>=3.1.44",
     "langchain>=0.3.26",
     "langchain-community>=0.3.26",
@@ -20,7 +19,9 @@ dependencies = [
     "rich>=14.0.0",
     "shutup>=0.2.0",
     "tinydb>=4.8.2",
+    "torch>=2.7.1",
     "uv>=0.7.17",
+    "coqui-tts",
 ]
 
 [tool.uv.sources]
