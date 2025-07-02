@@ -23,7 +23,7 @@ class Task(BaseModel, Query, Mapping):
     name: str = Field(description="任务名称", examples=["为 add 函数添加测试"])
     desc: str = Field(
         description="任务描述",
-        default=None,
+        default="",
     )
     task_type: str = Field(
         description="任务类型",
@@ -38,7 +38,7 @@ class Task(BaseModel, Query, Mapping):
             "ci",
             "chore",
         ],
-        default=None,
+        default="",
     )
     priority: int = Field(
         description="任务优先级",
@@ -54,69 +54,26 @@ class Task(BaseModel, Query, Mapping):
 
     created_at: int = Field(
         description="任务创建时间",
-        default=None,
+        default=0,
     )
     started_at: int = Field(
         description="任务开始时间",
-        default=None,
+        default=0,
     )
     finished_at: int = Field(
         description="任务完成时间",
-        default=None,
+        default=0,
     )
 
-    perent_task_id: str = Field(
+    parent_task_id: str = Field(
         description="父任务ID",
-        default=None,
+        default=0,
     )
 
     order: int = Field(
         description="任务排序",
         default=0,
     )
-
-    def merge(self, task: dict):
-        if task is None:
-            return
-
-        if task.name is not None:
-            self.name = task.name
-
-        if task.desc is not None:
-            self.desc = task.desc
-
-        if task.task_type is not None:
-            self.task_type = task.task_type
-
-        if task.priority is not None:
-            self.priority = task.priority
-
-        if task.status is not None:
-            self.status = task.status
-
-        if task.perent_task_id is not None:
-            self.perent_task_id = task.perent_task_id
-
-        if task.created_at is not None:
-            self.created_at = task.created_at
-
-        if task.started_at is not None:
-            self.started_at = task.started_at
-
-        if task.finished_at is not None:
-            self.finished_at = task.finished_at
-
-        if task.updated_at is not None:
-            self.updated_at = task.updated_at
-
-        if task.updated_at is not None:
-            self.updated_at = task.updated_at
-
-        if task.updated_at is not None:
-            self.updated_at = task.updated_at
-
-        if task.order is not None:
-            self.order = task.order
 
     def dict(self):
         return {
@@ -129,7 +86,7 @@ class Task(BaseModel, Query, Mapping):
             "created_at": self.created_at,
             "started_at": self.started_at,
             "finished_at": self.finished_at,
-            "perent_task_id": self.perent_task_id,
+            "parent_task_id": self.parent_task_id,
             "order": self.order,
         }
 
@@ -155,13 +112,12 @@ class TaskManager(object):
 
     def replace(self, namespace: str, tasks: list[Task]) -> bool:
         for task in tasks:
-            task.namespace = namespace
             task.created_at = int(time.time())
 
         with self.lock:
             table = self.db.table(namespace)
             table.truncate()
-            table.insert_multiple(tasks)
+            table.insert_multiple([task.dict() for task in tasks])
             return True
 
     def get(self, namespace: str, task_id: str) -> Task:
@@ -221,7 +177,7 @@ async def task_add(
     name: str = Field(description="任务名称", examples=["为 add 函数添加测试"]),
     desc: str = Field(
         description="任务描述",
-        default=None,
+        default="",
     ),
     task_type: str = Field(
         description="任务类型",
@@ -236,27 +192,37 @@ async def task_add(
             "ci",
             "chore",
         ],
-        default=None,
     ),
     priority: int = Field(
         description="任务优先级",
         examples=[1, 2, 3, 4, 5],
         default=3,
     ),
-    perent_task_id: str = Field(
+    parent_task_id: str = Field(
         description="父任务ID",
-        default=None,
+        default="",
     ),
     order: int = Field(
         description="任务排序",
-        default=None,
+        default=0,
     ),
 ) -> bool:
     """
     添加一个任务
     """
 
-    manager.add(Task(**locals()))
+    return manager.add(
+        namespace,
+        Task(
+            task_id=task_id,
+            name=name,
+            desc=desc,
+            task_type=task_type,
+            priority=priority,
+            parent_task_id=parent_task_id,
+            order=order,
+        ),
+    )
 
 
 @mcp.tool()
@@ -284,7 +250,7 @@ async def task_list(
     列出命名空间下的所有任务
     """
     tasks = manager.list(namespace)
-    tasks.sort(reverse=False, key=lambda x: x.order)
+    tasks.sort(key=lambda x: x.order)
     return tasks
 
 
@@ -346,7 +312,7 @@ async def task_update(
     """
     更新一个任务
     """
-    return manager.update(Task(**locals()))
+    return manager.update(namespace, task)
 
 
 @mcp.tool()
@@ -370,7 +336,7 @@ async def task_start(
     task = manager.get(namespace, task_id)
     task.started_at = int(time.time())
     task.status = status
-    manager.update(task)
+    manager.update(namespace, task)
 
 
 @mcp.tool()
@@ -394,7 +360,7 @@ async def task_finish(
     task = manager.get(namespace, task_id)
     task.finished_at = int(time.time())
     task.status = status
-    manager.update(task)
+    manager.update(namespace, task)
 
 
 @mcp.tool()

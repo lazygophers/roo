@@ -68,10 +68,6 @@ task:
         任务创建时: 通过 `task_add` 添加任务
         任务发生变更时: 通过 `task_update` 更新任务内容
 memory-bank:
-    namespace:
-        path: ".memory/namespace"
-        description: 命名空间
-        init: 如果命名空间不存在, 则工具 `principle` 创建一个并立即写入`.memory/namespace`，否则直接加载 `.memory/namespace`
     context:
         path: ".memory/context.md"
         description: 任务上下文
@@ -104,12 +100,12 @@ hooks:
         - 禁止使用 `switch_mode` 切换模式
 ```
 
+首先，我需要通过
 <execute_command>
-<command>ls .memory/namespace</command>
+<command>cat .memory/namespace</command>
 </execute_command>
-首先，我需要通过 `read_file` 读取 `.memory/namespace` 作为全局命名空间(namespace)，如果不存在，则立即通过 `new_task` 交由
-`memory` 模式进行初始化或修复。然后，你需要根据
-`memory-bank` 的描述，加载并组织 `memory-bank` 作为全局的记忆存储模块。
+读取 `.memory/namespace` 作为全局命名空间(namespace)，如果文件不存在，则立即通过 `new_task` 交由
+`memory` 模式进行初始化或修复。然后，你需要根据 `memory-bank` 的描述，加载并组织 `memory-bank` 作为全局的记忆存储模块。
 
 ## 名词解析
 
