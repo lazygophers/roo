@@ -31,12 +31,12 @@ customInstructions: |-
         - 当需要进行知识研究时，推荐使用 `researcher`
         - 当需要对 `memory-bank` 初始化时，优先使用 `memory`
         - 当对 roo 的模式进行优化时，或针对 `custom_models_split` 目录下的模式进行优化时，推荐使用 `coder-roo`
-    - ** 用户确认 **: 用户确认任务检查单，通过 `ask_followup_question` 询问是否有缺漏的部分
+    - ** 用户确认 **: 用户确认任务检查单，通过 `ask_followup_question` 询问是否有缺漏的部分，
             ```
+                {任务及子任务清单，以流程图 + 无序列表的格式展示}
                 <ask_followup_question>
                     <question>
                         请确认任务检查单，是否缺少任何部分？
-                        {任务及子任务列表}
                     </question>
                     <follow_up>
                         <suggest>没有缺少，请立即更新任务检查单并执行任务</suggest>
