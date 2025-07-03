@@ -2,6 +2,8 @@ app_name = "lazygophers"
 
 http_port = 14000
 
+tts_model_name = "tts_models/multilingual/multi-dataset/xtts_v2"
+
 proxies = {"http": "http://127.0.0.1:7899", "https": "https://127.0.0.1:7899"}
 
 searx_hosts = [
@@ -38,8 +40,8 @@ searx_hosts = [
 import os
 import appdirs
 
-models_path = os.path.join(appdirs.user_config_dir(appname=app_name), "models")
+# models_path = os.path.join(appdirs.user_config_dir(appname=app_name), "models")
 
-for key in proxies:
-    os.environ["{}_PROXY".format(key.upper())] = proxies[key]
+cache_dir = os.path.join(os.getcwd(), "cache")
+
 os.environ["COQUI_TOS_AGREED"] = "1"

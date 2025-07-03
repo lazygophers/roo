@@ -5,11 +5,12 @@ from git import Repo, BadName, GitCommandError
 from pydantic import Field
 
 from core.cache import Cache
+from core.config import cache_dir
 from core.croe import mcp
 from tools.file import read_file
 
 cache = Cache(
-    os.path.join("cache", "github", "cache")
+    os.path.join(cache_dir, "github", "cache")
 )  # 初始化缓存实例，用于存储仓库更新时间等信息
 
 

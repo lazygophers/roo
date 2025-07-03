@@ -18,11 +18,8 @@ dependencies = [
     "requests>=2.32.4",
     "rich>=14.0.0",
     "shutup>=0.2.0",
+    "simpleaudio>=1.0.4",
     "tinydb>=4.8.2",
     "torch>=2.7.1",
     "uv>=0.7.17",
-    "coqui-tts",
 ]
-
-[tool.uv.sources]
-coqui-tts = { git = "https://github.com/Luoxin/coqui-ai-TTS" }

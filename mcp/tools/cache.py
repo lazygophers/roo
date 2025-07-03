@@ -2,8 +2,9 @@ import os
 from pydantic import Field
 from core.cache import Cache
 from core.croe import mcp
+from core.config import cache_dir
 
-cache = Cache(os.path.join("cache", "cache"))
+cache = Cache(os.path.join(cache_dir, "cache"))
 
 
 @mcp.tool()

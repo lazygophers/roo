@@ -1,23 +1,13 @@
-import torch
-from TTS.api import TTS
-from core.config import app_name, models_path
+import simpleaudio
+from bark import generate_audio, preload_models
 
-# print(TTS().list_models())
-print(models_path)
+# download and load all models
+preload_models()
 
-# Initialize TTS
-tts = TTS(
-    model_name="tts_models/multilingual/multi-dataset/xtts_v2",
-    model_path=models_path,
-    progress_bar=True,
-    gpu=torch.cuda.is_available(),
-)
-
-# List speakers
-print(tts.speakers)
-
-tts.tts(
-    text="Hello world!",
-    speaker="Craig Gutsy",
-    language="en",
-)
+# generate audio from text
+text_prompt = """
+     Hello, my name is Suno. And, uh — and I like pizza. [laughs] 
+     But I also have other interests such as playing tic tac toe.
+"""
+audio_array = generate_audio(text_prompt)
+simpleaudio.play_buffer(audio_array)
