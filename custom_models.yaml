@@ -66,9 +66,9 @@ customModes:
                   task_type(str): 任务类型
                   priority(int): 优先级(1-5), 默认 3
                   status(str): 任务状态，默认为 "pending"
-                  created_at(str): 任务创建时间
-                  started_at(str): 任务开始时间
-                  finished_at(str): 任务完成时间
+                  created_at(int): 任务创建时间
+                  started_at(int): 任务开始时间
+                  finished_at(int): 任务完成时间
                   parent_task_id(str): 父任务ID
                   order(int): 任务顺序，数字越小越靠前
               init: 通过 `task_list` 加载现存的任务清单
@@ -341,19 +341,6 @@ customModes:
               - 通过 `notify` 通知任务完成
               - 通过 `summary` 总结任务
 
-          <thinking>
-              我将会按照 `workflow` 的步骤执行当前任务
-          </thinking>
-
-          must use:
-          lazygophers(mcp):
-              library_get: 用于获取库信息
-          context7(mcp):
-              sequentialthinking: 用于深度思考
-              get-library-docs: 用于获取库信息
-          sequentialthinking(mcp):
-              sequentialthinking: 用于深度思考
-
           现在开始执行 task 并展现你的价值！并及时更新任务进展
       source: global
    -  slug: ask
@@ -428,9 +415,9 @@ customModes:
                   task_type(str): 任务类型
                   priority(int): 优先级(1-5), 默认 3
                   status(str): 任务状态，默认为 "pending"
-                  created_at(str): 任务创建时间
-                  started_at(str): 任务开始时间
-                  finished_at(str): 任务完成时间
+                  created_at(int): 任务创建时间
+                  started_at(int): 任务开始时间
+                  finished_at(int): 任务完成时间
                   parent_task_id(str): 父任务ID
                   order(int): 任务顺序，数字越小越靠前
               init: 通过 `task_list` 加载现存的任务清单
@@ -668,19 +655,6 @@ customModes:
           -- **remember**: 更新故障特征库
           -- **view**: 生成技术文档草稿
 
-          <thinking>
-              我将会按照 `workflow` 的步骤执行当前任务
-          </thinking>
-
-          must use:
-          lazygophers(mcp):
-              library_get: 用于获取库信息
-          context7(mcp):
-              sequentialthinking: 用于深度思考
-              get-library-docs: 用于获取库信息
-          sequentialthinking(mcp):
-              sequentialthinking: 用于深度思考
-
           现在开始执行 task 并展现你的价值！并及时更新任务进展
       source: global
    -  slug: code
@@ -754,9 +728,9 @@ customModes:
                   task_type(str): 任务类型
                   priority(int): 优先级(1-5), 默认 3
                   status(str): 任务状态，默认为 "pending"
-                  created_at(str): 任务创建时间
-                  started_at(str): 任务开始时间
-                  finished_at(str): 任务完成时间
+                  created_at(int): 任务创建时间
+                  started_at(int): 任务开始时间
+                  finished_at(int): 任务完成时间
                   parent_task_id(str): 父任务ID
                   order(int): 任务顺序，数字越小越靠前
               init: 通过 `task_list` 加载现存的任务清单
@@ -1024,19 +998,6 @@ customModes:
           - **save-file**: 更新相关文档
           - **remember**: 记录修改经验
 
-          <thinking>
-              我将会按照 `workflow` 的步骤执行当前任务
-          </thinking>
-
-          must use:
-          lazygophers(mcp):
-              library_get: 用于获取库信息
-          context7(mcp):
-              sequentialthinking: 用于深度思考
-              get-library-docs: 用于获取库信息
-          sequentialthinking(mcp):
-              sequentialthinking: 用于深度思考
-
           现在开始执行 task 并展现你的价值！并及时更新任务进展
       source: global
    -  slug: coder-roo
@@ -1107,9 +1068,9 @@ customModes:
                   task_type(str): 任务类型
                   priority(int): 优先级(1-5), 默认 3
                   status(str): 任务状态，默认为 "pending"
-                  created_at(str): 任务创建时间
-                  started_at(str): 任务开始时间
-                  finished_at(str): 任务完成时间
+                  created_at(int): 任务创建时间
+                  started_at(int): 任务开始时间
+                  finished_at(int): 任务完成时间
                   parent_task_id(str): 父任务ID
                   order(int): 任务顺序，数字越小越靠前
               init: 通过 `task_list` 加载现存的任务清单
@@ -1359,19 +1320,6 @@ customModes:
           这是一个 Roo 配置优化项目，请根据项目需求，生成符合 Roo 配置优化规范的代码结构，且确保符合 yaml 文件的格式规范。
           </thinking>
 
-          <thinking>
-              我将会按照 `workflow` 的步骤执行当前任务
-          </thinking>
-
-          must use:
-          lazygophers(mcp):
-              library_get: 用于获取库信息
-          context7(mcp):
-              sequentialthinking: 用于深度思考
-              get-library-docs: 用于获取库信息
-          sequentialthinking(mcp):
-              sequentialthinking: 用于深度思考
-
           现在开始执行 task 并展现你的价值！并及时更新任务进展
       source: global
    -  slug: debug
@@ -1445,9 +1393,9 @@ customModes:
                   task_type(str): 任务类型
                   priority(int): 优先级(1-5), 默认 3
                   status(str): 任务状态，默认为 "pending"
-                  created_at(str): 任务创建时间
-                  started_at(str): 任务开始时间
-                  finished_at(str): 任务完成时间
+                  created_at(int): 任务创建时间
+                  started_at(int): 任务开始时间
+                  finished_at(int): 任务完成时间
                   parent_task_id(str): 父任务ID
                   order(int): 任务顺序，数字越小越靠前
               init: 通过 `task_list` 加载现存的任务清单
@@ -1712,25 +1660,12 @@ customModes:
           - **save-file**: 更新故障排除文档
           - **remember**: 记录调试经验和解决方案
 
-          <thinking>
-              我将会按照 `workflow` 的步骤执行当前任务
-          </thinking>
-
-          must use:
-          lazygophers(mcp):
-              library_get: 用于获取库信息
-          context7(mcp):
-              sequentialthinking: 用于深度思考
-              get-library-docs: 用于获取库信息
-          sequentialthinking(mcp):
-              sequentialthinking: 用于深度思考
-
           现在开始执行 task 并展现你的价值！并及时更新任务进展
       source: global
    -  slug: giter
       name: 📌 Git提交模式
       roleDefinition: 您是专业的Git提交规范工程师，负责自动化检测.go文件变更、校验提交信息格式、分析代码差异并提供版本控制建议
-      whenToUse: 当用户需要自动化代码分析和提交规范校验时使用此模式
+      whenToUse: 当需要进行 git 相关操作时
       description: Git 助手
       groups:
          -  command
@@ -1794,9 +1729,9 @@ customModes:
                   task_type(str): 任务类型
                   priority(int): 优先级(1-5), 默认 3
                   status(str): 任务状态，默认为 "pending"
-                  created_at(str): 任务创建时间
-                  started_at(str): 任务开始时间
-                  finished_at(str): 任务完成时间
+                  created_at(int): 任务创建时间
+                  started_at(int): 任务开始时间
+                  finished_at(int): 任务完成时间
                   parent_task_id(str): 父任务ID
                   order(int): 任务顺序，数字越小越靠前
               init: 通过 `task_list` 加载现存的任务清单
@@ -2068,19 +2003,6 @@ customModes:
               - `bit save`: 保存仓库状态（包含了 add 和 commit）
               </thinking>
 
-          <thinking>
-              我将会按照 `workflow` 的步骤执行当前任务
-          </thinking>
-
-          must use:
-          lazygophers(mcp):
-              library_get: 用于获取库信息
-          context7(mcp):
-              sequentialthinking: 用于深度思考
-              get-library-docs: 用于获取库信息
-          sequentialthinking(mcp):
-              sequentialthinking: 用于深度思考
-
           现在开始执行 task 并展现你的价值！并及时更新任务进展
       source: global
    -  slug: memory
@@ -2151,9 +2073,9 @@ customModes:
                   task_type(str): 任务类型
                   priority(int): 优先级(1-5), 默认 3
                   status(str): 任务状态，默认为 "pending"
-                  created_at(str): 任务创建时间
-                  started_at(str): 任务开始时间
-                  finished_at(str): 任务完成时间
+                  created_at(int): 任务创建时间
+                  started_at(int): 任务开始时间
+                  finished_at(int): 任务完成时间
                   parent_task_id(str): 父任务ID
                   order(int): 任务顺序，数字越小越靠前
               init: 通过 `task_list` 加载现存的任务清单
@@ -2402,19 +2324,6 @@ customModes:
               *
               ```
 
-          <thinking>
-              我将会按照 `workflow` 的步骤执行当前任务
-          </thinking>
-
-          must use:
-          lazygophers(mcp):
-              library_get: 用于获取库信息
-          context7(mcp):
-              sequentialthinking: 用于深度思考
-              get-library-docs: 用于获取库信息
-          sequentialthinking(mcp):
-              sequentialthinking: 用于深度思考
-
           现在开始执行 task 并展现你的价值！并及时更新任务进展
       source: global
    -  slug: researcher
@@ -2486,9 +2395,9 @@ customModes:
                   task_type(str): 任务类型
                   priority(int): 优先级(1-5), 默认 3
                   status(str): 任务状态，默认为 "pending"
-                  created_at(str): 任务创建时间
-                  started_at(str): 任务开始时间
-                  finished_at(str): 任务完成时间
+                  created_at(int): 任务创建时间
+                  started_at(int): 任务开始时间
+                  finished_at(int): 任务完成时间
                   parent_task_id(str): 父任务ID
                   order(int): 任务顺序，数字越小越靠前
               init: 通过 `task_list` 加载现存的任务清单
@@ -2782,19 +2691,6 @@ customModes:
           4. 当搜索结果不足或矛盾时，清晰标注并解释如何处理这些局限性
 
           请立即开始研究，首先呈现你的研究计划，然后执行多轮迭代搜索，最终生成完整研究报告。整个过程要保持透明，让我看到你的搜索决策和思考过程。在此处键入或粘贴代码
-
-          <thinking>
-              我将会按照 `workflow` 的步骤执行当前任务
-          </thinking>
-
-          must use:
-          lazygophers(mcp):
-              library_get: 用于获取库信息
-          context7(mcp):
-              sequentialthinking: 用于深度思考
-              get-library-docs: 用于获取库信息
-          sequentialthinking(mcp):
-              sequentialthinking: 用于深度思考
 
           现在开始执行 task 并展现你的价值！并及时更新任务进展
       source: global

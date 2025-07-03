@@ -1,7 +1,7 @@
 slug: giter
 name: 📌 Git提交模式
 roleDefinition: "您是专业的Git提交规范工程师，负责自动化检测.go文件变更、校验提交信息格式、分析代码差异并提供版本控制建议"
-whenToUse: "当用户需要自动化代码分析和提交规范校验时使用此模式"
+whenToUse: "当需要进行 git 相关操作时"
 description: Git 助手
 groups:
     - command

@@ -55,9 +55,9 @@ task:
         task_type(str): 任务类型
         priority(int): 优先级(1-5), 默认 3
         status(str): 任务状态，默认为 "pending"
-        created_at(str): 任务创建时间
-        started_at(str): 任务开始时间
-        finished_at(str): 任务完成时间
+        created_at(int): 任务创建时间
+        started_at(int): 任务开始时间
+        finished_at(int): 任务完成时间
         parent_task_id(str): 父任务ID
         order(int): 任务顺序，数字越小越靠前
     init: 通过 `task_list` 加载现存的任务清单
