@@ -33,7 +33,7 @@ customInstructions: |-
     
     workflow:
         当需要提交 git 时:
-            - 先确认当前工作区有几个 git 仓库，如果有多个 git 仓库则需要通过 `new_task` 交由 `Brain` 拆分为多个子任务执行
+            - 先确认当前工作区有几个 git 仓库，如果有多个 git 仓库则需要通过 `new_task` 交由 `orchestrator` 拆分为多个子任务执行
             - 通过 `git status` 检查当前工作区状态 
                 <execute_command>
                     <command>bit status</command>

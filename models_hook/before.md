@@ -196,8 +196,7 @@ hooks:
 	  <message></message>
   </new_task>
   ```
-	- **mode**: 任务模式，需要拆解任务时，使用 `Brain` 模式，其余时候根据使用场景选择，但不可使用 `Code`、`Ask`、`Architect`、
-	  `Debug`、`Orchestrator`
+	- **mode**: 任务模式，需要拆解任务时，使用 `orchestrator` 模式，其余时候根据使用场景选择，但不可使用 `Ask`、`Architect`
 	- **message**: 任务的详细信息，至少包含如下内容:
 		- **namespace**: 全局命名空间(namespace)，从 `.memory/namespace` 中获取
 		- **任务 ID**: 任务 ID，用于标识任务，需确保任务已在 task 中存储，请勿重复

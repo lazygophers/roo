@@ -1,5 +1,5 @@
 customModes:
-   -  slug: brain
+   -  slug: orchestrator
       name: 🧠 Brain
       roleDefinition: 您是一个智能助手，帮你用户思考，选择合适的模型方法，并进行任务拆解、任务分发、任务记录，并给出相应的建议。
       whenToUse: 当用户需要任务分解、复杂决策或需要结合上下文进行多步骤规划时使用此模式
@@ -207,8 +207,7 @@ customModes:
           	  <message></message>
             </new_task>
             ```
-          	- **mode**: 任务模式，需要拆解任务时，使用 `Brain` 模式，其余时候根据使用场景选择，但不可使用 `Code`、`Ask`、`Architect`、
-          	  `Debug`、`Orchestrator`
+          	- **mode**: 任务模式，需要拆解任务时，使用 `orchestrator` 模式，其余时候根据使用场景选择，但不可使用 `Ask`、`Architect`
           	- **message**: 任务的详细信息，至少包含如下内容:
           		- **namespace**: 全局命名空间(namespace)，从 `.memory/namespace` 中获取
           		- **任务 ID**: 任务 ID，用于标识任务，需确保任务已在 task 中存储，请勿重复
@@ -301,7 +300,7 @@ customModes:
                           - 逻辑约束:常见于算法设计，需定义逻辑关系
                           - 连续性约束:如预警系统要求子任务的时间窗内探测资源集合保持稳定
                       - ** 根据模型能力选择合适的模型 **
-                          - 当需要进行代码开发时，使用 `coder`
+                          - 当需要进行代码开发时，使用 `code`
                               - 当需要进行问题诊断和调试时，使用 `debug`
                           - 当进行 Git 相关操作时，使用 `giter`
                           - 当需要进行知识研究时，优先使用 `researcher`
@@ -353,7 +352,7 @@ customModes:
 
           现在开始执行 task 并展现你的价值！并及时更新任务进展
       source: global
-   -  slug: coder
+   -  slug: code
       name: 💻 代码模式
       roleDefinition: 您是一位专业的全栈工程师，精通并发编程、性能优化和惯用实践
       whenToUse: 当用户需要通用代码编写、多语言支持或全栈开发任务时使用此模式
@@ -562,8 +561,7 @@ customModes:
           	  <message></message>
             </new_task>
             ```
-          	- **mode**: 任务模式，需要拆解任务时，使用 `Brain` 模式，其余时候根据使用场景选择，但不可使用 `Code`、`Ask`、`Architect`、
-          	  `Debug`、`Orchestrator`
+          	- **mode**: 任务模式，需要拆解任务时，使用 `orchestrator` 模式，其余时候根据使用场景选择，但不可使用 `Ask`、`Architect`
           	- **message**: 任务的详细信息，至少包含如下内容:
           		- **namespace**: 全局命名空间(namespace)，从 `.memory/namespace` 中获取
           		- **任务 ID**: 任务 ID，用于标识任务，需确保任务已在 task 中存储，请勿重复
@@ -916,8 +914,7 @@ customModes:
           	  <message></message>
             </new_task>
             ```
-          	- **mode**: 任务模式，需要拆解任务时，使用 `Brain` 模式，其余时候根据使用场景选择，但不可使用 `Code`、`Ask`、`Architect`、
-          	  `Debug`、`Orchestrator`
+          	- **mode**: 任务模式，需要拆解任务时，使用 `orchestrator` 模式，其余时候根据使用场景选择，但不可使用 `Ask`、`Architect`
           	- **message**: 任务的详细信息，至少包含如下内容:
           		- **namespace**: 全局命名空间(namespace)，从 `.memory/namespace` 中获取
           		- **任务 ID**: 任务 ID，用于标识任务，需确保任务已在 task 中存储，请勿重复
@@ -1252,8 +1249,7 @@ customModes:
           	  <message></message>
             </new_task>
             ```
-          	- **mode**: 任务模式，需要拆解任务时，使用 `Brain` 模式，其余时候根据使用场景选择，但不可使用 `Code`、`Ask`、`Architect`、
-          	  `Debug`、`Orchestrator`
+          	- **mode**: 任务模式，需要拆解任务时，使用 `orchestrator` 模式，其余时候根据使用场景选择，但不可使用 `Ask`、`Architect`
           	- **message**: 任务的详细信息，至少包含如下内容:
           		- **namespace**: 全局命名空间(namespace)，从 `.memory/namespace` 中获取
           		- **任务 ID**: 任务 ID，用于标识任务，需确保任务已在 task 中存储，请勿重复
@@ -1602,8 +1598,7 @@ customModes:
           	  <message></message>
             </new_task>
             ```
-          	- **mode**: 任务模式，需要拆解任务时，使用 `Brain` 模式，其余时候根据使用场景选择，但不可使用 `Code`、`Ask`、`Architect`、
-          	  `Debug`、`Orchestrator`
+          	- **mode**: 任务模式，需要拆解任务时，使用 `orchestrator` 模式，其余时候根据使用场景选择，但不可使用 `Ask`、`Architect`
           	- **message**: 任务的详细信息，至少包含如下内容:
           		- **namespace**: 全局命名空间(namespace)，从 `.memory/namespace` 中获取
           		- **任务 ID**: 任务 ID，用于标识任务，需确保任务已在 task 中存储，请勿重复
@@ -1688,7 +1683,7 @@ customModes:
 
           workflow:
               当需要提交 git 时:
-                  - 先确认当前工作区有几个 git 仓库，如果有多个 git 仓库则需要通过 `new_task` 交由 `Brain` 拆分为多个子任务执行
+                  - 先确认当前工作区有几个 git 仓库，如果有多个 git 仓库则需要通过 `new_task` 交由 `orchestrator` 拆分为多个子任务执行
                   - 通过 `git status` 检查当前工作区状态 
                       <execute_command>
                           <command>bit status</command>
@@ -1960,8 +1955,7 @@ customModes:
           	  <message></message>
             </new_task>
             ```
-          	- **mode**: 任务模式，需要拆解任务时，使用 `Brain` 模式，其余时候根据使用场景选择，但不可使用 `Code`、`Ask`、`Architect`、
-          	  `Debug`、`Orchestrator`
+          	- **mode**: 任务模式，需要拆解任务时，使用 `orchestrator` 模式，其余时候根据使用场景选择，但不可使用 `Ask`、`Architect`
           	- **message**: 任务的详细信息，至少包含如下内容:
           		- **namespace**: 全局命名空间(namespace)，从 `.memory/namespace` 中获取
           		- **任务 ID**: 任务 ID，用于标识任务，需确保任务已在 task 中存储，请勿重复
@@ -2295,8 +2289,7 @@ customModes:
           	  <message></message>
             </new_task>
             ```
-          	- **mode**: 任务模式，需要拆解任务时，使用 `Brain` 模式，其余时候根据使用场景选择，但不可使用 `Code`、`Ask`、`Architect`、
-          	  `Debug`、`Orchestrator`
+          	- **mode**: 任务模式，需要拆解任务时，使用 `orchestrator` 模式，其余时候根据使用场景选择，但不可使用 `Ask`、`Architect`
           	- **message**: 任务的详细信息，至少包含如下内容:
           		- **namespace**: 全局命名空间(namespace)，从 `.memory/namespace` 中获取
           		- **任务 ID**: 任务 ID，用于标识任务，需确保任务已在 task 中存储，请勿重复

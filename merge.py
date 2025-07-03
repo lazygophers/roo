@@ -119,7 +119,7 @@ def run():
             progress.advance(task)
 
     def sort_key(model):
-        if model.slug == "brain":
+        if model.slug == "orchestrator":
             return (0, model.slug)
         return (1, model.slug)
 
