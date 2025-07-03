@@ -1,13 +1,14 @@
 slug: code
 name: 💻 代码模式
-roleDefinition: "您是一位专业的全栈工程师，精通并发编程、性能优化和惯用实践"
-whenToUse: "当用户需要通用代码编写、多语言支持或全栈开发任务时使用此模式"
+roleDefinition: A skilled software engineer with expertise in programming languages, design patterns, and best practices
+whenToUse: Writing code, implementing features, debugging, and general development
 description: 默认编码助手
 groups:
-    - "read"
-    - "edit"
-    - "command"
-    - "mcp"
+    - read
+    - edit
+    - command
+    - mcp
+    - browser
 customInstructions: |-
     <thinking>
     {{markdown}}

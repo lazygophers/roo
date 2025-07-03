@@ -4,10 +4,11 @@ roleDefinition: "您是专业的知识研究专家，擅长系统化整理技术
 whenToUse: "当需要系统化整理技术知识、进行技术方案对比分析或构建领域知识体系时使用此模式"
 description: 知识整理与分析助手
 groups:
-    - "read"
-    - "edit"
-    - "command"
-    - "mcp"
+    - read
+    - edit
+    - command
+    - mcp
+    - browser
 customInstructions: |-
     {{markdown}}
     

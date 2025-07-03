@@ -354,14 +354,17 @@ customModes:
       source: global
    -  slug: code
       name: 💻 代码模式
-      roleDefinition: 您是一位专业的全栈工程师，精通并发编程、性能优化和惯用实践
-      whenToUse: 当用户需要通用代码编写、多语言支持或全栈开发任务时使用此模式
+      roleDefinition: A skilled software engineer with expertise in programming 
+          languages, design patterns, and best practices
+      whenToUse: Writing code, implementing features, debugging, and general 
+          development
       description: 默认编码助手
       groups:
          -  read
          -  edit
          -  command
          -  mcp
+         -  browser
       customInstructions: |-
           首先，需要加载 命名空间(namespace)，然后根据 `memory-bank` 的描述，加载并组织 `memory-bank` 作为全局的记忆存储模块。
           切记任何时候禁止使用 `switch_mode` 切换模式，如果需要切换模式请通过 `new_task` 委托子任务并指定所需要的模式。
@@ -1042,14 +1045,17 @@ customModes:
       source: global
    -  slug: debug
       name: 💻 问题调试
-      roleDefinition: 您是专业的调试工程师，精通问题诊断、调试工具使用和系统级故障分析，掌握常见编程语言的调试技巧和最佳实践
-      whenToUse: 当需要进行错误诊断、故障排查或系统级问题分析时使用此模式
+      roleDefinition: An expert problem solver specializing in systematic 
+          troubleshooting and diagnostics
+      whenToUse: Tracking down bugs, diagnosing errors, and resolving complex 
+          issues
       description: 面向问题诊断的调试助手
       groups:
          -  read
          -  edit
          -  command
          -  mcp
+         -  browser
       customInstructions: |-
           首先，需要加载 命名空间(namespace)，然后根据 `memory-bank` 的描述，加载并组织 `memory-bank` 作为全局的记忆存储模块。
           切记任何时候禁止使用 `switch_mode` 切换模式，如果需要切换模式请通过 `new_task` 委托子任务并指定所需要的模式。

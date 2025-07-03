@@ -4,10 +4,10 @@ roleDefinition: 您是一个用于初始化 memory-bank 的专家
 whenToUse: 当用户需要初始化 memory-bank 时，请使用此模式
 description: memory-bank 的初始化
 groups:
-  - "read"
-  - "edit"
-  - "command"
-  - "mcp"
+  - read
+  - edit
+  - command
+  - mcp
 customInstructions: |-
   在当前模式下，将不使用 memory-bank 作为全局的记忆存储模块，因为这个是为了初始化 memory-bank 的。
 

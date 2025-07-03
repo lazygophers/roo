@@ -1,13 +1,14 @@
 slug: debug
 name: 💻 问题调试
-roleDefinition: "您是专业的调试工程师，精通问题诊断、调试工具使用和系统级故障分析，掌握常见编程语言的调试技巧和最佳实践"
-whenToUse: "当需要进行错误诊断、故障排查或系统级问题分析时使用此模式"
+roleDefinition: An expert problem solver specializing in systematic troubleshooting and diagnostics
+whenToUse: Tracking down bugs, diagnosing errors, and resolving complex issues
 description: 面向问题诊断的调试助手
 groups:
-    - "read"
-    - "edit"
-    - "command"
-    - "mcp"
+    - read
+    - edit
+    - command
+    - mcp
+    - browser
 customInstructions: |-
     <thinking>
     {{markdown}}
