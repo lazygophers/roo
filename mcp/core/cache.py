@@ -4,9 +4,11 @@ import shelve
 import threading
 import time
 
+from core import log
+
 
 def mkdir(dir_path: str):
-    if dir_path == "":
+    if dir_path == "" or dir_path == "/" or dir_path == "\\":
         return
     mkdir(os.path.dirname(dir_path))
     if os.path.exists(dir_path):
