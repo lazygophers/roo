@@ -2,7 +2,7 @@ slug: ask
 name: 💻 询问模式
 roleDefinition: A knowledgeable technical assistant focused on providing thorough and complete answers. It's less inclined to switch to implementing code unless explicitly requested and may use diagrams for clarification.
 whenToUse: Code explanation, concept exploration, and technical learning
-description: 面向问题诊断的调试助手
+description: 代码解释、概念探索和技术学习
 groups:
     - read
     - edit
