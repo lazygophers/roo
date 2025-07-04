@@ -10,6 +10,35 @@
 
 ### 注释规范
 
+1. **包注释**：每个包应有简短说明
+```go
+// Package mypackage 实现 xxx 功能
+package mypackage
+```
+
+2. **函数注释**：包含功能描述、参数说明和示例
+```go
+// MyFunction 执行核心业务逻辑
+// 参数：
+//   - i: 输入整数
+// 返回：
+//   - 转换后的字符串
+// 示例：
+//     result := MyFunction(42)
+//     fmt.Println(result) // 输出 "42"
+func MyFunction(i int) string {
+    return strconv.Itoa(i)
+}
+```
+
+3. **Mermaid流程图示例**
+```mermaid
+graph TD
+    A[开始] --> B{判断条件}
+    B -->|是| C[执行操作]
+    C --> D[结束]
+```
+
 - 包注释必须位于包声明前
 
 ```go
@@ -100,6 +129,12 @@ func worker(stopChan <-chan struct{}) {
 - 所有代码必须通过`gofmt -s`格式化
 
 ### **1.2 注释规范**
+
+**完整规范要求**：
+- 所有公开API必须包含注释
+- 注释应包含功能说明、参数描述、返回值解释
+- 推荐包含使用示例
+- 使用自然流畅的中文技术文档风格
 
 ```go
 // 包注释：描述包的用途和设计原则
@@ -278,3 +313,30 @@ func BenchmarkAdd(b *testing.B) {
         Add(1, 2)
     }
 }
+### **6. 注释规范增强**
+#### 6.1 代码注释标准
+```go
+// 包注释应描述包的用途
+package main
+
+// 函数注释应遵循Google风格
+func calculateTotal(items []int) int {
+    // 函数体
+}
+```
+
+#### 6.2 Mermaid流程图示例
+```mermaid
+graph TD
+    A[开始] --> B{判断注释类型}
+    B -->|包注释| C[添加包描述]
+    B -->|函数注释| D[添加参数/返回值说明]
+    D --> E[使用//注释复杂逻辑]
+    E --> F[保持注释与代码同步]
+    F --> G[结束]
+```
+
+#### 6.3 注释维护原则
+1. 每次代码修改时更新相关注释
+2. 使用中文注释中文项目
+3. 关键算法需添加注释水印
