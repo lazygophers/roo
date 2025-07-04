@@ -46,7 +46,7 @@ customInstructions: |-
                     <cwd>{当前目录}</cwd>
                 </execute_command>
             - 通过 `execute_command` 提交所有变更
-            - 如果存在 remote branch，则将提交推送到 remote branch
+            - 如果存在 remote branch，则通过 `bit sync` 将提交推送到 remote branch
     
     <thinking>
     当用户需要生成符合规范的Git提交信息时，我将:
