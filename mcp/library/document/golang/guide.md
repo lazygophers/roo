@@ -10,13 +10,13 @@
 
 ### 注释规范
 
-- **包注释**：每个包应有简短说明
+- 包注释：每个包应有简短说明
 ```go
 // Package mypackage 实现 xxx 功能
 package mypackage
 ```
 
-- **函数注释**：包含功能描述、参数说明和示例
+- 函数注释：包含功能描述、参数说明和示例
 ```go
 // MyFunction 执行核心业务逻辑
 // 参数：
@@ -31,7 +31,7 @@ func MyFunction(i int) string {
 }
 ```
 
-3. **Mermaid流程图示例**
+- Mermaid流程图示例
 ```mermaid
 graph TD
     A[开始] --> B{判断条件}
@@ -122,13 +122,13 @@ func worker(stopChan <-chan struct{}) {
 
 ```
 
-## **1. 代码风格**
+## 代码风格
 
-### **1.1 格式化**
+### 格式化
 
 - 所有代码必须通过`gofmt -s`格式化
 
-### **1.2 注释规范**
+### 注释规范
 
 **完整规范要求**：
 - 所有公开API必须包含注释
@@ -151,7 +151,7 @@ func Get(url string) ([]byte, error) {
 }
 ```
 
-### **1.3 命名约定**
+### 命名约定
 
 | 元素    | 命名规则           | 示例                |
 |-------|----------------|-------------------|
@@ -162,9 +162,9 @@ func Get(url string) ([]byte, error) {
 | 变量    | 短名（局部）/描述名（全局） | `i`, `maxRetries` |
 | 接口    | 以`-er`结尾或单一动作  | `Reader`, `Close` |
 
-## **2. 错误处理**
+## 错误处理
 
-### **2.1 错误设计**
+### 错误设计
 
 ```go
 // 静态错误
@@ -184,7 +184,7 @@ func (e *HTTPError) Error() string {
 }
 ```
 
-### **2.2 错误处理模式**
+### 错误处理模式
 
 ```go
 // 推荐：尽早返回，减少嵌套
@@ -205,9 +205,9 @@ func ReadFile(path string) ([]byte, error) {
 }
 ```
 
-## **3. 并发编程**
+## 并发编程
 
-### **3.1 goroutine管理**
+### goroutine管理
 
 ```go
 // 使用channel控制goroutine退出
@@ -235,7 +235,7 @@ go worker(jobsCh, stopCh)
 close(stopCh)
 ```
 
-### **3.2 并发原语**
+### 3.2 并发原语
 
 | 场景      | 推荐原语      | 示例代码                                         |
 |---------|-----------|----------------------------------------------|
@@ -244,9 +244,9 @@ close(stopCh)
 | 等待多协程完成 | WaitGroup | `wg.Add(2); go func() { defer wg.Done() }()` |
 | 单次初始化   | Once      | `var once sync.Once; once.Do(init)`          |
 
-## **4. 性能优化**
+## 性能优化
 
-### **4.1 内存分配**
+### 内存分配
 
 ```go
 // 预分配切片容量
@@ -266,7 +266,7 @@ func process() {
 }
 ```
 
-### **4.2 字符串操作**
+### 字符串操作
 
 ```go
 // 推荐：使用strings.Builder替代+
@@ -280,9 +280,9 @@ result := builder.String()
 s := strconv.Itoa(123) // 比fmt.Sprintf快3-4倍
 ```
 
-## **5. 测试规范**
+## 测试规范
 
-### **5.1 单元测试**
+### 单元测试
 
 ```go
 func TestAdd(t *testing.T) {
@@ -305,7 +305,7 @@ func TestAdd(t *testing.T) {
 }
 ```
 
-### **5.2 基准测试**
+### 基准测试
 
 ```go
 func BenchmarkAdd(b *testing.B) {
@@ -313,8 +313,8 @@ func BenchmarkAdd(b *testing.B) {
         Add(1, 2)
     }
 }
-### **6. 注释规范增强**
-#### 6.1 代码注释标准
+### 注释规范增强
+#### 代码注释标准
 ```go
 // 包注释应描述包的用途
 package main
@@ -325,7 +325,7 @@ func calculateTotal(items []int) int {
 }
 ```
 
-#### 6.2 Mermaid流程图示例
+#### Mermaid流程图示例
 ```mermaid
 graph TD
     A[开始] --> B{判断注释类型}
@@ -336,7 +336,7 @@ graph TD
     F --> G[结束]
 ```
 
-#### 6.3 注释维护原则
+#### 注释维护原则
 - 每次代码修改时更新相关注释
-2. 使用中文注释中文项目
-3. 关键算法需添加注释水印
+- 使用中文注释中文项目
+- 关键算法需添加注释水印

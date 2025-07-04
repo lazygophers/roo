@@ -1,6 +1,6 @@
 from mcp.server.fastmcp import FastMCP
 
-from core.config import http_port, app_name
+from core.config import http_port, app_name, debug
 
 mcp = FastMCP(
     name=app_name,
@@ -9,5 +9,5 @@ mcp = FastMCP(
     json_response=True,
     host="0.0.0.0",
     port=http_port,
-    log_level="DEBUG",
+    log_level="DEBUG" if debug else "INFO",
 )

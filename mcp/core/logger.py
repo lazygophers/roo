@@ -12,4 +12,4 @@ logging.basicConfig(
 )
 
 # 创建日志记录器
-log = logging.getLogger("rich")
+log = logging.getLogger("lazygophers")

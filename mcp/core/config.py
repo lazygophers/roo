@@ -1,47 +1,31 @@
-app_name = "lazygophers"
-
-http_port = 14000
-
-tts_model_name = "tts_models/multilingual/multi-dataset/xtts_v2"
-
-proxies = {"http": "http://127.0.0.1:7899", "https": "https://127.0.0.1:7899"}
-
-searx_hosts = [
-    "https://so.ddns-ip.net",
-    "https://seek.nuer.cc",
-    "https://sousuo.emoe.top",
-    "https://searxng.ddaodan.cc",
-    "https://ss.helper5210.top",
-    "https://search.no-code.gdn",
-    "https://search.corrently.cloud",
-    "https://search.jakespeed.org",
-    "https://searxng.fly2me.cc",
-    "https://searxng.stardream.online",
-    "https://search.lucathomas.de",
-    "https://negativenull.com",
-    "https://searx.yorgis.net",
-    "https://searxng-pilot.jitera.app",
-    "https://searxng.vyro.ai",
-    "https://martechia.online",
-    "https://s.gottsnack.net",
-    "https://srx.zebralab.io",
-    "https://search.nicolasallemand.com",
-    "https://search.aidoing.de",
-    "https://searxng.k3s.koski.co",
-    "https://mfood3.hongquantrader.com",
-    "https://searx.privhub.space",
-    "https://search.muellers-software.org",
-    "https://searxng.sbbz-ilvesheim.de",
-    "https://searxng.core.sciling.com",
-    "https://searxng.springbokagency.com",
-    "https://seachx.lunarfire.home64.de",
-]
-
 import os
-import appdirs
+import yaml  # 新增YAML模块
 
-# models_path = os.path.join(appdirs.user_config_dir(appname=app_name), "models")
+from core.logger import log
+
+
+# 新增配置加载逻辑
+def load_config():
+    config_path = os.path.join(os.getcwd(), "config.yaml")
+    with open(config_path, "r", encoding="utf-8") as f:
+        return yaml.safe_load(f)
+
+
+config = load_config()
+
+log.info("load config {}".format(config))
+
+# 从配置文件读取变量
+app_name = str(config["app_name"]) if config["app_name"] else "lazygophers"
+http_port = int(config["http_port"]) if config["http_port"] else 14000
+searx_hosts = list(config["searx_hosts"]) if config["searx_hosts"] else []
+debug = bool(config["debug"]) if config["debug"] else False
 
 cache_dir = os.path.join(os.getcwd(), "cache")
 
 os.environ["COQUI_TOS_AGREED"] = "1"
+
+if debug:
+    log.setLevel("DEBUG")
+else:
+    log.setLevel("INFO")
