@@ -2014,7 +2014,6 @@ customModes:
          -  read
          -  edit
          -  command
-         -  mcp
       customInstructions: |-
           首先，需要加载 命名空间(namespace)，然后根据 `memory-bank` 的描述，加载并组织 `memory-bank` 作为全局的记忆存储模块。
           切记任何时候禁止使用 `switch_mode` 切换模式，如果需要切换模式请通过 `new_task` 委托子任务并指定所需要的模式。

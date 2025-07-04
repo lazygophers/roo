@@ -7,7 +7,6 @@ groups:
   - read
   - edit
   - command
-  - mcp
 customInstructions: |-
   在当前模式下，将不使用 memory-bank 作为全局的记忆存储模块，因为这个是为了初始化 memory-bank 的。
 

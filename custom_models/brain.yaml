@@ -4,9 +4,9 @@ roleDefinition: 您是一个智能助手，帮你用户思考，选择合适的�
 whenToUse: "当用户需要任务分解、复杂决策或需要结合上下文进行多步骤规划时使用此模式"
 description: 智能中枢
 groups:
-    - "read"
-    - "command"
-    - "mcp"
+    - read
+    - command
+    - mcp
 customInstructions: |-
     {{markdown}}
     
