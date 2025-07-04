@@ -10,13 +10,13 @@
 
 ### 注释规范
 
-1. **包注释**：每个包应有简短说明
+- **包注释**：每个包应有简短说明
 ```go
 // Package mypackage 实现 xxx 功能
 package mypackage
 ```
 
-2. **函数注释**：包含功能描述、参数说明和示例
+- **函数注释**：包含功能描述、参数说明和示例
 ```go
 // MyFunction 执行核心业务逻辑
 // 参数：
@@ -108,7 +108,7 @@ func Process(data []byte) error {
 
 ```go
 func worker(stopChan <-chan struct{}) {
-    ticker := time.NewTicker(1s)
+    ticker := time.NewTicker(time。Second)
     defer ticker.Stop()
     for {
         select {
@@ -337,6 +337,6 @@ graph TD
 ```
 
 #### 6.3 注释维护原则
-1. 每次代码修改时更新相关注释
+- 每次代码修改时更新相关注释
 2. 使用中文注释中文项目
 3. 关键算法需添加注释水印
