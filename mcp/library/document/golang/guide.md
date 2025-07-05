@@ -108,7 +108,7 @@ func Process(data []byte) error {
 
 ```go
 func worker(stopChan <-chan struct{}) {
-    ticker := time.NewTicker(time。Second)
+    ticker := time.NewTicker(time.Second)
     defer ticker.Stop()
     for {
         select {
@@ -191,15 +191,19 @@ func (e *HTTPError) Error() string {
 func ReadFile(path string) ([]byte, error) {
     f, err := os.Open(path)
     if err != nil {
-        log.Errorf("err:%s", err)
-        return nil, err
+        // 错误处理：使用fmt.Errorf并保留原始错误
+        // 错误处理：使用fmt.Errorf并保留原始错误
+                if err := f.Close(); err != nil {
+                    return nil, fmt.Errorf("close file: %w", err)
+                }
+                return nil, fmt.Errorf("read file: %w", err)
     }
     defer f.Close()
 
     data, err := io.ReadAll(f)
     if err != nil {
-        log.Errorf("err:%s", err)
-        return nil, err
+        // 错误处理：使用fmt.Errorf并保留原始错误
+        return fmt.Errorf("open file: %w", err)
     }
     return data, nil
 }
@@ -215,9 +219,7 @@ func worker(jobs <-chan Job, stop <-chan struct{}) {
     for {
         select {
         case job, ok := <-jobs:
-            if !ok {
-                return
-            }
+            if !ok {\n            return\n        }\n        process(job)
             process(job)
         case <-stop:
             return
@@ -237,7 +239,7 @@ close(stopCh)
 
 ### 3.2 并发原语
 
-| 场景      | 推荐原语      | 示例代码                                         |
+| 场景      | 推荐原语      | 示例代码                                         | 说明                  |
 |---------|-----------|----------------------------------------------|
 | 协程间通信   | Channel   | `jobs := make(chan Job, 10)`                 |
 | 共享资源保护  | Mutex     | `var mu sync.Mutex`                          |
