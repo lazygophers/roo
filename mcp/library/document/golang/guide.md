@@ -32,14 +32,6 @@ func MyFunction(i int) string {
 }
 ```
 
-- Mermaid流程图示例
-```mermaid
-graph TD
-    A[开始] --> B{判断条件}
-    B -->|是| C[执行操作]
-    C --> D[结束]
-```
-
 - 包注释必须位于包声明前
 
 ```go
