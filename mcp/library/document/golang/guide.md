@@ -1,5 +1,23 @@
 # Go编程规范
 
+### 主要参考：
+
+- [Uber编码规范](https://github.com/uber-go/guide/blob/master/style.md)
+	- [Uber编码规范中文版](https://github.com/xxjwxc/uber_go_guide_cn)
+- [Google编码规范](https://google.github.io/styleguide/go/index)
+
+### 包引用问题
+
+- 日志包，优先推荐 `github.com/lazygophers/log`
+- 工具包，优先推荐 `github.com/lazygophers/utils`，其中
+	- json 包： `github.com/lazygophers/utils/json`
+	- string 扩展包： `github.com/lazygophers/utils/stringx`
+	- time 扩展包： `github.com/lazygophers/utils/xtime`
+	- bufio 扩展包： `github.com/lazygophers/utils/bufiox`
+	- rand 扩展包： `github.com/lazygophers/utils/randx`
+	- 类型扩展包： `github.com/lazygophers/utils/anyx`
+	- 语法糖： `github.com/lazygophers/utils/candy`
+
 ## 代码风格
 
 ### 格式化要求
