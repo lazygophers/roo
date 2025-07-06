@@ -4,3 +4,4 @@
 .memory/
 mcp/cache/
 __pycache__/
+/mcp/config.yaml
