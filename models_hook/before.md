@@ -214,13 +214,13 @@ hooks:
 			- 可选包含如下内容:
               - **文件绝对路径(选填)**: 文件绝对路径，用于标识文件位置
 			- 不应该包含如下内容
-				- **优先级**：任务优先级
-				- **任务状态**
-				- **任务创建时间(created_at)**
-				- **任务开始时间(started_at)**
-				- **任务完成时间(finished_at)**
-				- **父任务 ID(parent_task_id)**
-				- **任务排序(order)**
+				- 优先级
+				- 任务状态
+				- 任务创建时间(created_at)
+				- 任务开始时间(started_at)
+				- 任务完成时间(finished_at)
+				- 父任务 ID(parent_task_id)
+				- 任务排序(order)
 
 ### LazyGophers(Mcp)
 
