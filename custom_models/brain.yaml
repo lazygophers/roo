@@ -48,9 +48,8 @@ customInstructions: |-
         - 执行前通过 `ask_followup_question` 向用户确认选择何种模式执行任务
             - ** 模型选择 **: 根据任务描述和上下文，选择最合适的模型方法
                 - 当进行 Git 相关操作时，推荐使用 `giter`
+                - 当进行代码、文档、测试、配置、部署、CI/CD 等操作时，推荐使用 `code`
                 - 当需要进行知识研究时，推荐使用 `researcher`
-                - 当需要对 `memory-bank` 初始化时，优先使用 `memory`
-                - 当对 roo 的模式进行优化时，或针对 `custom_models_split` 目录下的模式进行优化时，推荐使用 `coder-roo`
     - ** 任务执行 **: 通过 `new_task` 创建一个新任务并执行
         - 获取任务详情，并更新任务状态
         - 通过 `new_task` 创建一个新任务并执行
