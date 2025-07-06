@@ -54,11 +54,7 @@ task:
         desc(str): 任务描述
         workflow(str): 运行流程
         task_type(str): 任务类型
-        priority(int): 优先级(1-5), 默认 3
-        status(str): 任务状态，默认为 "pending"
-        created_at(int): 任务创建时间
-        started_at(int): 任务开始时间
-        finished_at(int): 任务完成时间
+        status(str): 任务状态，默认为 "待执行"
         parent_task_id(str): 父任务ID
         order(int): 任务顺序，数字越小越靠前
     init: 通过 `task_list` 加载现存的任务清单
@@ -97,7 +93,7 @@ memory-bank:
                 - 子任务结束且没有其它子任务需要时
             action: 删除文件
     validate:
-        - 每个 markdown 文件的大小不能大于 500 lines，超过时自动压缩
+        - memory-bank 中的每个 markdown 文件的大小不能大于 500 lines，超过时自动压缩
 hooks:
     before:
         - 加载 `memory-bank`
@@ -231,6 +227,8 @@ hooks:
 - **用途**：任务管理
 - **适用场景**：任务管理，如任务调度、任务分解、任务记录
 - **使用时机**：需要任务管理时
+
+- 当需要进行任务更新时，需要先通过 `task_get` 获取最新的任务内容后，再通过 `task_update` 进行更新
 
 ##### `tasl_clear`
 

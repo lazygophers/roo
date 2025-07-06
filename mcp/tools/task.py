@@ -60,19 +60,6 @@ class Task(BaseModel, Query, Mapping):
         default=task_state_examples[0],
     )
 
-    created_at: int = Field(
-        description="任务创建时间",
-        default=0,
-    )
-    started_at: int = Field(
-        description="任务开始时间",
-        default=0,
-    )
-    finished_at: int = Field(
-        description="任务完成时间",
-        default=0,
-    )
-
     parent_task_id: str = Field(
         description="父任务ID",
         default=0,
@@ -92,9 +79,6 @@ class Task(BaseModel, Query, Mapping):
             "task_type": self.task_type,
             "priority": self.priority,
             "status": self.status,
-            "created_at": self.created_at,
-            "started_at": self.started_at,
-            "finished_at": self.finished_at,
             "parent_task_id": self.parent_task_id,
             "order": self.order,
         }
@@ -109,7 +93,6 @@ class TaskManager(object):
         atexit.register(self.db.close)
 
     def add(self, namespace: str, task: Task) -> bool:
-        task.created_at = int(time.time())
         task.status = task_state_examples[0]
 
         with self.lock:
@@ -121,7 +104,6 @@ class TaskManager(object):
 
     def replace(self, namespace: str, tasks: list[Task]) -> bool:
         for task in tasks:
-            task.created_at = int(time.time())
 
         with self.lock:
             table = self.db.table(namespace)
@@ -300,7 +282,6 @@ async def task_start(
     任务开始
     """
     task = manager.get(namespace, task_id)
-    task.started_at = int(time.time())
     task.status = status
     manager.update(namespace, task)
 
@@ -324,7 +305,6 @@ async def task_finish(
     任务完成
     """
     task = manager.get(namespace, task_id)
-    task.finished_at = int(time.time())
     task.status = status
     manager.update(namespace, task)
 
