@@ -38,6 +38,11 @@ class Task(BaseModel, Query, Mapping):
         description="任务描述",
         default="",
     )
+    workflow: str = Field(
+        description="任务工作流",
+        default="",
+    )
+
     task_type: str = Field(
         description="任务类型",
         examples=task_type_examples,
@@ -83,6 +88,7 @@ class Task(BaseModel, Query, Mapping):
             "task_id": self.task_id,
             "name": self.name,
             "desc": self.desc,
+            "workflow": self.workflow,
             "task_type": self.task_type,
             "priority": self.priority,
             "status": self.status,
@@ -173,32 +179,7 @@ async def task_add(
         description="命名空间",
         examples=["github.com/lazygophers/utils", "github.com/lazygophers/log"],
     ),
-    task_id: str = Field(
-        description="任务ID, namespace下唯一",
-        examples=["go-code-add-1", "pyton-test-add-1"],
-    ),
-    name: str = Field(description="任务名称", examples=["为 add 函数添加测试"]),
-    desc: str = Field(
-        description="任务描述",
-        default="",
-    ),
-    task_type: str = Field(
-        description="任务类型",
-        examples=task_type_examples,
-    ),
-    priority: int = Field(
-        description="任务优先级",
-        examples=[1, 2, 3, 4, 5],
-        default=3,
-    ),
-    parent_task_id: str = Field(
-        description="父任务ID",
-        default="",
-    ),
-    order: int = Field(
-        description="任务排序",
-        default=0,
-    ),
+    task: Task = Field(description="任务"),
 ) -> bool:
     """
     添加一个任务
@@ -206,15 +187,7 @@ async def task_add(
 
     return manager.add(
         namespace,
-        Task(
-            task_id=task_id,
-            name=name,
-            desc=desc,
-            task_type=task_type,
-            priority=priority,
-            parent_task_id=parent_task_id,
-            order=order,
-        ),
+        task,
     )
 
 

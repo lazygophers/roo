@@ -4,4 +4,8 @@
 .memory/
 mcp/cache/
 __pycache__/
-/mcp/config.yaml
+mcp/config.yaml
+mcp/cache/cache.db
+mcp/cache/library/cache.db
+mcp/cache/github/cache.db
+mcp/cache/task/manager.json
