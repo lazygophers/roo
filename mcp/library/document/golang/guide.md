@@ -93,6 +93,79 @@ type User struct {
 - 使用中文注释中文项目
 - 关键算法需添加注释水印
 
+## 编码规范
+
+### 减少嵌套
+
+代码应通过尽可能先处理错误情况/特殊情况并尽早返回或继续循环来减少嵌套。减少嵌套多个级别的代码的代码量。
+
+```go
+for _, v := range data {
+  if v.F1 != 1 {
+    log.Printf("Invalid v: %v", v)
+    continue
+  }
+
+  v = process(v)
+  if err := v.Call(); err != nil {
+    return err
+  }
+  v.Send()
+}
+```
+
+### 减少不必要的 else
+
+如果在 if 的两个分支中都设置了变量，则可以将其替换为单个 if。
+
+```go
+a := 10
+if b {
+  a = 100
+}
+```
+
+#### 变量初始化
+
+##### 对零值结构使用 var
+
+如果在声明中省略了结构的所有字段，请使用 var 声明结构。
+
+```go
+var user User
+```
+
+##### 初始化 Struct 引用
+
+在初始化结构引用时，请使用&T{}代替new(T)，以使其与结构体初始化一致。
+
+```go
+sval := T{Name: "foo"}
+
+sptr := &T{Name: "bar"}
+```
+
+##### 初始化 Map
+
+对于空 map 请使用 make(..) 初始化，并且 map 是通过编程方式填充的。 这使得 map 初始化在表现上不同于声明，并且它还可以方便地在 make 后添加大小提示。
+
+```go
+var (
+  // m1 读写安全;
+  // m2 在写入时会 panic
+  m1 = make(map[T1]T2)
+  m2 map[T1]T2
+)
+```
+
+##### 初始化 Slice
+
+对于空的 slice，请使用 var 创建。
+
+```go
+var s1 []T
+```
+
 ## 错误处理
 
 - 禁止在业务逻辑中使用 `panic`
