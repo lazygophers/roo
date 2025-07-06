@@ -58,6 +58,7 @@ func Connect(host string) (*Connection, error) { ... }
 ### 错误设计原则
 
 - 禁止在业务逻辑中使用 `panic`
+
 - 优先使用 `errors.New` 或 `fmt.Errorf` 创建错误
 
 ```go
@@ -72,14 +73,9 @@ func ReadFile(path string) ([]byte, error) {
         log.Errorf("err:%s", err)
         return nil, err
     }
-    if _, err := os.Stat(path); os.IsNotExist(err) {
-        return nil, fmt.Errorf("文件不存在: %w", ErrNotFound)
-    }
-    // ...
+s    // ...
 }
 ```
-
-### 错误处理模式
 
 - 采用尽早返回模式减少嵌套
 
@@ -90,6 +86,25 @@ func Process(data []byte) error {
     }
     // 处理逻辑
     return nil
+}
+```
+
+```go
+// 推荐：尽早返回，减少嵌套
+func ReadFile(path string) ([]byte, error) {
+    f, err := os.Open(path)
+    if err != nil {
+		log.Errorf("err:%s", err)
+		return nil, err
+    }
+    defer f.Close()
+
+    data, err := io.ReadAll(f)
+    if err != nil {
+		log.Errorf("err:%s", err)
+		return nil, err
+    }
+    return data, nil
 }
 ```
 
@@ -174,31 +189,6 @@ type HTTPError struct {
 
 func (e *HTTPError) Error() string {
     return fmt.Sprintf("HTTP %d: %s", e.Code, e.Msg)
-}
-```
-
-### 错误处理模式
-
-```go
-// 推荐：尽早返回，减少嵌套
-func ReadFile(path string) ([]byte, error) {
-    f, err := os.Open(path)
-    if err != nil {
-        // 错误处理：使用fmt.Errorf并保留原始错误
-        // 错误处理：使用fmt.Errorf并保留原始错误
-                if err := f.Close(); err != nil {
-                    return nil, fmt.Errorf("close file: %w", err)
-                }
-                return nil, fmt.Errorf("read file: %w", err)
-    }
-    defer f.Close()
-
-    data, err := io.ReadAll(f)
-    if err != nil {
-        // 错误处理：使用fmt.Errorf并保留原始错误
-        return fmt.Errorf("open file: %w", err)
-    }
-    return data, nil
 }
 ```
 
