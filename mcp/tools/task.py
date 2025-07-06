@@ -103,7 +103,7 @@ class TaskManager(object):
             return True
 
     def replace(self, namespace: str, tasks: list[Task]) -> bool:
-å        with self.lock:
+        with self.lock:
             table = self.db.table(namespace)
             table.truncate()
             table.insert_multiple([task.dict() for task in tasks])
