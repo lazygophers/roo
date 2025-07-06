@@ -38,18 +38,18 @@
 
 ### 注释规范
 
+- 使用自然流畅的中文技术文档风格
 - 注释应包含功能说明、参数描述、返回值解释
 - 推荐包含使用示例
-- 使用自然流畅的中文技术文档风格
 
-- 包注释：每个包应有简短说明
+#### 包注释：每个包应有简短说明
 
 ```go
 // Package mypackage 实现 xxx 功能
 package mypackage
 ```
 
-- 函数注释：包含功能描述、参数说明和示例
+#### 函数注释：包含功能描述、参数说明和示例
 
 ```go
 // MyFunction 执行核心业务逻辑
@@ -65,14 +65,14 @@ func MyFunction(i int) string {
 }
 ```
 
-- 所有公开API必须包含注释
+#### 所有公开API必须包含注释
 
 ```go
 // Connect 建立到指定主机的网络连接
 func Connect(host string) (*Connection, error) { ... }
 ```
 
-- 类型注释应跟随字段
+#### 类型注释应跟随字段
 
 ```go
 // User 用户结构体
@@ -84,7 +84,6 @@ type User struct {
 	// 创建时间
 	CreatedAt time.Time
 }
-
 ```
 
 #### 注释维护原则
@@ -147,7 +146,8 @@ sptr := &T{Name: "bar"}
 
 ##### 初始化 Map
 
-对于空 map 请使用 make(..) 初始化，并且 map 是通过编程方式填充的。 这使得 map 初始化在表现上不同于声明，并且它还可以方便地在 make 后添加大小提示。
+对于空 map 请使用 make(..) 初始化，并且 map 是通过编程方式填充的。 这使得 map 初始化在表现上不同于声明，并且它还可以方便地在
+make 后添加大小提示。
 
 ```go
 var (
@@ -344,15 +344,5 @@ func BenchmarkAdd(b *testing.B) {
     for i := 0; i < b.N; i++ {
         Add(1, 2)
     }
-}
-### 注释规范增强
-#### 代码注释标准
-```go
-// 包注释应描述包的用途
-package main
-
-// 函数注释应遵循Google风格
-func calculateTotal(items []int) int {
-    // 函数体
 }
 ```
