@@ -1,5 +1,7 @@
 .idea/
 .vscode/
-.roo/
 .DS_Store
 .memory/
+mcp/cache/
+__pycache__/
+/mcp/config.yaml
