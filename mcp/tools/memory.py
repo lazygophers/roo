@@ -73,9 +73,6 @@ class Manager(object):
     def get_relation_table(self, namespace: str):
         return self.get_table("{}.relation".format(namespace))
 
-    def get_observation_table(self, namespace: str):
-        return self.get_table("{}.observation".format(namespace))
-
     def add_entities(self, namespace: str, entities: list[Entity]):
         with self.lock:
             self.get_entity_table(namespace).insert_multiple(
@@ -105,17 +102,32 @@ class Manager(object):
                 in [relation.relation_type for relation in relations]
             )
 
+    def _get_or_create_entity(self, namespace: str, entity_name: str):
+        table = self.get_entity_table(namespace)
+        if not table.contains(lambda name: name == entity_name):
+            table.insert(
+                Entity(
+                    name=entity_name,
+                    entity_type="unknown",
+                    observations=[],
+                ).model_dump()
+            )
+
+        return table.get(lambda name: name == entity_name)
+
     def add_observations(self, namespace: str, observations: list[Observation]):
         with self.lock:
-            table = self.get_observation_table(namespace)
+            table = self.get_entity_table(namespace)
             for observation in observations:
-                old_observation = table.get(
-                    lambda entity_name: observation["entity_name"]
+                old_entity = self._get_or_create_entity(
+                    namespace, observation.entity_name
                 )
-                if old_observation:
-                    table.remove(lambda entity_name: entity_name)
+                if old_entity["observations"] is None:
+                    old_entity["observations"] = []
 
-                table.insert(observation.model_dump())
+                old_entity["observations"].extend(observation.observations)
+                old_entity["observations"] = list(set(old_entity["observations"]))
+                table.update(old_entity, lambda entity_name: entity_name)
 
     def delete_observations(self, namespace: str, observations: list[Observation]):
         """
@@ -126,24 +138,40 @@ class Manager(object):
         :return:
         """
         with self.lock:
-            table = self.get_observation_table(namespace)
+            table = self.get_entity_table(namespace)
             for observation in observations:
-                old_observation = table.get(
-                    lambda entity_name: observation["entity_name"]
+                old_entity = self._get_or_create_entity(
+                    namespace, observation.entity_name
                 )
-                if old_observation:
-                    old_observation["observations"] = [
-                        observation
-                        for observation in old_observation["observations"]
-                        if observation not in observation["observations"]
-                    ]
-                    table.update(observation, lambda entity_name: entity_name)
+                if old_entity["observations"] is None:
+                    old_entity["observations"] = []
+
+                old_entity["observations"] = [
+                    observation
+                    for observation in old_entity["observations"]
+                    if observation not in observation.observations
+                ]
+                table.update(old_entity, lambda entity_name: entity_name)
+
+    def get_entities(self, namespace: str):
+        with self.lock:
+            return self.get_entity_table(namespace).all()
+
+    def get_relations(self, namespace: str):
+        with self.lock:
+            return self.get_relation_table(namespace).all()
+
+    def get_graph(self, namespace: str):
+        with self.lock:
+            return {
+                "entities": self.get_entity_table(namespace).all,
+                "relations": self.get_relation_table(namespace).all,
+            }
 
     def clear(self, namespace: str):
         with self.lock:
             self.get_entity_table(namespace).truncate()
             self.get_relation_table(namespace).truncate()
-            self.get_observation_table(namespace).truncate()
 
 
 manager = Manager()
