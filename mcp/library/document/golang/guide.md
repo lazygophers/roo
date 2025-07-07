@@ -56,19 +56,17 @@
 // Package util 包含常见的实用函数和常量
 ```
 
-- 结构体（接口）注释：每个自定义结构体或接口应有简要介绍，成员变量需有详细说明，格式为 `结构体名，结构体说明`
+- 结构体（接口）注释：每个自定义结构体或接口应有简要介绍，格式为 `结构体名，结构体说明`。成员变量需有详细说明，位于成员变量的前一行或成员变量之后
 
 ```go
 // User 表示一个用户 RESTful 资源
 // 同时它也被用作 gorm 模型
 type User struct {
-    // Standard object's metadata.
-    metav1.ObjectMeta `json:"metadata,omitempty"`
-    Nickname string `json:"nickname" gorm:"column:nickname"`
-    Password string `json:"password" gorm:"column:password"`
-    Email string `json:"email" gorm:"column:email"`
-    Phone string `json:"phone" gorm:"column:phone"`
-    isAdmin int `json:"isAdmin,omitempty" gorm:"columnisAdmin"`
+	// 名称
+	Name string
+	Age  int // 年龄
+	// 邮箱
+	Email string
 }
 ```
 
@@ -82,6 +80,8 @@ func add(a, b int) int {
 ```
 
 - 代码逻辑注释：每个代码块应添加单行注释，使用 `TODO` 标记未完成的代码块
+- 核心逻辑注释：代码块的注释应包含核心逻辑的描述，以及核心逻辑的实现方式
+- 关键逻辑注释：核心逻辑的注释应包含核心逻辑的描述，以及核心逻辑的实现方式
 
 #### 注释内容：
 

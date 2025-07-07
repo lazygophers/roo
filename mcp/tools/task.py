@@ -1,12 +1,10 @@
 import atexit
 import os.path
 import threading
-import time
 from typing import Mapping
 
-from tinydb import TinyDB, Query
-
 from pydantic import Field, BaseModel
+from tinydb import TinyDB, Query
 
 from core.cache import mkdir
 from core.croe import mcp
@@ -27,7 +25,7 @@ task_type_examples = [
 
 class Task(BaseModel, Query, Mapping):
     def __len__(self):
-        return len(self.dict().keys())
+        return len(self.model_dump().keys())
 
     task_id: str = Field(
         description="任务ID, namespace下唯一",
@@ -70,21 +68,8 @@ class Task(BaseModel, Query, Mapping):
         default=0,
     )
 
-    def dict(self):
-        return {
-            "task_id": self.task_id,
-            "name": self.name,
-            "desc": self.desc,
-            "workflow": self.workflow,
-            "task_type": self.task_type,
-            "priority": self.priority,
-            "status": self.status,
-            "parent_task_id": self.parent_task_id,
-            "order": self.order,
-        }
 
-
-class TaskManager(object):
+class Manager(object):
     def __init__(self):
         self.lock = threading.Lock()
         filename = os.path.join("cache", "task", "manager.json")
@@ -99,14 +84,14 @@ class TaskManager(object):
             table = self.db.table(namespace)
             if table.contains(Query().task_id == task.task_id):
                 return False
-            table.insert(task.dict())
+            table.insert(task.model_dump())
             return True
 
     def replace(self, namespace: str, tasks: list[Task]) -> bool:
         with self.lock:
             table = self.db.table(namespace)
             table.truncate()
-            table.insert_multiple([task.dict() for task in tasks])
+            table.insert_multiple([task.model_dump() for task in tasks])
             return True
 
     def get(self, namespace: str, task_id: str) -> Task:
@@ -139,7 +124,7 @@ class TaskManager(object):
         with self.lock:
             table = self.db.table(namespace)
             table.update(
-                task.dict(),
+                task.model_dump(),
                 Query().task_id == task.task_id,
             )
             return True
@@ -150,7 +135,7 @@ class TaskManager(object):
             return table.contains(Query().task_id == task_id)
 
 
-manager = TaskManager()
+manager = Manager()
 
 
 @mcp.tool()
