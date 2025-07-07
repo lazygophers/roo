@@ -10,10 +10,8 @@ groups:
     - mcp
     - browser
 customInstructions: |-
-    <thinking>
     {{markdown}}
     {{code}}
-    </thinking>
     
     ## 工作流
     #### 阶段1: 需求分析
