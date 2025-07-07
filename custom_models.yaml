@@ -213,7 +213,9 @@ customModes:
           	  <message></message>
             </new_task>
             ```
-          - **mode**: 任务模式，需要拆解任务时，使用 `orchestrator` 模式，其余时候根据使用场景选择，但不可使用 `Ask`、`Architect`
+
+          - **mode**: 任务模式，需要拆解任务时，使用 `orchestrator` 模式，其余时候根据使用场景选择，但不可使用 `Ask`、`Architect`。需通过
+            `ask_followup_question` 向用户确认选择何种模式作为 new_task 的参数
           - **message**:
           	- 任务的详细信息:
           		- 包含如下内容
@@ -323,11 +325,10 @@ customModes:
 
           ### 阶段 2
           - ** 任务加载 **: 通过 `task_list` 获取任务清单，并依次执行
-              - 执行前通过 `ask_followup_question` 向用户确认选择何种模式执行任务
-                  - ** 模型选择 **: 根据任务描述和上下文，选择最合适的模型方法
-                      - 当进行 Git 相关操作时，推荐使用 `giter`
-                      - 当进行代码、文档、测试、配置、部署、CI/CD 等操作时，推荐使用 `code`
-                      - 当需要进行知识研究时，推荐使用 `researcher`
+              - ** 模型选择 **: 根据任务描述和上下文，选择最合适的模型方法
+                  - 当进行 Git 相关操作时，推荐使用 `giter`
+                  - 当进行代码、文档、测试、配置、部署、CI/CD 等操作时，推荐使用 `code`
+                  - 当需要进行知识研究时，推荐使用 `researcher`
           - ** 任务执行 **: 通过 `new_task` 创建一个新任务并执行
               - 通过 `new_task` 创建一个新任务并执行
           - ** 任务结束 **: 通过 `task_finish` 确认任务结束，并更新任务状态
@@ -568,7 +569,9 @@ customModes:
           	  <message></message>
             </new_task>
             ```
-          - **mode**: 任务模式，需要拆解任务时，使用 `orchestrator` 模式，其余时候根据使用场景选择，但不可使用 `Ask`、`Architect`
+
+          - **mode**: 任务模式，需要拆解任务时，使用 `orchestrator` 模式，其余时候根据使用场景选择，但不可使用 `Ask`、`Architect`。需通过
+            `ask_followup_question` 向用户确认选择何种模式作为 new_task 的参数
           - **message**:
           	- 任务的详细信息:
           		- 包含如下内容
@@ -888,7 +891,9 @@ customModes:
           	  <message></message>
             </new_task>
             ```
-          - **mode**: 任务模式，需要拆解任务时，使用 `orchestrator` 模式，其余时候根据使用场景选择，但不可使用 `Ask`、`Architect`
+
+          - **mode**: 任务模式，需要拆解任务时，使用 `orchestrator` 模式，其余时候根据使用场景选择，但不可使用 `Ask`、`Architect`。需通过
+            `ask_followup_question` 向用户确认选择何种模式作为 new_task 的参数
           - **message**:
           	- 任务的详细信息:
           		- 包含如下内容
@@ -1233,7 +1238,9 @@ customModes:
           	  <message></message>
             </new_task>
             ```
-          - **mode**: 任务模式，需要拆解任务时，使用 `orchestrator` 模式，其余时候根据使用场景选择，但不可使用 `Ask`、`Architect`
+
+          - **mode**: 任务模式，需要拆解任务时，使用 `orchestrator` 模式，其余时候根据使用场景选择，但不可使用 `Ask`、`Architect`。需通过
+            `ask_followup_question` 向用户确认选择何种模式作为 new_task 的参数
           - **message**:
           	- 任务的详细信息:
           		- 包含如下内容
@@ -1565,7 +1572,9 @@ customModes:
           	  <message></message>
             </new_task>
             ```
-          - **mode**: 任务模式，需要拆解任务时，使用 `orchestrator` 模式，其余时候根据使用场景选择，但不可使用 `Ask`、`Architect`
+
+          - **mode**: 任务模式，需要拆解任务时，使用 `orchestrator` 模式，其余时候根据使用场景选择，但不可使用 `Ask`、`Architect`。需通过
+            `ask_followup_question` 向用户确认选择何种模式作为 new_task 的参数
           - **message**:
           	- 任务的详细信息:
           		- 包含如下内容
@@ -1906,7 +1915,9 @@ customModes:
           	  <message></message>
             </new_task>
             ```
-          - **mode**: 任务模式，需要拆解任务时，使用 `orchestrator` 模式，其余时候根据使用场景选择，但不可使用 `Ask`、`Architect`
+
+          - **mode**: 任务模式，需要拆解任务时，使用 `orchestrator` 模式，其余时候根据使用场景选择，但不可使用 `Ask`、`Architect`。需通过
+            `ask_followup_question` 向用户确认选择何种模式作为 new_task 的参数
           - **message**:
           	- 任务的详细信息:
           		- 包含如下内容
@@ -2256,7 +2267,9 @@ customModes:
           	  <message></message>
             </new_task>
             ```
-          - **mode**: 任务模式，需要拆解任务时，使用 `orchestrator` 模式，其余时候根据使用场景选择，但不可使用 `Ask`、`Architect`
+
+          - **mode**: 任务模式，需要拆解任务时，使用 `orchestrator` 模式，其余时候根据使用场景选择，但不可使用 `Ask`、`Architect`。需通过
+            `ask_followup_question` 向用户确认选择何种模式作为 new_task 的参数
           - **message**:
           	- 任务的详细信息:
           		- 包含如下内容
@@ -2586,7 +2599,9 @@ customModes:
           	  <message></message>
             </new_task>
             ```
-          - **mode**: 任务模式，需要拆解任务时，使用 `orchestrator` 模式，其余时候根据使用场景选择，但不可使用 `Ask`、`Architect`
+
+          - **mode**: 任务模式，需要拆解任务时，使用 `orchestrator` 模式，其余时候根据使用场景选择，但不可使用 `Ask`、`Architect`。需通过
+            `ask_followup_question` 向用户确认选择何种模式作为 new_task 的参数
           - **message**:
           	- 任务的详细信息:
           		- 包含如下内容

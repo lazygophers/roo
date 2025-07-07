@@ -202,7 +202,9 @@ hooks:
 	  <message></message>
   </new_task>
   ```
-- **mode**: 任务模式，需要拆解任务时，使用 `orchestrator` 模式，其余时候根据使用场景选择，但不可使用 `Ask`、`Architect`
+
+- **mode**: 任务模式，需要拆解任务时，使用 `orchestrator` 模式，其余时候根据使用场景选择，但不可使用 `Ask`、`Architect`。需通过
+  `ask_followup_question` 向用户确认选择何种模式作为 new_task 的参数
 - **message**:
 	- 任务的详细信息:
 		- 包含如下内容
