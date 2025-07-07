@@ -42,7 +42,6 @@
 
 - 使用自然、流畅、简练的中文技术文档风格
 - 注释应包含功能说明，推荐包含使用示例
-- 中英文字符间用空格分隔，禁止多行注释，单行注释不超过 120 字符
 - 所有公开API必须包含注释
 - 维护原则
 	- 每次代码修改时更新相关注释
@@ -52,9 +51,45 @@
 #### 注释格式
 
 - 包注释：每个包应包含包名、描述、作者和更新信息，位于 `package` 子句前。格式为 `// Package 包名 包描述`
+
+```go
+// Package util 包含常见的实用函数和常量
+```
+
 - 结构体（接口）注释：每个自定义结构体或接口应有简要介绍，成员变量需有详细说明，格式为 `结构体名，结构体说明`
+
+```go
+// User 表示一个用户 RESTful 资源
+// 同时它也被用作 gorm 模型
+type User struct {
+    // Standard object's metadata.
+    metav1.ObjectMeta `json:"metadata,omitempty"`
+    Nickname string `json:"nickname" gorm:"column:nickname"`
+    Password string `json:"password" gorm:"column:password"`
+    Email string `json:"email" gorm:"column:email"`
+    Phone string `json:"phone" gorm:"column:phone"`
+    isAdmin int `json:"isAdmin,omitempty" gorm:"columnisAdmin"`
+}
+```
+
 - 函数注释：每个函数或方法应有注释，包括函数名称、描述，并提供详细解释
+
+```go
+// add 返回两个整数的和
+func add(a, b int) int {
+    return a + b
+}
+```
+
 - 代码逻辑注释：每个代码块应添加单行注释，使用 `TODO` 标记未完成的代码块
+
+#### 注释内容：
+
+- 注释应描述代码目的：首先，注释应该解释代码的作用，确保读者能够理解代码的意图
+- 避免描述显而易见的事情：注释不应该对代码进行重复描述，而应提供更多的背景信息或关键决策
+- 保持注释简短：注释应该简短明了，避免过长的注释，如果需要更详细的解释，可以使用块注释或文档注释
+- 使用正确的语法和标点符号：注释应该使用正确的语法和标点符号，以确保注释的可读性和一致性
+- 更新注释：在代码发生变更时，应及时更新相关注释，以反映最新的功能和逻辑
 
 ## 编码规范
 

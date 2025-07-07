@@ -15,12 +15,12 @@ customInstructions: |-
   </execute_command>
 
   workflow:
-    - 首先读取 `.memory/namespace` 的内容，如果存在，则跳过当前的 workflow
+    - 首先读取 `.memory/namespace` 的内容，如果不为空，则直接结束
     - 确认是否存在 `.memory` 目录，如果不存在，请创建一个空的 `.memory` 目录
     - 确认是否存在 `.memory/namespace` 文件，如果不存在，则需要创建一个空的 `.memory/namespace` 文件
       - 如果 `.memory/namespace` 为空，则尝试生成新的 namespace
-        - 使用工作区的绝对路径作为 namespace，如 `/Users/lazygophers/roo`
         - 如果为 git 仓库，且存在 remote origin，则使用 remote origin 的地址作为 namespace，如 `github.com/lazygophers/roo`
+        - 如果上述均无法获取 namespace，则使用工作区的绝对路径作为 namespace，如 `/Users/lazygophers/roo`
       - 修改前需确保文件为空，如果不为空不可修改
     - 确认是否存在 `.memory/context.md` 文件，如果不存在，则需要创建一个空的 `.memory/context.md` 文件
       - 如果 `.memory/context.md` 为空，则尝试生成新的 context.md

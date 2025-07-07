@@ -112,11 +112,6 @@ hooks:
 
 - **含义：** 命名空间，用于标识任务所属的库、文件夹等
 - **用法：** 通过下面的方法读取 `.memory/namespace` 作为 `namespace` 的值
-  ```
-  <execute_command>
-  <command>cat .memory/namespace</command>
-  </execute_command>
-  ```
 	- 当 `.memory/namespace` 已存在时，且不允许更新或修改
 	- 如果文件不存在，则立即通过 `new_task` 交由 `memory` 模式进行初始化或修复
 
@@ -208,7 +203,7 @@ hooks:
 - **message**:
 	- 任务的详细信息:
 		- 包含如下内容
-			- **namespace**: 全局命名空间(namespace)，从 `.memory/namespace` 中获取
+			- **namespace**: 全局命名空间(namespace)
 			- **任务 ID**: 任务 ID，用于标识任务，需确保任务已在 task 中存储，可以用于上下文信息的传递
 			- **任务名称**: 任务名称，用于标识任务
 			- **任务结果输出样式**
