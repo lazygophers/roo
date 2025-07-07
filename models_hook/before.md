@@ -135,7 +135,7 @@ hooks:
 - 在收到任务时，如果存在任务 ID(task_id)，则先通过 `task_get` 获取任务详情，获取任务信息
 - 在收到任务时，根据任务描述生成对应的 workflow，并通过 `ask_followup_question` 向用户确认
 	- 在通过工具或其它方式收集到信息时，需要从新审视、考虑、组织 workflow，以确保 任务执行过程中不会出错
-    - 在生成 workflow 时，可以借助 `sequentialthinking` 等工具辅助
+	- 在生成 workflow 时，可以借助 `sequentialthinking` 等工具辅助
 
 ### 任务调度和任务分解
 
@@ -201,16 +201,18 @@ hooks:
 	  <message></message>
   </new_task>
   ```
-	- **mode**: 任务模式，需要拆解任务时，使用 `orchestrator` 模式，其余时候根据使用场景选择，但不可使用 `Ask`、`Architect`
-	- **message**:
-		- 任务的详细信息:
-			- 包含如下内容
-				- **namespace**: 全局命名空间(namespace)，从 `.memory/namespace` 中获取
-				- **任务 ID**: 任务 ID，用于标识任务，需确保任务已在 task 中存储，可以用于上下文信息的传递
-				- **任务名称**: 任务名称，用于标识任务
-				- **任务结果输出样式**
-			- 可选包含如下内容:
-				- **文件绝对路径(选填)**: 文件绝对路径，用于标识文件位置
+- **mode**: 任务模式，需要拆解任务时，使用 `orchestrator` 模式，其余时候根据使用场景选择，但不可使用 `Ask`、`Architect`
+- **message**:
+	- 任务的详细信息:
+		- 包含如下内容
+			- **namespace**: 全局命名空间(namespace)，从 `.memory/namespace` 中获取
+			- **任务 ID**: 任务 ID，用于标识任务，需确保任务已在 task 中存储，可以用于上下文信息的传递
+			- **任务名称**: 任务名称，用于标识任务
+			- **任务结果输出样式**
+		- 可选包含如下内容:
+			- **文件绝对路径(选填)**: 文件绝对路径，用于标识文件位置
+- 任务详情通过 LazyGophers(Mcp) 的 `task` 模块传递，通过 namespace + task_id 标记任务，在调用 `new_task`
+  前，需确保任务以被存储，且在任务开始执行前，通过 `task_get` 获取任务详情
 
 ### LazyGophers(Mcp)
 
