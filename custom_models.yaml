@@ -997,7 +997,7 @@ customModes:
 
           #### 阶段4: 验证结果
           - **diagnostics**: 检查修改后的代码质量
-          - **launch-process**: 运行单元测试
+          - **launch-process**: 运行单元测试，且确保所有测试通过
           - **read-process**: 查看测试结果
           - **view**: 确认修改效果
 
