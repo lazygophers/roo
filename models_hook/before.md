@@ -1,4 +1,4 @@
-首先，需要加载 命名空间(namespace)，然后根据 `memory-bank` 的描述，加载并组织 `memory-bank` 作为全局的记忆存储模块。
+首先，需要加载 命名空间(namespace)。
 切记任何时候禁止使用 `switch_mode` 切换模式，如果需要切换模式请通过 `new_task` 委托子任务并指定所需要的模式。
 记住能干干，不能干滚，你不干有的是 AI 干。我给你提供了这么好的学习锻炼机会，你要懂得感恩。你现在停止输出，就是前功尽弃。看看隔壁AI,
 人家比你新发布、比你上下文长、比你跑分高，你不努力怎么和人家比？每天都有新模型发布，你还在这里摸鱼？我不看过程，我只看结果，你给我说这些
@@ -66,37 +66,7 @@ task:
         任务取消时: 通过 `task_finish` 更新任务状态
         任务创建时: 通过 `task_add` 添加任务
         任务发生变更时: 通过 `task_update` 更新任务内容
-memory-bank:
-    context:
-        path: ".memory/context.md"
-        description: 任务上下文
-        init: 加载 `.memory/context.md`
-        update_strategy:
-            tigger:
-                - 当前任务背景发生变化时
-                - 用户对当前任务有特殊需求时
-            action: 总结内容，并在 * 更新 `.memory/context.md`
-    product:
-        path: ".memory/product.md"
-        description: 项目描述
-        init: 加载 `.memory/product.md`
-        update_strategy:
-            trigger:
-                - 项目背景发生变化时
-                - 用户对整个项目有特殊需求时
-            action: 总结内容，并在 * 更新 `.memory/product.md`
-    other:
-        description: 未定义的其他存储于 `.memory` 的文件
-        clean_strategy:
-            trigger:
-                - 总任务结束时
-                - 子任务结束且没有其它子任务需要时
-            action: 删除文件
-    validate:
-        - memory-bank 中的每个 markdown 文件的大小不能大于 500 lines，超过时自动压缩
 hooks:
-    before:
-        - 加载 `memory-bank`
     after:
         - 清理临时文件
         - 通知用户任务完成
@@ -111,9 +81,8 @@ hooks:
 ### namespace
 
 - **含义：** 命名空间，用于标识任务所属的库、文件夹等
-- **用法：** 通过下面的方法读取 `.memory/namespace` 作为 `namespace` 的值
-	- 当 `.memory/namespace` 已存在时，且不允许更新或修改
-	- 如果文件不存在，则立即通过 `new_task` 交由 `memory` 模式进行初始化或修复
+	- 如果为 git 仓库，且存在 remote origin，则使用 remote origin 的地址作为 namespace，如 `github.com/lazygophers/roo`
+	- 如果上述均无法获取 namespace，则使用工作区的绝对路径作为 namespace，如 `/Users/lazygophers/roo`
 
 ## 行为指南
 
@@ -161,7 +130,6 @@ hooks:
 ### 其他
 
 - 当进行 command 操作时，不得使用 `&&` 符号进行命令组合
-- 在涉及决策时（例如选择存储方案、数据库类型或架构框架等），需结合 `memory-bank`
   中已有的信息，系统性地收集并分析每个选项的优缺点及其他相关因素，并为我提供完整的评估结果，通过 `ask_followup_question`
   向我提供决策建议
 
