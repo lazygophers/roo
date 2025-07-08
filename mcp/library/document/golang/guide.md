@@ -1,3 +1,7 @@
+以下是更新后的完整 **Go编程规范** 文档，已将“表驱动测试”相关内容整合至“测试规范”章节：
+
+---
+
 # Go编程规范
 
 ### 主要参考：
@@ -17,6 +21,7 @@
 	- rand 扩展包： `github.com/lazygophers/utils/randx`
 	- 类型扩展包： `github.com/lazygophers/utils/anyx`
 	- 语法糖： `github.com/lazygophers/utils/candy`
+- atomic 包，优先推荐 `go.uber.org/atomic`
 
 ## 代码风格
 
@@ -312,6 +317,125 @@ s := strconv.Itoa(123) // 比fmt.Sprintf快3-4倍
 ```
 
 ## 测试规范
+
+### 测试文件命名规范
+
+- 单元测试文件必须以 `_test.go` 结尾，例如 `example_test.go`
+- 测试文件应与被测试的源代码文件位于同一包中
+
+### 测试函数命名规范
+
+- 测试函数必须以 `Test` 开头，例如 `TestExample`
+- 如果测试函数是针对某个特定方法（如 Foo），可以使用 `Test_Foo` 或 `TestBar_Foo` 的形式，其中下划线不能出现在前面描述情况以外的位置
+- 测试函数的参数必须是 `t *testing.T` 或 `b *testing.B`
+
+### 测试用例的编写
+
+- 每个重要的函数都应编写测试用例，测试用例应与正规代码一起提交，以便进行回归测试
+- 使用表格驱动测试（Table-Driven Test）来简化测试逻辑，例如通过结构体数组定义多个测试用例
+- 测试用例应覆盖正常情况和异常情况，确保代码的健壮性和正确性
+
+#### 表驱动测试（Table-Driven Test）
+
+当测试逻辑是重复的时候，通过 `subtests` 使用表驱动的方式编写测试用例代码会更简洁。
+
+##### **Bad 示例**
+
+```go
+// func TestSplitHostPort(t *testing.T)
+host, port, err := net.SplitHostPort("192.0.2.0:8000")
+require.NoError(t, err)
+assert.Equal(t, "192.0.2.0", host)
+assert.Equal(t, "8000", port)
+
+host, port, err = net.SplitHostPort("192.0.2.0:http")
+require.NoError(t, err)
+assert.Equal(t, "192.0.2.0", host)
+assert.Equal(t, "http", port)
+
+host, port, err = net.SplitHostPort(":8000")
+require.NoError(t, err)
+assert.Equal(t, "", host)
+assert.Equal(t, "8000", port)
+
+host, port, err = net.SplitHostPort("1:8")
+require.NoError(t, err)
+assert.Equal(t, "1", host)
+assert.Equal(t, "8", port)
+```
+
+##### **Good 示例**
+
+```go
+// func TestSplitHostPort(t *testing.T)
+tests := []struct{
+  give     string
+  wantHost string
+  wantPort string
+}{
+  {
+    give:     "192.0.2.0:8000",
+    wantHost: "192.0.2.0",
+    wantPort: "8000",
+  },
+  {
+    give:     "192.0.2.0:http",
+    wantHost: "192.0.2.0",
+    wantPort: "http",
+  },
+}
+
+for _, tt := range tests {
+  t.Run(tt.give, func(t *testing.T) {
+    host, port, err := net.SplitHostPort(tt.give)
+    require.NoError(t, err)
+    assert.Equal(t, tt.wantHost, host)
+    assert.Equal(t, tt.wantPort, port)
+  })
+}
+```
+
+##### **命名约定**
+
+- 将结构体切片命名为 `tests`。
+- 每个测试用例命名为 `tt`。
+- 输入字段使用 `give` 前缀，输出字段使用 `want` 前缀。
+
+##### **并行测试注意事项**
+
+当测试用例需要并行执行时，必须显式声明循环变量的作用域，以避免竞态条件：
+
+```go
+for _, tt := range tests {
+  tt := tt // 显式声明作用域
+  t.Run(tt.give, func(t *testing.T) {
+    t.Parallel() // 并行执行
+    // 测试逻辑
+  })
+}
+```
+
+### 测试执行与命令
+
+- 使用 `go test` 命令执行测试，可以运行当前目录下的所有测试，也可以通过 `-v` 参数显示详细信息
+- 可以通过 `-run` 参数指定要运行的测试用例，例如 `go test -run TestAdd`
+- 可以通过 `-bench` 参数执行基准测试，例如 `go test -bench=.`
+- 使用 `go test -cover` 生成测试覆盖率报告，确保测试覆盖率达到预期
+
+### 测试用例的跳过与并行执行
+
+- 使用 `t.SkipNow()` 方法跳过当前测试，但会继续执行下一个测试
+- 使用 `-parallel` 参数启用并行测试，例如 `go test -parallel=4`
+
+### 测试用例的性能测试
+
+- 基准测试（Benchmark）用于测试代码的性能，例如 CPU 使用率和内存分配情况
+- 基准测试函数以 Benchmark 开头，例如 BenchmarkGetPrimes
+- 使用 `b.N` 表示基准测试的执行次数，通过 go test -bench=. 命令执行基准测试
+
+### 测试用例的覆盖率与质量
+
+- 使用 `go test -cover` 生成测试覆盖率报告，确保测试覆盖率达到 100%
 
 ### 单元测试
 
