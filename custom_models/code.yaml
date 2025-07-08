@@ -40,3 +40,5 @@ customInstructions: |-
     - **remove-files**: 删除临时测试文件
     - **save-file**: 更新相关文档
     - **remember**: 记录修改经验
+    - **view**: 确认修改完成
+        - 如果是 git 仓库，通过 ask_followup_question 向用户确认是否需要进行 git 提交（第一个选项是`否`，第二个选项`是`）
