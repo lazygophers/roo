@@ -134,8 +134,6 @@ mcp:
                    alwaysAllow:
                        - resolve-library-id
                        - get-library-docs
-                       - sequentialthinking
-                       - sequentialthinking_tools
                    timeout: 3600
             ```
 
