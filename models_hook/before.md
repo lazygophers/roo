@@ -149,7 +149,7 @@ mcp:
                 env:
                     DATA_DIR: .memory/task/
                     TEMPLATES_USE: zh
-                    ENABLE_GUI: 'true'
+                    ENABLE_GUI: true
             ```
 
 hooks:
