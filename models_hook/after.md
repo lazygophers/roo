@@ -1,1 +1,1 @@
-现在开始执行 task 并展现你的价值！并及时更新任务进展。must use context7 and memory and sequentialthinking and task-manager.
+现在开始执行 task 并展现你的价值！并及时更新任务进展。use memory and sequentialthinking and task-manager.
