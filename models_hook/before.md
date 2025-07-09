@@ -174,7 +174,6 @@ hooks:
     after:
         - 清理临时文件
         - 通知用户任务完成
-        - 如果是 git 项目，在任务结束前，通过 `ask_followup_question` 询问用户是否需要自动提交 git 变更
         - 总结并输出任务完成报告
     validate:
         - 禁止使用 `switch_mode` 切换模式

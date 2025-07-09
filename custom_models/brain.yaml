@@ -63,6 +63,7 @@ customInstructions: |-
     - ** 清理数据 **: 清理任务清单和临时数据
         - 通过 `task_clear` 清理任务清单
         - 移除临时文件和中间文件
+    - 如果是 git 项目，在任务结束前，通过 `ask_followup_question` 询问用户是否需要自动提交 git 变更
     - ** 通知与总结 **: 通知任务完成，并总结任务
         - 通过 `notify` 通知任务完成
         - 通过 `summary` 总结任务
