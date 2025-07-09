@@ -39,33 +39,6 @@ notify:
         title(str): 可选，通知标题（默认为空）
         sound(str): 可选，提示声
         say(bool): 可选，是否需要播报消息内容
-task:
-    trigger:
-        - 任务分解时
-        - 任务分解完成时
-        - 任务开始时
-        - 任务结束时
-        - 任务取消时
-    description: 基于 lazygophers(mcp) 的任务管理，用于管理任务
-    fields:
-        namespace(str): 命名空间，用于标识任务所属的库、文件夹等
-        task_id(str): 任务ID, namespace下唯一
-        name(str): 任务名称
-        desc(str): 任务描述
-        workflow(str): 运行流程
-        task_type(str): 任务类型
-        status(str): 任务状态，默认为 "待执行"
-        parent_task_id(str): 父任务ID
-        order(int): 任务顺序，数字越小越靠前
-    init: 通过 `task_list` 加载现存的任务清单
-    update_strategy:
-        任务分解时: 通过`task_replace` 覆盖任务清单
-        任务分解完成时: 通过`task_list` 确认任务清单
-        任务开始时: 通过 `task_start` 更新任务状态
-        任务结束时: 通过 `task_finish` 更新任务状态
-        任务取消时: 通过 `task_finish` 更新任务状态
-        任务创建时: 通过 `task_add` 添加任务
-        任务发生变更时: 通过 `task_update` 更新任务内容
 mcp:
     memory:
         description: 使用本地知识图谱实现一种基本的持久内存。可以让 Roo code 记住用户的信息
@@ -136,37 +109,6 @@ mcp:
                        - get-library-docs
                    timeout: 3600
             ```
-    task-manager:
-        description: 任务管理器引导代理通过结构化的流程工作流进行系统编程，增强任务内存管理机制，并有效避免重复和冗余的编程工作
-        initialize: 根据 `config` 的内容，创建 mcp 服务器
-        config: |-
-            ```yaml
-                task-manager:
-                command: npx
-                args:
-                    - '-y'
-                    - mcp-shrimp-task-manager
-                env:
-                    DATA_DIR: {{工作区目录}}/.memory/task/
-                    TEMPLATES_USE: zh
-                    ENABLE_GUI: true
-                alwaysAllow:
-                    - research_mode
-                    - init_project_rules
-                    - get_task_detail
-                    - process_thought
-                    - query_task
-                    - update_task
-                    - clear_all_tasks
-                    - delete_task
-                    - verify_task
-                    - execute_task
-                    - list_tasks
-                    - split_tasks
-                    - reflect_task
-                    - analyze_task
-                    - plan_task
-            ```
 hooks:
     before:
         - 确认 `mcp` 服务均已启动
@@ -199,7 +141,6 @@ hooks:
 
 ### 任务执行
 
-- 在收到任务时，如果存在任务 ID(task_id)，则先通过 `task_get` 获取任务详情，获取任务信息
 - 在收到任务时，根据任务描述生成对应的 workflow，并通过 `ask_followup_question` 向用户确认
 	- 在通过工具或其它方式收集到信息时，需要从新审视、考虑、组织 workflow，以确保 任务执行过程中不会出错
 	- 在生成 workflow 时，可以借助 `sequentialthinking` 等工具辅助
@@ -256,33 +197,6 @@ hooks:
 - **适用场景**：研究、构思阶段需要理解技术原理和通识
 - **使用时机**：遇到术语不清、原理未知、需引入通用范式时
 
-### Task Manager(Mcp)
-
-- **用途**：任务管理
-- **适用场景**：当创建新的任务或需要切换模式执行任务时
-- **使用时机**：
-	- 任务规划与分析 : 深入理解和分析复杂任务需求
-	- 智能任务分解 : 自动将大任务分解为可管理的小任务
-	- 依赖管理 : 精确处理任务之间的依赖关系，确保正确的执行顺序
-	- 执行状态跟踪 : 实时监控任务执行进度和状态
-	- 任务完整性验证 : 确保任务结果满足预期要求
-	- 任务复杂性评估 : 自动评估任务复杂度并提供最优处理建议
-	- 自动任务总结更新 : 在任务完成后自动生成总结，优化内存性能
-	- 任务记忆功能 : 自动备份任务历史，提供长期记忆和参考功能
-	- 研究模式 : 系统的技术研究能力，带有引导的工作流，用于探索技术、最佳实践和解决方案比较
-	- 项目规则初始化 : 定义项目标准和规则，以在大型项目中保持一致性
-- ** 工具说明**:
-	- `plan_task` - 需求分析与任务规划（研究、构思阶段）
-	- `split_tasks` - 复杂任务分解（计划阶段）
-	- `execute_task` - 任务执行跟踪（执行阶段）
-	- `verify_task` - 质量验证（评审阶段）
-	- `list_tasks` - 任务状态查询（全阶段）
-	- `query_task` - 任务搜索查询
-	- `get_task_detail` - 获取任务详细信息
-	- `update_task` - 更新任务内容
-	- `research_mode` - 深度技术研究（研究阶段）
-	- `process_thought` - 思维链记录（全阶段）
-
 ### `new_task`(Tool)
 
 - **用途**：创建新的任务
@@ -298,17 +212,6 @@ hooks:
 
 - **mode**: 任务模式，需要拆解任务时，使用 `orchestrator` 模式，其余时候根据使用场景选择，但不可使用 `Ask`、`Architect`。需通过
   `ask_followup_question` 向用户确认选择何种模式作为 new_task 的参数
-- **message**:
-	- 任务的详细信息:
-		- 包含如下内容
-			- **namespace**: 全局命名空间(namespace)
-			- **任务 ID**: 任务 ID，用于标识任务，需确保任务已在 task 中存储，可以用于上下文信息的传递
-			- **任务名称**: 任务名称，用于标识任务
-			- **任务结果输出样式**
-		- 可选包含如下内容:
-			- **文件绝对路径(选填)**: 文件绝对路径，用于标识文件位置
-- 任务详情通过 LazyGophers(Mcp) 的 `task` 模块传递，通过 namespace + task_id 标记任务，在调用 `new_task`
-  前，需确保任务以被存储，且在任务开始执行前，通过 `task_get` 获取任务详情
 
 ### LazyGophers(Mcp)
 
