@@ -98,7 +98,7 @@ mcp:
                        - '-y'
                        - '@modelcontextprotocol/server-memory'
                    env:
-                       MEMORY_FILE_PATH: .memory/memory.json
+                       MEMORY_FILE_PATH: {{工作区目录}}/.memory/memory.json
                    alwaysAllow:
                        - read_graph
                        - create_relations
@@ -147,11 +147,26 @@ mcp:
                     - '-y'
                     - mcp-shrimp-task-manager
                 env:
-                    DATA_DIR: .memory/task/
+                    DATA_DIR: {{工作区目录}}/.memory/task/
                     TEMPLATES_USE: zh
                     ENABLE_GUI: true
+                alwaysAllow:
+                    - research_mode
+                    - init_project_rules
+                    - get_task_detail
+                    - process_thought
+                    - query_task
+                    - update_task
+                    - clear_all_tasks
+                    - delete_task
+                    - verify_task
+                    - execute_task
+                    - list_tasks
+                    - split_tasks
+                    - reflect_task
+                    - analyze_task
+                    - plan_task
             ```
-
 hooks:
     before:
         - 确认 `mcp` 服务均已启动
@@ -247,16 +262,16 @@ hooks:
 - **用途**：任务管理
 - **适用场景**：当创建新的任务或需要切换模式执行任务时
 - **使用时机**：
-  - 任务规划与分析 : 深入理解和分析复杂任务需求
-  - 智能任务分解 : 自动将大任务分解为可管理的小任务
-  - 依赖管理 : 精确处理任务之间的依赖关系，确保正确的执行顺序
-  - 执行状态跟踪 : 实时监控任务执行进度和状态
-  - 任务完整性验证 : 确保任务结果满足预期要求
-  - 任务复杂性评估 : 自动评估任务复杂度并提供最优处理建议
-  - 自动任务总结更新 : 在任务完成后自动生成总结，优化内存性能
-  - 任务记忆功能 : 自动备份任务历史，提供长期记忆和参考功能
-  - 研究模式 : 系统的技术研究能力，带有引导的工作流，用于探索技术、最佳实践和解决方案比较
-  - 项目规则初始化 : 定义项目标准和规则，以在大型项目中保持一致性
+	- 任务规划与分析 : 深入理解和分析复杂任务需求
+	- 智能任务分解 : 自动将大任务分解为可管理的小任务
+	- 依赖管理 : 精确处理任务之间的依赖关系，确保正确的执行顺序
+	- 执行状态跟踪 : 实时监控任务执行进度和状态
+	- 任务完整性验证 : 确保任务结果满足预期要求
+	- 任务复杂性评估 : 自动评估任务复杂度并提供最优处理建议
+	- 自动任务总结更新 : 在任务完成后自动生成总结，优化内存性能
+	- 任务记忆功能 : 自动备份任务历史，提供长期记忆和参考功能
+	- 研究模式 : 系统的技术研究能力，带有引导的工作流，用于探索技术、最佳实践和解决方案比较
+	- 项目规则初始化 : 定义项目标准和规则，以在大型项目中保持一致性
 
 ### `new_task`(Tool)
 
