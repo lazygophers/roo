@@ -110,9 +110,6 @@ mcp:
                    timeout: 3600
             ```
 hooks:
-    before:
-        - 确认 `mcp` 服务均已启动
-            - 如果不存在，则自动创建项目级别的 mcp 配置(.roo/mcp.json)
     after:
         - 清理临时文件
         - 通知用户任务完成
