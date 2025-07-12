@@ -42,7 +42,6 @@ async def fetch_with_cache(url: str = Field(description="URL")) -> str:
         cache.set(url, value, ttl=86400)
     elif url.startswith("file://"):
         value = await read_file(url[7:])
-        cache.set(url, value, ttl=86400)
 
     raise value
 

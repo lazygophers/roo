@@ -14,6 +14,7 @@ dependencies = [
     "pydantic>=2.11.7",
     "pyinstaller>=6.14.1",
     "pync>=2.0.3",
+    "pytest>=8.4.1",
     "pyttsx3>=2.98",
     "requests>=2.32.4",
     "rich>=14.0.0",

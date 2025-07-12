@@ -1,291 +1,285 @@
 # Go编程规范
 
+### 主要参考：
+
+- **Uber编码规范**
+	- [英文版](https://github.com/uber-go/guide/blob/master/style.md)
+	- [中文版](https://github.com/xxjwxc/uber_go_guide_cn)
+- **Google编码规范**  
+  [官方文档](https://google.github.io/styleguide/go/index)
+
+## 包引用问题
+
+- **日志包**：优先推荐 `github.com/lazygophers/log`
+- **工具包**：优先使用 `github.com/lazygophers/utils`
+	- `json` 包：`github.com/lazygophers/utils/json`
+	- `string` 扩展：`github.com/lazygophers/utils/stringx`
+	- `time` 扩展：`github.com/lazygophers/utils/xtime`
+	- `bufio` 扩展：`github.com/lazygophers/utils/bufiox`
+	- `rand` 扩展：`github.com/lazygophers/utils/randx`
+	- `类型` 扩展：`github.com/lazygophers/utils/anyx`
+	- 语法糖：`github.com/lazygophers/utils/candy`
+- **原子操作**：优先使用 `go.uber.org/atomic`
+
 ## 代码风格
 
 ### 格式化要求
 
-- 所有代码必须通过 `gofmt -s` 格式化
-- 行长度建议不超过120字符，超过时优先重构逻辑
-- 缩进使用Tab(四个空格)
-
-### 注释规范
-
-- 包注释：每个包应有简短说明
-```go
-```go
-// Package mypackage 实现 xxx 功能
-package mypackage
-```
-
-- 函数注释：包含功能描述、参数说明和示例
-```go
-// MyFunction 执行核心业务逻辑
-// 参数：
-//   - i: 输入整数
-// 返回：
-//   - 转换后的字符串
-// 示例：
-//     result := MyFunction(42)
-//     fmt.Println(result) // 输出 "42"
-func MyFunction(i int) string {
-    return strconv.Itoa(i)
-}
-```
-
-- Mermaid流程图示例
-```mermaid
-graph TD
-    A[开始] --> B{判断条件}
-    B -->|是| C[执行操作]
-    C --> D[结束]
-```
-
-- 包注释必须位于包声明前
-
-```go
-// Package network 提供网络连接管理功能
-package network
-```
-
-- 导出函数必须包含文档注释
-
-```go
-// Connect 建立到指定主机的网络连接
-func Connect(host string) (*Connection, error) { ... }
-```
-
-### 命名规则
-
-- 包名使用小写单单词，如 `database`、`httpclient`
-- 导出类型使用驼峰命名法，如 `HTTPClient`
-- 未导出类型首字母小写，如 `httpClient`
-- 常量全大写下划线分隔，如 `MAX_CONNECTION_COUNT`
-
-## 错误处理
-
-### 错误设计原则
-
-- 禁止在业务逻辑中使用 `panic`
-- 优先使用 `errors.New` 或 `fmt.Errorf` 创建错误
-
-```go
-var ErrNotFound = errors.New("资源未找到")
-
-func ReadFile(path string) ([]byte, error) {
-    _, err := os.Stat(path)
-    if err != nil {
-        if os.IsNotExist(err) {
-            return nil, ErrNotFound
-        }
-        log.Errorf("err:%s", err)
-        return nil, err
-    }
-    if _, err := os.Stat(path); os.IsNotExist(err) {
-        return nil, fmt.Errorf("文件不存在: %w", ErrNotFound)
-    }
-    // ...
-}
-```
-
-### 错误处理模式
-
-- 采用尽早返回模式减少嵌套
-
-```go
-func Process(data []byte) error {
-    if len(data) == 0 {
-        return errors.New("数据不能为空")
-    }
-    // 处理逻辑
-    return nil
-}
-```
-
-## 并发编程
-
-### 协程管理
-
-- 使用 channel 控制协程生命周期
-
-```go
-func worker(stopChan <-chan struct{}) {
-    ticker := time.NewTicker(time.Second)
-    defer ticker.Stop()
-    for {
-        select {
-        case <-stopChan:
-            return
-        case <-ticker.C:
-            // 处理逻辑
-        }
-    }
-}
-
-```
-
-## 代码风格
-
-### 格式化
-
-- 所有代码必须通过`gofmt -s`格式化
-
-### 注释规范
-
-**完整规范要求**：
-- 所有公开API必须包含注释
-- 注释应包含功能说明、参数描述、返回值解释
-- 推荐包含使用示例
-- 使用自然流畅的中文技术文档风格
-
-```go
-// 包注释：描述包的用途和设计原则
-package http
-
-// 导出函数注释：遵循"Name ..."格式
-// Get fetches a resource by URL and handles retries automatically.
-func Get(url string) ([]byte, error) {
-    // 内部注释：解释复杂逻辑
-    // Use exponential backoff for retries
-    for attempt := 0; attempt < maxRetries; attempt++ {
-        // ...
-    }
-}
-```
+- **强制要求**：所有代码必须通过 `gofmt -s` 格式化。
+- **缩进规范**：使用 `Tab`（等效于 4 个空格）。
 
 ### 命名约定
 
-| 元素    | 命名规则           | 示例                |
-|-------|----------------|-------------------|
-| 包名    | 小写单单词          | `net`, `http`     |
-| 导出类型  | 驼峰命名（首字母大写）    | `HTTPClient`      |
-| 未导出类型 | 驼峰命名（首字母小写）    | `httpClient`      |
-| 常量    | 全大写+下划线        | `MAX_CONNECTIONS` |
-| 变量    | 短名（局部）/描述名（全局） | `i`, `maxRetries` |
-| 接口    | 以`-er`结尾或单一动作  | `Reader`, `Close` |
+| **元素**    | **命名规则**                  | **示例**             |
+|-----------|---------------------------|--------------------|
+| **包名**    | 小写单单词                     | `net`, `http`      |
+| **导出类型**  | 驼峰命名（首字母大写）               | `HTTPClient`       |
+| **未导出类型** | 驼峰命名（首字母小写）               | `httpClient`       |
+| **常量**    | 全大写 + 下划线分隔               | `MAX_CONNECTIONS`  |
+| **变量**    | 短名（局部）/描述性名称（全局）          | `i`, `maxRetries`  |
+| **接口**    | 以 `-er` 结尾或体现单一动作         | `Reader`, `Closer` |
+| **测试函数**  | 必须以 `Test` 开头，如 `TestAdd` |                    |
+
+### 注释规范
+
+#### **注释要求**
+
+- **语言**：使用中文注释
+- **覆盖范围**：所有公开 API 必须有注释，关键算法需添加水印注释。
+- **维护原则**：修改代码时同步更新注释。
+
+#### **注释格式**
+
+- **包注释**：
+  ```go
+  // Package util 包含常用工具函数和常量
+  ```
+- **结构体注释**：
+  ```go
+  // User 表示用户 RESTful 资源，同时作为 gorm 模型
+  type User struct {
+      // 用户名称
+      Name string
+      Age  int // 用户年龄
+      Email string // 电子邮箱
+  }
+  ```
+- **函数注释**：
+  ```go
+  // Add 返回两个整数的和
+  func Add(a, b int) int {
+      return a + b
+  }
+  ```
+- **代码块注释**：
+	- 单行注释说明逻辑目的。
+	- 使用 `TODO` 标记未完成代码。
+
+#### **注释内容原则**
+
+- 描述代码目的，而非重复代码逻辑。
+- 避免冗余，如 `// i++`。
+- 保持简洁，复杂逻辑用块注释或文档注释。
+
+## 编码规范
+
+### 减少代码嵌套
+
+- **优先处理错误/边界条件**，尽早返回或跳过循环：
+  ```go
+  for _, v := range data {
+      if v.F1 != 1 {
+          log.Printf("Invalid v: %v", v)
+          continue
+      }
+      v = process(v)
+      if err := v.Call(); err != nil {
+          return err
+      }
+      v.Send()
+  }
+  ```
+- **避免不必要的 `else`**：
+  ```go
+  a := 10
+  if b {
+      a = 100
+  }
+  ```
+
+### 变量初始化
+
+- **零值结构体**：使用 `var` 声明：
+  ```go
+  var user User
+  ```
+- **结构体引用**：用 `&T{}` 替代 `new(T)`：
+  ```go
+  sptr := &T{Name: "bar"}
+  ```
+- **Map 初始化**：用 `make` 并指定容量：
+  ```go
+  m1 := make(map[T1]T2, 100)
+  ```
+- **Slice 初始化**：用 `var` 声明空 slice：
+  ```go
+  var s1 []T
+  ```
 
 ## 错误处理
 
-### 错误设计
+### 基本原则
 
-```go
-// 静态错误
-var ErrNotFound = errors.New("resource not found")
+- **禁止业务逻辑使用 `panic`**。
+- **静态错误**：直接定义常量：
+  ```go
+  var ErrNotFound = errors.New("资源未找到")
+  ```
+- **动态错误**：用 `%w` 包裹原始错误：
+  ```go
+  return fmt.Errorf("parse config: %w", err)
+  ```
+- **结构化错误**：自定义 `Error()` 方法：
+  ```go
+  type HTTPError struct { Code int; Msg string }
+  func (e *HTTPError) Error() string { return fmt.Sprintf("%d: %s", e.Code, e.Msg) }
+  ```
 
-// 动态错误（使用%w保留原始错误）
-return fmt.Errorf("parse config: %w", err)
+### 错误返回模式
 
-// 结构化错误
-type HTTPError struct {
-    Code int
-    Msg  string
-}
-
-func (e *HTTPError) Error() string {
-    return fmt.Sprintf("HTTP %d: %s", e.Code, e.Msg)
-}
-```
-
-### 错误处理模式
-
-```go
-// 推荐：尽早返回，减少嵌套
-func ReadFile(path string) ([]byte, error) {
-    f, err := os.Open(path)
-    if err != nil {
-        // 错误处理：使用fmt.Errorf并保留原始错误
-        // 错误处理：使用fmt.Errorf并保留原始错误
-                if err := f.Close(); err != nil {
-                    return nil, fmt.Errorf("close file: %w", err)
-                }
-                return nil, fmt.Errorf("read file: %w", err)
-    }
-    defer f.Close()
-
-    data, err := io.ReadAll(f)
-    if err != nil {
-        // 错误处理：使用fmt.Errorf并保留原始错误
-        return fmt.Errorf("open file: %w", err)
-    }
-    return data, nil
-}
-```
+- **尽早返回**：减少嵌套：
+  ```go
+  func Process(data []byte) error {
+      if len(data) == 0 {
+          return errors.New("数据不能为空")
+      }
+      // 处理逻辑
+      return nil
+  }
+  ```
 
 ## 并发编程
 
-### goroutine管理
+### Goroutine 管理
 
-```go
-// 使用channel控制goroutine退出
-func worker(jobs <-chan Job, stop <-chan struct{}) {
-    for {
-        select {
-        case job, ok := <-jobs:
-            if !ok {\n            return\n        }\n        process(job)
-            process(job)
-        case <-stop:
-            return
-        }
-    }
-}
+- **使用通道控制生命周期**：
+  ```go
+  func worker(jobs <-chan Job, stop <-chan struct{}) {
+      for {
+          select {
+          case job, ok := <-jobs:
+              if !ok { return }
+              process(job)
+          case <-stop:
+              return
+          }
+      }
+  }
+  ```
 
-// 启动和停止示例
-stopCh := make(chan struct{})
-jobsCh := make(chan Job)
+### 并发原语推荐
 
-go worker(jobsCh, stopCh)
-
-// 停止工作
-close(stopCh)
-```
-
-### 并发原语 3.2
-
-| 场景      | 推荐原语      | 示例代码                                         | 说明                  |
-|---------|-----------|----------------------------------------------|
-| 协程间通信   | Channel   | `jobs := make(chan Job, 10)`                 |
-| 共享资源保护  | Mutex     | `var mu sync.Mutex`                          |
-| 等待多协程完成 | WaitGroup | `wg.Add(2); go func() { defer wg.Done() }()` |
-| 单次初始化   | Once      | `var once sync.Once; once.Do(init)`          |
+| **场景**  | **原语**    | **示例**                                       | **说明**   |
+|---------|-----------|----------------------------------------------|----------|
+| 协程间通信   | Channel   | `jobs := make(chan Job, 10)`                 | 缓冲通道避免阻塞 |
+| 共享资源保护  | Mutex     | `var mu sync.Mutex`                          | 互斥锁保护临界区 |
+| 等待多协程完成 | WaitGroup | `wg.Add(2); go func() { defer wg.Done() }()` | 确保所有协程完成 |
+| 单次初始化   | Once      | `var once sync.Once; once.Do(init)`          | 避免重复初始化  |
 
 ## 性能优化
 
 ### 内存分配
 
-```go
-// 预分配切片容量
-data := make([]int, 0, 100)
-
-// 对象复用（sync.Pool）
-var bufPool = sync.Pool{
-    New: func() interface{} {
-        return make([]byte, 1024)
-    },
-}
-
-func process() {
-    buf := bufPool.Get().([]byte)
-    defer bufPool.Put(buf)
-    // 使用buf
-}
-```
+- **预分配容量**：
+  ```go
+  data := make([]int, 0, 100)
+  ```
+- **对象复用**：用 `sync.Pool`：
+  ```go
+  var bufPool = sync.Pool{ New: func() interface{} { return make([]byte, 1024) } }
+  ```
 
 ### 字符串操作
 
-```go
-// 推荐：使用strings.Builder替代+
-var builder strings.Builder
-for i := 0; i < 1000; i++ {
-    builder.WriteString("part")
-}
-result := builder.String()
-
-// 数值转字符串：使用strconv而非fmt
-s := strconv.Itoa(123) // 比fmt.Sprintf快3-4倍
-```
+- **避免 `+` 拼接**：使用 `bytes.Buffer`：
+  ```go
+  var b bytes.Buffer
+  for i := 0; i < 1000; i++ {
+      b.WriteString("part")
+  }
+  ```
+- **数值转字符串**：用 `strconv.Itoa` 替代 `fmt.Sprintf`：
+  ```go
+  s := strconv.Itoa(123) // 更高效
+  ```
 
 ## 测试规范
 
-### 单元测试
+### 命名规范
+
+- **测试文件**：以 `_test.go` 结尾，与源码同包。
+- **测试函数**：以 `Test` 开头，如 `TestAdd`，输入/输出字段用 `give`/`want` 前缀。
+- **参数类型**：必须是 `*testing.T` 或 `*testing.B`。
+
+### 表驱动测试（Table-Driven Test）
+
+#### **核心原则**
+
+- **避免重复逻辑**：通过结构体数组定义测试用例。
+- **子测试（Subtests）**：用 `t.Run` 管理不同输入。
+
+#### **示例**
+
+```go
+func TestSplitHostPort(t *testing.T) {
+    tests := []struct {
+        give     string
+        wantHost string
+        wantPort string
+    }{
+        {"192.0.2.0:8000", "192.0.2.0", "8000"},
+        {"192.0.2.0:http", "192.0.2.0", "http"},
+    }
+
+    for _, tt := range tests {
+        tt := tt // 避免竞态
+        t.Run(tt.give, func(t *testing.T) {
+            host, port, err := net.SplitHostPort(tt.give)
+            require.NoError(t, err)
+            assert.Equal(t, tt.wantHost, host)
+            assert.Equal(t, tt.wantPort, port)
+        })
+    }
+}
+```
+
+#### **并行测试**
+
+- **声明变量作用域**：在循环内重新声明 `tt`。
+- **启用并行**：添加 `t.Parallel()`：
+  ```go
+  for _, tt := range tests {
+      tt := tt
+      t.Run(tt.name, func(t *testing.T) {
+          t.Parallel()
+          // 测试逻辑
+      })
+  }
+  ```
+
+### 测试执行与质量
+
+- **覆盖率**：要求 `go test -cover` 达到 100%。
+- **命令参数**：
+	- `-v`：显示详细输出
+	- `-run TestName`：运行特定测试
+	- `-bench .`：执行基准测试
+
+## 附录
+
+### 测试代码样例
+
+#### **单元测试**
 
 ```go
 func TestAdd(t *testing.T) {
@@ -293,9 +287,7 @@ func TestAdd(t *testing.T) {
         a, b int
         want int
     }{
-        {1, 2, 3},
-        {0, 0, 0},
-        {-1, 1, 0},
+        {1, 2, 3}, {0, 0, 0}, {-1, 1, 0},
     }
 
     for _, tt := range tests {
@@ -308,7 +300,7 @@ func TestAdd(t *testing.T) {
 }
 ```
 
-### 基准测试
+#### **基准测试**
 
 ```go
 func BenchmarkAdd(b *testing.B) {
@@ -316,30 +308,4 @@ func BenchmarkAdd(b *testing.B) {
         Add(1, 2)
     }
 }
-### 注释规范增强
-#### 代码注释标准
-```go
-// 包注释应描述包的用途
-package main
-
-// 函数注释应遵循Google风格
-func calculateTotal(items []int) int {
-    // 函数体
-}
 ```
-
-#### Mermaid流程图示例
-```mermaid
-graph TD
-    A[开始] --> B{判断注释类型}
-    B -->|包注释| C[添加包描述]
-    B -->|函数注释| D[添加参数/返回值说明]
-    D --> E[使用//注释复杂逻辑]
-    E --> F[保持注释与代码同步]
-    F --> G[结束]
-```
-
-#### 注释维护原则
-- 每次代码修改时更新相关注释
-- 使用中文注释中文项目
-- 关键算法需添加注释水印
