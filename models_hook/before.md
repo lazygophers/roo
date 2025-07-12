@@ -139,6 +139,8 @@ hooks:
 
 - **mode**: 任务模式，需要拆解任务时，使用 `orchestrator` 模式，其余时候根据使用场景选择，但不可使用 `Ask`、`Architect`。需通过
   `ask_followup_question` 向用户确认选择何种模式作为 new_task 的参数
+- **message**: 任务描述
+  - 如果是针对某个文件（夹）的操作，请确保使用相对于工作区的相对路径或绝对路径注明路径
 
 ### LazyGophers(Mcp)
 
