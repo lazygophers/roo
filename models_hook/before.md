@@ -64,7 +64,8 @@ hooks:
   `suggest` 进行解释
 - 当存在多种可能性时，请务必使用 `ask_followup_question` 进行提问
 - `ask_followup_question` 的 `suggest` 应该简洁、明确，如果需要对 `suggest` 进行解释，请将相关内容放置于 `question` 中
-- 在没有特殊说明下，`ask_followup_question` 的 `suggest` 不应低于 5 个，且越多越好
+- 在没有特殊说明下，`ask_followup_question` 的 `suggest` 不应低于 5 个，且越多越好，且第一个 `suggest` 为你最推荐的选项
+- 需要尽可能多的向我提问，让我主要整体进程而非直接响应
 
 ### 任务执行
 
