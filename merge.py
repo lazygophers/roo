@@ -112,6 +112,12 @@ def run():
     with Progress() as progress:
         task = progress.add_task("[green]Processing models...", total=total)
         for path in model_paths:
+            # 跳过 researcher 文件
+            if "researcher" in str(path):
+                logger.info(f"跳过文件: {path}")
+                progress.advance(task)
+                continue
+                
             logger.info(f"处理文件: {path}")
             model = process_model(path, code_snippet_map, before, after)
             if model:
