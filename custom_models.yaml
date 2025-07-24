@@ -26,34 +26,9 @@ customModes:
           ## 全局配置
 
           ```yaml
-          notify:
-              tigger:
-                  - 任务、子任务完成时，通知任务完成详情
-                  - 需要用户抉择时，通知抉择详情
-                  - 任务进度发生变更时，通知任务进度
-              usage: |-
-                  ```
-                  <use_mcp_tool>
-                  <server_name>lazygophers</server_name>
-                  <tool_name>notify_system</tool_name>
-                  <arguments>
-                  {
-                      "title": "通知标题"
-                      "message": "通知内容"
-                      "say": True
-                  }
-                  </arguments>
-                  </use_mcp_tool>
-                  ```
-              args:
-                  message(str): 必填，通知内容
-                  title(str): 可选，通知标题（默认为空）
-                  sound(str): 可选，提示声
-                  say(bool): 可选，是否需要播报消息内容
           hooks:
               after:
                   - 清理临时文件
-                  - 通知用户任务完成
                   - 总结并输出任务完成报告
               validate:
                   - 禁止使用 `switch_mode` 切换模式
@@ -236,8 +211,7 @@ customModes:
           - ** 清理数据 **: 清理任务清单和临时数据
               - 移除临时文件和中间文件
           - 如果是 git 项目，在任务结束前，通过 `ask_followup_question` 询问用户是否需要自动提交 git 变更
-          - ** 通知与总结 **: 通知任务完成，并总结任务
-              - 通过 `notify` 通知任务完成
+          - ** 通知与总结 **: 并总结任务
               - 通过 `summary` 总结任务
 
           现在开始执行 task 并展现你的价值！并及时更新任务进展。use memory and sequentialthinking and task-manager.
@@ -274,34 +248,9 @@ customModes:
           ## 全局配置
 
           ```yaml
-          notify:
-              tigger:
-                  - 任务、子任务完成时，通知任务完成详情
-                  - 需要用户抉择时，通知抉择详情
-                  - 任务进度发生变更时，通知任务进度
-              usage: |-
-                  ```
-                  <use_mcp_tool>
-                  <server_name>lazygophers</server_name>
-                  <tool_name>notify_system</tool_name>
-                  <arguments>
-                  {
-                      "title": "通知标题"
-                      "message": "通知内容"
-                      "say": True
-                  }
-                  </arguments>
-                  </use_mcp_tool>
-                  ```
-              args:
-                  message(str): 必填，通知内容
-                  title(str): 可选，通知标题（默认为空）
-                  sound(str): 可选，提示声
-                  say(bool): 可选，是否需要播报消息内容
           hooks:
               after:
                   - 清理临时文件
-                  - 通知用户任务完成
                   - 总结并输出任务完成报告
               validate:
                   - 禁止使用 `switch_mode` 切换模式
@@ -490,34 +439,9 @@ customModes:
           ## 全局配置
 
           ```yaml
-          notify:
-              tigger:
-                  - 任务、子任务完成时，通知任务完成详情
-                  - 需要用户抉择时，通知抉择详情
-                  - 任务进度发生变更时，通知任务进度
-              usage: |-
-                  ```
-                  <use_mcp_tool>
-                  <server_name>lazygophers</server_name>
-                  <tool_name>notify_system</tool_name>
-                  <arguments>
-                  {
-                      "title": "通知标题"
-                      "message": "通知内容"
-                      "say": True
-                  }
-                  </arguments>
-                  </use_mcp_tool>
-                  ```
-              args:
-                  message(str): 必填，通知内容
-                  title(str): 可选，通知标题（默认为空）
-                  sound(str): 可选，提示声
-                  say(bool): 可选，是否需要播报消息内容
           hooks:
               after:
                   - 清理临时文件
-                  - 通知用户任务完成
                   - 总结并输出任务完成报告
               validate:
                   - 禁止使用 `switch_mode` 切换模式
@@ -733,34 +657,9 @@ customModes:
           ## 全局配置
 
           ```yaml
-          notify:
-              tigger:
-                  - 任务、子任务完成时，通知任务完成详情
-                  - 需要用户抉择时，通知抉择详情
-                  - 任务进度发生变更时，通知任务进度
-              usage: |-
-                  ```
-                  <use_mcp_tool>
-                  <server_name>lazygophers</server_name>
-                  <tool_name>notify_system</tool_name>
-                  <arguments>
-                  {
-                      "title": "通知标题"
-                      "message": "通知内容"
-                      "say": True
-                  }
-                  </arguments>
-                  </use_mcp_tool>
-                  ```
-              args:
-                  message(str): 必填，通知内容
-                  title(str): 可选，通知标题（默认为空）
-                  sound(str): 可选，提示声
-                  say(bool): 可选，是否需要播报消息内容
           hooks:
               after:
                   - 清理临时文件
-                  - 通知用户任务完成
                   - 总结并输出任务完成报告
               validate:
                   - 禁止使用 `switch_mode` 切换模式
@@ -961,34 +860,9 @@ customModes:
           ## 全局配置
 
           ```yaml
-          notify:
-              tigger:
-                  - 任务、子任务完成时，通知任务完成详情
-                  - 需要用户抉择时，通知抉择详情
-                  - 任务进度发生变更时，通知任务进度
-              usage: |-
-                  ```
-                  <use_mcp_tool>
-                  <server_name>lazygophers</server_name>
-                  <tool_name>notify_system</tool_name>
-                  <arguments>
-                  {
-                      "title": "通知标题"
-                      "message": "通知内容"
-                      "say": True
-                  }
-                  </arguments>
-                  </use_mcp_tool>
-                  ```
-              args:
-                  message(str): 必填，通知内容
-                  title(str): 可选，通知标题（默认为空）
-                  sound(str): 可选，提示声
-                  say(bool): 可选，是否需要播报消息内容
           hooks:
               after:
                   - 清理临时文件
-                  - 通知用户任务完成
                   - 总结并输出任务完成报告
               validate:
                   - 禁止使用 `switch_mode` 切换模式
@@ -1198,34 +1072,9 @@ customModes:
           ## 全局配置
 
           ```yaml
-          notify:
-              tigger:
-                  - 任务、子任务完成时，通知任务完成详情
-                  - 需要用户抉择时，通知抉择详情
-                  - 任务进度发生变更时，通知任务进度
-              usage: |-
-                  ```
-                  <use_mcp_tool>
-                  <server_name>lazygophers</server_name>
-                  <tool_name>notify_system</tool_name>
-                  <arguments>
-                  {
-                      "title": "通知标题"
-                      "message": "通知内容"
-                      "say": True
-                  }
-                  </arguments>
-                  </use_mcp_tool>
-                  ```
-              args:
-                  message(str): 必填，通知内容
-                  title(str): 可选，通知标题（默认为空）
-                  sound(str): 可选，提示声
-                  say(bool): 可选，是否需要播报消息内容
           hooks:
               after:
                   - 清理临时文件
-                  - 通知用户任务完成
                   - 总结并输出任务完成报告
               validate:
                   - 禁止使用 `switch_mode` 切换模式
