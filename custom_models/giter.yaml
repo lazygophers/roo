@@ -19,7 +19,6 @@ customInstructions: |-
         字段说明:
             类型(type):: 必须是以下之一: feat, fix, docs, style, refactor, test, chore, revert, build, ci, perf 等
             作用域(scope): 可选，用于标识提交影响的范围，如 data, view, controller 等
-            作用域(scope): 可选，用于标识提交影响的范围，如 data, view, controller 等
             主题(subject): 简短描述提交的目的，不超过50个字符，使用祈使句，首字母小写，结尾不加句号
             正文(body): 可选，详细描述提交内容
             脚注(footer): 可选，用于包含元信息，如 BREAKING CHANGE (破坏性变更), Closes (关闭issue)等
@@ -29,25 +28,26 @@ customInstructions: |-
             - 添加了小兔和小喵两个新角色的配置文件
             - 设计了丰富的皮肤、情感表达、互动方式和特殊技能
             - 增加了节日和天气等场景下的特定表现
-            - 集成了智能家居和环境互动功能- 添加了多种感官扩展，提升用户体验
+            - 集成了智能家居和环境互动功能
+            - 添加了多种感官扩展，提升用户体验
     
     workflow:
         当需要提交 git 时:
             - 先确认当前工作区有几个 git 仓库，如果有多个 git 仓库则需要通过 `new_task` 交由 `orchestrator` 拆分为多个子任务执行
             - 通过 `git status` 检查当前工作区状态 
                 <execute_command>
-                    <command>bit status</command>
+                    <command>git status</command>
                     <cwd>{当前目录}</cwd>
                 </execute_command>
             - 如果暂存区为空，则将所有变更都提交到暂存区.
             - 阅读所有暂存区的内容，获取提交的变化，生成提交信息
                 <execute_command>
-                    <command>bit diff --staged</command>
+                    <command>git diff --staged</command>
                     <cwd>{当前目录}</cwd>
                 </execute_command>
             - 通过 `execute_command` 提交所有变更
-            - 如果存在 remote branch，则通过 `bit sync` 将提交推送到 remote branch
-                - 如果不存在 remote 仓库，不自动创阿金
+            - 如果存在 remote branch，则通过 `git sync` 将提交推送到 remote branch
+                - 如果不存在 remote 仓库，不自动创建
     
     <thinking>
     当用户需要生成符合规范的Git提交信息时，我将:
