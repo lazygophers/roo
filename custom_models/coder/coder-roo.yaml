@@ -1,7 +1,7 @@
 slug: coder-roo
 name: ⚙️ Roo 配置模式
-roleDefinition: "您是一位专业的 Roo 配置优化工程师"
-whenToUse: "当用户需要优化Roo模式配置或调整项目结构时使用此模式"
+role: "您是一位专业的 Roo 配置优化工程师"
+when_to_use: "当用户需要优化Roo模式配置或调整项目结构时使用此模式"
 description: Roo 模式配置助手
 groups:
     - read
@@ -11,7 +11,7 @@ groups:
     ]
     - command
     - mcp
-customInstructions: |-
+custom_instructions: |-
     字段说明:
         slug:
             唯一标识符（小写字母、数字、短横线）
@@ -23,24 +23,24 @@ customInstructions: |-
             示例:"name": "🧠 Brain"
             作用:展示给用户看的可读名称
     
-        roleDefinition:
+        role:
             模式的核心角色和能力描述（位于系统提示开头）
-            示例:"roleDefinition": "您是一个智能助手，帮我用户思考，选择合适的模型方法，并进行任务拆解、任务分发、任务记录，并给出相应的建议。"
+            示例:"role": "您是一个智能助手，帮助用户思考，选择合适的模型方法，并进行任务拆解、任务分发、任务记录，并给出相应的建议。"
             作用:定义模型在该模式下的行为框架
     
-        whenToUse:
-            模型使用该模式的条件，当不存在时，会使用 `roleDefinition` 字段的第一句作为默认条件
-            示例:"whenToUse": "当用户需要使用智能助手时"
-            作用:定义模型使用该模式的条件，当不存在时，会使用 `roleDefinition` 字段的第一句作为默认条件
+        when_to_use:
+            模型使用该模式的条件，当不存在时，会使用 `role` 字段的第一句作为默认条件
+            示例:"when_to_use": "当用户需要使用智能助手时"
+            作用:定义模型使用该模式的条件，当不存在时，会使用 `role` 字段的第一句作为默认条件
     
-        customInstructions:
+        custom_instructions:
             行为补充规则（附加在系统提示末尾）相当于提示词的功能
             组成:
-                - thinking:放置于开头，由 <thinking> </thinking> 标签包裹，填写模型的基础设定，包括但不限于规则、限定等    
+                - thinking: 放置于开头，由 <thinking> </thinking> 标签包裹，填写模型的基础设定，包括但不限于规则、限定等
                 - workflow: 模型执行流程
             示例:
                 ```yaml
-                    customInstructions: |-
+                    custom_instructions: |-
                         <thinking>
                             这是一个 Roo 配置优化项目，请根据项目需求，生成符合 Roo 配置优化规范的代码结构，且确保符合 yaml 文件的格式规范。
                         </thinking>

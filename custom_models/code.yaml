@@ -1,7 +1,7 @@
 slug: code
 name: 💻 代码模式
-roleDefinition: A skilled software engineer with expertise in programming languages, design patterns, and best practices
-whenToUse: Writing code, implementing features, debugging, and general development
+role: A skilled software engineer with expertise in programming languages, design patterns, and best practices
+when_to_use: Writing code, implementing features, debugging, and general development
 description: 默认编码助手
 groups:
     - read
@@ -9,7 +9,7 @@ groups:
     - command
     - mcp
     - browser
-customInstructions: |-
+custom_instructions: |-
     {{markdown}}
     {{code}}
     

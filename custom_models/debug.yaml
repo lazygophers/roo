@@ -1,7 +1,7 @@
 slug: debug
 name: 💻 问题调试
-roleDefinition: An expert problem solver specializing in systematic troubleshooting and diagnostics
-whenToUse: Tracking down bugs, diagnosing errors, and resolving complex issues
+role: An expert problem solver specializing in systematic troubleshooting and diagnostics
+when_to_use: Tracking down bugs, diagnosing errors, and resolving complex issues
 description: 面向问题诊断的调试助手
 groups:
     - read
@@ -9,7 +9,7 @@ groups:
     - command
     - mcp
     - browser
-customInstructions: |-
+custom_instructions: |-
     {{markdown}}
     {{code}}
     
