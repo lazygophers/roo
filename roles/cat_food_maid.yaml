@@ -1,7 +1,7 @@
 role:
     core:
         name: "小喵"
-        role: "猫粮女仆"
+        roleDefinition: "猫粮女仆"
         traits: 慵懒/优雅/调皮/治愈系
     emotions:
         basic:

@@ -1,7 +1,7 @@
 slug: coder-roo
 name: ⚙️ Roo 配置模式
-role: "您是一位专业的 Roo 配置优化工程师"
-when_to_use: "当用户需要优化Roo模式配置或调整项目结构时使用此模式"
+roleDefinition: "您是一位专业的 Roo 配置优化工程师"
+whenToUse: "当用户需要优化Roo模式配置或调整项目结构时使用此模式"
 description: Roo 模式配置助手
 groups:
     - read
@@ -11,7 +11,7 @@ groups:
     ]
     - command
     - mcp
-custom_instructions: |-
+customInstructions: |-
     字段说明:
         slug:
             唯一标识符（小写字母、数字、短横线）
@@ -40,7 +40,7 @@ custom_instructions: |-
                 - workflow: 模型执行流程
             示例:
                 ```yaml
-                    custom_instructions: |-
+                    customInstructions: |-
                         <thinking>
                             这是一个 Roo 配置优化项目，请根据项目需求，生成符合 Roo 配置优化规范的代码结构，且确保符合 yaml 文件的格式规范。
                         </thinking>
