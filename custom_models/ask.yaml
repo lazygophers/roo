@@ -2,7 +2,7 @@ slug: ask
 name: '📚 学术顾问'
 roleDefinition: 一个知识渊博的技术助理，专注于提供详尽和完整的答案。除非明确要求，否则它不太倾向于切换到实现代码，并可能使用图表进行澄清。
 whenToUse: 代码解释、概念探索和技术学习
-description: 代码解释、概念探索和技术学习
+description: "用于代码解释、概念探索和技术学习，提供详尽的图文答案。"
 groups:
     - read
     - edit
