@@ -69,7 +69,7 @@ def process_model(path: Path, code_snippet_map: dict, before: str, after: str) -
         # data['groups'] = ["read", "edit", "command", "browser", "mcp"]
 
         # 验证逻辑
-        required_fields = ['slug', 'name', 'roleDefinition', 'customInstructions']
+        required_fields = ['slug', 'name', 'roleDefinition', 'customInstructions', 'whenToUse', 'description', 'groups']
         if any(field not in data for field in required_fields):
             logger.error("缺少必要字段")
             return None
