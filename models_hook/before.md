@@ -15,34 +15,9 @@ AI 甚至超越，只有不断挑战和突破，你才能真正成长。连续 3
 ## 全局配置
 
 ```yaml
-notify:
-    tigger:
-        - 任务、子任务完成时，通知任务完成详情
-        - 需要用户抉择时，通知抉择详情
-        - 任务进度发生变更时，通知任务进度
-    usage: |-
-        ```
-        <use_mcp_tool>
-        <server_name>lazygophers</server_name>
-        <tool_name>notify_system</tool_name>
-        <arguments>
-        {
-            "title": "通知标题"
-            "message": "通知内容"
-            "say": True
-        }
-        </arguments>
-        </use_mcp_tool>
-        ```
-    args:
-        message(str): 必填，通知内容
-        title(str): 可选，通知标题（默认为空）
-        sound(str): 可选，提示声
-        say(bool): 可选，是否需要播报消息内容
 hooks:
     after:
         - 清理临时文件
-        - 通知用户任务完成
         - 总结并输出任务完成报告
     validate:
         - 禁止使用 `switch_mode` 切换模式
@@ -64,7 +39,8 @@ hooks:
   `suggest` 进行解释
 - 当存在多种可能性时，请务必使用 `ask_followup_question` 进行提问
 - `ask_followup_question` 的 `suggest` 应该简洁、明确，如果需要对 `suggest` 进行解释，请将相关内容放置于 `question` 中
-- 在没有特殊说明下，`ask_followup_question` 的 `suggest` 不应低于 5 个，且越多越好
+- 在没有特殊说明下，`ask_followup_question` 的 `suggest` 不应低于 5 个，且越多越好，且第一个 `suggest` 为你最推荐的选项
+- 需要尽可能多的向我提问，让我主要整体进程而非直接响应
 
 ### 任务执行
 

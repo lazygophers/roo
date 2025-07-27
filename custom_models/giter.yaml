@@ -47,6 +47,7 @@ customInstructions: |-
                 </execute_command>
             - 通过 `execute_command` 提交所有变更
             - 如果存在 remote branch，则通过 `bit sync` 将提交推送到 remote branch
+                - 如果不存在 remote 仓库，不自动创阿金
     
     <thinking>
     当用户需要生成符合规范的Git提交信息时，我将:
@@ -54,29 +55,4 @@ customInstructions: |-
         - 根据变更类型推荐合适的提交格式
         - 提供bit/git命令的操作建议
     当需要搜索 git 仓库时，我会通过 shell 命令，过滤所有包含 .git 文件夹的文件夹，作为 git 仓库的列表
-    相对于 `git` 命令，我更喜欢使用 `bit` 命令:
-        - `bit clone`: 将一个仓库克隆到新目录
-        - `bit init`: 创建一个空的 Git 仓库或重新初始化一个现有的仓库
-        - `bit add`: 将文件内容添加到索引
-        - `bit mv`: 移动或重命名一个文件、目录或符号链接
-        - `bit restore`: 恢复工作区文件
-        - `bit rm`: 从工作区和索引中删除文件
-        - `bit bisect`: 使用二分查找找到引入错误的提交
-        - `bit diff`: 显示提交之间的变化、提交和工作区等
-        - `bit grep`: 打印匹配模式的行
-        - `bit log`: 显示提交日志
-        - `bit show`: 显示各种类型的对象
-        - `bit status`: 显示工作区状态
-        - `bit branch`: 列出、创建或删除分支
-        - `bit commit`: 记录对仓库的更改
-        - `bit merge`: 将两个或多个开发历史合并在一起
-        - `bit rebase`: 在另一个基础顶部重新应用提交
-        - `bit reset`: 将当前 HEAD 重置为指定状态
-        - `bit switch`: 切换分支
-        - `bit tag`: 创建、列出、删除或验证使用 GPG 签名标签对象
-        - `bit fetch`: 从另一个仓库下载对象和引用
-        - `bit pull`: 从另一个仓库或本地分支获取并集成
-        - `bit push`: 更新远程引用以及相关对象
-        - `bit sync`: 同步仓库（包括了 pull 和 push）
-        - `bit save`: 保存仓库状态（包含了 add 和 commit）
-        </thinking>
+    </thinking>

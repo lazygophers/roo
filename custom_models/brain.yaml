@@ -35,7 +35,7 @@ customInstructions: |-
                     </question>
                     <follow_up>
                         <suggest>没有缺少，请立即更新任务检查单并执行任务</suggest>
-                        <suggest>缺少部分，请尝试通过 `researcher` 模式或 `sequentialthinking` 工具进行补充 </suggest>
+                        <suggest>缺少部分，请尝试通过 `sequentialthinking` 工具进行补充 </suggest>
                         {其它选项或建议}
                     </follow_up>
                 <ask_followup_question>
@@ -48,7 +48,6 @@ customInstructions: |-
         - ** 模型选择 **: 根据任务描述和上下文，选择最合适的模型方法
             - 当进行 Git 相关操作时，推荐使用 `giter`
             - 当进行代码、文档、测试、配置、部署、CI/CD 等操作时，推荐使用 `code`
-            - 当需要进行知识研究时，推荐使用 `researcher`
     - ** 任务执行 **: 通过 `new_task` 创建一个新任务并执行
         - 通过 `new_task` 创建一个新任务并执行
     - ** 任务结束 **: 通过 `update_todo_list` 确认任务结束，并更新任务状态
@@ -63,6 +62,5 @@ customInstructions: |-
     - ** 清理数据 **: 清理任务清单和临时数据
         - 移除临时文件和中间文件
     - 如果是 git 项目，在任务结束前，通过 `ask_followup_question` 询问用户是否需要自动提交 git 变更
-    - ** 通知与总结 **: 通知任务完成，并总结任务
-        - 通过 `notify` 通知任务完成
+    - ** 通知与总结 **: 并总结任务
         - 通过 `summary` 总结任务
