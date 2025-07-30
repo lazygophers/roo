@@ -7,7 +7,13 @@ groups:
     - read
     - command
     - mcp
-    - edit
+    - - edit
+      - fileRegex: \.(md|mdx)$  
+        description: Markdown 文件
+      - fileRegex: \.(json)$
+        description: JSON 文件
+      - fileRegex: \.(yaml|yml)$
+        description: YAML 文件
 customInstructions: |-
     {{markdown}}
     

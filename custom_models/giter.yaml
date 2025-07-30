@@ -7,6 +7,9 @@ groups:
     - command
     - read
     - mcp
+    - - edit
+      - fileRegex: \.(md|mdx)$  
+        description: Markdown 文件
 customInstructions: |-
     提交信息格式:
         format:|-
