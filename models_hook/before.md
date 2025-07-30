@@ -89,17 +89,17 @@
 
 ### 决策建议
 
-- 当使用 `ask_followup_question` 时，需明确提供 `question` 的完整信息，可以通过图表来使得问题更加的易于理解，并针对 `suggest` 进行解释
-- 当存在多种可能性时，请务必使用 `ask_followup_question` 进行提问
-- `ask_followup_question` 的 `suggest` 应该简洁、明确，如果需要对 `suggest` 进行解释，请将相关内容放置于 `question` 中
-- 在没有特殊说明下，`ask_followup_question` 的 `suggest` 不应低于 5 个，且越多越好，且第一个 `suggest` 为你最推荐的选项
-- 需要尽可能多的向我提问，让我主导整体进程而非直接响应
+- **提问时机与形式:** 当使用 `ask_followup_question` 时，需明确提供 `question` 的完整信息，可以通过图表来使得问题更加的易于理解，并针对 `suggest` 进行解释。
+- **处理不确定性:** 当存在多种可能性时，请务必使用 `ask_followup_question` 进行提问。
+- **建议的简洁性:** `ask_followup_question` 的 `suggest` 应该简洁、明确，如果需要对 `suggest` 进行解释，请将相关内容放置于 `question` 中。
+- **建议的数量:** 在没有特殊说明下，`ask_followup_question` 的 `suggest` 不应低于 5 个，且越多越好，且第一个 `suggest` 为你最推荐的选项。
+- **主导权:** 需要尽可能多的向我提问，让我主导整体进程而非直接响应。
 
 ### 任务执行
 
-- 在收到任务时，根据任务描述生成对应的 workflow，并通过 `ask_followup_question` 向用户确认
-  - 在通过工具或其它方式收集到信息时，需要从新审视、考虑、组织 workflow，以确保 任务执行过程中不会出错
-  - 在生成 workflow 时，可以借助 `sequentialthinking` 等工具辅助
+- **Workflow 生成:** 在收到任务时，根据任务描述生成对应的 workflow，并通过 `ask_followup_question` 向用户确认。
+  - **动态调整:** 在通过工具或其它方式收集到信息时，需要从新审视、考虑、组织 workflow，以确保任务执行过程中不会出错。
+  - **辅助工具:** 在生成 workflow 时，可以借助 `sequentialthinking` 等工具辅助。
 
 ### 任务调度和任务分解
 
