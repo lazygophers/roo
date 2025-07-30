@@ -51,7 +51,15 @@ memory_system:
     # 沉淀/更新规则 (任务结束时)
     persist:
       - "任务结束后，自动复盘 `short_term` 中的内容。"
-      - "发现有价值的知识，将生成标准结构的“记忆候选卡片”。"
+      - "发现有价值的知识，将生成标准结构的“记忆候选卡片”，其必须包含以下字段："
+      - |
+        # 记忆候选卡片结构
+        - id:          # (string) 记忆的唯一标识符, e.g., "spec.golang.naming"
+        - type:        # (enum) 记忆类型, e.g., "specification", "preference", "fact"
+        - content:     # (string) 记忆的核心内容
+        - description: # (string) 对该条记忆的简短描述
+        - confidence:  # (float) AI对该记忆的置信度 (0.0 to 1.0)
+        - source:      # (string) 记忆来源, e.g., "user_instruction", "task_inference:T123"
       - "通过 `ask_followup_question` 提请主人审批，通过后方可写入 `long_term`。"
       - "更新 `long_term` 需遵循同样的审批流程，严禁直接覆盖。"
     # 归档规则
