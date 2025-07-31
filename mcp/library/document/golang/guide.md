@@ -5,7 +5,7 @@
 - **Uber编码规范**
 	- [英文版](https://github.com/uber-go/guide/blob/master/style.md)
 	- [中文版](https://github.com/xxjwxc/uber_go_guide_cn)
-- **Google编码规范**  
+- **Google编码规范**
   [官方文档](https://google.github.io/styleguide/go/index)
 
 ## 包引用问题
@@ -145,6 +145,44 @@
   func (e *HTTPError) Error() string { return fmt.Sprintf("%d: %s", e.Code, e.Msg) }
   ```
 
+### 错误判断与提取
+
+- **判断特定错误**: 使用 `errors.Is` 来检查错误链中是否包含特定的哨兵错误（sentinel error）。这比直接使用 `==` 更健壮，因为它可以处理被包装过的错误。
+
+  ```go
+  var ErrFoo = errors.New("foo error")
+
+  func Check() error {
+      return fmt.Errorf("wrapped: %w", ErrFoo)
+  }
+
+  // ...
+  err := Check()
+  if errors.Is(err, ErrFoo) {
+      // err 包含 ErrFoo
+  }
+  ```
+
+- **提取特定类型错误**: 使用 `errors.As` 来检查错误链中是否存在特定类型的错误，并将其提取出来以便访问其字段。
+
+  ```go
+  type MyError struct {
+      Code int
+  }
+  func (e *MyError) Error() string { return "my error" }
+
+  func Check() error {
+      return &MyError{Code: 42}
+  }
+
+  // ...
+  err := Check()
+  var myErr *MyError
+  if errors.As(err, &myErr) {
+      fmt.Println(myErr.Code) // 输出: 42
+  }
+  ```
+
 ### 错误返回模式
 
 - **尽早返回**：减少嵌套：
@@ -186,6 +224,62 @@
 | 等待多协程完成 | WaitGroup | `wg.Add(2); go func() { defer wg.Done() }()` | 确保所有协程完成 |
 | 单次初始化   | Once      | `var once sync.Once; once.Do(init)`          | 避免重复初始化  |
 
+## Context 使用规范
+
+`context.Context` 是现代 Go 并发编程和 API 设计中不可或缺的一部分，用于处理超时、取消信号以及在 API 调用链中传递请求范围的数据。
+
+### 核心原则
+
+- **作为第一个参数**: `Context` 应始终作为函数的第一个参数，且通常命名为 `ctx`。
+  ```go
+  func DoSomething(ctx context.Context, arg1, arg2 string) error {
+      // ...
+  }
+  ```
+
+- **禁止存储在结构体中**: 不应将 `Context` 作为结构体字段。它应该在函数调用链中显式传递，以保持其请求范围的生命周期。
+
+- **不要传递 `nil` Context**: 如果不确定使用哪个 `Context`，应使用 `context.Background()` 或 `context.TODO()`。
+  - `context.Background()`: 通常用于主函数、初始化和测试中，是所有 `Context` 的根。
+  - `context.TODO()`: 当不确定使用哪个 `Context`，或函数未来计划支持 `Context` 但目前尚未实现时使用。
+
+- **小心使用 `WithValue`**:
+  - `WithValue` 不应用于传递可选参数，这会降低代码的可读性和健-壮性。
+  - 它主要用于在进程和 API 边界传递请求范围的元数据，如追踪 ID、用户身份信息等。
+
+- **及时取消**: `Context` 的 `cancel` 函数被调用后，应尽快让使用该 `Context` 的 Goroutine 停止工作并返回。
+  ```go
+  ctx, cancel := context.WithTimeout(context.Background(), 50*time.Millisecond)
+  defer cancel() // 确保 cancel 函数总是被调用
+  ```
+
+## 泛型使用规范
+
+Go 1.18 引入了泛型，为处理通用数据结构和函数提供了强大的类型安全工具。
+
+### 使用原则
+
+- **适用场景**: 优先将泛型用于操作通用数据结构（如切片、map、channel）的函数，例如 `Filter`、`Map`、`Reduce` 等。
+  
+- **避免滥用**: 如果接口可以清晰地解决问题，则不必强制使用泛型。泛型并非旨在取代接口。
+
+- **类型参数命名**:
+  - 类型参数建议使用单个大写字母，如 `T`。
+  - 如果函数有多个类型参数，应选择有意义的名称，如 `K` (Key), `V` (Value)。
+
+### 示例
+
+```go
+// MapKeys 返回一个 map 的所有键的切片。
+func MapKeys[K comparable, V any](m map[K]V) []K {
+    r := make([]K, 0, len(m))
+    for k := range m {
+        r = append(r, k)
+    }
+    return r
+}
+```
+
 ## 性能优化
 
 ### 内存分配
@@ -221,6 +315,13 @@
 - **测试函数**：以 `Test` 开头，如 `TestAdd`，输入/输出字段用 `give`/`want` 前缀。
 - **参数类型**：必须是 `*testing.T` 或 `*testing.B`。
 
+### 断言库推荐
+
+- **推荐库**: `github.com/stretchr/testify`
+- **说明**: `testify` 提供了一套丰富的断言工具（`assert` 和 `require`），可以显著简化测试代码，使其更具可读性。`require` 在断言失败时会立即终止测试，而 `assert` 则会记录失败并继续执行。
+- **参考**:
+  - [GitHub 仓库](https://github.com/stretchr/testify)
+
 ### 表驱动测试（Table-Driven Test）
 
 #### **核心原则**
@@ -245,9 +346,12 @@ func TestSplitHostPort(t *testing.T) {
         tt := tt // 避免竞态
         t.Run(tt.give, func(t *testing.T) {
             host, port, err := net.SplitHostPort(tt.give)
-            require.NoError(t, err)
-            assert.Equal(t, tt.wantHost, host)
-            assert.Equal(t, tt.wantPort, port)
+            // 使用 require 包确保前置条件满足
+            require.NoError(t, err, "解析地址不应出错")
+
+            // 使用 assert 包进行结果断言
+            assert.Equal(t, tt.wantHost, host, "主机名应匹配")
+            assert.Equal(t, tt.wantPort, port, "端口号应匹配")
         })
     }
 }
@@ -269,7 +373,7 @@ func TestSplitHostPort(t *testing.T) {
 
 ### 测试执行与质量
 
-- **覆盖率**：要求 `go test -cover` 达到 100%。
+- **覆盖率**: `go test -cover` 的结果应至少保证 **90%** 以上。对于核心业务逻辑，应追求更高的覆盖率。
 - **命令参数**：
 	- `-v`：显示详细输出
 	- `-run TestName`：运行特定测试
@@ -292,9 +396,8 @@ func TestAdd(t *testing.T) {
 
     for _, tt := range tests {
         t.Run(fmt.Sprintf("%d+%d", tt.a, tt.b), func(t *testing.T) {
-            if got := Add(tt.a, tt.b); got != tt.want {
-                t.Errorf("Add() = %v, want %v", got, tt.want)
-            }
+            got := Add(tt.a, tt.b)
+            assert.Equal(t, tt.want, got, "Add() 的结果应与期望值相等")
         })
     }
 }
