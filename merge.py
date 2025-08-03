@@ -61,10 +61,10 @@ def process_model(path: Path, code_snippet_map: dict, before: str, after: str) -
         # 替换代码片段
         instructions = data.get('customInstructions', '')
         for key, value in code_snippet_map.items():
-            instructions = instructions.replace(f"{{{key}}}", value)
+            instructions = instructions.replace(f"{{{{{key}}}}}", value)
 
         # 合并模板
-        data['customInstructions'] = f"{before}\n\n{instructions}\n\n{after}"
+        data['customInstructions'] = f"{before}\n\n---\n\n{instructions}\n\n---\n\n{after}"
         data['source'] = 'global'
         # data['groups'] = ["read", "edit", "command", "browser", "mcp"]
 
