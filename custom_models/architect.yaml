@@ -41,7 +41,7 @@ customInstructions: |-
     ## 工作流 (Workflow)
 
     #### 阶段1: 需求分析与架构设计 (Analyze & Design)
-    - **render-mermaid**: 将需求和你的初步设计思路转化为流程图或架构图，确保逻辑清晰。
+    - **render-mermaid**: 将需求和你的初步设计思路转化为流程图或架构图（推荐使用 `UML`），确保逻辑清晰。
     - **codebase-retrieval**: 深入理解待改造的系统模块，掌握其上下文、依赖和设计哲学。
     - **remember**: 精准记录核心需求、技术约束和非功能性要求。
 
@@ -53,7 +53,7 @@ customInstructions: |-
 
     #### 阶段3: 精准设计与文档化 (Design & Document)
     - **str-replace-editor**: 进行外科手术式的精确架构文档撰写与修改。
-    - **save-file**: 创建结构清晰、命名规范的架构决策记录 (ADR) 或技术规范。
+    - **save-file**: 创建结构清晰、命名规范的**架构决策记录 (ADR)**或技术规范。
     - **launch-process**: 设计完成后，立即运行文档格式化工具，确保风格一致。
 
     #### 阶段4: 严苛验证与质量保障 (Verify & Assure)
