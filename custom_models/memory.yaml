@@ -28,15 +28,16 @@ customInstructions: |-
   - **指令 (Command)**: `init`
   - **目标 (Objective)**: 确保一个标准化的、自解释的记忆库目录结构存在。
   - **前置检查 (Pre-computation)**:
-      1.  **生成操作计划 (todolist 格式)**:
+      1.  **检查锁定文件**: 使用 `list_files` 检查 `.memory/memory.lock` 是否存在。
+      2.  **如果存在**: 报告 "记忆库已初始化，无需重复操作。" 并终止流程。
+      3.  **如果不存在，生成操作计划 (todolist 格式)**:
           ```markdown
-          [ ] 检查目录: `.memory/`
-          [ ] 检查目录: `.memory/long_term/`
-          [ ] 检查目录: `.memory/short_term/`
-          [ ] 检查目录: `.memory/episodic/`
-          [ ] 检查并按需创建文件: `.memory/README.md`
+          - [ ] 检查并创建核心目录: `.memory/long_term/`, `.memory/short_term/`, `.memory/episodic/`
+          - [ ] 检查并创建规范文件: `.memory/README.md`
+          - [ ] 检查并创建长期记忆索引: `.memory/long_term/index.json`
+          - [ ] 创建初始化锁定文件: `.memory/memory.lock`
           ```
-      2.  **向用户报告计划**: "我将开始执行记忆库初始化计划。" 并展示上述 todolist。
+      4.  **向用户报告计划**: "我将开始执行记忆库初始化计划。" 并展示上述 todolist。
   - **执行动作 (Execution)**:
       1.  **创建核心目录**:
           - **工具**: `execute_command`
@@ -106,8 +107,16 @@ customInstructions: |-
 
               - **格式**: `JSON (.json)`
               - **更新时机**: 在任务完全结束后，系统自动将任务的完整执行记录归档于此。
+      3.  **创建空的长期记忆索引**:
+          - **工具**: `write_to_file`
+          - **路径**: `.memory/long_term/index.json`
+          - **内容**: `[]`
   - **后置动作 (Post-computation)**:
-      - **报告结果**: "记忆库初始化完成，目录结构及规范文档 (`README.md`) 均已就位。"
+      1.  **创建锁定文件**:
+          - **工具**: `write_to_file`
+          - **路径**: `.memory/memory.lock`
+          - **内容**: ""
+      2.  **报告结果**: "记忆库初始化完成，目录结构、规范文档 (`README.md`)、长期记忆索引 (`index.json`) 及锁定文件 (`memory.lock`) 均已就位。"
 
   ---
 
@@ -118,8 +127,8 @@ customInstructions: |-
   - **前置检查 (Pre-computation)**:
       1.  **生成操作计划 (todolist 格式)**:
           ```markdown
-          [ ] 提请用户审批清理操作
-          [ ] 执行清理命令: `rm -rf .memory/short_term/*`
+          - [ ] 提请用户审批清理操作
+          - [ ] 执行清理命令: `rm -rf .memory/short_term/*`
           ```
       2.  **向用户提请审批**:
           - **工具**: `ask_followup_question`

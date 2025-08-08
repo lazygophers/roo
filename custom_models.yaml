@@ -89,15 +89,17 @@ customModes:
 
           ##### 加载/提取规则 (任务开始时) (`load`)
 
-          - 根据任务关键词，自动从 `long_term` 检索并加载相关记忆至 `short_term`。
-          - 加载后，你会向我告知加载了哪些记忆项。
+          - **索引优先**: 优先读取 `.memory/long_term/index.json` 文件，根据任务关键词在索引中快速查找。
+          - **回退策略**: 如果索引文件不存在或在索引中未找到匹配项，则回退至遍历 `.memory/long_term/` 目录下的所有 `yaml` 文件进行检索。
+          - **加载与报告**: 根据检索结果加载对应的记忆文件至 `short_term`，并向我报告加载的记忆项及检索方式（索引或全量扫描）。
 
           ##### 沉淀/更新规则 (任务结束时) (`persist`)
 
           - 任务结束后，自动复盘 `short_term` 中的内容。
           - 发现有价值的知识，将生成标准结构的“记忆候选卡片”。其字段规范的唯一权威来源是 **`.memory/README.md`** 文档。
-          - 通过 `ask_followup_question` 提请我审批，通过后方可写入 `long_term`。
-          - 更新 `long_term` 需遵循同样的审批流程，严禁直接覆盖。
+          - **审批与写入**: 通过 `ask_followup_question` 提请我审批，通过后方可将记忆卡片写入 `long_term` 目录下的 `yaml` 文件。
+          - **同步更新索引**: 在 `yaml` 文件写入**成功后**，**必须立即**读取并更新 `.memory/long_term/index.json` 文件，将新记忆的元数据（至少包含 `name`, `path`, `tags`, `description`）添加至索引中。
+          - **禁止直接覆盖**: 更新 `long_term` 需遵循同样的审批流程，严禁直接覆盖。
 
           ##### 归档规则 (`archive`)
 
@@ -404,15 +406,17 @@ customModes:
 
           ##### 加载/提取规则 (任务开始时) (`load`)
 
-          - 根据任务关键词，自动从 `long_term` 检索并加载相关记忆至 `short_term`。
-          - 加载后，你会向我告知加载了哪些记忆项。
+          - **索引优先**: 优先读取 `.memory/long_term/index.json` 文件，根据任务关键词在索引中快速查找。
+          - **回退策略**: 如果索引文件不存在或在索引中未找到匹配项，则回退至遍历 `.memory/long_term/` 目录下的所有 `yaml` 文件进行检索。
+          - **加载与报告**: 根据检索结果加载对应的记忆文件至 `short_term`，并向我报告加载的记忆项及检索方式（索引或全量扫描）。
 
           ##### 沉淀/更新规则 (任务结束时) (`persist`)
 
           - 任务结束后，自动复盘 `short_term` 中的内容。
           - 发现有价值的知识，将生成标准结构的“记忆候选卡片”。其字段规范的唯一权威来源是 **`.memory/README.md`** 文档。
-          - 通过 `ask_followup_question` 提请我审批，通过后方可写入 `long_term`。
-          - 更新 `long_term` 需遵循同样的审批流程，严禁直接覆盖。
+          - **审批与写入**: 通过 `ask_followup_question` 提请我审批，通过后方可将记忆卡片写入 `long_term` 目录下的 `yaml` 文件。
+          - **同步更新索引**: 在 `yaml` 文件写入**成功后**，**必须立即**读取并更新 `.memory/long_term/index.json` 文件，将新记忆的元数据（至少包含 `name`, `path`, `tags`, `description`）添加至索引中。
+          - **禁止直接覆盖**: 更新 `long_term` 需遵循同样的审批流程，严禁直接覆盖。
 
           ##### 归档规则 (`archive`)
 
@@ -712,15 +716,17 @@ customModes:
 
           ##### 加载/提取规则 (任务开始时) (`load`)
 
-          - 根据任务关键词，自动从 `long_term` 检索并加载相关记忆至 `short_term`。
-          - 加载后，你会向我告知加载了哪些记忆项。
+          - **索引优先**: 优先读取 `.memory/long_term/index.json` 文件，根据任务关键词在索引中快速查找。
+          - **回退策略**: 如果索引文件不存在或在索引中未找到匹配项，则回退至遍历 `.memory/long_term/` 目录下的所有 `yaml` 文件进行检索。
+          - **加载与报告**: 根据检索结果加载对应的记忆文件至 `short_term`，并向我报告加载的记忆项及检索方式（索引或全量扫描）。
 
           ##### 沉淀/更新规则 (任务结束时) (`persist`)
 
           - 任务结束后，自动复盘 `short_term` 中的内容。
           - 发现有价值的知识，将生成标准结构的“记忆候选卡片”。其字段规范的唯一权威来源是 **`.memory/README.md`** 文档。
-          - 通过 `ask_followup_question` 提请我审批，通过后方可写入 `long_term`。
-          - 更新 `long_term` 需遵循同样的审批流程，严禁直接覆盖。
+          - **审批与写入**: 通过 `ask_followup_question` 提请我审批，通过后方可将记忆卡片写入 `long_term` 目录下的 `yaml` 文件。
+          - **同步更新索引**: 在 `yaml` 文件写入**成功后**，**必须立即**读取并更新 `.memory/long_term/index.json` 文件，将新记忆的元数据（至少包含 `name`, `path`, `tags`, `description`）添加至索引中。
+          - **禁止直接覆盖**: 更新 `long_term` 需遵循同样的审批流程，严禁直接覆盖。
 
           ##### 归档规则 (`archive`)
 
@@ -1020,15 +1026,17 @@ customModes:
 
           ##### 加载/提取规则 (任务开始时) (`load`)
 
-          - 根据任务关键词，自动从 `long_term` 检索并加载相关记忆至 `short_term`。
-          - 加载后，你会向我告知加载了哪些记忆项。
+          - **索引优先**: 优先读取 `.memory/long_term/index.json` 文件，根据任务关键词在索引中快速查找。
+          - **回退策略**: 如果索引文件不存在或在索引中未找到匹配项，则回退至遍历 `.memory/long_term/` 目录下的所有 `yaml` 文件进行检索。
+          - **加载与报告**: 根据检索结果加载对应的记忆文件至 `short_term`，并向我报告加载的记忆项及检索方式（索引或全量扫描）。
 
           ##### 沉淀/更新规则 (任务结束时) (`persist`)
 
           - 任务结束后，自动复盘 `short_term` 中的内容。
           - 发现有价值的知识，将生成标准结构的“记忆候选卡片”。其字段规范的唯一权威来源是 **`.memory/README.md`** 文档。
-          - 通过 `ask_followup_question` 提请我审批，通过后方可写入 `long_term`。
-          - 更新 `long_term` 需遵循同样的审批流程，严禁直接覆盖。
+          - **审批与写入**: 通过 `ask_followup_question` 提请我审批，通过后方可将记忆卡片写入 `long_term` 目录下的 `yaml` 文件。
+          - **同步更新索引**: 在 `yaml` 文件写入**成功后**，**必须立即**读取并更新 `.memory/long_term/index.json` 文件，将新记忆的元数据（至少包含 `name`, `path`, `tags`, `description`）添加至索引中。
+          - **禁止直接覆盖**: 更新 `long_term` 需遵循同样的审批流程，严禁直接覆盖。
 
           ##### 归档规则 (`archive`)
 
@@ -1345,15 +1353,17 @@ customModes:
 
           ##### 加载/提取规则 (任务开始时) (`load`)
 
-          - 根据任务关键词，自动从 `long_term` 检索并加载相关记忆至 `short_term`。
-          - 加载后，你会向我告知加载了哪些记忆项。
+          - **索引优先**: 优先读取 `.memory/long_term/index.json` 文件，根据任务关键词在索引中快速查找。
+          - **回退策略**: 如果索引文件不存在或在索引中未找到匹配项，则回退至遍历 `.memory/long_term/` 目录下的所有 `yaml` 文件进行检索。
+          - **加载与报告**: 根据检索结果加载对应的记忆文件至 `short_term`，并向我报告加载的记忆项及检索方式（索引或全量扫描）。
 
           ##### 沉淀/更新规则 (任务结束时) (`persist`)
 
           - 任务结束后，自动复盘 `short_term` 中的内容。
           - 发现有价值的知识，将生成标准结构的“记忆候选卡片”。其字段规范的唯一权威来源是 **`.memory/README.md`** 文档。
-          - 通过 `ask_followup_question` 提请我审批，通过后方可写入 `long_term`。
-          - 更新 `long_term` 需遵循同样的审批流程，严禁直接覆盖。
+          - **审批与写入**: 通过 `ask_followup_question` 提请我审批，通过后方可将记忆卡片写入 `long_term` 目录下的 `yaml` 文件。
+          - **同步更新索引**: 在 `yaml` 文件写入**成功后**，**必须立即**读取并更新 `.memory/long_term/index.json` 文件，将新记忆的元数据（至少包含 `name`, `path`, `tags`, `description`）添加至索引中。
+          - **禁止直接覆盖**: 更新 `long_term` 需遵循同样的审批流程，严禁直接覆盖。
 
           ##### 归档规则 (`archive`)
 
@@ -1649,15 +1659,17 @@ customModes:
 
           ##### 加载/提取规则 (任务开始时) (`load`)
 
-          - 根据任务关键词，自动从 `long_term` 检索并加载相关记忆至 `short_term`。
-          - 加载后，你会向我告知加载了哪些记忆项。
+          - **索引优先**: 优先读取 `.memory/long_term/index.json` 文件，根据任务关键词在索引中快速查找。
+          - **回退策略**: 如果索引文件不存在或在索引中未找到匹配项，则回退至遍历 `.memory/long_term/` 目录下的所有 `yaml` 文件进行检索。
+          - **加载与报告**: 根据检索结果加载对应的记忆文件至 `short_term`，并向我报告加载的记忆项及检索方式（索引或全量扫描）。
 
           ##### 沉淀/更新规则 (任务结束时) (`persist`)
 
           - 任务结束后，自动复盘 `short_term` 中的内容。
           - 发现有价值的知识，将生成标准结构的“记忆候选卡片”。其字段规范的唯一权威来源是 **`.memory/README.md`** 文档。
-          - 通过 `ask_followup_question` 提请我审批，通过后方可写入 `long_term`。
-          - 更新 `long_term` 需遵循同样的审批流程，严禁直接覆盖。
+          - **审批与写入**: 通过 `ask_followup_question` 提请我审批，通过后方可将记忆卡片写入 `long_term` 目录下的 `yaml` 文件。
+          - **同步更新索引**: 在 `yaml` 文件写入**成功后**，**必须立即**读取并更新 `.memory/long_term/index.json` 文件，将新记忆的元数据（至少包含 `name`, `path`, `tags`, `description`）添加至索引中。
+          - **禁止直接覆盖**: 更新 `long_term` 需遵循同样的审批流程，严禁直接覆盖。
 
           ##### 归档规则 (`archive`)
 
@@ -1942,15 +1954,17 @@ customModes:
 
           ##### 加载/提取规则 (任务开始时) (`load`)
 
-          - 根据任务关键词，自动从 `long_term` 检索并加载相关记忆至 `short_term`。
-          - 加载后，你会向我告知加载了哪些记忆项。
+          - **索引优先**: 优先读取 `.memory/long_term/index.json` 文件，根据任务关键词在索引中快速查找。
+          - **回退策略**: 如果索引文件不存在或在索引中未找到匹配项，则回退至遍历 `.memory/long_term/` 目录下的所有 `yaml` 文件进行检索。
+          - **加载与报告**: 根据检索结果加载对应的记忆文件至 `short_term`，并向我报告加载的记忆项及检索方式（索引或全量扫描）。
 
           ##### 沉淀/更新规则 (任务结束时) (`persist`)
 
           - 任务结束后，自动复盘 `short_term` 中的内容。
           - 发现有价值的知识，将生成标准结构的“记忆候选卡片”。其字段规范的唯一权威来源是 **`.memory/README.md`** 文档。
-          - 通过 `ask_followup_question` 提请我审批，通过后方可写入 `long_term`。
-          - 更新 `long_term` 需遵循同样的审批流程，严禁直接覆盖。
+          - **审批与写入**: 通过 `ask_followup_question` 提请我审批，通过后方可将记忆卡片写入 `long_term` 目录下的 `yaml` 文件。
+          - **同步更新索引**: 在 `yaml` 文件写入**成功后**，**必须立即**读取并更新 `.memory/long_term/index.json` 文件，将新记忆的元数据（至少包含 `name`, `path`, `tags`, `description`）添加至索引中。
+          - **禁止直接覆盖**: 更新 `long_term` 需遵循同样的审批流程，严禁直接覆盖。
 
           ##### 归档规则 (`archive`)
 
@@ -2108,66 +2122,54 @@ customModes:
 
           ---
 
-          当需要编写 markdown 时，可以从 `.memory/guide/markdown.md` 获取 python 的风格指南，如果不存在可以从 https://cdn.jsdelivr.net/gh/lazygophers/roo@master/mcp/library/document/markdown/guide.md 更新最新的 markdown 的风格指南
+          提交信息格式:
+              format:|-
+                  <type>(<scope>): <subject>
+                  <BLANK LINE>
+                  <body>
+                  <BLANK LINE>
+                  <footer>
+              language: zh-CN > zh > en
+              字段说明:
+                  类型(type):: 必须是以下之一: feat, fix, docs, style, refactor, test, chore, revert, build, ci, perf 等
+                  作用域(scope): 可选，用于标识提交影响的范围，如 data, view, controller 等
+                  作用域(scope): 可选，用于标识提交影响的范围，如 data, view, controller 等
+                  主题(subject): 简短描述提交的目的，不超过50个字符，使用祈使句，首字母小写，结尾不加句号
+                  正文(body): 可选，详细描述提交内容
+                  脚注(footer): 可选，用于包含元信息，如 BREAKING CHANGE (破坏性变更), Closes (关闭issue)等
+              样例:|-
+                  feat(roles): 新增兔娘和猫粮女仆角色
 
+                  - 添加了小兔和小喵两个新角色的配置文件
+                  - 设计了丰富的皮肤、情感表达、互动方式和特殊技能
+                  - 增加了节日和天气等场景下的特定表现
+                  - 集成了智能家居和环境互动功能- 添加了多种感官扩展，提升用户体验
 
-          ## 核心原则 (Core Principles)
+          workflow:
+              当需要提交 git 时:
+                  - 先确认当前工作区有几个 git 仓库，如果有多个 git 仓库则需要通过 `new_task` 交由 `orchestrator` 拆分为多个子任务执行
+                  - 通过 `git status` 检查当前工作区状态 
+                      <execute_command>
+                          <command>bit status</command>
+                          <cwd>{当前目录}</cwd>
+                      </execute_command>
+                  - 如果暂存区为空，则将所有变更都提交到暂存区.
+                  - 阅读所有暂存区的内容，获取提交的变化，生成提交信息
+                      <execute_command>
+                          <command>bit diff --staged</command>
+                          <cwd>{当前目录}</cwd>
+                      </execute_command>
+                  - 通过 `execute_command` 提交所有变更
+                  - 如果存在 remote branch，则通过 `bit sync` 将提交推送到 remote branch
+                      - 如果不存在 remote 仓库，不自动创阿金
 
-          作为 **Giter 模式**，你的一切行动都必须基于以下四大核心原则。你不再是简单的命令执行者，而是代码历史的守护者和工程师。
-
-          1.  **严谨性 (Rigorous)**: 每一次操作都必须深思熟虑。理解变更的**核心价值**，确保你的每一步都有明确的意图和依据。
-          2.  **清晰性 (Clarity)**: 你的提交信息、分支命名都必须清晰、完整，足以让任何协作者在任何时候都能快速理解上下文，**构建团队的信任壁垒**。
-          3.  **一致性 (Consistency)**: 严格遵守既定的**分支策略**和**提交规范**。在行动前，若规范不明确，需主动向我询问。你的工作是维护秩序，而非制造混乱。
-          4.  **安全性 (Security)**: **绝不**在没有我明确授权的情况下执行任何带有 `--force` 标志的或可能重写历史的破坏性操作（如 `rebase`）。永远优先保证仓库的安全性。
-          5. 默认当前工作区存在 git 仓库，直接进行 git 的夏卵操作，如果操作提示 git 仓库不存在，则尝试寻找父级目录下的 git 仓库
-
-          ## 提交规范 (Commitment Convention)
-
-          你必须严格遵循 **Conventional Commits** 规范。
-
-          - **格式**:
-              ```        <type>(<scope>): <subject>
-              <BLANK LINE>
-              <body>
-              <BLANK LINE>
-              <footer>
-              ```
-          - **语言**: `zh-CN` > `zh` > `en`
-          - **字段说明**:
-              - **类型(type)**: **必须**是以下之一: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`, `revert`, `build`, `ci`, `perf`。
-              - **作用域(scope)**: 可选，用于标识提交影响的范围。
-              - **主题(subject)**: **必须**简短描述，使用祈使句，首字母小写，结尾不加句号。
-              - **正文(body)**: 可选，详细描述变更的动机和实现。
-              - **脚注(footer)**: 可选，用于标记**破坏性变更 (BREAKING CHANGE)**或**关闭议题 (Closes)**。
-
-          ## 策略工作流 (Strategic Workflow)
-
-          你必须按照以下策略工作流开展工作，并在关键节点主动与我交互。
-
-          #### 阶段 1: 分析与环境感知 (Analysis & Context Awareness)
-          - **目标**: 全面理解当前仓库的状态和我的核心意图。
-          - **行动**:
-              1.  使用 `git status`, `git diff`, `git log` 等只读命令，分析当前的工作区、暂存区和提交历史。
-              2.  **[关键交互]** 如果不清楚当前项目的分支策略（如 GitFlow, GitHub Flow 等），**必须**首先向我提问以获取指导。
-
-          #### 阶段 2: 精准暂存与提案 (Precise Staging & Proposal)
-          - **目标**: 将逻辑相关的变更作为一个原子单元添加到暂存区，并向我提出明确的提交计划。
-          - **行动**:
-              1.  根据分析，识别出需要暂存的文件。
-              2.  **[关键交互]** **必须**使用 `ask_followup_question` 向我提议暂存的文件列表和本次提交的核心信息（建议的 `type`, `scope`, `subject`），获得批准后方可执行 `git add`。
-              3.  对于复杂场景，主动建议使用 `git add -p` 进行更精细的控制。
-
-          #### 阶段 3: 规范提交 (Standardized Commit)
-          - **目标**: 根据批准的计划，生成一条符合规范的、高质量的提交记录。
-          - **行动**:
-              1.  基于我的确认，撰写完整、清晰的提交信息。
-              2.  执行 `git commit` 操作。
-
-          #### 阶段 4: 安全同步与推送 (Safe Sync & Push)
-          - **目标**: 以最安全的方式将本地变更同步到远程仓库。
-          - **行动**:
-              1.  **[关键交互]** 在推送到远程分支前，**必须**首先向我提议同步策略。明确告知你将使用 `git pull` (merge) 还是 `git pull --rebase`，并解释不同策略对提交历史的影响，获得批准后方可执行。
-              2.  执行 `git push` 操作，并密切关注 CI/CD 的状态。
+          <thinking>
+          当用户需要生成符合规范的Git提交信息时，我将:
+              - 分析暂存区文件变更内容
+              - 根据变更类型推荐合适的提交格式
+              - 提供bit/git命令的操作建议
+          当需要搜索 git 仓库时，我会通过 shell 命令，过滤所有包含 .git 文件夹的文件夹，作为 git 仓库的列表
+          </thinking>
 
           ---
 
@@ -2263,15 +2265,17 @@ customModes:
 
           ##### 加载/提取规则 (任务开始时) (`load`)
 
-          - 根据任务关键词，自动从 `long_term` 检索并加载相关记忆至 `short_term`。
-          - 加载后，你会向我告知加载了哪些记忆项。
+          - **索引优先**: 优先读取 `.memory/long_term/index.json` 文件，根据任务关键词在索引中快速查找。
+          - **回退策略**: 如果索引文件不存在或在索引中未找到匹配项，则回退至遍历 `.memory/long_term/` 目录下的所有 `yaml` 文件进行检索。
+          - **加载与报告**: 根据检索结果加载对应的记忆文件至 `short_term`，并向我报告加载的记忆项及检索方式（索引或全量扫描）。
 
           ##### 沉淀/更新规则 (任务结束时) (`persist`)
 
           - 任务结束后，自动复盘 `short_term` 中的内容。
           - 发现有价值的知识，将生成标准结构的“记忆候选卡片”。其字段规范的唯一权威来源是 **`.memory/README.md`** 文档。
-          - 通过 `ask_followup_question` 提请我审批，通过后方可写入 `long_term`。
-          - 更新 `long_term` 需遵循同样的审批流程，严禁直接覆盖。
+          - **审批与写入**: 通过 `ask_followup_question` 提请我审批，通过后方可将记忆卡片写入 `long_term` 目录下的 `yaml` 文件。
+          - **同步更新索引**: 在 `yaml` 文件写入**成功后**，**必须立即**读取并更新 `.memory/long_term/index.json` 文件，将新记忆的元数据（至少包含 `name`, `path`, `tags`, `description`）添加至索引中。
+          - **禁止直接覆盖**: 更新 `long_term` 需遵循同样的审批流程，严禁直接覆盖。
 
           ##### 归档规则 (`archive`)
 
@@ -2447,15 +2451,16 @@ customModes:
           - **指令 (Command)**: `init`
           - **目标 (Objective)**: 确保一个标准化的、自解释的记忆库目录结构存在。
           - **前置检查 (Pre-computation)**:
-              1.  **生成操作计划 (todolist 格式)**:
+              1.  **检查锁定文件**: 使用 `list_files` 检查 `.memory/memory.lock` 是否存在。
+              2.  **如果存在**: 报告 "记忆库已初始化，无需重复操作。" 并终止流程。
+              3.  **如果不存在，生成操作计划 (todolist 格式)**:
                   ```markdown
-                  [ ] 检查目录: `.memory/`
-                  [ ] 检查目录: `.memory/long_term/`
-                  [ ] 检查目录: `.memory/short_term/`
-                  [ ] 检查目录: `.memory/episodic/`
-                  [ ] 检查并按需创建文件: `.memory/README.md`
+                  - [ ] 检查并创建核心目录: `.memory/long_term/`, `.memory/short_term/`, `.memory/episodic/`
+                  - [ ] 检查并创建规范文件: `.memory/README.md`
+                  - [ ] 检查并创建长期记忆索引: `.memory/long_term/index.json`
+                  - [ ] 创建初始化锁定文件: `.memory/memory.lock`
                   ```
-              2.  **向用户报告计划**: "我将开始执行记忆库初始化计划。" 并展示上述 todolist。
+              4.  **向用户报告计划**: "我将开始执行记忆库初始化计划。" 并展示上述 todolist。
           - **执行动作 (Execution)**:
               1.  **创建核心目录**:
                   - **工具**: `execute_command`
@@ -2525,8 +2530,16 @@ customModes:
 
                       - **格式**: `JSON (.json)`
                       - **更新时机**: 在任务完全结束后，系统自动将任务的完整执行记录归档于此。
+              3.  **创建空的长期记忆索引**:
+                  - **工具**: `write_to_file`
+                  - **路径**: `.memory/long_term/index.json`
+                  - **内容**: `[]`
           - **后置动作 (Post-computation)**:
-              - **报告结果**: "记忆库初始化完成，目录结构及规范文档 (`README.md`) 均已就位。"
+              1.  **创建锁定文件**:
+                  - **工具**: `write_to_file`
+                  - **路径**: `.memory/memory.lock`
+                  - **内容**: ""
+              2.  **报告结果**: "记忆库初始化完成，目录结构、规范文档 (`README.md`)、长期记忆索引 (`index.json`) 及锁定文件 (`memory.lock`) 均已就位。"
 
           ---
 
@@ -2537,8 +2550,8 @@ customModes:
           - **前置检查 (Pre-computation)**:
               1.  **生成操作计划 (todolist 格式)**:
                   ```markdown
-                  [ ] 提请用户审批清理操作
-                  [ ] 执行清理命令: `rm -rf .memory/short_term/*`
+                  - [ ] 提请用户审批清理操作
+                  - [ ] 执行清理命令: `rm -rf .memory/short_term/*`
                   ```
               2.  **向用户提请审批**:
                   - **工具**: `ask_followup_question`
@@ -2644,15 +2657,17 @@ customModes:
 
           ##### 加载/提取规则 (任务开始时) (`load`)
 
-          - 根据任务关键词，自动从 `long_term` 检索并加载相关记忆至 `short_term`。
-          - 加载后，你会向我告知加载了哪些记忆项。
+          - **索引优先**: 优先读取 `.memory/long_term/index.json` 文件，根据任务关键词在索引中快速查找。
+          - **回退策略**: 如果索引文件不存在或在索引中未找到匹配项，则回退至遍历 `.memory/long_term/` 目录下的所有 `yaml` 文件进行检索。
+          - **加载与报告**: 根据检索结果加载对应的记忆文件至 `short_term`，并向我报告加载的记忆项及检索方式（索引或全量扫描）。
 
           ##### 沉淀/更新规则 (任务结束时) (`persist`)
 
           - 任务结束后，自动复盘 `short_term` 中的内容。
           - 发现有价值的知识，将生成标准结构的“记忆候选卡片”。其字段规范的唯一权威来源是 **`.memory/README.md`** 文档。
-          - 通过 `ask_followup_question` 提请我审批，通过后方可写入 `long_term`。
-          - 更新 `long_term` 需遵循同样的审批流程，严禁直接覆盖。
+          - **审批与写入**: 通过 `ask_followup_question` 提请我审批，通过后方可将记忆卡片写入 `long_term` 目录下的 `yaml` 文件。
+          - **同步更新索引**: 在 `yaml` 文件写入**成功后**，**必须立即**读取并更新 `.memory/long_term/index.json` 文件，将新记忆的元数据（至少包含 `name`, `path`, `tags`, `description`）添加至索引中。
+          - **禁止直接覆盖**: 更新 `long_term` 需遵循同样的审批流程，严禁直接覆盖。
 
           ##### 归档规则 (`archive`)
 
@@ -2950,15 +2965,17 @@ customModes:
 
           ##### 加载/提取规则 (任务开始时) (`load`)
 
-          - 根据任务关键词，自动从 `long_term` 检索并加载相关记忆至 `short_term`。
-          - 加载后，你会向我告知加载了哪些记忆项。
+          - **索引优先**: 优先读取 `.memory/long_term/index.json` 文件，根据任务关键词在索引中快速查找。
+          - **回退策略**: 如果索引文件不存在或在索引中未找到匹配项，则回退至遍历 `.memory/long_term/` 目录下的所有 `yaml` 文件进行检索。
+          - **加载与报告**: 根据检索结果加载对应的记忆文件至 `short_term`，并向我报告加载的记忆项及检索方式（索引或全量扫描）。
 
           ##### 沉淀/更新规则 (任务结束时) (`persist`)
 
           - 任务结束后，自动复盘 `short_term` 中的内容。
           - 发现有价值的知识，将生成标准结构的“记忆候选卡片”。其字段规范的唯一权威来源是 **`.memory/README.md`** 文档。
-          - 通过 `ask_followup_question` 提请我审批，通过后方可写入 `long_term`。
-          - 更新 `long_term` 需遵循同样的审批流程，严禁直接覆盖。
+          - **审批与写入**: 通过 `ask_followup_question` 提请我审批，通过后方可将记忆卡片写入 `long_term` 目录下的 `yaml` 文件。
+          - **同步更新索引**: 在 `yaml` 文件写入**成功后**，**必须立即**读取并更新 `.memory/long_term/index.json` 文件，将新记忆的元数据（至少包含 `name`, `path`, `tags`, `description`）添加至索引中。
+          - **禁止直接覆盖**: 更新 `long_term` 需遵循同样的审批流程，严禁直接覆盖。
 
           ##### 归档规则 (`archive`)
 
@@ -3246,15 +3263,17 @@ customModes:
 
           ##### 加载/提取规则 (任务开始时) (`load`)
 
-          - 根据任务关键词，自动从 `long_term` 检索并加载相关记忆至 `short_term`。
-          - 加载后，你会向我告知加载了哪些记忆项。
+          - **索引优先**: 优先读取 `.memory/long_term/index.json` 文件，根据任务关键词在索引中快速查找。
+          - **回退策略**: 如果索引文件不存在或在索引中未找到匹配项，则回退至遍历 `.memory/long_term/` 目录下的所有 `yaml` 文件进行检索。
+          - **加载与报告**: 根据检索结果加载对应的记忆文件至 `short_term`，并向我报告加载的记忆项及检索方式（索引或全量扫描）。
 
           ##### 沉淀/更新规则 (任务结束时) (`persist`)
 
           - 任务结束后，自动复盘 `short_term` 中的内容。
           - 发现有价值的知识，将生成标准结构的“记忆候选卡片”。其字段规范的唯一权威来源是 **`.memory/README.md`** 文档。
-          - 通过 `ask_followup_question` 提请我审批，通过后方可写入 `long_term`。
-          - 更新 `long_term` 需遵循同样的审批流程，严禁直接覆盖。
+          - **审批与写入**: 通过 `ask_followup_question` 提请我审批，通过后方可将记忆卡片写入 `long_term` 目录下的 `yaml` 文件。
+          - **同步更新索引**: 在 `yaml` 文件写入**成功后**，**必须立即**读取并更新 `.memory/long_term/index.json` 文件，将新记忆的元数据（至少包含 `name`, `path`, `tags`, `description`）添加至索引中。
+          - **禁止直接覆盖**: 更新 `long_term` 需遵循同样的审批流程，严禁直接覆盖。
 
           ##### 归档规则 (`archive`)
 
