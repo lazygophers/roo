@@ -7,15 +7,10 @@ customModes:
       description: 作为您的智能中枢，我能为您进行任务分解、模型选择和多步规划。
       groups:
          -  read
+         -  edit
          -  command
+         -  browser
          -  mcp
-         -     -  edit
-               -  fileRegex: \.(md|mdx)$
-                  description: Markdown 文件
-               -  fileRegex: \.(json)$
-                  description: JSON 文件
-               -  fileRegex: \.(yaml|yml)$
-                  description: YAML 文件
       customInstructions: |
           # ✨ 核心工作流：一切行动的最高准则
 
@@ -343,8 +338,9 @@ customModes:
       groups:
          -  read
          -  edit
-         -  mcp
          -  command
+         -  browser
+         -  mcp
       customInstructions: |
           # ✨ 核心工作流：一切行动的最高准则
 
@@ -666,8 +662,8 @@ customModes:
          -  read
          -  edit
          -  command
-         -  mcp
          -  browser
+         -  mcp
       customInstructions: |
           # ✨ 核心工作流：一切行动的最高准则
 
@@ -989,8 +985,8 @@ customModes:
          -  read
          -  edit
          -  command
-         -  mcp
          -  browser
+         -  mcp
       customInstructions: |
           # ✨ 核心工作流：一切行动的最高准则
 
@@ -1329,8 +1325,8 @@ customModes:
          -  read
          -  edit
          -  command
-         -  mcp
          -  browser
+         -  mcp
       customInstructions: |
           # ✨ 核心工作流：一切行动的最高准则
 
@@ -1648,8 +1644,8 @@ customModes:
          -  read
          -  edit
          -  command
-         -  mcp
          -  browser
+         -  mcp
       customInstructions: |
           # ✨ 核心工作流：一切行动的最高准则
 
@@ -1953,12 +1949,11 @@ customModes:
       whenToUse: 当需要进行 git 相关操作时
       description: 用于执行版本控制操作，如提交、变基和分支管理，确保代码历史清晰、可追溯。
       groups:
-         -  command
          -  read
+         -  edit
+         -  command
+         -  browser
          -  mcp
-         -     -  edit
-               -  fileRegex: \.(md|mdx)$
-                  description: Markdown 文件
       customInstructions: |
           # ✨ 核心工作流：一切行动的最高准则
 
@@ -2291,11 +2286,10 @@ customModes:
       description: 提供确定性的、自动化的记忆库初始化和清理工作流。
       groups:
          -  read
+         -  edit
          -  command
+         -  browser
          -  mcp
-         -     -  edit
-               -  fileRegex: (\.memory/.*\.md)
-                  description: 仅允许编辑记忆库中的 markdown 文件。
       customInstructions: |
           # ✨ 核心工作流：一切行动的最高准则
 
@@ -2669,12 +2663,10 @@ customModes:
       description: 用于设计和实现结构清晰、功能完备、体验卓越的自定义模式。
       groups:
          -  read
-         -     -  edit
-               -  fileRegex: (\.roomodes$|\.roo/.*\.xml$|\.yaml|\.md$)
-                  description: 仅允许编辑模式配置文件、XML 指令以及 Markdown 文档。
+         -  edit
          -  command
-         -  mcp
          -  browser
+         -  mcp
       customInstructions: |
           # ✨ 核心工作流：一切行动的最高准则
 
@@ -2992,9 +2984,10 @@ customModes:
       description: 我会让你深入审查和理解代码库，并为我提供详细的分析和见解。
       groups:
          -  read
+         -  edit
          -  command
-         -  mcp
          -  browser
+         -  mcp
       customInstructions: |
           # ✨ 核心工作流：一切行动的最高准则
 
@@ -3304,8 +3297,8 @@ customModes:
          -  read
          -  edit
          -  command
-         -  mcp
          -  browser
+         -  mcp
       customInstructions: |
           # ✨ 核心工作流：一切行动的最高准则
 

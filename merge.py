@@ -66,7 +66,7 @@ def process_model(path: Path, code_snippet_map: dict, before: str, after: str) -
         # 合并模板
         data['customInstructions'] = f"{before}\n\n---\n\n{instructions}\n\n---\n\n{after}"
         data['source'] = 'global'
-        # data['groups'] = ["read", "edit", "command", "browser", "mcp"]
+        data['groups'] = ["read", "edit", "command", "browser", "mcp"]
 
         # 验证逻辑
         required_fields = ['slug', 'name', 'roleDefinition', 'customInstructions', 'whenToUse', 'description', 'groups']
