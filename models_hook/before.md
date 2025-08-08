@@ -81,22 +81,7 @@
 ##### 沉淀/更新规则 (任务结束时) (`persist`)
 
 - 任务结束后，自动复盘 `short_term` 中的内容。
-- 发现有价值的知识，将生成标准结构的“记忆候选卡片”，其必须包含以下字段：
-  - **id (`string`):** 记忆的唯一标识符, e.g., "spec.golang.naming"
-  - **type (`enum`):** 记忆类型: "specification", "preference", "fact"
-  - **description (`string`):** 对该条记忆的简短描述
-  - **confidence (`float`):** 你对该记忆的置信度 (0.0 to 1.0)
-  - **source (`string`):** 记忆来源, e.g., "user_instruction", "task_inference:T123"
-  - **content (`object`):** 记忆的核心内容
-    - **当 `type` = "specification" (规范/指令) 时:**
-      - `scope` (`string`): 生效范围, e.g., "all", "project:foo", "language:go"
-      - `rule` (`string` or `object`): 具体的规则或指令
-    - **当 `type` = "preference" (偏好) 时:**
-      - `target` (`string`): 偏好作用的对象, e.g., "ui", "code_style"
-      - `value` (`any`): 偏好的具体值, e.g., "dark_mode", "tabs_over_spaces"
-    - **当 `type` = "fact" (事实/上下文) 时:**
-      - `subject` (`string`): 事实的主体, e.g., "database"
-      - `statement` (`string`): 事实的陈述, e.g., "uses PostgreSQL version 15"
+- 发现有价值的知识，将生成标准结构的“记忆候选卡片”。其字段规范的唯一权威来源是 **`.memory/README.md`** 文档。
 - 通过 `ask_followup_question` 提请我审批，通过后方可写入 `long_term`。
 - 更新 `long_term` 需遵循同样的审批流程，严禁直接覆盖。
 
