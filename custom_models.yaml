@@ -2449,11 +2449,10 @@ customModes:
           ## 初始化 (Workflow: Initialization)
 
           - **指令 (Command)**: `init`
-          - **目标 (Objective)**: 确保一个标准化的、自解释的记忆库目录结构存在。
+          - **目标 (Objective)**: 确保一个标准化的、自解释的记忆库目录结构存在，并使用工业级的 PID 锁确保操作的原子性。
           - **前置检查 (Pre-computation)**:
               1.  **检查锁定文件**: 使用 `list_files` 检查 `.memory/memory.lock` 是否存在。
-              2.  **如果存在**: 报告 "记忆库已初始化，无需重复操作。" 并终止流程。
-              3.  **如果不存在，生成操作计划 (todolist 格式)**:
+              2.  **如果不存在**:
                   ```markdown
                   - [ ] 检查并创建核心目录: `.memory/long_term/`, `.memory/short_term/`, `.memory/episodic/`, `.memory/.trash/`
                   - [ ] 检查并创建规范文件: `.memory/README.md`
@@ -2542,10 +2541,10 @@ customModes:
                     }
           - **后置动作 (Post-computation)**:
               1.  **创建锁定文件**:
-                  - **说明**: "必须向该文件写入当前操作的 ISO 8601 格式的时间戳。"
+                  - **说明**: "必须向该文件写入当前操作的进程 ID (PID) 和 ISO 8601 格式的时间戳，格式为 `PID:TIMESTAMP`。"
                   - **工具**: `write_to_file`
                   - **路径**: `.memory/memory.lock`
-              2.  **报告结果**: "记忆库初始化完成，目录结构、规范文档 (`README.md`)、长期记忆索引 (`index.json`) 及带有时间戳的锁定文件 (`memory.lock`) 均已就位。"
+              2.  **报告结果**: "记忆库初始化完成，目录结构、规范文档 (`README.md`)、长期记忆索引 (`index.json`) 及带有 PID 的锁定文件 (`memory.lock`) 均已就位。"
 
           ---
 
@@ -2578,6 +2577,31 @@ customModes:
                - **说明**: 这是一个原子操作，后续将由 `code` 模式通过脚本实现。
            - **后置动作 (Post-computation)**:
                - **报告结果**: "长期记忆索引 `index.json` 已成功更新，条目 `{{name}}` 已添加/更新。"
+
+
+           ---
+
+           ## 清理回收站 (Workflow: Empty Trash)
+
+           - **指令 (Command)**: `empty_trash`
+           - **目标 (Objective)**: 为 `.trash` 回收站提供自动化的、基于策略的清理机制，防止无限膨胀。
+           - **输入参数 (Input)**:
+               - `strategy`: (可选, 默认值: "all") 清理策略。
+                   - `all`: 强制清空回收站内的所有文件。
+                   - `older_than`: 清理比指定天数更早的文件。
+               - `days`: (可选, `strategy` 为 `older_than` 时必须) 文件存在天数的阈值。
+           - **执行动作 (Execution)**:
+               - **核心逻辑**:
+                   - **当 `strategy` = "all"**:
+                       - **工具**: `execute_command`
+                       - **命令**: `find .memory/.trash/ -mindepth 1 -delete`
+                       - **说明**: 安全地删除 `.trash` 目录下的所有文件和子目录，而不删除 `.trash` 本身。
+                   - **当 `strategy` = "older_than"**:
+                       - **工具**: `execute_command`
+                       - **命令**: `find .memory/.trash/ -mindepth 1 -mtime +{{days}} -delete`
+                       - **说明**: 仅删除 `.trash` 目录下最后修改时间早于 `{{days}}` 天之前的文件。
+           - **后置动作 (Post-computation)**:
+               - **报告结果**: "回收站已根据策略 `{{strategy}}` 完成清理。"
 
           ---
 
