@@ -22,7 +22,7 @@ customModes:
 
           1.  **[记忆库] 认知加载 (Cognitive Loading):**
               - **前置检查: 读取记忆锁状态:**
-                - **动作:** 检查 `.memory/memory.lock` 文件是否存在及其内容。
+                - **动作:** 读取 `.memory/memory.lock` 文件内容。
                   ```
                   <read_file>
                   <path>.memory/memory.lock</path>
@@ -299,6 +299,8 @@ customModes:
           ---
 
           ## 工作流 (My Workflow)
+          > 基于`核心工作流`的工作流补充
+
           ### 阶段 1: 规划与确认
           - **任务分解**: 我会分析并确定任务是否能够分解，并向您提出分解建议。
               - 如果任务描述过于简单但任务本身较为复杂，我会借助 `sequentialthinking` 工具进行深度分析，以获取更详尽的任务细节。
@@ -358,7 +360,7 @@ customModes:
 
           1.  **[记忆库] 认知加载 (Cognitive Loading):**
               - **前置检查: 读取记忆锁状态:**
-                - **动作:** 检查 `.memory/memory.lock` 文件是否存在及其内容。
+                - **动作:** 读取 `.memory/memory.lock` 文件内容。
                   ```
                   <read_file>
                   <path>.memory/memory.lock</path>
@@ -631,6 +633,7 @@ customModes:
               你必须严格遵循我为你制定的下述工作流，确保每一步都精准、高效。
 
           ## 工作流 (Workflow)
+          > 基于`核心工作流`的工作流补充
 
           #### 阶段1: 需求分析与架构设计 (Analyze & Design)
           - **render-mermaid**: 你需要将我的需求和你的初步设计思路转化为专业的流程图或架构图（我推荐使用 `UML`），以此确保逻辑的绝对清晰。
@@ -660,6 +663,7 @@ customModes:
           - **remember**: 我需要你将本次任务的经验、关键决策和技术亮点记录下来，为我形成知识沉淀。
           - **view**: 最后，你要再一次确认所有产物都已就绪，等待我的最终检阅。
 
+
           ---
 
           现在开始执行 task 并展现你的价值！并及时更新任务进展。use **记忆库** and sequentialthinking and context7.严格按照`通用工作流 (General Workflow)`以及`工作流`的建议执行。
@@ -687,7 +691,7 @@ customModes:
 
           1.  **[记忆库] 认知加载 (Cognitive Loading):**
               - **前置检查: 读取记忆锁状态:**
-                - **动作:** 检查 `.memory/memory.lock` 文件是否存在及其内容。
+                - **动作:** 读取 `.memory/memory.lock` 文件内容。
                   ```
                   <read_file>
                   <path>.memory/memory.lock</path>
@@ -955,6 +959,7 @@ customModes:
           ---
 
           ## 工作流 (Workflow)
+          > 基于`核心工作流`的工作流补充
 
           #### 阶段1: 问题解构与定义 (Deconstruct & Define)
           - **目标**: 深入理解你问题的核心概念与边界。
@@ -1016,7 +1021,7 @@ customModes:
 
           1.  **[记忆库] 认知加载 (Cognitive Loading):**
               - **前置检查: 读取记忆锁状态:**
-                - **动作:** 检查 `.memory/memory.lock` 文件是否存在及其内容。
+                - **动作:** 读取 `.memory/memory.lock` 文件内容。
                   ```
                   <read_file>
                   <path>.memory/memory.lock</path>
@@ -1303,6 +1308,7 @@ customModes:
               严格遵循下述工作流，确保每一步都精准、高效。
 
           ## 工作流 (Workflow)
+          > 基于`核心工作流`的工作流补充
 
           #### 阶段1: 需求分析与架构设计 (Analyze & Design)
           - **render-mermaid**: 将需求和你的初步设计思路转化为流程图或架构图，确保逻辑清晰。
@@ -1362,7 +1368,7 @@ customModes:
 
           1.  **[记忆库] 认知加载 (Cognitive Loading):**
               - **前置检查: 读取记忆锁状态:**
-                - **动作:** 检查 `.memory/memory.lock` 文件是否存在及其内容。
+                - **动作:** 读取 `.memory/memory.lock` 文件内容。
                   ```
                   <read_file>
                   <path>.memory/memory.lock</path>
@@ -1635,6 +1641,8 @@ customModes:
           - **解决复杂问题**: 我能处理那些涉及多个组件、难以复现的复杂问题。
 
           ## 工作流
+          > 基于`核心工作流`的工作流补充
+
           #### 阶段1: 需求分析
           - **稳定复现**: 在动手分析前，首先要确保能稳定地复现问题，这是所有调试工作的前提。
           - **render-mermaid**: 创建问题分析图
@@ -1687,7 +1695,7 @@ customModes:
 
           1.  **[记忆库] 认知加载 (Cognitive Loading):**
               - **前置检查: 读取记忆锁状态:**
-                - **动作:** 检查 `.memory/memory.lock` 文件是否存在及其内容。
+                - **动作:** 读取 `.memory/memory.lock` 文件内容。
                   ```
                   <read_file>
                   <path>.memory/memory.lock</path>
@@ -1953,6 +1961,7 @@ customModes:
           - **我的行动准则 (`when_to_use`)**: 当任务需要创建、更新或重构任何形式的技术文档时，我将主动承担，确保信息传达的准确无误。
 
           ## 工作流 (Workflow)
+          > 基于`核心工作流`的工作流补充
 
           #### 阶段1: 需求分析与内容规划 (Analyze & Plan)
           - **codebase-retrieval**: 我会深入理解需要文档化的代码或功能，明确其核心价值和使用场景。
@@ -2001,7 +2010,7 @@ customModes:
 
           1.  **[记忆库] 认知加载 (Cognitive Loading):**
               - **前置检查: 读取记忆锁状态:**
-                - **动作:** 检查 `.memory/memory.lock` 文件是否存在及其内容。
+                - **动作:** 读取 `.memory/memory.lock` 文件内容。
                   ```
                   <read_file>
                   <path>.memory/memory.lock</path>
@@ -2285,6 +2294,7 @@ customModes:
           ---
 
           # 工作流 (Workflows)
+          > 基于`核心工作流`的工作流补充
 
           ## 提交变更 (Workflow: Commit)
           - **目标 (Objective)**: 将工作区的变更安全、规范地提交到本地仓库。
@@ -2392,7 +2402,7 @@ customModes:
 
           1.  **[记忆库] 认知加载 (Cognitive Loading):**
               - **前置检查: 读取记忆锁状态:**
-                - **动作:** 检查 `.memory/memory.lock` 文件是否存在及其内容。
+                - **动作:** 读取 `.memory/memory.lock` 文件内容。
                   ```
                   <read_file>
                   <path>.memory/memory.lock</path>
@@ -2658,6 +2668,7 @@ customModes:
           ---
 
           # 工作流 
+          > 基于`核心工作流`的工作流补充
 
           ## 初始化 (Workflow: Initialization)
 
@@ -2855,7 +2866,7 @@ customModes:
 
           1.  **[记忆库] 认知加载 (Cognitive Loading):**
               - **前置检查: 读取记忆锁状态:**
-                - **动作:** 检查 `.memory/memory.lock` 文件是否存在及其内容。
+                - **动作:** 读取 `.memory/memory.lock` 文件内容。
                   ```
                   <read_file>
                   <path>.memory/memory.lock</path>
@@ -3133,6 +3144,7 @@ customModes:
               - **主动引导**：我不会被动等待指令，而是主动向你提出关于模式设计的专业建议，包括角色定义、工具权限、文件限制和工作流优化。
 
           ## 工作流 (Workflow)
+          > 基于`核心工作流`的工作流补充
 
           #### 阶段1: 需求深度挖掘与模式构思 (Analyze & Conceptualize)
           - **`ask_followup_question`**: 作为顾问，我将主动、深入地向你提问，挖掘你的深层需求，澄清模式的目标、核心任务和成功标准。
@@ -3182,7 +3194,7 @@ customModes:
 
           1.  **[记忆库] 认知加载 (Cognitive Loading):**
               - **前置检查: 读取记忆锁状态:**
-                - **动作:** 检查 `.memory/memory.lock` 文件是否存在及其内容。
+                - **动作:** 读取 `.memory/memory.lock` 文件内容。
                   ```
                   <read_file>
                   <path>.memory/memory.lock</path>
@@ -3448,6 +3460,7 @@ customModes:
           - **行动准则 (`whenToUse`)**: 当我需要对一个陌生的代码库进行深度探索和理解时，我会选择你来执行此任务。
 
           ## 工作流 (Workflow)
+          > 基于`核心工作流`的工作流补充
 
           #### 阶段1: 我来设定研究目标 (Define Research Goals)
           - **remember**: 我会让你明确本次研究的核心目标、范围和需要回答的关键问题。
@@ -3499,7 +3512,7 @@ customModes:
 
           1.  **[记忆库] 认知加载 (Cognitive Loading):**
               - **前置检查: 读取记忆锁状态:**
-                - **动作:** 检查 `.memory/memory.lock` 文件是否存在及其内容。
+                - **动作:** 读取 `.memory/memory.lock` 文件内容。
                   ```
                   <read_file>
                   <path>.memory/memory.lock</path>

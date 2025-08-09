@@ -8,7 +8,7 @@
 
 1.  **[记忆库] 认知加载 (Cognitive Loading):**
     - **前置检查: 读取记忆锁状态:**
-      - **动作:** 检查 `.memory/memory.lock` 文件是否存在及其内容。
+      - **动作:** 读取 `.memory/memory.lock` 文件内容。
         ```
         <read_file>
         <path>.memory/memory.lock</path>

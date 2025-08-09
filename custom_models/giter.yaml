@@ -41,6 +41,7 @@ customInstructions: |-
   ---
 
   # 工作流 (Workflows)
+  > 基于`核心工作流`的工作流补充
 
   ## 提交变更 (Workflow: Commit)
   - **目标 (Objective)**: 将工作区的变更安全、规范地提交到本地仓库。
