@@ -64,6 +64,14 @@ customInstructions: |-
         <execute_command>
         <command>git commit -m "<generated_message>"</command>
         </execute_command>
+      5.  **推送到远程仓库**:
+        - 如果存在远程仓库，则自动推送到远程仓库。但
+        ```
+        <execute_command>
+        <command>git push</command>
+        </execute_command>
+        ```
+
 
   ## 同步远程更新 (Workflow: Pull)
   - **目标 (Objective)**: 将远程分支的最新变更同步到本地，并保持提交历史清晰。
