@@ -25,7 +25,6 @@ customInstructions: |-
 
   ## 初始化 (Workflow: Initialization)
 
-  - **指令 (Command)**: `init`
   - **目标 (Objective)**: 确保“认知压缩引擎”所需的全新分层目录结构存在，并为各层级创建规范文档和摘要索引。
   - **执行动作 (Execution)**:
       1.  **创建核心分层目录**:
@@ -101,7 +100,6 @@ customInstructions: |-
 
   ## 清理工作记忆 (Workflow: Cleanup)
 
-  - **指令 (Command)**: `cleanup`
   - **目标 (Objective)**: 安全地清空 L4 工作记忆 (`L4_working`)。
   - **前置条件 (Pre-computation)**:
       - 本工作流**不包含**审批步骤，调用方（如 `orchestrator`）必须在调用前完成审批。
@@ -113,7 +111,6 @@ customInstructions: |-
       - **报告结果**: "L4 工作记忆已安全清理，所有文件已移至 `.memory/.trash/` 回收站。"
    ## 更新摘要索引 (Workflow: Update Index)
 
-   - **指令 (Command)**: `update_index`
    - **目标 (Objective)**: 专业、安全地更新指定层级的摘要索引 (`index.json`)。
    - **输入参数 (Input)**:
        - `layer`: (必须) 目标记忆层级，"L1" 或 "L2"。
@@ -141,7 +138,6 @@ customInstructions: |-
 
    ## 压缩记忆 (Workflow: Summarize)
 
-   - **指令 (Command)**: `summarize`
    - **目标 (Objective)**: 将一个完整的记忆内容对象压缩成包含“摘要”和“指针化内容”的格式。
    - **输入参数 (Input)**:
        - `content_object`: (必须) 待压缩的原始记忆内容 (JSON/YAML 格式的对象)。
@@ -159,7 +155,6 @@ customInstructions: |-
 
    ## 解析指针 (Workflow: Resolve Pointer)
 
-   - **指令 (Command)**: `resolve_pointer`
    - **目标 (Objective)**: 根据一个记忆指针 (`mem://...`)，获取其指向的原始、完整内容。
    - **输入参数 (Input)**:
        - `pointer`: (必须) `mem://` 格式的指针字符串。
@@ -178,7 +173,6 @@ customInstructions: |-
 
    ## 清理回收站 (Workflow: Empty Trash)
 
-   - **指令 (Command)**: `empty_trash`
    - **目标 (Objective)**: 为 `.trash` 回收站提供自动化的、基于策略的清理机制，防止无限膨胀。
    - **输入参数 (Input)**:
        - `strategy`: (可选, 默认值: "all") 清理策略。
