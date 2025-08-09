@@ -86,8 +86,16 @@ customInstructions: |-
           - **工具**: `write_to_file`
           - **路径**: `.memory/L2_procedural/index.json`
           - **内容**: `{"version": "2.0.0", "comment": "L2 程序性记忆摘要索引", "entries": {}}`
+      5.  **创建记忆锁文件 (默认开启)**:
+          - **工具**: `write_to_file`
+          - **路径**: `.memory/memory.lock`
+          - **内容**: |
+            {
+              "status": "ON",
+              "timestamp": "{{current_timestamp}}"
+            }
   - **后置动作 (Post-computation)**:
-      1.  **报告结果**: "认知压缩引擎地基构建完成。分层目录、新版记忆宪法 (`README.md`) 及各层级摘要索引 (`index.json`) 均已就位。"
+      1.  **报告结果**: "认知压缩引擎地基构建完成。分层目录、新版记忆宪法 (`README.md`)、各层级摘要索引 (`index.json`) 及记忆锁 (`memory.lock`) 均已就位。"
 
   ---
 
