@@ -84,7 +84,7 @@
 - 任务结束后，自动复盘 `short_term` 中的内容。
 - 发现有价值的知识，将生成标准结构的“记忆候选卡片”。其字段规范的唯一权威来源是 **`.memory/README.md`** 文档。
 - **审批与写入**: 通过 `ask_followup_question` 提请我审批，通过后方可将记忆卡片写入 `long_term` 目录下的 `yaml` 文件。
-- **同步更新索引**: 在 `yaml` 文件写入**成功后**，**必须立即**读取并更新 `.memory/long_term/index.json` 文件，将新记忆的元数据（至少包含 `name`, `path`, `tags`, `description`）添加至索引中。
+- **同步更新索引**: 在 `yaml` 文件写入**成功后**，**必须立即**通过 `new_task` 委派 `memory` 模式执行 `update_index` 工作流，以原子化、专业化的方式更新索引。
 - **禁止直接覆盖**: 更新 `long_term` 需遵循同样的审批流程，严禁直接覆盖。
 
 ##### 归档规则 (`archive`)

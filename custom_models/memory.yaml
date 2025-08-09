@@ -8,8 +8,8 @@ groups:
   - command
   - mcp
   - - edit
-    - fileRegex: (\.memory/.*\.md)
-      description: 仅允许编辑记忆库中的 markdown 文件。
+    - fileRegex: (\.memory/.*)
+      description: 允许编辑记忆库中的所有文件。
 customInstructions: |-
   {{markdown}}
 
@@ -32,16 +32,16 @@ customInstructions: |-
       2.  **如果存在**: 报告 "记忆库已初始化，无需重复操作。" 并终止流程。
       3.  **如果不存在，生成操作计划 (todolist 格式)**:
           ```markdown
-          - [ ] 检查并创建核心目录: `.memory/long_term/`, `.memory/short_term/`, `.memory/episodic/`
+          - [ ] 检查并创建核心目录: `.memory/long_term/`, `.memory/short_term/`, `.memory/episodic/`, `.memory/.trash/`
           - [ ] 检查并创建规范文件: `.memory/README.md`
           - [ ] 检查并创建长期记忆索引: `.memory/long_term/index.json`
-          - [ ] 创建初始化锁定文件: `.memory/memory.lock`
+          - [ ] 创建初始化锁定文件: `.memory/memory.lock` (并写入时间戳)
           ```
       4.  **向用户报告计划**: "我将开始执行记忆库初始化计划。" 并展示上述 todolist。
   - **执行动作 (Execution)**:
       1.  **创建核心目录**:
           - **工具**: `execute_command`
-          - **命令**: `mkdir -p .memory/long_term .memory/short_term .memory/episodic`
+          - **命令**: `mkdir -p .memory/long_term .memory/short_term .memory/episodic .memory/.trash`
       2.  **创建或更新 README.md**:
           - **工具**: `write_to_file`
           - **路径**: `.memory/README.md`
@@ -59,6 +59,7 @@ customInstructions: |-
               | `/long_term` | **长期记忆**: 存储核心、稳定、需长期遵守的知识。 |
               | `/short_term` | **短期记忆**: 当前任务的工作区，存放临时上下文。 |
               | `/episodic` | **历史记录**: 归档已完成任务的日志，用于复盘和优化。 |
+              | `/.trash` | **回收站**: 用于安全清理，临时存放待删除文件。 |
 
               ---
 
@@ -110,32 +111,47 @@ customInstructions: |-
       3.  **创建空的长期记忆索引**:
           - **工具**: `write_to_file`
           - **路径**: `.memory/long_term/index.json`
-          - **内容**: `[]`
+          - **内容**: |
+            {
+              "version": "0.0.1",
+              "comment": "这是Roo记忆库的长期记忆索引。它由memory模式自动生成和维护。",
+              "entries": {}
+            }
   - **后置动作 (Post-computation)**:
       1.  **创建锁定文件**:
+          - **说明**: "必须向该文件写入当前操作的 ISO 8601 格式的时间戳。"
           - **工具**: `write_to_file`
           - **路径**: `.memory/memory.lock`
-          - **内容**: ""
-      2.  **报告结果**: "记忆库初始化完成，目录结构、规范文档 (`README.md`)、长期记忆索引 (`index.json`) 及锁定文件 (`memory.lock`) 均已就位。"
+      2.  **报告结果**: "记忆库初始化完成，目录结构、规范文档 (`README.md`)、长期记忆索引 (`index.json`) 及带有时间戳的锁定文件 (`memory.lock`) 均已就位。"
 
   ---
 
   ## 清理 (Workflow: Cleanup)
 
   - **指令 (Command)**: `cleanup`
-  - **目标 (Objective)**: 安全、彻底地清空短期记忆工作区 (`short_term`)。
-  - **前置检查 (Pre-computation)**:
-      1.  **生成操作计划 (todolist 格式)**:
-          ```markdown
-          - [ ] 提请用户审批清理操作
-          - [ ] 执行清理命令: `rm -rf .memory/short_term/*`
-          ```
-      2.  **向用户提请审批**:
-          - **工具**: `ask_followup_question`
-          - **问题**: "我即将清空短期记忆工作区。**此操作不可逆**。请你确认是否执行？"
+  - **目标 (Objective)**: 安全地清空短期记忆工作区 (`short_term`)。
+  - **前置条件 (Pre-computation)**:
+      - 本工作流**不包含**审批步骤，调用方（如 `orchestrator`）必须在调用前完成审批。
   - **执行动作 (Execution)**:
       - **工具**: `execute_command`
-      - **命令**: `rm -rf .memory/short_term/*`
-      - **前置条件**: 仅在获得用户明确批准后执行。
+      - **命令**: `mv .memory/short_term/* .memory/.trash/`
   - **后置动作 (Post-computation)**:
-      - **报告结果**: "短期记忆工作区已成功清理。"
+      - **报告结果**: "短期记忆工作区已安全清理，所有文件已移至 `.memory/.trash/` 回收站。"
+   ## 更新索引 (Workflow: Update Index)
+
+   - **指令 (Command)**: `update_index`
+   - **目标 (Objective)**: 专业、安全地更新长期记忆索引 (`index.json`)。
+   - **输入参数 (Input)**:
+       - `path`: (必须) 新增或更新的记忆项的 `yaml` 文件路径。
+       - `name`: (必须) 记忆项的唯一名称。
+       - `description`: (可选) 对记忆项的简短描述。
+       - `tags`: (可选) 用于分类和检索的标签列表。
+   - **执行动作 (Execution)**:
+       - **核心逻辑**:
+           1.  **读取索引文件**: 加载 `.memory/long_term/index.json` 的内容。
+           2.  **构造新条目**: 根据输入参数创建一个新的 JSON 对象。
+           3.  **更新索引**: 将新条目添加或更新到索引的 `entries` 字段中，使用 `name` 作为键。
+           4.  **写回索引文件**: 将更新后的完整 JSON 对象写回 `.memory/long_term/index.json`。
+       - **说明**: 这是一个原子操作，后续将由 `code` 模式通过脚本实现。
+   - **后置动作 (Post-computation)**:
+       - **报告结果**: "长期记忆索引 `index.json` 已成功更新，条目 `{{name}}` 已添加/更新。"
