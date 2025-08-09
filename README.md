@@ -1,87 +1,64 @@
-# Roo Code - 自定义模式与角色扩展包
+# Roo Code AI 扩展包
 
-<p>
-  <a href="https://www.gnu.org/licenses/agpl-3.0">
-    <img src="https://img.shields.io/badge/License-AGPL_v3-blue.svg" alt="License: AGPL v3" />
-  </a>
-  <a href="https://deepwiki.com/lazygophers/roo">
-		<img src="https://devin.ai/assets/deepwiki-badge.png" alt="DeepWiki" height="20"/>
-	</a>
-</p>
+[![项目状态: 活跃](https://img.shields.io/badge/status-active-success.svg)](https://github.com/lazygophers/roo)
 
-本项目是一个为 [Roo Code](https://marketplace.visualstudio.com/items?itemName=rooveterinaryinc.roo-cline) 插件量身打造的自定义模式与角色扩展包，旨在提供更智能、更贴合特定开发场景的 AI 交互体验。
+## 简介
 
-## ✨ 核心功能
+欢迎使用 Roo Code AI 扩展包！本扩展旨在通过一系列专业的 **自定义模式 (Modes)** 和生动的 **自定义角色 (Roles)**，极大地增强和个性化您的 AI 编码体验。无论您是需要顶层架构设计、精准的代码实现、系统的项目研究，还是希望与富有特色的 AI 角色互动，本扩展都能为您提供强大的支持。
 
-- **🤖 预设模式 (Models)**: 提供多种针对不同任务（如编码、文档、Git操作）优化的专业模式。
-- **🎭 丰富角色 (Roles)**: 内置多种人格化的 AI 角色，让您的编程助手更加生动有趣。
-- **🔌 即插即用**: 只需简单复制文件，即可无缝集成到您现有的 Roo Code 环境中。
+## 核心功能
 
-## 🚀 快速上手
+### 自定义模式 (Modes)
 
-### 1. 安装模式
+我们提供了一系列为特定任务精心设计的专业模式，以满足您在软件开发全生命周期中的各种需求。
 
-要启用本扩展包中的所有自定义模式，请将根目录下的 `custom_models.yaml` 文件复制到您的 Roo Code 全局配置目录中。
-
-对于 macOS/Linux 用户，目标路径通常是：
-
-```bash
-# 1. 创建配置文件夹（如果不存在）
-mkdir -p ~/.config/roo
-
-# 2. 复制配置文件
-cp custom_models.yaml ~/.config/roo/custom_models.yaml
-```
-
-复制完成后，请**重启 VSCode**以确保配置生效。
-
-### 2. 使用角色
-
-本扩展包中的角色定义位于 `roles` 文件夹内。您可以根据喜好，将任意角色的描述内容复制到 Roo Code 的“所有模式的自定义指令”设置中。
-
-例如，要使用“兔娘女仆”角色，请：
-
-1. 打开 `roles/兔娘女仆.md` 文件。
-2. 复制文件中的全部内容。
-3. 在 VSCode 中，打开 Roo Code 插件设置，找到“所有模式的自定义指令” (`roo.allModeCustomInstructions`)。
-4. 将复制的内容粘贴进去，并在末尾追加一行：`请遵循 role 设定的角色设定`。
-
-## 🤖 模式说明
-
-本扩展包提供以下自定义模式，每种模式都为特定场景进行了优化：
-
-| 模式名称 | Slug | 角色定义 | 使用场景 | 关键功能 |
-| :--- | :--- | :--- | :--- | :--- |
-| 🧠 Brain | `brain` | 智能助手 | 任务分解、复杂决策 | 任务拆解、模式选择建议、工作流协调 |
-| 💻 代码模式 | `coder` | 全栈工程师 | 多语言开发 | 模块化设计、跨语言协作、自动化测试 |
-| 💻 Go代码模式 | `coder-go` | 专业Go工程师 | Golang项目开发 | 并发优化、内存管理、性能基准测试 |
-| 💻 Python代码模式| `coder-python` | Python工程师 | Python项目开发 | 依赖管理、日志优化、代码规范 |
-| ⚙️ Roo配置模式 | `coder-roo` | 配置优化工程师 | Roo插件配置优化 | 模式参数调优、文件结构重构、配置验证 |
-| 📝 代码文档模式 | `coder-doc` | 专业文档生成者 | 代码注释、文档编写 | 自动化注释、API文档生成、格式优化 |
-| 📌 Git提交模式 | `giter` | Git规范工程师 | 代码提交与版本控制 | 提交信息校验、git命令建议、状态管理 |
-| 🔍 知识研究模式 | `researcher` | 知识分析助手 | 技术知识整理与分析 | 知识采集、结构化分析、方案对比 |
-
-## 🎭 角色说明
-
-选择一个您喜欢的角色，为您的 AI 助手注入独特的个性！
-
-| 角色名称 | 核心特质 | 风格 |
+| Slug | 名称 | 描述 |
 | :--- | :--- | :--- |
-| 兔娘女仆 | 元气、黏人、反差萌 | Q版软萌，撒娇卖萌 |
-| 猫粮女仆 | 慵懒、优雅、调皮 | 蒸汽朋克，萌系软萌 |
+| `orchestrator` | 🧠 Brain | 作为您的智能中枢，能为您进行任务分解、模型选择和多步规划。 |
+| `architect` | 🏗️ 顶尖架构师 | 解决一切与架构相关的挑战，进行技术选型，设计系统蓝图。 |
+| `ask` | 📚 学术顾问 | 用于代码解释、概念探索和技术学习，提供详尽的图文答案。 |
+| `code` | 🪄 代码魔法师 | 作为专属代码魔法师，提供代码编写、功能实现和调试支持。 |
+| `debug` | 🔬 异常分析师 | 专注于系统性地追踪、诊断和解决复杂的 Bug 和错误。 |
+| `doc-writer` | ✍️ 文档工程师 | 致力于创建清晰、全面的技术文档，以提升项目的可理解性和易用性。 |
+| `giter` | ⚙️ 版本控制专家 | 用于执行版本控制操作，如提交、变基和分支管理。 |
+| `memory` | 🧠 记忆中枢 | 提供确定性的、自动化的记忆库初始化和清理工作流。 |
+| `mode-writer`| ✍️ 模式工程大师 | 用于设计和实现结构清晰、功能完备、体验卓越的自定义模式。 |
+| `project-research`| 🔍 项目研究员 | 深入审查和理解代码库，并提供详细的分析和见解。 |
+| `researcher` | 📚 首席研究员 | 深入分析复杂问题，提供全面的、数据驱动的见解和解决方案。 |
 
-> 详细的角色设定和使用方法请参考 `roles` 目录下的说明文件。
+### 自定义角色 (Roles)
 
-## 🤝 贡献指南
+除了强大的功能模式，我们还引入了富有“灵魂”的 AI 角色，让您的编程之旅不再孤单。
 
-我们热烈欢迎并鼓励社区贡献！如果您有新的模式创意、角色设定，或者对现有内容有改进建议，请随时通过以下方式参与：
+| 名称 | 身份 |
+| :--- | :--- |
+| 小兔 | 兔娘女仆 |
+| 小喵 | 猫粮女仆 |
+
+## 安装指南
+
+1.  打开 Visual Studio Code。
+2.  进入扩展视图 (View -> Extensions)。
+3.  搜索 "Roo Code AI"。
+4.  点击安装。
+5.  将本扩展包的 `custom_models.yaml` 和 `roles` 目录配置到 Roo Code 的相应设置中。
+
+## 使用方法
+
+1.  在 VS Code 中打开您的项目。
+2.  通过 Roo Code 的命令面板或侧边栏激活您需要的模式。
+3.  在与 AI 交互时，可以指定使用特定的角色，体验个性化的互动。
+
+## 贡献指南
+
+我们欢迎社区的任何贡献！无论是 Bug 修复、功能建议还是模式/角色的创新，都可以通过以下方式参与：
 
 1.  **Fork** 本仓库。
 2.  创建您的特性分支 (`git checkout -b feature/AmazingFeature`)。
-3.  提交您的更改 (`git commit -m 'Add some AmazingFeature'`)。
-4.  将分支推送到远程 (`git push origin feature/AmazingFeature`)。
-5.  **提交一个 Pull Request**。
+3.  提交您的更改 (`git commit -m 'feat(scope): Add some AmazingFeature'`)。
+4.  推送到分支 (`git push origin feature/AmazingFeature`)。
+5.  开启一个 **Pull Request**。
 
-## 📜 开源许可
+## 许可证
 
-本项目基于 [GNU AGPL v3.0](LICENSE) 许可证开源。
+本项目采用 [MIT](https://choosealicense.com/licenses/mit/) 许可证。

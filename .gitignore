@@ -10,3 +10,5 @@ mcp/cache/library/cache.db
 mcp/cache/github/cache.db
 mcp/cache/task/manager.json
 /mcp/dist/lazygophers-mcp
+.roo
+update.sh

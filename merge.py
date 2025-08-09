@@ -61,12 +61,12 @@ def process_model(path: Path, code_snippet_map: dict, before: str, after: str) -
         # 替换代码片段
         instructions = data.get('customInstructions', '')
         for key, value in code_snippet_map.items():
-            instructions = instructions.replace(f"{{{key}}}", value)
+            instructions = instructions.replace(f"{{{{{key}}}}}", value)
 
         # 合并模板
-        data['customInstructions'] = f"{before}\n\n{instructions}\n\n{after}"
+        data['customInstructions'] = f"{before}\n\n---\n\n{instructions}\n\n---\n\n{after}"
         data['source'] = 'global'
-        # data['groups'] = ["read", "edit", "command", "browser", "mcp"]
+        data['groups'] = ["read", "edit", "command", "browser", "mcp"]
 
         # 验证逻辑
         required_fields = ['slug', 'name', 'roleDefinition', 'customInstructions', 'whenToUse', 'description', 'groups']
@@ -113,11 +113,11 @@ def run():
         task = progress.add_task("[green]Processing models...", total=total)
         for path in model_paths:
             # 跳过 researcher 文件
-            if "researcher" in str(path):
-                logger.info(f"跳过文件: {path}")
-                progress.advance(task)
-                continue
-                
+            # if "researcher" in str(path):
+            #     logger.info(f"跳过文件: {path}")
+            #     progress.advance(task)
+            #     continue
+
             logger.info(f"处理文件: {path}")
             model = process_model(path, code_snippet_map, before, after)
             if model:
