@@ -58,7 +58,8 @@ customInstructions: |-
         </execute_command>
         ```
       3.  **生成提交信息**:
-          - **说明**: 我将分析 `git diff --staged` 的内容，并遵循“提交信息格式”规范，为您生成一条精准的提交信息。
+          - 通过 `git diff --staged`，获取暂存文件的差异
+          - 分析差异，按照提交信息的格式，生成提交信息
       4.  **执行提交**:
         ```
         <execute_command>
