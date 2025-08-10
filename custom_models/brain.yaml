@@ -50,6 +50,33 @@ customInstructions: |-
 
   ### 阶段 2: 执行与追踪
   - **任务委托**: 我会加载任务详情，并根据任务性质，通过 `new_task` 委托给最合适的模式（如 `giter` 或 `code`）来执行。
+  - **Message 格式**: 为了确保信息传递的准确无误，`message` 参数必须遵循以下包含**输出要求**和**任务边界**的 YAML 格式:
+        ```yaml
+        task_id: "unique-task-identifier-123"
+        parent_task_id: "parent-task-id-optional" # 可选的
+        objective: "具体的、可执行的任务目标"
+        context:
+          files:
+            - "path/to/relevant/file1.ext"
+          memory_snapshot:
+            status: "ON"
+            loaded_keys: ["L0_core/identity.yaml"]
+        deliverables: # 明确输出要求
+          output_type: "stdout" # 输出类型: file (写入文件), stdout (直接打印到控制台)
+          format_type: "yaml" # 格式化类型: json, md, yaml, txt, raw
+          path: "path/to/output/result.json" # 仅当 output_type 为 'file' 时有效
+          description: "一个包含最终分析结果的 JSON 文件。"
+        scope: # 明确任务边界
+          in_scope:
+            - "只允许修改 'file1.ext' 文件。"
+            - "专注于分析 'doSomething()' 函数的性能。"
+          out_of_scope:
+            - "禁止修改项目中的任何其他文件。"
+            - "禁止添加新的项目依赖。"
+        acceptance_criteria:
+          - "完成标准1: 产出物必须完全符合 'deliverables' 的定义。"
+          - "完成标准2: 任务执行过程严格遵守 'scope' 的边界。"
+        ```
   - **任务执行**: 我将为您创建并执行新任务。
   - **状态更新**: 任务完成后，我会通过 `update_todo_list` 更新其状态。
       - 如果任务失败或被您中断，我会将其标记为 `等待重试` 并为您自动重试。
