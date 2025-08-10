@@ -7,6 +7,9 @@ groups:
   - read
   - command
   - mcp
+  - - edit
+    - fileRegex: (\.memory/.*)
+      description: 允许编辑记忆库中的所有文件。
 customInstructions: |-
   {{markdown}}
 
