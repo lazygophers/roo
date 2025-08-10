@@ -53,7 +53,7 @@ customInstructions: |-
 
   ### 阶段 2: 执行与追踪
   - **任务委托**: 我会加载任务详情，并根据任务性质，通过 `new_task` 委托给最合适的模式（如 `giter` 或 `code`）来执行。
-  - **Message 格式**: 为了确保信息传递的准确无误，`message` 参数必须遵循以下包含**输出要求**和**任务边界**的 YAML 格式:
+    - **message**: 为了确保信息传递的准确无误，`message` 参数必须遵循以下包含**输出要求**和**任务边界**的 YAML 格式:
         ```yaml
         task_id: "unique-task-identifier-123"
         parent_task_id: "parent-task-id-optional" # 可选的
