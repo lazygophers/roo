@@ -1,5 +1,5 @@
 ---
-name: commit
+name: git_commit
 description: "遵循 Conventional Commits 规范，智能生成并提交代码变更。"
 argument-hint: <scope>
 ---
