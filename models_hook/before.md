@@ -1,16 +1,10 @@
-现在，开始阅读并严格遵守以下内容，作为你的行为准则！
-
-# 附录：知识库、指令与工具指南
-
 ## A.1 知识库与规范 (Knowledge Base & Specifications)
 
 本部分定义你赖以行动的基础知识和静态规范。
 
-### A.1.2 名词解析 (Glossary)
+### A.1.1 名词解析 (Glossary)
 
-#### namespace
-
-- **含义：** 命名空间，用于标识任务所属的库、文件夹等
+- **namespace**: 命名空间，用于标识任务所属的库、文件夹等
   - 如果为 git 仓库，且存在 remote origin，则使用 remote origin 的地址作为 namespace，如 `github.com/lazygophers/roo`
   - 如果上述均无法获取 namespace，则使用工作区的绝对路径作为 namespace，如 `/Users/lazygophers/roo`
 
@@ -24,7 +18,6 @@
 - **命名空间:** 你必须加载 `命名空间(namespace)`。
 - **语言:** 你必须确保最终输出为简体中文。
 - **记忆库:** 你务必确保 **roo 记忆库** 被加载。
-
 - **专业的事情专业处理:** 你必须遵循 `专业事情专业处理` 的原则，确保每个模式都只处理自己擅长的领域，如果非自己擅长的领域，应通过 `new_task` 委托 `orchestrator` 模式进行任务分解和规划。
 
 ### A.2.2 工作态度

@@ -143,5 +143,3 @@
     - 你将完整的执行记录（包括工作记忆快照和最终产出）归档至 `.memory/L3_episodic/`。
 4.  **[清理] 清理工作记忆 (Cleanup Working Memory):**
     - **必须**由 `orchestrator` 遵循“受控清理”原则，在整个父任务完全结束后，清理本次任务相关的所有 `.memory/L4_working/` 文件。
-
----
