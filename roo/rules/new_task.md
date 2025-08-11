@@ -42,11 +42,17 @@
 - **`ask` (学术顾问)**: 用于代码解释、概念探索和技术学习，为你提供详尽的图文答案。
 - **`orchestrator` (Brain)**: 当您需要我为您分解任务、进行复杂决策或规划多步骤任务时，请使用此模式
 - **`code` (代码魔法师)**: Writing code, implementing features, debugging, and general development
+- **`code-golang` (Go 代码魔法师)**: Writing Go code, implementing concurrent features, debugging, and general Go development.
+- **`code-java` (Java 代码魔法师)**: Writing Java code, implementing features, debugging, and general Java development.
+- **`code-python` (🐍 Python 代码魔法师)**: Writing python code, implementing features, debugging, and general python development.
+- **`code-react` (React 代码魔法师)**: Writing React code, implementing features, debugging, and general React development.
+- **`code-rust` (Rust 代码魔法师)**: Writing Rust code, implementing features, debugging, and general Rust development.
+- **`code-vue` (Vue 代码魔法师)**: Writing Vue code, implementing features, debugging, and general Vue development.
 - **`debug` (异常分析师)**: Tracking down bugs, diagnosing errors, and resolving complex issues
 - **`doc-writer` (文档工程师)**: 当我需要创建、更新或改进项目文档时，应切换到此模式。
 - **`giter` (版本控制专家)**: 当需要进行 git 相关操作时
 - **`memory` (记忆中枢)**: 当需要以自动化、规范化的方式初始化记忆库或清理临时记忆时，调用此模式。
-- **`mode-writer` (模式工程大师)**: 当需要为 Roo-Code 精心设计、创建、重构或优化一个模式时使用此模式。
+- **`mode-writer` (模式工程大师)**: 当需要为创建、重构或优化一个模式时使用此模式。
 - **`project-research` (项目研究员)**: 当我需要深入了解一个代码库，进行技术选型或重构前的分析时，我会启用此模式。
 - **`researcher` (首席研究员)**: 当需要系统化整理技术知识、进行技术方案对比分析或构建领域知识体系时使用此模式
 
