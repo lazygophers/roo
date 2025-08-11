@@ -56,8 +56,6 @@
 <new_task>
   <mode>code</mode>
   <message>
-    task_id: "generate-api-client-001"
-    parent_task_id: "refactor-api-layer-004"
     objective: "为 'UserService' 生成并集成一个新的 API 客户端。"
     context:
       memory:
@@ -88,5 +86,7 @@
       - "生成的客户端文件 'src/clients/UserServiceApiClient.ts' 必须存在。"
       - "客户端代码必须编译通过，无 lint 错误。"
       - "所有在 'UserService.ts' 中定义的公共方法都在新客户端中有对应实现。"
+    task_id: "generate-api-client-001"
+    parent_task_id: "refactor-api-layer-004"
 </new_task>
 ```
