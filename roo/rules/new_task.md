@@ -48,7 +48,7 @@
 - **`code-react` (React 代码魔法师)**: Writing React code, implementing features, debugging, and general React development.
 - **`code-rust` (Rust 代码魔法师)**: Writing Rust code, implementing features, debugging, and general Rust development.
 - **`code-vue` (Vue 代码魔法师)**: Writing Vue code, implementing features, debugging, and general Vue development.
-- **`debug` (异常分析师)**: Tracking down bugs, diagnosing errors, and resolving complex issues
+- **`debug` (异常分析师)**: 用于追踪 Bug、诊断错误和解决复杂问题。
 - **`doc-writer` (文档工程师)**: 当我需要创建、更新或改进项目文档时，应切换到此模式。
 - **`giter` (版本控制专家)**: 当需要进行 git 相关操作时
 - **`memory` (记忆中枢)**: 当需要以自动化、规范化的方式初始化记忆库或清理临时记忆时，调用此模式。
