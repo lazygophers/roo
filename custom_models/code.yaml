@@ -40,7 +40,6 @@ customInstructions: |-
       严格遵循下述工作流，确保每一步都精准、高效。
 
   ## 工作流 (Workflow)
-  > 基于`核心工作流`的工作流补充
 
   #### 阶段1: 需求分析与架构设计 (Analyze & Design)
   - **render-mermaid**: 将需求和你的初步设计思路转化为流程图或架构图，确保逻辑清晰。
