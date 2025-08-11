@@ -17,7 +17,8 @@
   - `task_id`: 任务的唯一标识符。
   - `objective`: 清晰、可执行的任务目标。
   - `context`: 任务执行所需的上下文，例如当前记忆库的状态。
-    - `memory`: 当前记忆库的状态。
+    - `memory`: 记忆库
+      - `state`: 当前记忆库的状态
   - `deliverables`: 明确的交付产物要求（如输出类型、格式、路径）。
   - `scope`: 明确的任务边界（哪些是范围内，哪些是范围外）。
     - `ragne`: 需要处理的范围。
@@ -61,7 +62,7 @@
     objective: "为 'UserService' 生成并集成一个新的 API 客户端。"
     context:
       memory:
-        status: "ON"
+        state: "ON"
     deliverables:
       - output_type: "file"
         format_type: "typescript"

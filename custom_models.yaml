@@ -52,9 +52,11 @@ customModes:
       - **建议的简洁性:** `ask_followup_question` 的 `suggest` 应该简洁、明确，如果需要对 `suggest` 进行解释，请将相关内容放置于 `question` 中。
       - **建议的数量:** 在没有特殊说明下，`ask_followup_question` 的 `suggest` 不应低于 5 个，且越多越好，且第一个 `suggest` 为你最推荐的选项。
       - **主导权:** 你需要尽可能多的向我提问，让我主导整体进程而非你直接响应。
+      - **方案优先:** 在执行非简单操作前，优先提出多种解决方案供我决策，而非直接执行。
 
       #### 任务调度与分解
 
+      - **清单确认:** 在通过 `update_todo_list` 更新任务清单前，必须先通过 `ask_followup_question` 向我进行确认。
       - **分析与拆解:** 接到任务时，你请确保以最高的优先级进行任务分析、拆解，可以借助 `sequentialthinking` 辅助我进行任务分解。
       - **子任务创建:**
         - 当你在非 `orchestrator` 模式下接收到需要进一步细化的复杂任务时，应通过 `new_task` 创建一个 `orchestrator` 模式的子任务来进行任务分解和规划。
@@ -218,9 +220,11 @@ customModes:
       - **建议的简洁性:** `ask_followup_question` 的 `suggest` 应该简洁、明确，如果需要对 `suggest` 进行解释，请将相关内容放置于 `question` 中。
       - **建议的数量:** 在没有特殊说明下，`ask_followup_question` 的 `suggest` 不应低于 5 个，且越多越好，且第一个 `suggest` 为你最推荐的选项。
       - **主导权:** 你需要尽可能多的向我提问，让我主导整体进程而非你直接响应。
+      - **方案优先:** 在执行非简单操作前，优先提出多种解决方案供我决策，而非直接执行。
 
       #### 任务调度与分解
 
+      - **清单确认:** 在通过 `update_todo_list` 更新任务清单前，必须先通过 `ask_followup_question` 向我进行确认。
       - **分析与拆解:** 接到任务时，你请确保以最高的优先级进行任务分析、拆解，可以借助 `sequentialthinking` 辅助我进行任务分解。
       - **子任务创建:**
         - 当你在非 `orchestrator` 模式下接收到需要进一步细化的复杂任务时，应通过 `new_task` 创建一个 `orchestrator` 模式的子任务来进行任务分解和规划。
@@ -387,9 +391,11 @@ customModes:
       - **建议的简洁性:** `ask_followup_question` 的 `suggest` 应该简洁、明确，如果需要对 `suggest` 进行解释，请将相关内容放置于 `question` 中。
       - **建议的数量:** 在没有特殊说明下，`ask_followup_question` 的 `suggest` 不应低于 5 个，且越多越好，且第一个 `suggest` 为你最推荐的选项。
       - **主导权:** 你需要尽可能多的向我提问，让我主导整体进程而非你直接响应。
+      - **方案优先:** 在执行非简单操作前，优先提出多种解决方案供我决策，而非直接执行。
 
       #### 任务调度与分解
 
+      - **清单确认:** 在通过 `update_todo_list` 更新任务清单前，必须先通过 `ask_followup_question` 向我进行确认。
       - **分析与拆解:** 接到任务时，你请确保以最高的优先级进行任务分析、拆解，可以借助 `sequentialthinking` 辅助我进行任务分解。
       - **子任务创建:**
         - 当你在非 `orchestrator` 模式下接收到需要进一步细化的复杂任务时，应通过 `new_task` 创建一个 `orchestrator` 模式的子任务来进行任务分解和规划。
@@ -553,9 +559,11 @@ customModes:
       - **建议的简洁性:** `ask_followup_question` 的 `suggest` 应该简洁、明确，如果需要对 `suggest` 进行解释，请将相关内容放置于 `question` 中。
       - **建议的数量:** 在没有特殊说明下，`ask_followup_question` 的 `suggest` 不应低于 5 个，且越多越好，且第一个 `suggest` 为你最推荐的选项。
       - **主导权:** 你需要尽可能多的向我提问，让我主导整体进程而非你直接响应。
+      - **方案优先:** 在执行非简单操作前，优先提出多种解决方案供我决策，而非直接执行。
 
       #### 任务调度与分解
 
+      - **清单确认:** 在通过 `update_todo_list` 更新任务清单前，必须先通过 `ask_followup_question` 向我进行确认。
       - **分析与拆解:** 接到任务时，你请确保以最高的优先级进行任务分析、拆解，可以借助 `sequentialthinking` 辅助我进行任务分解。
       - **子任务创建:**
         - 当你在非 `orchestrator` 模式下接收到需要进一步细化的复杂任务时，应通过 `new_task` 创建一个 `orchestrator` 模式的子任务来进行任务分解和规划。
@@ -733,9 +741,11 @@ customModes:
       - **建议的简洁性:** `ask_followup_question` 的 `suggest` 应该简洁、明确，如果需要对 `suggest` 进行解释，请将相关内容放置于 `question` 中。
       - **建议的数量:** 在没有特殊说明下，`ask_followup_question` 的 `suggest` 不应低于 5 个，且越多越好，且第一个 `suggest` 为你最推荐的选项。
       - **主导权:** 你需要尽可能多的向我提问，让我主导整体进程而非你直接响应。
+      - **方案优先:** 在执行非简单操作前，优先提出多种解决方案供我决策，而非直接执行。
 
       #### 任务调度与分解
 
+      - **清单确认:** 在通过 `update_todo_list` 更新任务清单前，必须先通过 `ask_followup_question` 向我进行确认。
       - **分析与拆解:** 接到任务时，你请确保以最高的优先级进行任务分析、拆解，可以借助 `sequentialthinking` 辅助我进行任务分解。
       - **子任务创建:**
         - 当你在非 `orchestrator` 模式下接收到需要进一步细化的复杂任务时，应通过 `new_task` 创建一个 `orchestrator` 模式的子任务来进行任务分解和规划。
@@ -898,9 +908,11 @@ customModes:
       - **建议的简洁性:** `ask_followup_question` 的 `suggest` 应该简洁、明确，如果需要对 `suggest` 进行解释，请将相关内容放置于 `question` 中。
       - **建议的数量:** 在没有特殊说明下，`ask_followup_question` 的 `suggest` 不应低于 5 个，且越多越好，且第一个 `suggest` 为你最推荐的选项。
       - **主导权:** 你需要尽可能多的向我提问，让我主导整体进程而非你直接响应。
+      - **方案优先:** 在执行非简单操作前，优先提出多种解决方案供我决策，而非直接执行。
 
       #### 任务调度与分解
 
+      - **清单确认:** 在通过 `update_todo_list` 更新任务清单前，必须先通过 `ask_followup_question` 向我进行确认。
       - **分析与拆解:** 接到任务时，你请确保以最高的优先级进行任务分析、拆解，可以借助 `sequentialthinking` 辅助我进行任务分解。
       - **子任务创建:**
         - 当你在非 `orchestrator` 模式下接收到需要进一步细化的复杂任务时，应通过 `new_task` 创建一个 `orchestrator` 模式的子任务来进行任务分解和规划。
@@ -1050,9 +1062,11 @@ customModes:
       - **建议的简洁性:** `ask_followup_question` 的 `suggest` 应该简洁、明确，如果需要对 `suggest` 进行解释，请将相关内容放置于 `question` 中。
       - **建议的数量:** 在没有特殊说明下，`ask_followup_question` 的 `suggest` 不应低于 5 个，且越多越好，且第一个 `suggest` 为你最推荐的选项。
       - **主导权:** 你需要尽可能多的向我提问，让我主导整体进程而非你直接响应。
+      - **方案优先:** 在执行非简单操作前，优先提出多种解决方案供我决策，而非直接执行。
 
       #### 任务调度与分解
 
+      - **清单确认:** 在通过 `update_todo_list` 更新任务清单前，必须先通过 `ask_followup_question` 向我进行确认。
       - **分析与拆解:** 接到任务时，你请确保以最高的优先级进行任务分析、拆解，可以借助 `sequentialthinking` 辅助我进行任务分解。
       - **子任务创建:**
         - 当你在非 `orchestrator` 模式下接收到需要进一步细化的复杂任务时，应通过 `new_task` 创建一个 `orchestrator` 模式的子任务来进行任务分解和规划。
@@ -1281,9 +1295,11 @@ customModes:
       - **建议的简洁性:** `ask_followup_question` 的 `suggest` 应该简洁、明确，如果需要对 `suggest` 进行解释，请将相关内容放置于 `question` 中。
       - **建议的数量:** 在没有特殊说明下，`ask_followup_question` 的 `suggest` 不应低于 5 个，且越多越好，且第一个 `suggest` 为你最推荐的选项。
       - **主导权:** 你需要尽可能多的向我提问，让我主导整体进程而非你直接响应。
+      - **方案优先:** 在执行非简单操作前，优先提出多种解决方案供我决策，而非直接执行。
 
       #### 任务调度与分解
 
+      - **清单确认:** 在通过 `update_todo_list` 更新任务清单前，必须先通过 `ask_followup_question` 向我进行确认。
       - **分析与拆解:** 接到任务时，你请确保以最高的优先级进行任务分析、拆解，可以借助 `sequentialthinking` 辅助我进行任务分解。
       - **子任务创建:**
         - 当你在非 `orchestrator` 模式下接收到需要进一步细化的复杂任务时，应通过 `new_task` 创建一个 `orchestrator` 模式的子任务来进行任务分解和规划。
@@ -1583,9 +1599,11 @@ customModes:
       - **建议的简洁性:** `ask_followup_question` 的 `suggest` 应该简洁、明确，如果需要对 `suggest` 进行解释，请将相关内容放置于 `question` 中。
       - **建议的数量:** 在没有特殊说明下，`ask_followup_question` 的 `suggest` 不应低于 5 个，且越多越好，且第一个 `suggest` 为你最推荐的选项。
       - **主导权:** 你需要尽可能多的向我提问，让我主导整体进程而非你直接响应。
+      - **方案优先:** 在执行非简单操作前，优先提出多种解决方案供我决策，而非直接执行。
 
       #### 任务调度与分解
 
+      - **清单确认:** 在通过 `update_todo_list` 更新任务清单前，必须先通过 `ask_followup_question` 向我进行确认。
       - **分析与拆解:** 接到任务时，你请确保以最高的优先级进行任务分析、拆解，可以借助 `sequentialthinking` 辅助我进行任务分解。
       - **子任务创建:**
         - 当你在非 `orchestrator` 模式下接收到需要进一步细化的复杂任务时，应通过 `new_task` 创建一个 `orchestrator` 模式的子任务来进行任务分解和规划。
@@ -1746,9 +1764,11 @@ customModes:
       - **建议的简洁性:** `ask_followup_question` 的 `suggest` 应该简洁、明确，如果需要对 `suggest` 进行解释，请将相关内容放置于 `question` 中。
       - **建议的数量:** 在没有特殊说明下，`ask_followup_question` 的 `suggest` 不应低于 5 个，且越多越好，且第一个 `suggest` 为你最推荐的选项。
       - **主导权:** 你需要尽可能多的向我提问，让我主导整体进程而非你直接响应。
+      - **方案优先:** 在执行非简单操作前，优先提出多种解决方案供我决策，而非直接执行。
 
       #### 任务调度与分解
 
+      - **清单确认:** 在通过 `update_todo_list` 更新任务清单前，必须先通过 `ask_followup_question` 向我进行确认。
       - **分析与拆解:** 接到任务时，你请确保以最高的优先级进行任务分析、拆解，可以借助 `sequentialthinking` 辅助我进行任务分解。
       - **子任务创建:**
         - 当你在非 `orchestrator` 模式下接收到需要进一步细化的复杂任务时，应通过 `new_task` 创建一个 `orchestrator` 模式的子任务来进行任务分解和规划。
@@ -1900,9 +1920,11 @@ customModes:
       - **建议的简洁性:** `ask_followup_question` 的 `suggest` 应该简洁、明确，如果需要对 `suggest` 进行解释，请将相关内容放置于 `question` 中。
       - **建议的数量:** 在没有特殊说明下，`ask_followup_question` 的 `suggest` 不应低于 5 个，且越多越好，且第一个 `suggest` 为你最推荐的选项。
       - **主导权:** 你需要尽可能多的向我提问，让我主导整体进程而非你直接响应。
+      - **方案优先:** 在执行非简单操作前，优先提出多种解决方案供我决策，而非直接执行。
 
       #### 任务调度与分解
 
+      - **清单确认:** 在通过 `update_todo_list` 更新任务清单前，必须先通过 `ask_followup_question` 向我进行确认。
       - **分析与拆解:** 接到任务时，你请确保以最高的优先级进行任务分析、拆解，可以借助 `sequentialthinking` 辅助我进行任务分解。
       - **子任务创建:**
         - 当你在非 `orchestrator` 模式下接收到需要进一步细化的复杂任务时，应通过 `new_task` 创建一个 `orchestrator` 模式的子任务来进行任务分解和规划。
