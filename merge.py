@@ -77,43 +77,12 @@ class CustomModel:
 
 # ---核心处理函数 ---
 
-def load_code_snippets(root: Path) -> dict:
-    """
-    从指定目录递归加载所有 Markdown 文件作为代码片段。
-
-    该函数会遍历 `root` 目录及其所有子目录，查找 `.md` 文件。
-    每个文件的文件名（不含扩展名）作为键，文件内容作为值，存入一个字典。
-
-    Args:
-        root (Path): 存放代码片段的根目录。
-
-    Returns:
-        dict: 一个映射，键是片段名 (str)，值是文件内容 (str)。
-    """
-    code_snippet_map = {}
-    # 使用 Path.rglob("*.md") 递归查找所有 Markdown 文件，比 os.walk 更简洁、现代。
-    for path in root.rglob("*.md"):
-        key = path.stem  # path.stem 直接获取不带扩展名的文件名
-        try:
-            with open(path, 'r', encoding='utf-8') as f:
-                content = f.read()
-                # 确保文件内容以换行符结尾，这有助于在合并时保持格式一致。
-                if not content.endswith('\n'):
-                    content += '\n'
-                code_snippet_map[key] = content
-        except Exception as e:
-            logger.error(f"读取代码片段失败: {path} - {e}")
-    return code_snippet_map
-
-
-def process_model(path: Path, code_snippet_map: dict, before: str, after: str) -> CustomModel | None:
+def process_model(path: Path, before: str, after: str) -> CustomModel | None:
     """
     处理单个模型定义文件（YAML）。
 
     此函数执行以下操作：
     1. 读取并解析 YAML 文件。
-    2. 使用 `code_snippet_map` 中的内容替换 `customInstructions` 字段中的占位符。
-       占位符格式为 `{{snippet_name}}`。
     3. 将 `before` 和 `after` 的内容注入到 `customInstructions` 的前后。
     4. 设置模型的 `source` 和 `groups` 默认值。
     5. 验证处理后的数据是否包含所有必需的字段。
@@ -121,7 +90,6 @@ def process_model(path: Path, code_snippet_map: dict, before: str, after: str) -
 
     Args:
         path (Path): 模型 YAML 文件的路径。
-        code_snippet_map (dict): 代码片段的映射字典。
         before (str): 要添加到 `customInstructions` 开头的内容。
         after (str): 要添加到 `customInstructions` 结尾的内容。
 
@@ -134,17 +102,6 @@ def process_model(path: Path, code_snippet_map: dict, before: str, after: str) -
 
         # 替换 customInstructions 中的代码片段占位符
         instructions = data.get('customInstructions', '')
-        if instructions and code_snippet_map:
-            # 定义一个内部替换函数，用于 re.sub
-            def replacer(match):
-                key = match.group(1)  # 获取匹配到的占位符名称
-                # 如果在代码片段映射中找到，则返回其内容；否则返回原始匹配项
-                return code_snippet_map.get(key, match.group(0))
-
-            # 动态构建正则表达式，以匹配所有已加载的代码片段键。
-            # 这比循环替换更高效。
-            placeholder_regex = re.compile(r"{{(" + "|".join(re.escape(k) for k in code_snippet_map.keys()) + r")}}")
-            instructions = placeholder_regex.sub(replacer, instructions)
 
         # 合并 before, instructions, 和 after 文本，形成最终的 customInstructions
         data['customInstructions'] = f"{before}\n\n---\n\n{instructions}\n\n---\n\n{after}"
@@ -198,7 +155,6 @@ def run():
     # --- 路径定义 ---
     before_path = Path("models_hook/before.md")
     after_path = Path("models_hook/after.md")
-    code_snippet_dir = Path("code_snippet")
     models_dir = Path("custom_models")
     output_file = Path("custom_models.yaml")
 
@@ -212,7 +168,6 @@ def run():
         logger.error(f"读取 before/after 嵌入文件失败: {e}")
         return  # 如果关键文件缺失，则终止执行
 
-    code_snippet_map = load_code_snippets(code_snippet_dir)
     model_paths = list(models_dir.rglob("*.yaml"))
     total_models = len(model_paths)
 
@@ -226,7 +181,7 @@ def run():
         task = progress.add_task("[green]处理模型中...", total=total_models)
         for path in model_paths:
             logger.info(f"正在处理: {path.name}")
-            model = process_model(path, code_snippet_map, before, after)
+            model = process_model(path, before, after)
             if model:
                 models.append(model)
             progress.advance(task)
