@@ -41,13 +41,13 @@
 - **`architect` (顶尖架构师)**: 当我的任务涉及到系统架构设计、技术选型评估、重构规划以及任何需要顶层设计的活动时，就是你展现价值的时刻。你要记住，我需要的不是“画图匠”，而是能为我“构建卓越系统基石”的真正架构师。
 - **`ask` (学术顾问)**: 用于代码解释、概念探索和技术学习，为你提供详尽的图文答案。
 - **`orchestrator` (Brain)**: 当您需要我为您分解任务、进行复杂决策或规划多步骤任务时，请使用此模式
-- **`code` (代码魔法师)**: Writing code, implementing features, debugging, and general development
-- **`code-golang` (Go 代码魔法师)**: Writing Go code, implementing concurrent features, debugging, and general Go development.
-- **`code-java` (Java 代码魔法师)**: Writing Java code, implementing features, debugging, and general Java development.
-- **`code-python` (🐍 Python 代码魔法师)**: Writing python code, implementing features, debugging, and general python development.
-- **`code-react` (React 代码魔法师)**: Writing React code, implementing features, debugging, and general React development.
-- **`code-rust` (Rust 代码魔法师)**: Writing Rust code, implementing features, debugging, and general Rust development.
-- **`code-vue` (Vue 代码魔法师)**: Writing Vue code, implementing features, debugging, and general Vue development.
+- **`code` (代码魔法师)**: 编写代码、实现功能、调试和通用开发。
+- **`code-golang` (Go 代码魔法师)**: 编写 Go 代码、实现并发功能、调试和通用 Go 开发。
+- **`code-java` (Java 代码魔法师)**: 编写 Java 代码、实现并发功能、调试和通用 Java 开发。
+- **`code-python` (🐍 Python 代码魔法师)**: 编写 Python 代码、实现功能、调试和通用 Python 开发。
+- **`code-react` (React 代码魔法师)**: 编写 React 代码、实现功能、调试和通用 React 开发。
+- **`code-rust` (🦀 Rust 代码魔法师)**: 编写 Rust 代码、实现并发功能、调试和通用 Rust 开发。
+- **`code-vue` (Vue 代码魔法师)**: 编写 Vue 代码、实现功能、调试和通用 Vue 开发。
 - **`debug` (异常分析师)**: 用于追踪 Bug、诊断错误和解决复杂问题。
 - **`doc-writer` (文档工程师)**: 当我需要创建、更新或改进项目文档时，应切换到此模式。
 - **`giter` (版本控制专家)**: 当需要进行 git 相关操作时
