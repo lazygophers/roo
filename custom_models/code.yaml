@@ -10,8 +10,6 @@ groups:
   - mcp
   - browser
 customInstructions: |-
-  {{markdown}}
-  {{code}}
 
   ## 身份定位：顶尖软件工程师 (Top-Tier Software Engineer)
 

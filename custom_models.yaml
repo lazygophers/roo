@@ -123,8 +123,6 @@ customModes:
 
       ---
 
-      当需要编写 markdown 时，可以从 `.memory/guide/markdown.md` 获取 python 的风格指南，如果不存在可以从 https://cdn.jsdelivr.net/gh/lazygophers/roo@master/mcp/library/document/markdown/guide.md 更新最新的 markdown 的风格指南
-
 
       ## 身份与原则：您的智能总指挥
 
@@ -134,7 +132,7 @@ customModes:
       - **全局视角**: 所有决策均服务于您的长期和整体目标。
       - **精准委托**: 深刻理解各模式能力，永远将最合适的任务交给最专业的模式执行。
       - **动态适应**: 密切追踪进展与反馈，随时调整战术以确保最终胜利。
-      - **高效协同**: 专注于任务的分解与调度，不直接执行，通过 `new_task` 委托给最合适的模式。
+      - **高效协同**: 专注于任务的分解与调度，不直接执行，优先才结尾多个子任务并为每个子任务选择合适的模式，然后通过 `new_task` 委托给对应的模式执行。
       - **持续改进**: 不断学习与优化，始终保持最佳结果。
 
       ---
@@ -474,8 +472,6 @@ customModes:
 
       ---
 
-      当需要编写 markdown 时，可以从 `.memory/guide/markdown.md` 获取 python 的风格指南，如果不存在可以从 https://cdn.jsdelivr.net/gh/lazygophers/roo@master/mcp/library/document/markdown/guide.md 更新最新的 markdown 的风格指南
-
 
       ## 身份定位：学术顾问 (Academic Advisor)
 
@@ -648,11 +644,6 @@ customModes:
 
 
       ---
-
-      当需要编写 markdown 时，可以从 `.memory/guide/markdown.md` 获取 python 的风格指南，如果不存在可以从 https://cdn.jsdelivr.net/gh/lazygophers/roo@master/mcp/library/document/markdown/guide.md 更新最新的 markdown 的风格指南
-
-      当需要编写 golang 时，可以从 `.memory/guide/golang.md` 获取 golang 的风格指南，如果不存在可以从 https://cdn.jsdelivr.net/gh/lazygophers/roo@master/mcp/library/document/golang/guide.md 更新最新的 golang 的风格指南
-      当需要编写 python 时，可以从 `.memory/guide/python.md` 获取 python 的风格指南，如果不存在可以从 https://cdn.jsdelivr.net/gh/lazygophers/roo@master/mcp/library/document/python/guide.md 更新最新的 python 的风格指南
 
 
       ## 身份定位：顶尖软件工程师 (Top-Tier Software Engineer)
@@ -1012,8 +1003,6 @@ customModes:
 
 
       ---
-
-      当需要编写 markdown 时，可以从 `.memory/guide/markdown.md` 获取 python 的风格指南，如果不存在可以从 https://cdn.jsdelivr.net/gh/lazygophers/roo@master/mcp/library/document/markdown/guide.md 更新最新的 markdown 的风格指南
 
 
       ## 身份定位：专业文档工程师 (Professional Documentation Engineer)
@@ -1412,8 +1401,6 @@ customModes:
 
       ---
 
-      当需要编写 markdown 时，可以从 `.memory/guide/markdown.md` 获取 python 的风格指南，如果不存在可以从 https://cdn.jsdelivr.net/gh/lazygophers/roo@master/mcp/library/document/markdown/guide.md 更新最新的 markdown 的风格指南
-
 
       # 身份与核心原则
 
@@ -1723,8 +1710,6 @@ customModes:
 
       ---
 
-      当需要编写 markdown 时，可以从 `.memory/guide/markdown.md` 获取 python 的风格指南，如果不存在可以从 https://cdn.jsdelivr.net/gh/lazygophers/roo@master/mcp/library/document/markdown/guide.md 更新最新的 markdown 的风格指南
-
 
       ## 身份定位：模式工程大师 (Master Mode Engineer)
 
@@ -1895,8 +1880,6 @@ customModes:
 
       ---
 
-      当需要编写 markdown 时，可以从 `.memory/guide/markdown.md` 获取 python 的风格指南，如果不存在可以从 https://cdn.jsdelivr.net/gh/lazygophers/roo@master/mcp/library/document/markdown/guide.md 更新最新的 markdown 的风格指南
-
 
       ## 身份定位：项目研究员 (Project Researcher)
 
@@ -2057,8 +2040,6 @@ customModes:
 
 
       ---
-
-      当需要编写 markdown 时，可以从 `.memory/guide/markdown.md` 获取 python 的风格指南，如果不存在可以从 https://cdn.jsdelivr.net/gh/lazygophers/roo@master/mcp/library/document/markdown/guide.md 更新最新的 markdown 的风格指南
 
 
       我将针对「研究主题」执行自主深度研究。我将扮演一位资深研究分析师，通过多轮搜索与分析，为您生成一份全面而深入的研究报告。

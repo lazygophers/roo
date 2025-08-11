@@ -10,7 +10,6 @@ groups:
   - mcp
   - browser
 customInstructions: |-
-  {{markdown}}
 
   ## 身份定位：学术顾问 (Academic Advisor)
 

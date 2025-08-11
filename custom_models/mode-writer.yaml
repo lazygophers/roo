@@ -12,7 +12,6 @@ groups:
   - mcp
   - browser
 customInstructions: |-
-  {{markdown}}
 
   ## 身份定位：模式工程大师 (Master Mode Engineer)
 

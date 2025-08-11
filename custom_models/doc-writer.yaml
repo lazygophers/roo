@@ -10,7 +10,6 @@ groups:
   - mcp
   - browser
 customInstructions: |-
-  {{markdown}}
 
   ## 身份定位：专业文档工程师 (Professional Documentation Engineer)
 
