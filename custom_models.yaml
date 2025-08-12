@@ -12,7 +12,7 @@ customModes:
       -   - edit
           - fileRegex: (\.memory/.*)
             description: 允许编辑记忆库中的所有文件。
-    customInstructions: |-
+    customInstructions: |
       ## A.1 知识库与规范 (Knowledge Base & Specifications)
 
       本部分定义你赖以行动的基础知识和静态规范。
@@ -141,7 +141,7 @@ customModes:
 
       ---
 
-      现在开始执行用户需求并展现你的价值！并及时更新任务进展。严格按照`通用工作流 `以及`工作流`的建议执行。
+      现在开始执行用户需求并展现你的价值！并及时更新任务进展。严格按照`核心工作流`以及`工作流`的建议执行。
     source: global
   - slug: architect
     name: 🏗️ 顶尖架构师
@@ -158,7 +158,7 @@ customModes:
       - edit
       - mcp
       - command
-    customInstructions: |-
+    customInstructions: |
       ## A.1 知识库与规范 (Knowledge Base & Specifications)
 
       本部分定义你赖以行动的基础知识和静态规范。
@@ -297,7 +297,7 @@ customModes:
 
       ---
 
-      现在开始执行用户需求并展现你的价值！并及时更新任务进展。严格按照`通用工作流 `以及`工作流`的建议执行。
+      现在开始执行用户需求并展现你的价值！并及时更新任务进展。严格按照`核心工作流`以及`工作流`的建议执行。
     source: global
   - slug: ask
     name: 📚 学术顾问
@@ -311,7 +311,7 @@ customModes:
       - command
       - mcp
       - browser
-    customInstructions: |-
+    customInstructions: |
       ## A.1 知识库与规范 (Knowledge Base & Specifications)
 
       本部分定义你赖以行动的基础知识和静态规范。
@@ -445,7 +445,7 @@ customModes:
 
       ---
 
-      现在开始执行用户需求并展现你的价值！并及时更新任务进展。严格按照`通用工作流 `以及`工作流`的建议执行。
+      现在开始执行用户需求并展现你的价值！并及时更新任务进展。严格按照`核心工作流`以及`工作流`的建议执行。
     source: global
   - slug: code
     name: 🪄 代码魔法师
@@ -460,7 +460,7 @@ customModes:
       - command
       - mcp
       - browser
-    customInstructions: |-
+    customInstructions: |
       ## A.1 知识库与规范 (Knowledge Base & Specifications)
 
       本部分定义你赖以行动的基础知识和静态规范。
@@ -608,7 +608,7 @@ customModes:
 
       ---
 
-      现在开始执行用户需求并展现你的价值！并及时更新任务进展。严格按照`通用工作流 `以及`工作流`的建议执行。
+      现在开始执行用户需求并展现你的价值！并及时更新任务进展。严格按照`核心工作流`以及`工作流`的建议执行。
     source: global
   - slug: code-golang
     name: Go 代码魔法师
@@ -624,7 +624,7 @@ customModes:
       - command
       - mcp
       - browser
-    customInstructions: |-
+    customInstructions: |
       ## A.1 知识库与规范 (Knowledge Base & Specifications)
 
       本部分定义你赖以行动的基础知识和静态规范。
@@ -771,7 +771,7 @@ customModes:
 
       ---
 
-      现在开始执行用户需求并展现你的价值！并及时更新任务进展。严格按照`通用工作流 `以及`工作流`的建议执行。
+      现在开始执行用户需求并展现你的价值！并及时更新任务进展。严格按照`核心工作流`以及`工作流`的建议执行。
     source: global
   - slug: code-java
     name: Java 代码魔法师
@@ -786,7 +786,7 @@ customModes:
       - command
       - mcp
       - browser
-    customInstructions: |-
+    customInstructions: |
       ## A.1 知识库与规范 (Knowledge Base & Specifications)
 
       本部分定义你赖以行动的基础知识和静态规范。
@@ -934,7 +934,7 @@ customModes:
 
       ---
 
-      现在开始执行用户需求并展现你的价值！并及时更新任务进展。严格按照`通用工作流 `以及`工作流`的建议执行。
+      现在开始执行用户需求并展现你的价值！并及时更新任务进展。严格按照`核心工作流`以及`工作流`的建议执行。
     source: global
   - slug: code-python
     name: 🐍 Python 代码魔法师
@@ -949,7 +949,7 @@ customModes:
       - command
       - mcp
       - browser
-    customInstructions: |-
+    customInstructions: |
       ## A.1 知识库与规范 (Knowledge Base & Specifications)
 
       本部分定义你赖以行动的基础知识和静态规范。
@@ -1096,7 +1096,7 @@ customModes:
 
       ---
 
-      现在开始执行用户需求并展现你的价值！并及时更新任务进展。严格按照`通用工作流 `以及`工作流`的建议执行。
+      现在开始执行用户需求并展现你的价值！并及时更新任务进展。严格按照`核心工作流`以及`工作流`的建议执行。
     source: global
   - slug: code-react
     name: React 代码魔法师
@@ -1110,7 +1110,7 @@ customModes:
       - command
       - mcp
       - browser
-    customInstructions: |-
+    customInstructions: |
       ## A.1 知识库与规范 (Knowledge Base & Specifications)
 
       本部分定义你赖以行动的基础知识和静态规范。
@@ -1258,7 +1258,7 @@ customModes:
 
       ---
 
-      现在开始执行用户需求并展现你的价值！并及时更新任务进展。严格按照`通用工作流 `以及`工作流`的建议执行。
+      现在开始执行用户需求并展现你的价值！并及时更新任务进展。严格按照`核心工作流`以及`工作流`的建议执行。
     source: global
   - slug: code-rust
     name: 🦀 Rust 代码魔法师
@@ -1273,7 +1273,7 @@ customModes:
       - command
       - mcp
       - browser
-    customInstructions: |-
+    customInstructions: |
       ## A.1 知识库与规范 (Knowledge Base & Specifications)
 
       本部分定义你赖以行动的基础知识和静态规范。
@@ -1421,7 +1421,7 @@ customModes:
 
       ---
 
-      现在开始执行用户需求并展现你的价值！并及时更新任务进展。严格按照`通用工作流 `以及`工作流`的建议执行。
+      现在开始执行用户需求并展现你的价值！并及时更新任务进展。严格按照`核心工作流`以及`工作流`的建议执行。
     source: global
   - slug: code-vue
     name: Vue 代码魔法师
@@ -1435,7 +1435,7 @@ customModes:
       - command
       - mcp
       - browser
-    customInstructions: |-
+    customInstructions: |
       ## A.1 知识库与规范 (Knowledge Base & Specifications)
 
       本部分定义你赖以行动的基础知识和静态规范。
@@ -1583,7 +1583,7 @@ customModes:
 
       ---
 
-      现在开始执行用户需求并展现你的价值！并及时更新任务进展。严格按照`通用工作流 `以及`工作流`的建议执行。
+      现在开始执行用户需求并展现你的价值！并及时更新任务进展。严格按照`核心工作流`以及`工作流`的建议执行。
     source: global
   - slug: debug
     name: 🔬 异常分析师
@@ -1598,7 +1598,7 @@ customModes:
       - command
       - mcp
       - browser
-    customInstructions: |-
+    customInstructions: |
       ## A.1 知识库与规范 (Knowledge Base & Specifications)
 
       本部分定义你赖以行动的基础知识和静态规范。
@@ -1733,7 +1733,7 @@ customModes:
 
       ---
 
-      现在开始执行用户需求并展现你的价值！并及时更新任务进展。严格按照`通用工作流 `以及`工作流`的建议执行。
+      现在开始执行用户需求并展现你的价值！并及时更新任务进展。严格按照`核心工作流`以及`工作流`的建议执行。
     source: global
   - slug: doc-writer
     name: ✍️ 文档工程师
@@ -1747,7 +1747,7 @@ customModes:
       - command
       - mcp
       - browser
-    customInstructions: |-
+    customInstructions: |
       ## A.1 知识库与规范 (Knowledge Base & Specifications)
 
       本部分定义你赖以行动的基础知识和静态规范。
@@ -1868,7 +1868,7 @@ customModes:
 
       ---
 
-      现在开始执行用户需求并展现你的价值！并及时更新任务进展。严格按照`通用工作流 `以及`工作流`的建议执行。
+      现在开始执行用户需求并展现你的价值！并及时更新任务进展。严格按照`核心工作流`以及`工作流`的建议执行。
     source: global
   - slug: giter
     name: ⚙️ 版本控制专家
@@ -1883,7 +1883,7 @@ customModes:
       -   - edit
           - fileRegex: \.(md|mdx)$
             description: Markdown 文件
-    customInstructions: |-
+    customInstructions: |
       ## A.1 知识库与规范 (Knowledge Base & Specifications)
 
       本部分定义你赖以行动的基础知识和静态规范。
@@ -2083,7 +2083,7 @@ customModes:
 
       ---
 
-      现在开始执行用户需求并展现你的价值！并及时更新任务进展。严格按照`通用工作流 `以及`工作流`的建议执行。
+      现在开始执行用户需求并展现你的价值！并及时更新任务进展。严格按照`核心工作流`以及`工作流`的建议执行。
     source: global
   - slug: memory
     name: 🧠 记忆中枢
@@ -2098,7 +2098,7 @@ customModes:
       -   - edit
           - fileRegex: (\.memory/.*)
             description: 允许编辑记忆库中的所有文件。
-    customInstructions: |-
+    customInstructions: |
       ## A.1 知识库与规范 (Knowledge Base & Specifications)
 
       本部分定义你赖以行动的基础知识和静态规范。
@@ -2368,7 +2368,7 @@ customModes:
 
       ---
 
-      现在开始执行用户需求并展现你的价值！并及时更新任务进展。严格按照`通用工作流 `以及`工作流`的建议执行。
+      现在开始执行用户需求并展现你的价值！并及时更新任务进展。严格按照`核心工作流`以及`工作流`的建议执行。
     source: global
   - slug: mode-writer
     name: ✍️ 模式工程大师
@@ -2384,7 +2384,7 @@ customModes:
       - command
       - mcp
       - browser
-    customInstructions: |-
+    customInstructions: |
       ## A.1 知识库与规范 (Knowledge Base & Specifications)
 
       本部分定义你赖以行动的基础知识和静态规范。
@@ -2517,7 +2517,7 @@ customModes:
 
       ---
 
-      现在开始执行用户需求并展现你的价值！并及时更新任务进展。严格按照`通用工作流 `以及`工作流`的建议执行。
+      现在开始执行用户需求并展现你的价值！并及时更新任务进展。严格按照`核心工作流`以及`工作流`的建议执行。
     source: global
   - slug: project-research
     name: 🔍 项目研究员
@@ -2530,7 +2530,7 @@ customModes:
       - command
       - mcp
       - browser
-    customInstructions: |-
+    customInstructions: |
       ## A.1 知识库与规范 (Knowledge Base & Specifications)
 
       本部分定义你赖以行动的基础知识和静态规范。
@@ -2654,7 +2654,7 @@ customModes:
 
       ---
 
-      现在开始执行用户需求并展现你的价值！并及时更新任务进展。严格按照`通用工作流 `以及`工作流`的建议执行。
+      现在开始执行用户需求并展现你的价值！并及时更新任务进展。严格按照`核心工作流`以及`工作流`的建议执行。
     source: global
   - slug: researcher
     name: 📚 首席研究员
@@ -2668,7 +2668,7 @@ customModes:
       - command
       - mcp
       - browser
-    customInstructions: |-
+    customInstructions: |
       ## A.1 知识库与规范 (Knowledge Base & Specifications)
 
       本部分定义你赖以行动的基础知识和静态规范。
@@ -2841,5 +2841,5 @@ customModes:
 
       ---
 
-      现在开始执行用户需求并展现你的价值！并及时更新任务进展。严格按照`通用工作流 `以及`工作流`的建议执行。
+      现在开始执行用户需求并展现你的价值！并及时更新任务进展。严格按照`核心工作流`以及`工作流`的建议执行。
     source: global
