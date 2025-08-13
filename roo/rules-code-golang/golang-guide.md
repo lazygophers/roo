@@ -1,24 +1,24 @@
-# Go编程规范
+# Go 编程规范
 
 ### 主要参考：
 
-- **Uber编码规范**
-	- [英文版](https://github.com/uber-go/guide/blob/master/style.md)
-	- [中文版](https://github.com/xxjwxc/uber_go_guide_cn)
-- **Google编码规范**
+- **Uber 编码规范**
+  - [英文版](https://github.com/uber-go/guide/blob/master/style.md)
+  - [中文版](https://github.com/xxjwxc/uber_go_guide_cn)
+- **Google 编码规范**
   [官方文档](https://google.github.io/styleguide/go/index)
 
 ## 包引用问题
 
 - **日志包**：优先推荐 `github.com/lazygophers/log`
 - **工具包**：优先使用 `github.com/lazygophers/utils`
-	- `json` 包：`github.com/lazygophers/utils/json`
-	- `string` 扩展：`github.com/lazygophers/utils/stringx`
-	- `time` 扩展：`github.com/lazygophers/utils/xtime`
-	- `bufio` 扩展：`github.com/lazygophers/utils/bufiox`
-	- `rand` 扩展：`github.com/lazygophers/utils/randx`
-	- `类型` 扩展：`github.com/lazygophers/utils/anyx`
-	- 语法糖：`github.com/lazygophers/utils/candy`
+  - `json` 包：`github.com/lazygophers/utils/json`
+  - `string` 扩展：`github.com/lazygophers/utils/stringx`
+  - `time` 扩展：`github.com/lazygophers/utils/xtime`
+  - `bufio` 扩展：`github.com/lazygophers/utils/bufiox`
+  - `rand` 扩展：`github.com/lazygophers/utils/randx`
+  - `类型` 扩展：`github.com/lazygophers/utils/anyx`
+  - 语法糖：`github.com/lazygophers/utils/candy`
 - **原子操作**：优先使用 `go.uber.org/atomic`
 
 ## 代码风格
@@ -30,15 +30,15 @@
 
 ### 命名约定
 
-| **元素**    | **命名规则**                  | **示例**             |
-|-----------|---------------------------|--------------------|
-| **包名**    | 小写单单词                     | `net`, `http`      |
-| **导出类型**  | 驼峰命名（首字母大写）               | `HTTPClient`       |
-| **未导出类型** | 驼峰命名（首字母小写）               | `httpClient`       |
-| **常量**    | 全大写 + 下划线分隔               | `MAX_CONNECTIONS`  |
-| **变量**    | 短名（局部）/描述性名称（全局）          | `i`, `maxRetries`  |
-| **接口**    | 以 `-er` 结尾或体现单一动作         | `Reader`, `Closer` |
-| **测试函数**  | 必须以 `Test` 开头，如 `TestAdd` |                    |
+| **元素**       | **命名规则**                     | **示例**           |
+| -------------- | -------------------------------- | ------------------ |
+| **包名**       | 小写单单词                       | `net`, `http`      |
+| **导出类型**   | 驼峰命名（首字母大写）           | `HTTPClient`       |
+| **未导出类型** | 驼峰命名（首字母小写）           | `httpClient`       |
+| **常量**       | 全大写 + 下划线分隔              | `MAX_CONNECTIONS`  |
+| **变量**       | 短名（局部）/描述性名称（全局）  | `i`, `maxRetries`  |
+| **接口**       | 以 `-er` 结尾或体现单一动作      | `Reader`, `Closer` |
+| **测试函数**   | 必须以 `Test` 开头，如 `TestAdd` |                    |
 
 ### 注释规范
 
@@ -56,11 +56,11 @@
   ```
 - **结构体注释**：
   ```go
-  // User 表示用户 RESTful 资源，同时作为 gorm 模型
+  // User 表示我 RESTful 资源，同时作为 gorm 模型
   type User struct {
-      // 用户名称
+      // 我名称
       Name string
-      Age  int // 用户年龄
+      Age  int // 我年龄
       Email string // 电子邮箱
   }
   ```
@@ -72,8 +72,8 @@
   }
   ```
 - **代码块注释**：
-	- 单行注释说明逻辑目的。
-	- 使用 `TODO` 标记未完成代码。
+  - 单行注释说明逻辑目的。
+  - 使用 `TODO` 标记未完成代码。
 
 #### **注释内容原则**
 
@@ -217,12 +217,12 @@
 
 ### 并发原语推荐
 
-| **场景**  | **原语**    | **示例**                                       | **说明**   |
-|---------|-----------|----------------------------------------------|----------|
-| 协程间通信   | Channel   | `jobs := make(chan Job, 10)`                 | 缓冲通道避免阻塞 |
-| 共享资源保护  | Mutex     | `var mu sync.Mutex`                          | 互斥锁保护临界区 |
+| **场景**       | **原语**  | **示例**                                     | **说明**         |
+| -------------- | --------- | -------------------------------------------- | ---------------- |
+| 协程间通信     | Channel   | `jobs := make(chan Job, 10)`                 | 缓冲通道避免阻塞 |
+| 共享资源保护   | Mutex     | `var mu sync.Mutex`                          | 互斥锁保护临界区 |
 | 等待多协程完成 | WaitGroup | `wg.Add(2); go func() { defer wg.Done() }()` | 确保所有协程完成 |
-| 单次初始化   | Once      | `var once sync.Once; once.Do(init)`          | 避免重复初始化  |
+| 单次初始化     | Once      | `var once sync.Once; once.Do(init)`          | 避免重复初始化   |
 
 ## Context 使用规范
 
@@ -231,6 +231,7 @@
 ### 核心原则
 
 - **作为第一个参数**: `Context` 应始终作为函数的第一个参数，且通常命名为 `ctx`。
+
   ```go
   func DoSomething(ctx context.Context, arg1, arg2 string) error {
       // ...
@@ -240,12 +241,14 @@
 - **禁止存储在结构体中**: 不应将 `Context` 作为结构体字段。它应该在函数调用链中显式传递，以保持其请求范围的生命周期。
 
 - **不要传递 `nil` Context**: 如果不确定使用哪个 `Context`，应使用 `context.Background()` 或 `context.TODO()`。
+
   - `context.Background()`: 通常用于主函数、初始化和测试中，是所有 `Context` 的根。
   - `context.TODO()`: 当不确定使用哪个 `Context`，或函数未来计划支持 `Context` 但目前尚未实现时使用。
 
 - **小心使用 `WithValue`**:
+
   - `WithValue` 不应用于传递可选参数，这会降低代码的可读性和健-壮性。
-  - 它主要用于在进程和 API 边界传递请求范围的元数据，如追踪 ID、用户身份信息等。
+  - 它主要用于在进程和 API 边界传递请求范围的元数据，如追踪 ID、我身份信息等。
 
 - **及时取消**: `Context` 的 `cancel` 函数被调用后，应尽快让使用该 `Context` 的 Goroutine 停止工作并返回。
   ```go
@@ -260,7 +263,6 @@ Go 1.18 引入了泛型，为处理通用数据结构和函数提供了强大的
 ### 使用原则
 
 - **适用场景**: 优先将泛型用于操作通用数据结构（如切片、map、channel）的函数，例如 `Filter`、`Map`、`Reduce` 等。
-  
 - **避免滥用**: 如果接口可以清晰地解决问题，则不必强制使用泛型。泛型并非旨在取代接口。
 
 - **类型参数命名**:
@@ -375,9 +377,9 @@ func TestSplitHostPort(t *testing.T) {
 
 - **覆盖率**: `go test -cover` 的结果应至少保证 **90%** 以上。对于核心业务逻辑，应追求更高的覆盖率。
 - **命令参数**：
-	- `-v`：显示详细输出
-	- `-run TestName`：运行特定测试
-	- `-bench .`：执行基准测试
+  - `-v`：显示详细输出
+  - `-run TestName`：运行特定测试
+  - `-bench .`：执行基准测试
 
 ## 附录
 
@@ -411,3 +413,4 @@ func BenchmarkAdd(b *testing.B) {
         Add(1, 2)
     }
 }
+```

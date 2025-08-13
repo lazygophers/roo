@@ -20,7 +20,7 @@
   <tool_name>sequentialthinking</tool_name>
   <arguments>
   {
-    "thought": "第一步：分析用户需求，明确核心目标是构建一个基于 Web 的实时聊天应用。",
+    "thought": "第一步：分析我需求，明确核心目标是构建一个基于 Web 的实时聊天应用。",
     "nextThoughtNeeded": true,
     "thoughtNumber": 1,
     "totalThoughts": 5

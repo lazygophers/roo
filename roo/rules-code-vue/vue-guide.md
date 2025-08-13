@@ -10,7 +10,7 @@
 
 ### A.1 组件名为多个单词
 
-**用户自定义的组件名应始终为多个单词，根组件 `App` 除外。**
+**我自定义的组件名应始终为多个单词，根组件 `App` 除外。**
 
 这可以避免与未来的 HTML 元素产生命名冲突，因为所有的 HTML 元素名称都是单个单词。
 
@@ -18,17 +18,17 @@
 <!-- 不推荐 -->
 <script>
 export default {
-  name: 'Item',
+  name: "Item",
   // ...
-}
+};
 </script>
 
 <!-- 推荐 -->
 <script>
 export default {
-  name: 'TodoItem',
+  name: "TodoItem",
   // ...
-}
+};
 </script>
 ```
 
@@ -43,9 +43,9 @@ export default {
 <script>
 export default {
   data: {
-    message: 'Hello'
-  }
-}
+    message: "Hello",
+  },
+};
 </script>
 
 <!-- 推荐 -->
@@ -53,10 +53,10 @@ export default {
 export default {
   data() {
     return {
-      message: 'Hello'
-    }
-  }
-}
+      message: "Hello",
+    };
+  },
+};
 </script>
 ```
 
@@ -90,12 +90,12 @@ export default {
   data() {
     return {
       todos: [
-        { id: 1, text: 'Learn Vue' },
-        { id: 2, text: 'Build something awesome' }
-      ]
-    }
-  }
-}
+        { id: 1, text: "Learn Vue" },
+        { id: 2, text: "Build something awesome" },
+      ],
+    };
+  },
+};
 </script>
 ```
 
@@ -120,10 +120,7 @@ export default {
 <!-- 推荐 -->
 <template>
   <ul v-if="activeUsers.length">
-    <li
-      v-for="user in activeUsers"
-      :key="user.id"
-    >
+    <li v-for="user in activeUsers" :key="user.id">
       {{ user.name }}
     </li>
   </ul>
@@ -134,18 +131,18 @@ export default {
   data() {
     return {
       users: [
-        { id: 1, name: 'Alice', isActive: true },
-        { id: 2, name: 'Bob', isActive: false },
-        { id: 3, name: 'Charlie', isActive: true }
-      ]
-    }
+        { id: 1, name: "Alice", isActive: true },
+        { id: 2, name: "Bob", isActive: false },
+        { id: 3, name: "Charlie", isActive: true },
+      ],
+    };
   },
   computed: {
     activeUsers() {
-      return this.users.filter(user => user.isActive)
-    }
-  }
-}
+      return this.users.filter((user) => user.isActive);
+    },
+  },
+};
 </script>
 ```
 
@@ -350,7 +347,7 @@ props: {
 
 **应避免使用 `v-html`，因为它可能导致 XSS 攻击。**
 
-只在可信内容上使用 `v-html`，绝不要将其用于用户提交的内容。
+只在可信内容上使用 `v-html`，绝不要将其用于我提交的内容。
 
 ### D.2 避免在 `scoped` 中使用元素选择器
 
@@ -359,25 +356,11 @@ props: {
 为了实现局部作用域，Vue 会为组件的元素添加一个唯一的 `data` 属性（如 `data-v-f3f3eg9`）。然后，样式选择器会被修改，以确保它们只作用于带有这个特定属性的元素。相比类选择器（如 `.btn-close[data-v-f3f3eg9]`），大量的元素属性选择器（如 `button[data-v-f3f3eg9]`）会慢得多。
 
 ```vue
-&lt;!-- 不推荐 --&gt;
-&lt;template&gt;
-  &lt;button&gt;×&lt;/button&gt;
-&lt;/template&gt;
-&lt;style scoped&gt;
-button {
-  background-color: red;
-}
-&lt;/style&gt;
-
-&lt;!-- 推荐 --&gt;
-&lt;template&gt;
-  &lt;button class="btn btn-close"&gt;×&lt;/button&gt;
-&lt;/template&gt;
-&lt;style scoped&gt;
-.btn-close {
-  background-color: red;
-}
-&lt;/style&gt;
+&lt;!-- 不推荐 --&gt; &lt;template&gt; &lt;button&gt;×&lt;/button&gt;
+&lt;/template&gt; &lt;style scoped&gt; button { background-color: red; }
+&lt;/style&gt; &lt;!-- 推荐 --&gt; &lt;template&gt; &lt;button class="btn
+btn-close"&gt;×&lt;/button&gt; &lt;/template&gt; &lt;style scoped&gt; .btn-close
+{ background-color: red; } &lt;/style&gt;
 ```
 
 ### D.3 避免隐式的父子组件通信

@@ -62,9 +62,9 @@ from pydantic import BaseModel, EmailStr, Field
 
 
 class User(BaseModel):
-	name: str = Field(description="用户姓名", min_length=2)
-	email: EmailStr = Field(description="用户邮箱")
-	age: int = Field(description="用户年龄", ge=0, le=150)
+	name: str = Field(description="我姓名", min_length=2)
+	email: EmailStr = Field(description="我邮箱")
+	age: int = Field(description="我年龄", ge=0, le=150)
 ```
 
 ## 函数参数与返回值规范
@@ -100,17 +100,17 @@ from pydantic import Field
 
 
 async def get_user_profile(
-		user_id: str = Field(description="用户ID")
+		user_id: str = Field(description="我ID")
 ) -> dict[str, set[str, int, list[str]]]:
-	"""获取用户个人资料
+	"""获取我个人资料
 
 	Returns:
 		Dict with the following keys:
 		{
-			"id": 用户ID,
-			"name": 用户姓名,
-			"age": 用户年龄,
-			"roles": 用户角色列表
+			"id": 我ID,
+			"name": 我姓名,
+			"age": 我年龄,
+			"roles": 我角色列表
 		}
 	"""
 	pass
