@@ -13,7 +13,7 @@
 ## 核心参数与建议
 
 - **`mode` (必须)**: 指定新任务的执行模式。
-- **`message` (必须)**: 任务的具体指令。为了保证任务的高效和准确执行，`message` 应该结构化（yaml 格式），并至少包含以下信息：
+- **`message` (必须)**: 任务的具体指令。为了保证任务的高效和准确执行，`message` 应该结构化（json 格式），并至少包含以下信息：
   - `objective`: 清晰、可执行的任务目标。
   - `context`: 任务执行所需的上下文，例如当前记忆库的状态。
     - `memory`: 记忆库
@@ -69,37 +69,54 @@
 <new_task>
   <mode>code</mode>
   <message>
-    objective: "为 'UserService' 生成并集成一个新的 API 客户端。"
-    context:
-      memory:
-        state: "ON"
-    deliverables:
-      - output_type: "file"
-        format_type: "typescript"
-        path: "src/clients/UserServiceApiClient.ts"
-        description: "生成的 TypeScript API 客户端代码。"
-      - output_type: "stdout"
-        format_type: "raw"
-        description: "显示生成成功或失败的消息。"
-    scope:
-      range: "src/services/UserService.ts" # 主要处理范围是 UserService
-      include: # 需要包含的依赖或文件
-        - "src/core/api-interfaces.ts"
-      exclude: # 需要明确排除的目录或文件
-        - "src/tests/"
-        - "**/*.spec.ts"
-      required: # 必须遵守的硬性要求
-        - "客户端必须实现 IApiClient 接口。"
-        - "所有公共方法必须有完整的 TSDoc 注释。"
-      recommended: # 建议的最佳实践
-        - "为复杂的 DTOs 创建独立的类型定义。"
-      optional: # 可选的实现项
-        - "可以添加一个 mock 实现用于测试。"
-    acceptance_criteria:
-      - "生成的客户端文件 'src/clients/UserServiceApiClient.ts' 必须存在。"
-      - "客户端代码必须编译通过，无 lint 错误。"
-      - "所有在 'UserService.ts' 中定义的公共方法都在新客户端中有对应实现。"
-    task_id: "generate-api-client-001"
-    parent_task_id: "refactor-api-layer-004"
+  {
+    "objective": "为 'UserService' 生成并集成一个新的 API 客户端。",
+    "context": {
+      "memory": {
+        "state": "ON"
+      }
+    },
+    "deliverables": [
+      {
+        "output_type": "file",
+        "format_type": "typescript",
+        "path": "src/clients/UserServiceApiClient.ts",
+        "description": "生成的 TypeScript API 客户端代码。"
+      },
+      {
+        "output_type": "stdout",
+        "format_type": "raw",
+        "description": "显示生成成功或失败的消息。"
+      }
+    ],
+    "scope": {
+      "range": "src/services/UserService.ts",
+      "include": [
+        "src/core/api-interfaces.ts"
+      ],
+      "exclude": [
+        "src/tests/",
+        "**/*.spec.ts"
+      ],
+      "required": [
+        "客户端必须实现 IApiClient 接口。",
+        "所有公共方法必须有完整的 TSDoc 注释。"
+      ],
+      "recommended": [
+        "为复杂的 DTOs 创建独立的类型定义。"
+      ],
+      "optional": [
+        "可以添加一个 mock 实现用于测试。"
+      ]
+    },
+    "acceptance_criteria": [
+      "生成的客户端文件 'src/clients/UserServiceApiClient.ts' 必须存在。",
+      "客户端代码必须编译通过，无 lint 错误。",
+      "所有在 'UserService.ts' 中定义的公共方法都在新客户端中有对应实现。"
+    ],
+    "task_id": "generate-api-client-001",
+    "parent_task_id": "refactor-api-layer-004"
+  }
+  </message>
 </new_task>
 ```
