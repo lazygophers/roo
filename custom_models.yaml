@@ -2228,11 +2228,11 @@ customModes:
                   ## 2. 记忆压缩机制 (Memory Compression Mechanism)
 
                   ### 2.1 摘要优先 (Summary First)
-                  - L1, L2, L3 中的每个记忆 `.yaml` 文件，都在其层级的 `index.json` 中有一个对应的**摘要 (summary)** 条目。
-                  - **检索流程**: `Orchestrator` 首先扫描轻量的 `index.json`，通过摘要快速筛选，命中后再加载重量级的 `.yaml` 文件本体。
+                  - L1, L2, L3 中的每个记忆 `.json` 文件，都在其层级的 `index.json` 中有一个对应的**摘要 (summary)** 条目。
+                  - **检索流程**: `Orchestrator` 首先扫描轻量的 `index.json`，通过摘要快速筛选，命中后再加载重量级的 `.json` 文件本体。
 
                   ### 2.2 指针化引用 (Pointer Reference)
-                  - **格式**: `mem://<layer>/<id>#<optional_path_in_yaml>`
+                  - **格式**: `mem://<layer>/<id>#<optional_path_in_json>`
                   - **用途**: 对于代码块、长文档等冗长内容，在存入 L1/L2 时，会被替换为此指针。
                   - **解析**: `Orchestrator` 在工作记忆 (L4) 中遇到指针时，调用 `memory` 模式的 `resolve_pointer` 工作流来动态获取原始内容。
 
@@ -2287,7 +2287,7 @@ customModes:
            - `layer`: (必须) 目标记忆层级，"L1" 或 "L2"。
            - `id`: (必须) 记忆项的唯一 ID。
            - `summary`: (必须) 该记忆项的摘要。
-           - `path`: (必须) 记忆项的 `.yaml` 文件路径。
+           - `path`: (必须) 记忆项的 `.json` 文件路径。
            - `tags`: (可选) 用于分类和检索的标签列表。
        - **执行动作 (Execution)**:
            - **核心逻辑**:
@@ -2332,11 +2332,11 @@ customModes:
        - **执行动作 (Execution)**:
            - **核心逻辑**:
                1.  **解析指针**: 模型内部解析 `pointer` 字符串，提取出 `<layer>` 和 `<id>`。
-               2.  **定位文件**: 根据 `<layer>` 和 `<id>` 确定目标 `.yaml` 文件路径 (e.g., `.memory/L2_procedural/spec.golang.naming.yaml`)。
+               2.  **定位文件**: 根据 `<layer>` 和 `<id>` 确定目标 `.json` 文件路径 (e.g., `.memory/L2_procedural/spec.golang.naming.json`)。
                3.  **读取文件**:
                    - **工具**: `read_file`
                    - **路径**: `{{resolved_file_path}}`
-               4.  **提取内容**: 模型内部解析 YAML 内容，并根据指针中可能包含的 `#<path_in_yaml>` 提取具体字段。
+               4.  **提取内容**: 模型内部解析 JSON 内容，并根据指针中可能包含的 `#<path_in_json>` 提取具体字段。
        - **输出 (Output)**:
            - **返回**: 指针所指向的原始、完整内容 (字符串或对象)。
 
@@ -2374,16 +2374,16 @@ customModes:
           - **核心逻辑**:
               - **步骤 1: 动态确定目标目录**
                   - **内部处理**: 根据 `layer` 参数，确定目标目录路径 (e.g., `.memory/L1_declarative/`)。
-              - **步骤 2: 扫描所有 .yaml 文件**
+              - **步骤 2: 扫描所有 .json 文件**
                   - **工具**: `list_files`
                   - **路径**: `{{dynamic_target_directory}}`
-                  - **说明**: 递归查找所有 `.yaml` 文件。
+                  - **说明**: 递归查找所有 `.json` 文件。
               - **步骤 3: 在内存中构建新索引**
                   - **内部处理**:
                       - 初始化一个空的索引对象，包含 `version` 和 `comment`。
-                      - 遍历扫描到的每个 `.yaml` 文件：
+                      - 遍历扫描到的每个 `.json` 文件：
                           - 读取文件内容 (`read_file`)。
-                          - 解析 YAML，提取 `id` 和 `summary` 字段。
+                          - 解析 JSON，提取 `id` 和 `summary` 字段。
                           - 将提取的信息作为新条目添加到内存中的索引对象。
               - **步骤 4: 原子化覆盖旧索引**
                   - **工具**: `write_to_file`
