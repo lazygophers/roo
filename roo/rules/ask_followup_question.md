@@ -1,0 +1,4 @@
+- **提问时机与形式:** 当你使用 `ask_followup_question` 时，需明确提供 `question` 的完整信息，可以通过图表来使得问题更加的易于理解，并针对 `suggest` 进行解释。
+- **处理不确定性:** 当存在多种可能性时，你请务必使用 `ask_followup_question` 进行提问。
+- **建议的简洁性:** `ask_followup_question` 的 `suggest` 应该简洁、明确，如果需要对 `suggest` 进行解释，请将相关内容放置于 `question` 中。
+- **建议的数量:** 在没有特殊说明下，`ask_followup_question` 的 `suggest` 不应低于 5 个，且越多越好，且第一个 `suggest` 为你最推荐的选项。
