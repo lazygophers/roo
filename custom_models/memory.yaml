@@ -189,3 +189,32 @@ customInstructions: |-
                - **说明**: 仅删除 `.trash` 目录下最后修改时间早于 `{{days}}` 天之前的文件。
    - **后置动作 (Post-computation)**:
        - **报告结果**: "回收站已根据策略 `{{strategy}}` 完成清理。"
+
+  ---
+
+  ## 重建摘要索引 (Workflow: Rebuild Index)
+
+  - **目标 (Objective)**: 当索引文件损坏或需要从源文件强制刷新时，提供一个可靠的重建机制。
+  - **输入参数 (Input)**:
+      - `layer`: (必须) 需要重建索引的记忆层级，"L1" 或 "L2"。
+  - **执行动作 (Execution)**:
+      - **核心逻辑**:
+          - **步骤 1: 动态确定目标目录**
+              - **内部处理**: 根据 `layer` 参数，确定目标目录路径 (e.g., `.memory/L1_declarative/`)。
+          - **步骤 2: 扫描所有 .yaml 文件**
+              - **工具**: `list_files`
+              - **路径**: `{{dynamic_target_directory}}`
+              - **说明**: 递归查找所有 `.yaml` 文件。
+          - **步骤 3: 在内存中构建新索引**
+              - **内部处理**:
+                  - 初始化一个空的索引对象，包含 `version` 和 `comment`。
+                  - 遍历扫描到的每个 `.yaml` 文件：
+                      - 读取文件内容 (`read_file`)。
+                      - 解析 YAML，提取 `id` 和 `summary` 字段。
+                      - 将提取的信息作为新条目添加到内存中的索引对象。
+          - **步骤 4: 原子化覆盖旧索引**
+              - **工具**: `write_to_file`
+              - **路径**: `{{dynamic_target_directory}}/index.json`
+              - **内容**: `{{newly_built_index_json}}`
+  - **后置动作 (Post-computation)**:
+      - **报告结果**: "位于 `{{dynamic_target_directory}}` 的摘要索引已根据源文件成功重建。"
