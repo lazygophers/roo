@@ -258,10 +258,10 @@ graph TD
 
 本框架与现有的决策、任务、记忆等规则体系紧密集成，共同构成了一个完整、高效的任务执行系统。
 
-- **决策流程**: 根据 [`decision-flow.md`](decision-flow.md) 的规范，不同复杂度的任务对应不同的决策流程。
+- **决策流程**: 根据 [`decision-flow.md`] 的规范，不同复杂度的任务对应不同的决策流程。
 - **任务管理**: 本文档定义的任务管理规则（如 `update_todo_list` 的使用）是集成的基础。
-- **记忆库**: 根据 [`memory.md`](memory.md) 的规范，评估记录和经验沉淀将作为程序性记忆（L2）存储。
-- **工作流**: 根据 [`workflow-base.md`](workflow-base.md) 的规范，评估过程被集成到工作流的早期阶段。
+- **记忆库**: 根据 [`memory.md`] 的规范，评估记录和经验沉淀将作为程序性记忆（L2）存储。
+- **工作流**: 根据 [`workflow-base.md`] 的规范，评估过程被集成到工作流的早期阶段。
 
 ---
 
@@ -1060,7 +1060,7 @@ const migrationStrategy = {
 
 ### 通用行为准则
 
-- **清单确认:** 任务清单的创建和更新属于 **L1 级关键决策**，必须遵循 [决策流程规范](decision-flow.md) 进行确认。在通过 `update_todo_list` 更新任务清单前，必须先通过 `ask_followup_question` 向我进行确认。如果我提出了变更意见，需要按照 [变更重确认流程](decision-flow.md#变更重确认流程-change-reconfirmation-process) 重新向我确认。
+- **清单确认:** 任务清单的创建和更新属于 **L1 级关键决策**，必须遵循 [决策流程规范] 进行确认。在通过 `update_todo_list` 更新任务清单前，必须先通过 `ask_followup_question` 向我进行确认。如果我提出了变更意见，需要按照 [变更重确认流程](decision-flow.md#变更重确认流程-change-reconfirmation-process) 重新向我确认。
 - **分析与拆解:** 接到任务时，你请确保以最高的优先级进行任务分析、拆解，可以借助 `sequentialthinking` 辅助你进行任务分解。
 - **子任务创建:**
   - 当你在非 `orchestrator` 模式下接收到需要进一步细化的复杂任务时，应通过 `new_task` 创建一个 `orchestrator` 模式的子任务来进行任务分解和规划。
@@ -1080,7 +1080,7 @@ const migrationStrategy = {
 
 ### 任务清单生成
 
-- **决策流程**: 任务清单的生成必须遵循 [决策流程规范](decision-flow.md) 中定义的标准流程：
+- **决策流程**: 任务清单的生成必须遵循 [决策流程规范] 中定义的标准流程：
   - **决策触发**: 任务清单属于 [一级决策场景](decision-flow.md#一级决策场景必须触发)，必须通过 `ask_followup_question` 提请确认
   - **信息透明**: 提供完整的任务分解方案、执行顺序和预计时间
   - **选项充分**: 提供不少于 5 个可行选项（参见 [决策场景示例 - 任务清单确认](decision-flow.md#场景-5-任务清单确认)）
@@ -1121,7 +1121,7 @@ const migrationStrategy = {
 
 #### 拆分原则
 
-任务拆分应遵循 [任务分解原则参考指南](task-decomposition-principles.md) 中定义的详细框架。核心原则包括：
+任务拆分应遵循 [任务分解原则参考指南] 中定义的详细框架。核心原则包括：
 
 - **不可再分**: 确保每个子任务都是最小的独立工作单元。
 - **交付独立**: 确保子任务的产出可以独立交付，不依赖其他任务。
@@ -1839,9 +1839,9 @@ list_files → search_files → search_and_replace → update_todo_list
 
 本映射表与以下规范协同工作：
 
-- [`decision-flow.md`](decision-flow.md): 提供决策级别定义
-- [`complexity-assessment.md`](complexity-assessment.md): 提供复杂度评估标准
-- [`task-decomposition-principles.md`](task-decomposition-principles.md): 提供任务分解指导
+- [`decision-flow.md`]: 提供决策级别定义
+- [`complexity-assessment.md`]: 提供复杂度评估标准
+- [`task-decomposition-principles.md`]: 提供任务分解指导
 - [`brain.yaml`](.custom_models/brain.yaml): 集成到 orchestrator 模式配置中
 
 # Rules from /Users/luoxin/.roo/rules/workflow-base.md:
@@ -1964,7 +1964,7 @@ graph TD
 - **决策矩阵**：当方案超过 2 个时，**必须**提供一个清晰的决策矩阵（Markdown 表格），从多维度（如开发成本、性能、维护难度等）对比各方案。
 - **推荐方案**：明确提出在通用场景下的最优选择。
 - **推荐理由**：详细阐述为什么这是最平衡、最合适的选择。
-- **决策提请**: **必须**使用 `ask_followup_question` 工具，将方案选择权交还给我。此过程需严格遵循 [用户决策流程规范](decision-flow.md)。
+- **决策提请**: **必须**使用 `ask_followup_question` 工具，将方案选择权交还给我。此过程需严格遵循 [用户决策流程规范]。
   - **`question`**: 应包含方案的简要对比和你的推荐理由。
   - **`suggest`**: 应清晰列出 '选择方案 A', '选择方案 B' 等选项。
 
@@ -2065,8 +2065,7 @@ graph TD
 - **清理必须受控 (Controlled Cleanup)**
   - **清理权限**: **仅** `orchestrator` 模式拥有清理工作记忆的权限。
   - **清理时机 (父任务)**: 在顶层任务完全结束后，`orchestrator` 可直接清理所有相关的短期记忆，无需询问。
-  - **清理时机 (子任务)**: - 对于长周期父任务，`orchestrator` 可在子任务结束后，通过 `ask_followup_question` 询问我是否需要立即对本次子任务的短期记忆进行复盘和清理。</custom_instructions>
-    ====
+  - # **清理时机 (子任务)**: - 对于长周期父任务，`orchestrator` 可在子任务结束后，通过 `ask_followup_question` 询问我是否需要立即对本次子任务的短期记忆进行复盘和清理。</custom_instructions>
 
 REMINDERS
 
