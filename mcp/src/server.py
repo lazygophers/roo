@@ -11,7 +11,7 @@ import logging
 import sys
 from typing import Any, Callable, Dict, Union
 
-from src.tools import memory, timestamp
+from src.tools import timestamp
 
 
 def run_server() -> None:
@@ -23,16 +23,6 @@ def run_server() -> None:
     """
     tools: Dict[str, Callable[..., Any]] = {
         "get_timestamp": timestamp.get_timestamp,
-        "memory-init-workspace": memory.memory_init_workspace,
-        "memory-query-kb": memory.memory_query_kb,
-        "memory-update-context": memory.memory_update_context,
-        "memory-add-to-kb": memory.memory_add_to_kb,
-        "memory-cleanup-workspace": memory.memory_cleanup_workspace,
-        "memory-get-status": memory.memory_get_status,
-        "memory-dump": memory.memory_dump,
-        "memory-search": memory.memory_search,
-        "memory-backup": memory.memory_backup,
-        "memory-restore": memory.memory_restore,
     }
 
     for line in sys.stdin:
