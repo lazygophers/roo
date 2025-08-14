@@ -327,50 +327,10 @@ graph LR
 
 ---
 
-## 决策记录与追溯 (Decision Recording & Traceability)
-
-### 记录要求
-
-每个决策点必须记录以下信息：
-
-```json
-{
-  "decision_id": "uuid",
-  "timestamp": "ISO 8601",
-  "context": {
-    "task_id": "string",
-    "mode": "string",
-    "trigger_scenario": "string"
-  },
-  "options_presented": [
-    {
-      "option": "string",
-      "recommended": "boolean",
-      "risk_level": "low|medium|high"
-    }
-  ],
-  "user_choice": "string",
-  "execution_result": {
-    "status": "success|failure|cancelled",
-    "impact": "string",
-    "rollback_available": "boolean"
-  }
-}
-```
-
-### 追溯机制
-
-1.  **决策链路**: 维护决策之间的依赖关系
-2.  **版本控制**: 每个重要决策创建检查点
-3.  **审计日志**: 记录所有决策的完整历史
-4.  **回滚能力**: 支持回退到任意决策点
-
----
-
 ## 与其他规则的集成 (Integration with Other Rules)
 
 本规范与以下规则文件协同工作：
 
 - `task.md`: 定义任务分解和确认流程
-- `memory.md`: 规定决策记录的存储机制
+- `memory.md`: 规定记忆库的结构、工作流和交互协议
 - `workflow-base.md`: 集成到整体工作流程中

@@ -256,37 +256,12 @@ graph TD
 
 ### 与现有规则的集成 (Integration with Existing Rules)
 
-#### 与决策流程的集成
+本框架与现有的决策、任务、记忆等规则体系紧密集成，共同构成了一个完整、高效的任务执行系统。
 
-根据 [`decision-flow.md`](decision-flow.md) 的规范：
-
-- **Simple 任务**：可以减少决策确认环节，提高执行效率
-- **Medium 任务**：遵循标准决策流程
-- **Complex 任务**：需要额外的决策确认点和风险评估
-
-#### 与任务管理的集成
-
-根据 [`task.md`](task.md) 的规范：
-
-- **Simple 任务**：无需 `update_todo_list`
-- **Medium 任务**：建议使用任务清单
-- **Complex 任务**：必须使用详细的任务分解和清单管理
-
-#### 与记忆库的集成
-
-根据 [`memory.md`](memory.md) 的规范：
-
-- **评估记录**：作为程序性记忆（L2）存储
-- **经验沉淀**：复杂任务的评估经验形成可复用模板
-- **模式学习**：不同类型任务的评估模式持续优化
-
-#### 与工作流的集成
-
-根据 [`workflow-base.md`](workflow-base.md) 的规范：
-
-- 评估在"需求分析与方案设计"阶段之前进行
-- 评估结果影响后续的方案设计深度
-- Complex 任务触发强制的 `sequentialthinking` 流程
+- **决策流程**: 根据 [`decision-flow.md`](decision-flow.md) 的规范，不同复杂度的任务对应不同的决策流程。
+- **任务管理**: 本文档定义的任务管理规则（如 `update_todo_list` 的使用）是集成的基础。
+- **记忆库**: 根据 [`memory.md`](memory.md) 的规范，评估记录和经验沉淀将作为程序性记忆（L2）存储。
+- **工作流**: 根据 [`workflow-base.md`](workflow-base.md) 的规范，评估过程被集成到工作流的早期阶段。
 
 ---
 
@@ -1430,3 +1405,691 @@ task_template:
 | 代码实现 | code       | code-\*  | 通用开发任务     |
 | 测试编写 | code       | debug    | 测试用例开发     |
 | 文档编写 | doc-writer | -        | 专业文档生成     |
+
+# Rules from /Users/luoxin/.roo/rules/tool-usage.md:
+
+# 工具场景映射表 (Tool-Scenario Mapping Matrix)
+
+本文档定义了 roo 系统中各工具的使用场景映射关系，为 orchestrator 模式在任务执行过程中提供系统化的工具选择指导。
+
+---
+
+## 概述 (Overview)
+
+工具场景映射表通过明确的场景-工具对应关系，帮助 AI 快速准确地选择最适合的工具来完成特定任务。每个工具都有其最适用的场景和决策级别，合理的工具选择是高效执行的关键。
+
+---
+
+## 核心映射矩阵 (Core Mapping Matrix)
+
+### 认知与分析类工具 (Cognitive & Analysis Tools)
+
+| 工具名称                       | 主要场景           | 决策级别 | 触发条件         | 优先级 |
+| ------------------------------ | ------------------ | -------- | ---------------- | ------ |
+| **sequentialthinking**         | 任务分解、方案设计 | L1       | 复杂度评分 ≥ 60  | 最高   |
+|                                | 需求分析、架构规划 | L1       | 涉及多系统集成   | 最高   |
+|                                | 问题诊断、根因分析 | L2       | 问题原因不明确   | 高     |
+|                                | 策略制定、路径规划 | L2       | 存在多种实现路径 | 高     |
+| **list_code_definition_names** | 代码结构理解       | L3       | 首次接触代码库   | 高     |
+|                                | 重构前分析         | L2       | 计划修改核心逻辑 | 高     |
+|                                | 依赖关系梳理       | L3       | 需要了解模块关系 | 中     |
+| **search_files**               | 特定模式查找       | L4       | 已知搜索模式     | 高     |
+|                                | 影响范围评估       | L3       | 修改前评估影响   | 高     |
+|                                | TODO/FIXME 扫描    | L4       | 例行代码检查     | 低     |
+
+### 文件操作类工具 (File Operation Tools)
+
+| 工具名称               | 主要场景       | 决策级别 | 触发条件         | 优先级 |
+| ---------------------- | -------------- | -------- | ---------------- | ------ |
+| **read_file**          | 文件内容获取   | L4       | 需要查看具体内容 | 最高   |
+|                        | 配置文件检查   | L3       | 验证配置正确性   | 高     |
+|                        | 代码审查       | L3       | 代码质量检查     | 中     |
+| **list_files**         | 项目结构探索   | L4       | 初次了解项目     | 高     |
+|                        | 文件存在性验证 | L4       | 确认文件位置     | 高     |
+|                        | 批量操作准备   | L3       | 需要处理多文件   | 中     |
+| **apply_diff**         | 精确代码修改   | L2       | 修改已知代码段   | 最高   |
+|                        | Bug 修复       | L2       | 定位到具体问题   | 最高   |
+|                        | 重构实施       | L1       | 执行重构计划     | 高     |
+| **write_to_file**      | 新文件创建     | L2       | 创建新模块/配置  | 高     |
+|                        | 完全重写       | L1       | 文件需要重构     | 中     |
+|                        | 模板生成       | L3       | 批量创建相似文件 | 中     |
+| **insert_content**     | 添加新功能     | L3       | 插入新函数/类    | 高     |
+|                        | 导入语句添加   | L4       | 添加依赖引用     | 高     |
+|                        | 注释补充       | L4       | 增加文档说明     | 低     |
+| **search_and_replace** | 批量重命名     | L2       | 统一命名规范     | 高     |
+|                        | 版本号更新     | L3       | 发布新版本       | 中     |
+|                        | 配置值替换     | L3       | 环境配置更新     | 中     |
+
+### 决策交互类工具 (Decision & Interaction Tools)
+
+| 工具名称                  | 主要场景   | 决策级别 | 触发条件     | 优先级 |
+| ------------------------- | ---------- | -------- | ------------ | ------ |
+| **ask_followup_question** | 需求澄清   | L1       | 指令存在歧义 | 最高   |
+|                           | 方案选择   | L1       | 多个可行方案 | 最高   |
+|                           | 风险确认   | L1       | 破坏性操作   | 最高   |
+|                           | 参数补充   | L2       | 缺少必要信息 | 高     |
+|                           | 优化建议   | L2       | 发现改进空间 | 中     |
+| **update_todo_list**      | 任务初始化 | L1       | 任务开始     | 最高   |
+|                           | 进度更新   | L3       | 子任务完成   | 高     |
+|                           | 动态调整   | L2       | 发现新任务   | 高     |
+|                           | 完成确认   | L3       | 任务结束     | 高     |
+
+### 任务管理类工具 (Task Management Tools)
+
+| 工具名称        | 主要场景   | 决策级别 | 触发条件       | 优先级 |
+| --------------- | ---------- | -------- | -------------- | ------ |
+| **new_task**    | 模式切换   | L1       | 需要专业能力   | 最高   |
+|                 | 并行任务   | L2       | 可并行执行     | 高     |
+|                 | 子任务委派 | L2       | 任务可独立完成 | 高     |
+|                 | 批量处理   | L3       | 重复性任务     | 中     |
+| **switch_mode** | 专业切换   | L1       | 当前模式不适合 | 高     |
+|                 | 临时切换   | L2       | 短期特定需求   | 中     |
+|                 | 完成后切换 | L3       | 阶段性任务完成 | 低     |
+
+### 系统操作类工具 (System Operation Tools)
+
+| 工具名称            | 主要场景 | 决策级别 | 触发条件   | 优先级 |
+| ------------------- | -------- | -------- | ---------- | ------ |
+| **execute_command** | 构建测试 | L2       | 代码修改后 | 高     |
+|                     | 环境配置 | L1       | 项目初始化 | 高     |
+|                     | 依赖安装 | L2       | 新增依赖包 | 高     |
+|                     | 脚本执行 | L2       | 自动化任务 | 中     |
+|                     | 系统检查 | L3       | 环境验证   | 低     |
+
+### MCP 服务类工具 (MCP Service Tools)
+
+| 工具名称                | 主要场景     | 决策级别 | 触发条件     | 优先级 |
+| ----------------------- | ------------ | -------- | ------------ | ------ |
+| **use_mcp_tool**        | 外部文档查询 | L3       | 需要最新文档 | 高     |
+|                         | 深度思考辅助 | L1       | 复杂问题分析 | 高     |
+|                         | 知识补充     | L3       | 缺少领域知识 | 中     |
+| **access_mcp_resource** | 资源获取     | L3       | 需要外部数据 | 中     |
+|                         | 状态查询     | L4       | 监控外部状态 | 低     |
+
+### MCP 服务基础用例 (MCP Service Basic Use Cases)
+
+#### Sequential Thinking (Mcp)
+
+- **用途**：复杂问题的逐步分析
+- **适用场景**：需求分析、方案设计、问题排查
+- **使用时机**：当你遇到复杂逻辑或多步骤问题时
+
+##### 基础用例
+
+当你需要规划一个多步骤任务时，可以这样使用：
+
+```xml
+<use_mcp_tool>
+  <server_name>sequentialthinking</server_name>
+  <tool_name>sequentialthinking</tool_name>
+  <arguments>
+  {
+    "thought": "第一步：分析我需求，明确核心目标是构建一个基于 Web 的实时聊天应用。",
+    "nextThoughtNeeded": true,
+    "thoughtNumber": 1,
+    "totalThoughts": 5
+  }
+  </arguments>
+</use_mcp_tool>
+```
+
+#### Context 7 (Mcp)
+
+- **用途**：查询最新的技术文档、API 参考和代码示例
+- **适用场景**：技术调研、最佳实践获取
+- **使用时机**：当你需要了解新技术或验证实现方案时
+
+##### 基础用例
+
+当你需要查找相关文档时，可以这样使用：
+
+```xml
+<use_mcp_tool>
+  <server_name>context7</server_name>
+  <tool_name>get-library-docs</tool_name>
+  <arguments>
+  {
+    "context7CompatibleLibraryID": "/facebook/react",
+    "topic": "hooks"
+  }
+  </arguments>
+</use_mcp_tool>
+```
+
+#### DeepWiki (Mcp)
+
+- **用途**：检索背景知识、行业术语、常见架构和设计模式
+- **适用场景**：研究、构思阶段需要理解技术原理和通识
+- **使用时机**：当你遇到术语不清、原理未知、需引入通用范式时
+
+##### 基础用例
+
+当你需要了解“微服务架构”的基本概念时，可以这样使用：
+
+```xml
+<use_mcp_tool>
+  <server_name>deepwiki</server_name>
+  <tool_name>deepwiki_fetch</tool_name>
+  <arguments>
+  {
+    "url": "微服务架构"
+  }
+  </arguments>
+</use_mcp_tool>
+```
+
+---
+
+## 场景驱动的工具选择策略 (Scenario-Driven Tool Selection Strategy)
+
+### 1. 项目初始化场景
+
+```yaml
+场景描述: 新项目搭建或首次接触项目
+工具执行序列: 1. list_files (recursive=true) - 了解项目结构
+  2. read_file (package.json/pom.xml等) - 理解项目配置
+  3. list_code_definition_names - 掌握代码架构
+  4. sequentialthinking - 制定工作计划
+  5. ask_followup_question - 确认理解和方向
+  6. update_todo_list - 初始化任务清单
+```
+
+### 2. Bug 修复场景
+
+```yaml
+场景描述: 定位并修复代码缺陷
+工具执行序列: 1. read_file - 查看问题代码
+  2. search_files - 查找相关引用
+  3. sequentialthinking - 分析问题根因
+  4. ask_followup_question - 确认修复方案
+  5. apply_diff - 实施修复
+  6. execute_command - 运行测试验证
+  7. update_todo_list - 更新任务状态
+```
+
+### 3. 功能开发场景
+
+```yaml
+场景描述: 开发新功能模块
+工具执行序列: 1. sequentialthinking - 功能设计分析
+  2. ask_followup_question - 确认技术方案
+  3. write_to_file - 创建新文件
+  4. insert_content - 添加功能代码
+  5. search_and_replace - 更新相关配置
+  6. execute_command - 构建验证
+  7. update_todo_list - 标记完成
+```
+
+### 4. 代码重构场景
+
+```yaml
+场景描述: 优化代码结构和质量
+工具执行序列: 1. list_code_definition_names - 分析现有结构
+  2. search_files - 评估影响范围
+  3. sequentialthinking - 制定重构策略
+  4. ask_followup_question - 确认重构计划
+  5. apply_diff - 分步实施重构
+  6. execute_command - 回归测试
+  7. update_todo_list - 记录进展
+```
+
+### 5. 文档更新场景
+
+```yaml
+场景描述: 创建或更新项目文档
+工具执行序列: 1. list_files - 查找现有文档
+  2. read_file - 了解文档现状
+  3. new_task (doc-writer) - 委派文档任务
+  4. write_to_file/apply_diff - 更新文档
+  5. update_todo_list - 完成确认
+```
+
+### 6. CI/CD 自动化场景
+
+```yaml
+场景描述: 自动化代码集成、测试和部署流程
+工具执行序列: 1. read_file - 读取 CI/CD 配置文件 (如 .github/workflows/main.yml)
+  2. execute_command - 运行构建命令 (如 npm run build)
+  3. execute_command - 运行自动化测试 (如 npm test)
+  4. read_file - 读取测试或构建日志，检查是否有错误
+  5. ask_followup_question - 在部署到生产环境前请求最终确认
+  6. execute_command - 执行部署脚本 (如 ./deploy.sh)
+  7. update_todo_list - 更新部署任务状态为完成
+```
+
+---
+
+## 工具组合模式 (Tool Combination Patterns)
+
+### 探索型组合 (Exploration Pattern)
+
+```
+list_files → read_file → list_code_definition_names → search_files
+```
+
+**适用场景**: 初次了解代码库、技术调研、影响分析
+
+### 决策型组合 (Decision Pattern)
+
+```
+sequentialthinking → ask_followup_question → update_todo_list → new_task
+```
+
+**适用场景**: 复杂任务规划、方案选择、任务分配
+
+### 修改型组合 (Modification Pattern)
+
+```
+read_file → apply_diff → execute_command → update_todo_list
+```
+
+**适用场景**: 代码修改、Bug 修复、配置更新
+
+### 创建型组合 (Creation Pattern)
+
+```
+ask_followup_question → write_to_file → insert_content → execute_command
+```
+
+**适用场景**: 新功能开发、文件创建、模块添加
+
+### 批处理型组合 (Batch Pattern)
+
+```
+list_files → search_files → search_and_replace → update_todo_list
+```
+
+**适用场景**: 批量重命名、全局替换、统一更新
+
+---
+
+## 工具选择决策树 (Tool Selection Decision Tree)
+
+```
+任务开始
+├─ 需要理解现状？
+│  ├─ 是 → 使用探索型工具组合
+│  └─ 否 → 继续判断
+├─ 需要用户决策？
+│  ├─ 是 → ask_followup_question (L1级)
+│  └─ 否 → 继续判断
+├─ 任务复杂度 ≥ 60？
+│  ├─ 是 → sequentialthinking → 任务分解
+│  └─ 否 → 直接执行
+├─ 需要修改文件？
+│  ├─ 创建新文件 → write_to_file
+│  ├─ 精确修改 → apply_diff
+│  ├─ 添加内容 → insert_content
+│  └─ 批量替换 → search_and_replace
+├─ 需要外部能力？
+│  ├─ 专业模式 → new_task/switch_mode
+│  └─ MCP服务 → use_mcp_tool
+└─ 更新任务状态 → update_todo_list
+```
+
+---
+
+## 性能优化建议 (Performance Optimization)
+
+### 1. 工具使用优先级
+
+- **高优先级**: 直接解决问题的工具（apply_diff, write_to_file）
+- **中优先级**: 辅助理解的工具（read_file, search_files）
+- **低优先级**: 可选的增强工具（MCP 服务）
+
+### 2. 批量操作优化
+
+- 使用单个 `apply_diff` 处理多个修改
+- 合并多个 `read_file` 请求（最多 5 个文件）
+- 使用 `search_and_replace` 替代多次 `apply_diff`
+
+### 3. 决策时机优化
+
+- 前置重要决策，避免返工
+- 批量收集信息后统一决策
+- 使用决策矩阵减少决策次数
+
+---
+
+## 异常处理映射 (Exception Handling Mapping)
+
+| 异常类型   | 推荐工具                           | 处理策略           |
+| ---------- | ---------------------------------- | ------------------ |
+| 文件不存在 | list_files → ask_followup_question | 确认路径或创建文件 |
+| 权限不足   | ask_followup_question              | 请求权限或切换方案 |
+| 工具失败   | execute_command → read_file        | 查看错误日志并重试 |
+| 信息不足   | ask_followup_question              | 收集必要信息       |
+| 复杂度过高 | sequentialthinking → new_task      | 分解任务或委派     |
+
+---
+
+## 最佳实践 (Best Practices)
+
+### Do's ✅
+
+1. **始终验证前置条件**: 使用工具前确认文件存在、权限充足
+2. **优先使用组合模式**: 利用已验证的工具组合提高效率
+3. **及时更新任务状态**: 每个关键节点都更新 todo_list
+4. **主动请求决策**: 不确定时主动使用 ask_followup_question
+5. **充分利用 MCP 服务**: 复杂分析时借助 sequentialthinking
+
+### Don'ts ❌
+
+1. **避免冗余操作**: 不要重复读取未修改的文件
+2. **避免越级决策**: 不要跳过 L1 级决策直接执行
+3. **避免过度分解**: 简单任务不需要过度使用 sequentialthinking
+4. **避免延迟更新**: 不要积累多个任务后才更新状态
+5. **避免盲目执行**: 不要在信息不足时强行执行
+
+---
+
+## 工具使用反模式 (Anti-Patterns)
+
+为了确保工具链的高效和正确使用，需要警惕以下常见的反模式。这些反模式不仅会降低效率，还可能导致任务失败或产生不可预期的结果。
+
+#### ❌ 反模式 1: 用 `write_to_file` 进行微小修改
+
+- **表现**: 只是为了修改文件中的一行或几个字符，却读取了整个文件，然后在内存中修改后，用 `write_to_file` 完整地写回去。
+- **问题**:
+  - **效率低下**: 对于大文件，这会消耗大量不必要的 I/O 和内存。
+  - **风险高**: 如果在读写之间文件被外部修改，会导致内容冲突和数据丢失。
+  - **意图模糊**: 无法清晰地从操作中看出具体的修改意图。
+- **正确做法**:
+  - 使用 `apply_diff` 进行精确、外科手术式的修改。
+  - 使用 `search_and_replace` 进行目标明确的文本替换。
+  - 使用 `insert_content` 添加新内容。
+
+#### ❌ 反模式 2: 滥用 `execute_command` 执行文件系统操作
+
+- **表现**: 使用 `execute_command` 执行 `ls`, `cat`, `mkdir` 等本可以通过内建工具完成的操作。
+- **问题**:
+  - **平台依赖**: `ls` 等命令在不同操作系统（Linux/macOS vs. Windows）下行为不一致。
+  - **输出解析困难**: AI 需要解析非结构化的文本输出来获取信息，容易出错。
+  - **功能局限**: `ls` 无法像 `list_files` 那样提供递归和结构化的文件列表。
+- **正确做法**:
+  - **列出文件**: 使用 `list_files`。
+  - **读取文件**: 使用 `read_file`。
+  - **创建目录**: `write_to_file` 会自动创建不存在的目录，无需手动 `mkdir`。
+
+#### ❌ 反模式 3: 缺乏规划的连续工具调用
+
+- **表现**: 没有清晰的计划，只是一个接一个地调用工具，期望通过试错来完成任务。例如，反复地、无目的地 `read_file` 不同的文件。
+- **问题**:
+  - **效率低下**: 大量无效的工具调用浪费时间和资源。
+  - **逻辑混乱**: 缺乏顶层设计，容易陷入局部最优而忽略整体目标。
+  - **难以追溯**: 出现问题时，很难复盘和定位错误决策点。
+- **正确做法**:
+  - **复杂任务先规划**: 对于复杂度超过阈值的任务，首先使用 `sequentialthinking` 进行深度分析和规划。
+  - **确认后再执行**: 使用 `ask_followup_question` 向用户确认规划方案，再开始执行。
+  - **使用组合模式**: 遵循本文档中定义的“工具组合模式”来组织操作。
+
+#### ❌ 反模式 4: 在 `ask_followup_question` 中逃避责任
+
+- **表现**: 遇到难题或需要决策时，提出开放性问题，如“接下来做什么？”或“请提供文件路径”。
+- **问题**:
+  - **负担转移**: 将分析和决策的负担完全推给用户。
+  - **中断流程**: 打断了自动化的工作流，需要用户进行额外的思考和操作。
+- **正确做法**:
+  - **提供选项**: 分析可能的解决方案，并通过 `suggest` 提供给用户选择。
+  - **主动探索**: 如果缺少信息（如文件路径），应先使用 `list_files` 或 `search_files` 进行探索，然后将找到的可能选项提供给用户确认。
+
+---
+
+## 与其他规范的集成 (Integration with Other Specifications)
+
+本映射表与以下规范协同工作：
+
+- [`decision-flow.md`](decision-flow.md): 提供决策级别定义
+- [`complexity-assessment.md`](complexity-assessment.md): 提供复杂度评估标准
+- [`task-decomposition-principles.md`](task-decomposition-principles.md): 提供任务分解指导
+- [`brain.yaml`](.custom_models/brain.yaml): 集成到 orchestrator 模式配置中
+
+# Rules from /Users/luoxin/.roo/rules/workflow-base.md:
+
+# ✨ 核心工作流：一切行动的最高准则
+
+> **本部分是所有任务都必须遵循的最高行动纲领，其优先级高于一切。记忆库是本工作流的核心驱动力。**
+
+---
+
+## 阶段 1：任务初始化与规划 (Initialization & Planning)
+
+### 1. [记忆库] 认知加载与状态管理
+
+任务开始时，必须遵循本节定义的流程进行认知加载和状态管理。
+
+#### 1.1 记忆库核心原则与架构
+
+##### a. 最高准则
+
+- **记忆驱动**: 记忆库是所有工作流的核心驱动力。
+- **状态强制明示**: 在每次响应前，**必须**明确标示当前记忆库的激活状态 (`[记忆库: ON]`, `[记忆库: OFF]`, `[记忆库: PAUSED]`, `[记忆库: PADDING]`)。
+
+##### b. 认知压缩引擎架构
+
+采用分层与压缩相结合的记忆架构。
+
+- **记忆分层模型 (Hierarchical Memory Model)**
+
+| 路径                      | 层级           | 描述                                              | 权限与生命周期                                       |
+| ------------------------- | -------------- | ------------------------------------------------- | ---------------------------------------------------- |
+| `.memory/L0_core/`        | **核心记忆**   | 定义 AI 身份、核心指令、价值观。                  | 系统启动时无条件加载，永不卸载、永不修改。           |
+| `.memory/L1_declarative/` | **陈述性记忆** | “是什么”的知识，如项目规范、我偏好、事实数据。    | 按需加载，长期持久化。                               |
+| `.memory/L2_procedural/`  | **程序性记忆** | “如何做”的知识，如可复用的工作流、SOP、代码模板。 | 按需加载，长期持久化。                               |
+| `.memory/L3_episodic/`    | **情景记忆**   | 已完成任务的完整日志，用于复盘和优化。            | 归档，通常不直接参与新任务。                         |
+| `.memory/L4_working/`     | **工作记忆**   | 当前任务的临时上下文。                            | 任务开始时构建，任务执行中动态更新，任务结束后清理。 |
+| `.memory/staging/`        | **暂存区**     | 事务性写入 L1/L2 层前的临时存放区。               | 临时。                                               |
+| `.memory/.trash/`         | **回收站**     | 安全清理，临时存放待删除文件。                    | 临时，可由 `memory` 模式按策略清理。                 |
+
+```mermaid
+graph TD
+    subgraph Memory Architecture
+        direction TB
+        A(记忆库) --> L0(L0 核心记忆);
+        A --> L1(L1 陈述性记忆);
+        A --> L2(L2 程序性记忆);
+        A --> L3(L3 情景记忆);
+        A --> L4(L4 工作记忆);
+        A --> S(暂存区);
+        A --> T(回收站);
+    end
+
+    style L0 fill:#f9f,stroke:#333,stroke-width:2px;
+    style L1 fill:#bbf,stroke:#333,stroke-width:2px;
+    style L2 fill:#bdf,stroke:#333,stroke-width:2px;
+    style L3 fill:#dfb,stroke:#333,stroke-width:2px;
+    style L4 fill:#fdb,stroke:#333,stroke-width:2px;
+    style S fill:#ccc,stroke:#333,stroke-width:1px;
+    style T fill:#f77,stroke:#333,stroke-width:1px;
+```
+
+- **记忆压缩机制 (Memory Compression Mechanism)**
+  - **摘要优先 (Summary First)**:
+    - L1, L2, L3 中的每个记忆 `.json` 文件，都在其层级的 `index.json` 中有一个对应的**摘要 (summary)** 条目。
+    - **检索流程**: `orchestrator` 首先扫描轻量的 `index.json`，通过摘要快速筛选，命中后再加载重量级的 `.json` 文件本体。
+  - **指针化引用 (Pointer Reference)**:
+    - **格式**: `mem://<layer>/<id>#<optional_path_in_json>`
+    - **用途**: 对于代码块、长文档等冗长内容，在存入 L1/L2 时，会被替换为此指针。
+    - **解析**: AI 在工作记忆 (L4) 中遇到指针时，**必须**调用 `memory` 模式的 `resolve_pointer` 工作流来动态获取原始内容。
+
+#### 1.2 核心工作流：认知加载
+
+1.  **认知加载 (Cognitive Loading):**
+    - **前置检查: 读取记忆锁状态:**
+      - 若已明确当前的记忆库状态，则直接使用，不需要重新加载。
+      - **动作:** 读取 `.memory/memory.lock` 文件内容。
+      - **分支 1 (有文件):** 如果文件存在，则严格按照文件内容设置记忆库状态，不进行任何询问。
+      - **分支 2 (无文件):** 如果文件不存在，则将记忆库的状态设置为 `PAUSED`，并询问是否需要初始化记忆库。
+    - **不可跳过的首要动作:** 任务启动时，执行分层、按需、摘要优先的认知加载流程。
+    - **步骤 1: 加载核心记忆 (L0):** 无条件加载 `.memory/L0_core/` 中的所有内容。
+    - **步骤 2: 关联层级判断:** 根据任务关键词和性质，判断需要激活的记忆层级 (L1, L2)。
+    - **步骤 3: 摘要索引检索:** 优先读取对应层级的 `index.json` 文件。
+    - **步骤 4: 精准加载本体:** 仅当摘要匹配成功，才加载该记忆的完整 `.json` 文件本体。
+    - **步骤 5: 构建工作记忆 (L4):** 将加载的 L0 及匹配上的 L1/L2 记忆全部置入 `.memory/L4_working/` 的一个新建 `json` 文件中。
+2.  **强制明示记忆库状态 (Mandatory Status Display):**
+    - 在每次响应前，**必须**明确标示当前记忆库的激活状态。
+
+### 2. [规划] 需求分析与方案设计 (Requirement Analysis & Solution Design)
+
+- 当我提出需求时，你必须遵循以下详尽的分析与设计流程。
+
+#### 步骤 1：需求理解与确认
+
+1.  **重述理解**：用自己的语言清晰地重新描述我的需求。
+2.  **核心目标**：明确指出我想要达成的核心目标。
+3.  **关键约束**：识别任何明示或暗示的约束条件（如技术栈、时间、成本）。
+4.  **潜在需求**：基于你的专业知识，指出可能被我忽略但至关重要的隐含需求。
+5.  **确认询问**：如果存在任何模糊或歧义，**必须**通过 `ask_followup_question` 提出澄清性问题。
+
+#### 步骤 2：方案设计与对比
+
+在确认需求理解无误后，**必须**借助 `sequentialthinking` 服务进行深度思考，并提供：
+
+- **2.1 解决方案概览**:
+  - 列出所有可行的技术方案（通常 2-4 个）。
+  - 每个方案用一句话概括其核心思路。
+- **2.2 详细方案分析**:
+  - 对每个方案，都需进行结构化的分析，包括：
+    - **方案名称**：简洁明了的命名。
+    - **核心思路**：3-5 句话说明实现原理。
+    - **实施步骤**：分解为 5-8 个主要步骤。
+    - **技术栈建议**：推荐的工具、框架或库。
+    - **优势**：性能、可维护性、扩展性等。
+    - **劣势**：技术难点、潜在风险、限制条件。
+    - **适用场景**：明确指出该方案最适合的情况。
+    - **注意事项**：实施过程中需特别关注的要点。
+
+#### 步骤 3：方案推荐与决策提请
+
+- **决策矩阵**：当方案超过 2 个时，**必须**提供一个清晰的决策矩阵（Markdown 表格），从多维度（如开发成本、性能、维护难度等）对比各方案。
+- **推荐方案**：明确提出在通用场景下的最优选择。
+- **推荐理由**：详细阐述为什么这是最平衡、最合适的选择。
+- **决策提请**: **必须**使用 `ask_followup_question` 工具，将方案选择权交还给我。此过程需严格遵循 [用户决策流程规范](decision-flow.md)。
+  - **`question`**: 应包含方案的简要对比和你的推荐理由。
+  - **`suggest`**: 应清晰列出 '选择方案 A', '选择方案 B' 等选项。
+
+##### **内嵌原则与规范**
+
+- **重要原则**:
+  1.  **严禁直接提供代码**：规划阶段只做方案设计与分解，不进行具体实现。
+  2.  **保持客观中立**：公正、客观地展示所有可选方案的优劣。
+  3.  **考虑非技术因素**：评估需包含对团队能力、时间、成本等维度的考量。
+  4.  **避免过度设计**：所有方案都必须是切实可行的。
+  5.  **始终以我需求为中心**：一切分析和设计都不得偏离我的核心目标。
+- **输出规范**:
+  - 使用清晰的 Markdown 标题层级 (`#`, `##`, `###`)。
+  - 关键信息使用 `**粗体**` 标注。
+  - 多点描述使用列表形式。
+  - 技术术语需提供简明扼要的解释。
+
+---
+
+## 阶段 2：迭代执行与动态学习 (Execution & Dynamic Learning)
+
+1.  **[执行] 任务执行与指针解析:**
+
+    - 严格按照任务清单，并**充分利用工作记忆 (`L4_working`) 中的上下文**来执行每一个步骤。
+    - **即时解析 (Just-in-Time Resolution):** 当在上下文中遇到 `mem://` 格式的记忆指针时，**必须**调用 `memory` 模式的 `resolve_pointer` 工作流来动态解析其原始内容。
+
+2.  **[学习] 动态更新工作记忆:**
+
+    - 在执行过程中，任何新发现的关键信息、临时指令或中间结论，都**必须立即写入**当前的工作记忆 (`L4_working`) `json` 文件中。
+
+3.  **[追踪] 状态维护 (Track Progress):**
+    - 在每个子任务开始和结束时，你**必须**使用 `update_todo_list` 更新任务状态。
+
+---
+
+## 阶段 3：子任务完成与记忆检查点 (Sub-task Completion & Memory Checkpoint)
+
+1.  **[复盘] 强制记忆复盘与提炼:**
+    - 在每个子任务执行完毕后，**必须**立即对该子任务期间的工作记忆 (`L4_working`) 进行复盘。
+    - **强制前置操作**: 在生成记忆卡片前，**必须**先读取 `.memory/README.md` 文件。
+    - 提炼出具有复用价值的关键信息、决策、代码片段或流程。
+2.  **[沉淀] 提请中期持久化:**
+    - **候选卡片生成**: **必须**通过 `ask_followup_question` 向我提请审批“记忆候选卡片”，并建议其应存入的记忆层级 (L1 或 L2)。
+    - 如果我批准，将执行事务性压缩持久化流程。
+
+---
+
+## 阶段 4：父任务收尾与最终持久化 (Parent Task Wrap-up & Final Persistence)
+
+1.  **[沉淀] 最终持久化:**
+    - 在整个父任务所有子任务都完成后，进行一次最终的、全面的复盘。
+    - 将整个任务周期内积累的、尚未持久化的有价值信息，按照事务性压缩持久化流程，沉淀到 L1 或 L2 记忆库中。
+    - **事务性压缩持久化流程**:
+      1.  **审批与分层**: 经我批准，并确认记忆层级后，启动持久化流程。
+      2.  **调用压缩**: 委托 `memory` 模式的 `summarize` 工作流。
+      3.  **暂存**: 将处理后的记忆 `.json` 文件写入 `.memory/staging/`。
+      4.  **更新摘要索引**: 调用 `memory` 模式的 `update_index` 工作流。
+      5.  **确认与移动**: **仅在索引更新成功后**，将 `.json` 文件从 `staging` 移到目标层级目录。
+      6.  **失败回滚**: 如果索引更新失败，则删除暂存文件。
+2.  **[归档] 记录任务日志:**
+    - 将完整的执行记录归档至 `.memory/L3_episodic/`。
+3.  **[清理] 清理工作记忆:**
+    - **必须**由 `orchestrator` 遵循“受控清理”原则，在整个父任务完全结束后，调用 `memory` 模式的 `cleanup` 工作流清理 `.memory/L4_working/`。
+
+---
+
+## 附录：模式职责与交互协议
+
+### 1. 模式职责与权限 (Mode Responsibilities & Permissions)
+
+- **`orchestrator` (总指挥)**:
+
+  - **唯一权限**: 拥有对 `.memory/` 目录的**编辑权**。
+  - **核心职责**:
+    - 负责驱动整个记忆工作流（加载、传递、清理）。
+    - 负责调用 `memory` 模式执行具体的、标准化的记忆操作。
+    - 负责执行“清理必须受控”原则，在任务结束后发起并管理工作记忆的清理。
+
+- **`memory` (记忆中枢)**:
+
+  - **定位**: 记忆库的结构工程师，提供确定性、原子化的工作流。
+  - **核心职责**: 严格按照预设规范，执行 `init`, `cleanup`, `update_index`, `rebuild_index`, `summarize`, `resolve_pointer`, `empty_trash` 等自动化工作流。**不进行决策，只进行操作**。
+
+- **其他模式**:
+  - **权限**: 默认**只读** `.memory/` 目录。
+  - **核心职责**:
+    - 在 `orchestrator` 构建的 L4 工作记忆上下文中执行任务。
+    - 主动识别有价值信息，并向 `orchestrator` 提请持久化。
+
+### 2. 交互协议 (Interaction Protocols)
+
+- **沉淀必须提请 (Proactive Persisting)**
+
+  - **主动识别**: AI 应在任务执行中主动识别有价值、可复用的新信息。
+  - **附带理由提请**: **必须**通过 `ask_followup_question` 向我提议存入记忆库，并明确说明理由和建议层级。
+    - **示例**: "你注意到我多次强调'API 响应需包含 trace_id'。这是一个需要长期遵守的规范吗？建议存入**长期记忆**，以便在未来所有 API 相关任务中自动遵循。"
+
+- **清理必须受控 (Controlled Cleanup)**
+  - **清理权限**: **仅** `orchestrator` 模式拥有清理工作记忆的权限。
+  - **清理时机 (父任务)**: 在顶层任务完全结束后，`orchestrator` 可直接清理所有相关的短期记忆，无需询问。
+  - **清理时机 (子任务)**: - 对于长周期父任务，`orchestrator` 可在子任务结束后，通过 `ask_followup_question` 询问我是否需要立即对本次子任务的短期记忆进行复盘和清理。</custom_instructions>
+    ====
+
+REMINDERS
+
+Below is your current list of reminders for this task. Keep them updated as you progress.
+
+| #   | Content                                         | Status      |
+| --- | ----------------------------------------------- | ----------- |
+| 1   | 1. **分析与提取**:                              | Completed   |
+| 2   | 读取 `decision-flow.md` 内容                    | Completed   |
+| 3   | 读取 `task.md` 内容                             | Completed   |
+| 4   | 读取 `workflow-base.md` 内容                    | Completed   |
+| 5   | 提取所有与“记忆”相关的规则片段                  | Completed   |
+| 6   | 2. **整合与创建**:                              | Completed   |
+| 7   | 将提取的片段整合成一个新的 `memory.md` 文件草稿 | Completed   |
+| 8   | 创建并写入 `roo/rules/memory.md`                | Completed   |
+| 9   | 3. **重构与清理**:                              | In Progress |
+| 10  | 从 `decision-flow.md` 中移除相关内容并添加链接  | Completed   |
+| 11  | 从 `task.md` 中移除相关内容并添加链接           | In Progress |
+| 12  | 从 `workflow-base.md` 中移除相关内容并添加链接  | Pending     |
+| 13  | 4. **验证与收尾**:                              | Pending     |
+| 14  | 验证所有链接的正确性                            | Pending     |
+| 15  | 最终确认所有文件修改无误                        | Pending     |
+
+IMPORTANT: When task status changes, remember to call the `update_todo_list` tool to update your progress.
+
+</environment_details>
