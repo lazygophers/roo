@@ -1,29 +1,6 @@
-# ========================================
-# Python MCP Project Docker Ignore File
-# ========================================
-# This file optimizes Docker build context by excluding unnecessary files
-# Generated for lazygopher MCP service
-
-# ========================================
-# Version Control & Git
-# ========================================
-.git/
 .gitignore
-.gitattributes
-.github/
 
-# ========================================
-# Python Virtual Environments
-# ========================================
-venv/
-env/
-ENV/
-.env
-virtualenv/
 .venv/
-.virtualenv/
-pipenv/
-.Python
 
 # ========================================
 # Python Cache & Compiled Files

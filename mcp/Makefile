@@ -17,7 +17,8 @@ DOCKERFILE := Dockerfile
 DOCKER_CONTEXT := .
 BUILD_ARGS := --build-arg VERSION=$(VERSION) \
               --build-arg BUILD_DATE=$(BUILD_DATE) \
-              --build-arg GIT_COMMIT=$(GIT_COMMIT)
+              --build-arg GIT_COMMIT=$(GIT_COMMIT) \
+			  --debug=true
 
 # Image Tags
 IMAGE_TAG := $(IMAGE_NAME):$(VERSION)
@@ -129,7 +130,7 @@ run-shell: ## Run container with shell access for debugging
 .PHONY: test-mcp
 test-mcp: ## Test MCP service with sample input
 	@echo "$(PURPLE)Testing MCP service with sample request$(NC)"
-	@echo '{"jsonrpc":"2.0","method":"initialize","params":{"protocolVersion":"1.0.0","clientInfo":{"name":"test","version":"1.0.0"}},"id":1}' | \
+	@echo '{"jsonrpc": "2.0", "method": "get_timestamp", "id": 1}' | \
 		docker run --rm -i \
 		-v $(VOLUME_MOUNT) \
 		$(if $(wildcard $(ENV_FILE)),--env-file $(ENV_FILE),) \

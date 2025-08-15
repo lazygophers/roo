@@ -4,23 +4,6 @@ version = "0.1.0"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "appdirs>=1.4.4",
-    "black>=25.1.0",
-    "gitpython>=3.1.44",
-    "langchain>=0.3.26",
-    "langchain-community>=0.3.26",
-    "mcp>=1.10.1",
-    "psutil>=7.0.0",
     "pydantic>=2.11.7",
-    "pyinstaller>=6.14.1",
-    "pync>=2.0.3",
-    "pytest>=8.4.1",
-    "pyttsx3>=2.98",
-    "requests>=2.32.4",
-    "rich>=14.0.0",
     "shutup>=0.2.0",
-    "simpleaudio>=1.0.4",
-    "tinydb>=4.8.2",
-    "torch>=2.7.1",
-    "uv>=0.7.17",
 ]
