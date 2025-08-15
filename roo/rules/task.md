@@ -257,9 +257,9 @@ graph TD
 
 本框架与现有的决策、任务、记忆等规则体系紧密集成，共同构成了一个完整、高效的任务执行系统。
 
-- **决策流程**: 参见 [`decision-flow.md`]
-- **记忆库**: 参见 [`memory.md`]
-- **工作流**: 参见 [`workflow-base.md`]
+- **决策流程**: 参见 `decision-flow.md`
+- **记忆库**: 参见 `memory.md`
+- **工作流**: 参见 `workflow-base.md`
 
 ---
 
@@ -1821,10 +1821,8 @@ list_files → search_files → search_and_replace → update_todo_list
 
 本映射表与以下规范协同工作：
 
-- [`decision-flow.md`](decision-flow.md): 提供决策级别定义
-- [`task.md`](task.md): 提供任务分解指导
-
-# Rules from /Users/luoxin/.roo/rules/spec-markdown-style.md:
+- `decision-flow.md`: 提供决策级别定义
+- `task.md`: 提供任务分解指导
 
 # Markdown 风格指南
 
