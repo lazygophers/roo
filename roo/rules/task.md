@@ -40,7 +40,6 @@
 
 - **规则协同**: 与现有的决策流程、任务管理规则无缝集成
 - **模式联动**: 评估结果指导模式选择和切换决策
-- **记忆沉淀**: 评估经验形成可复用的知识
 
 ---
 
@@ -258,10 +257,9 @@ graph TD
 
 本框架与现有的决策、任务、记忆等规则体系紧密集成，共同构成了一个完整、高效的任务执行系统。
 
-- **决策流程**: 根据 [`decision-flow.md`] 的规范，不同复杂度的任务对应不同的决策流程。
-- **任务管理**: 本文档定义的任务管理规则（如 `update_todo_list` 的使用）是集成的基础。
-- **记忆库**: 根据 [`memory.md`] 的规范，评估记录和经验沉淀将作为程序性记忆（L2）存储。
-- **工作流**: 根据 [`workflow-base.md`] 的规范，评估过程被集成到工作流的早期阶段。
+- **决策流程**: 参见 [`decision-flow.md`]
+- **记忆库**: 参见 [`memory.md`]
+- **工作流**: 参见 [`workflow-base.md`]
 
 ---
 
@@ -1076,7 +1074,7 @@ const migrationStrategy = {
 - **决策流程**: 任务清单的生成必须遵循 [决策流程规范] 中定义的标准流程：
   - **决策触发**: 任务清单属于 [一级决策场景](decision-flow.md#一级决策场景必须触发)，必须通过 `ask_followup_question` 提请确认
   - **信息透明**: 提供完整的任务分解方案、执行顺序和预计时间
-  - **选项充分**: 提供不少于 5 个可行选项（参见 [决策场景示例 - 任务清单确认](decision-flow.md#场景-5-任务清单确认)）
+  - **选项充分**: 提供不少于 5 个可行选项（参见 [一级决策场景](decision-flow.md#一级决策场景必须触发)）
 - **我确认后**: 一旦我通过 `ask_followup_question` 做出选择，你将根据所选方案的"实施步骤"生成任务清单。
 - **清单更新**: 使用 `update_todo_list` 初始化任务清单，准备进入执行阶段。
 
@@ -1931,3 +1929,8 @@ Below is your current list of reminders for this task. Keep them updated as you 
 IMPORTANT: When task status changes, remember to call the `update_todo_list` tool to update your progress.
 
 </environment_details>
+
+
+[`decision-flow.md`]: decision-flow.md
+[`memory.md`]: memory.md
+[`workflow-base.md`]: workflow-base.md
