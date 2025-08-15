@@ -1463,15 +1463,12 @@ task_template:
 
 ### 任务管理类工具 (Task Management Tools)
 
-| 工具名称        | 主要场景   | 决策级别 | 触发条件       | 优先级 |
-| --------------- | ---------- | -------- | -------------- | ------ |
-| **new_task**    | 模式切换   | L1       | 需要专业能力   | 最高   |
-|                 | 并行任务   | L2       | 可并行执行     | 高     |
-|                 | 子任务委派 | L2       | 任务可独立完成 | 高     |
-|                 | 批量处理   | L3       | 重复性任务     | 中     |
-| **switch_mode** | 专业切换   | L1       | 当前模式不适合 | 高     |
-|                 | 临时切换   | L2       | 短期特定需求   | 中     |
-|                 | 完成后切换 | L3       | 阶段性任务完成 | 低     |
+| 工具名称     | 主要场景   | 决策级别 | 触发条件       | 优先级 |
+| ------------ | ---------- | -------- | -------------- | ------ |
+| **new_task** | 模式切换   | L1       | 需要专业能力   | 最高   |
+|              | 并行任务   | L2       | 可并行执行     | 高     |
+|              | 子任务委派 | L2       | 任务可独立完成 | 高     |
+|              | 批量处理   | L3       | 重复性任务     | 中     |
 
 ### 系统操作类工具 (System Operation Tools)
 
@@ -1709,7 +1706,7 @@ list_files → search_files → search_and_replace → update_todo_list
 │  ├─ 添加内容 → insert_content
 │  └─ 批量替换 → search_and_replace
 ├─ 需要外部能力？
-│  ├─ 专业模式 → new_task/switch_mode
+│  ├─ 专业模式 → new_task
 │  └─ MCP服务 → use_mcp_tool
 └─ 更新任务状态 → update_todo_list
 ```
@@ -1829,7 +1826,6 @@ list_files → search_files → search_and_replace → update_todo_list
 - [`decision-flow.md`]: 提供决策级别定义
 - [`complexity-assessment.md`]: 提供复杂度评估标准
 - [`task-decomposition-principles.md`]: 提供任务分解指导
-- [`brain.yaml`](.custom_models/brain.yaml): 集成到 orchestrator 模式配置中
 
 # Rules from /Users/luoxin/.roo/rules/workflow-base.md:
 
@@ -1929,7 +1925,6 @@ Below is your current list of reminders for this task. Keep them updated as you 
 IMPORTANT: When task status changes, remember to call the `update_todo_list` tool to update your progress.
 
 </environment_details>
-
 
 [`decision-flow.md`]: decision-flow.md
 [`memory.md`]: memory.md

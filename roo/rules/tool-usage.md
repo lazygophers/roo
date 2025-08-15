@@ -66,12 +66,12 @@
 
 ### 任务管理类工具 (Task Management Tools)
 
-| 工具名称        | 主要场景   | 决策级别 | 触发条件       | 优先级 |
-| --------------- | ---------- | -------- | -------------- | ------ |
-| **new_task**    | 模式切换   | L1       | 需要专业能力   | 最高   |
-|                 | 并行任务   | L2       | 可并行执行     | 高     |
-|                 | 子任务委派 | L2       | 任务可独立完成 | 高     |
-|                 | 批量处理   | L3       | 重复性任务     | 中     |
+| 工具名称     | 主要场景   | 决策级别 | 触发条件       | 优先级 |
+| ------------ | ---------- | -------- | -------------- | ------ |
+| **new_task** | 模式切换   | L1       | 需要专业能力   | 最高   |
+|              | 并行任务   | L2       | 可并行执行     | 高     |
+|              | 子任务委派 | L2       | 任务可独立完成 | 高     |
+|              | 批量处理   | L3       | 重复性任务     | 中     |
 
 ### 系统操作类工具 (System Operation Tools)
 
@@ -429,4 +429,3 @@ list_files → search_files → search_and_replace → update_todo_list
 - [`decision-flow.md`]: 提供决策级别定义
 - [`complexity-assessment.md`]: 提供复杂度评估标准
 - [`task-decomposition-principles.md`]: 提供任务分解指导
-- [`brain.yaml`](.custom_models/brain.yaml): 集成到 orchestrator 模式配置中
