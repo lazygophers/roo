@@ -1,4 +1,2 @@
-app_name: "lazygophers"
-http_port: 14000
 searx_hosts:
     - "https://so.ddns-ip.net"

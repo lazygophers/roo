@@ -1,0 +1,286 @@
+# =====================================================
+# Python MCP Project .gitignore
+# =====================================================
+# 本文件定义了 MCP 项目中应被 Git 忽略的文件和目录
+# 按类别组织，便于维护和理解
+# =====================================================
+
+# =====================================================
+# Python 标准忽略项
+# =====================================================
+
+# Python 字节码和缓存文件
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C 扩展
+*.so
+
+# Python 发行版和打包
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Python 虚拟环境
+.venv/
+venv/
+ENV/
+env/
+.env
+
+# PyInstaller 打包文件
+*.manifest
+*.spec
+
+# =====================================================
+# 项目特定忽略项
+# =====================================================
+
+# 配置文件（包含敏感信息）
+config.yaml
+!config.yaml.example
+
+# 备份目录
+backups/
+backup/
+*.backup
+*.bak
+
+# 日志文件
+*.log
+logs/
+*.log.*
+log/
+
+# =====================================================
+# UV/Poetry 包管理器相关
+# =====================================================
+
+# UV 包管理器
+.uv/
+# 注意：uv.lock 通常应该提交到版本控制
+# 如果你的团队决定不跟踪锁文件，请取消下行注释
+# uv.lock
+
+# Poetry
+poetry.lock
+.poetry/
+
+# =====================================================
+# 测试和临时文件
+# =====================================================
+
+# Pytest
+.pytest_cache/
+pytest_cache/
+
+# Coverage 测试覆盖率报告
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+
+# Tox 测试环境
+.tox/
+.nox/
+
+# 临时文件
+*.tmp
+temp/
+tmp/
+.temp/
+
+# =====================================================
+# IDE 和编辑器配置
+# =====================================================
+
+# Visual Studio Code
+.vscode/
+*.code-workspace
+.history/
+
+# JetBrains IDEs (PyCharm, IntelliJ)
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+.idea_modules/
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Vim
+*.swp
+*.swo
+*.swn
+*~
+.*.sw[op]
+
+# Emacs
+*~
+\#*\#
+.\#*
+.emacs.desktop
+.emacs.desktop.lock
+
+# =====================================================
+# 操作系统文件
+# =====================================================
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# Linux
+.directory
+.Trash-*
+.nfs*
+
+# =====================================================
+# 其他开发工具
+# =====================================================
+
+# Jupyter Notebook
+.ipynb_checkpoints
+*.ipynb_checkpoints/
+
+# pyenv
+.python-version
+
+# pipenv
+Pipfile.lock
+
+# celery
+celerybeat-schedule
+celerybeat.pid
+
+# SageMath
+*.sage.py
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Spyder
+.spyderproject
+.spyproject
+
+# Rope
+.ropeproject
+
+# mkdocs
+/site
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre
+.pyre/
+
+# pytype
+.pytype/
+
+# Cython
+cython_debug/
+
+# =====================================================
+# Docker 相关（如果需要忽略）
+# =====================================================
+# 注意：.dockerignore 通常应该提交
+# docker-compose.override.yml
+
+# =====================================================
+# 项目生成的文件
+# =====================================================
+
+# 数据库文件
+*.db
+*.sqlite
+*.sqlite3
+
+# 媒体和上传文件
+media/
+uploads/
+static/collected/
+
+# 缓存
+cache/
+.cache/
+
+# Session 文件
+sessions/
+
+# =====================================================
+# 安全相关
+# =====================================================
+
+# 私钥和证书
+*.pem
+*.key
+*.crt
+*.cer
+*.p12
+*.pfx
+
+# 密码和令牌文件
+.secrets/
+secrets.json
+tokens.json
+credentials.json
+
+# =====================================================
+# End of .gitignore
+# =====================================================

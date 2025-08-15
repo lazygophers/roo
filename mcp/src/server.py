@@ -11,7 +11,7 @@ import logging
 import sys
 from typing import Any, Callable, Dict, Union
 
-from src.tools import timestamp
+from src.tools import searx, timestamp
 
 
 def run_server() -> None:
@@ -23,6 +23,9 @@ def run_server() -> None:
     """
     tools: Dict[str, Callable[..., Any]] = {
         "get_timestamp": timestamp.get_timestamp,
+        "searx_search": searx.search,
+        "searx_suggestions": searx.search_suggestions,
+        "searx_engines": searx.get_supported_engines,
     }
 
     for line in sys.stdin:
