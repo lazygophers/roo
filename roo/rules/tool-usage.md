@@ -72,9 +72,6 @@
 |                 | 并行任务   | L2       | 可并行执行     | 高     |
 |                 | 子任务委派 | L2       | 任务可独立完成 | 高     |
 |                 | 批量处理   | L3       | 重复性任务     | 中     |
-| **switch_mode** | 专业切换   | L1       | 当前模式不适合 | 高     |
-|                 | 临时切换   | L2       | 短期特定需求   | 中     |
-|                 | 完成后切换 | L3       | 阶段性任务完成 | 低     |
 
 ### 系统操作类工具 (System Operation Tools)
 
@@ -312,7 +309,7 @@ list_files → search_files → search_and_replace → update_todo_list
 │  ├─ 添加内容 → insert_content
 │  └─ 批量替换 → search_and_replace
 ├─ 需要外部能力？
-│  ├─ 专业模式 → new_task/switch_mode
+│  ├─ 专业模式 → new_task
 │  └─ MCP服务 → use_mcp_tool
 └─ 更新任务状态 → update_todo_list
 ```

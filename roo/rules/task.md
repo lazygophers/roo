@@ -1064,14 +1064,7 @@ const migrationStrategy = {
 - **分析与拆解:** 接到任务时，你请确保以最高的优先级进行任务分析、拆解，可以借助 `sequentialthinking` 辅助你进行任务分解。
 - **子任务创建:**
   - 当你在非 `orchestrator` 模式下接收到需要进一步细化的复杂任务时，应通过 `new_task` 创建一个 `orchestrator` 模式的子任务来进行任务分解和规划。
-  - 当你需要切换其他模式（orchestrator 除外）时，请务必需要通过 `new_task` 创建新的子任务进行相关操作。
-  - 当需要进行任务分解和规划时，请务必使用 `switch_mode` 切换到 `orchestrator` 模式进行任务分解和规划。
-    ```
-    <switch_mode>
-    <mode_slug>orchestrator</mode_slug>
-    <reason>{{相关说明}}</reason>
-    </switch_mode>
-    ```
+  - 当你需要切换其他模式时，请务必需要通过 `new_task` 创建新的子任务进行相关操作。
 - **常用分解策略:**
   - **Git 操作:** 整个 git 相关的操作视做同一个子任务。
   - **文件/文件夹批量操作:** 当你需要读取、写入、编辑某一个文件夹时，你需要先通过 `list_files` 或 `search_files` 的方式递归获取文件列表，筛选出你需要的文件，此时对每一个文件的操作均应视为单独的子任务。
@@ -1153,8 +1146,6 @@ const migrationStrategy = {
 - **`mode-writer` (模式工程大师)**: 当需要为创建、重构或优化一个模式时使用此模式。
 - **`project-research` (项目研究员)**: 当你需要深入了解一个代码库，进行技术选型或重构前的分析时，你会启用此模式。
 - **`researcher` (首席研究员)**: 当需要系统化整理技术知识、进行技术方案对比分析或构建领域知识体系时使用此模式
-
-**模式切换决策**: 模式切换属于 [一级决策场景](decision-flow.md#一级决策场景必须触发)，需要遵循 [模式切换决策示例](decision-flow.md#场景-7-模式切换决策) 进行确认。
 
 ##### 调用样例
 
@@ -1405,8 +1396,6 @@ task_template:
 | 代码实现 | code       | code-\*  | 通用开发任务     |
 | 测试编写 | code       | debug    | 测试用例开发     |
 | 文档编写 | doc-writer | -        | 专业文档生成     |
-
-# Rules from /Users/luoxin/.roo/rules/tool-usage.md:
 
 # 工具场景映射表 (Tool-Scenario Mapping Matrix)
 
@@ -1854,80 +1843,11 @@ list_files → search_files → search_and_replace → update_todo_list
 
 ## 阶段 1：任务初始化与规划 (Initialization & Planning)
 
-### 1. [记忆库] 认知加载与状态管理
+### 1. [记忆库] 认知与记忆
 
-任务开始时，必须遵循本节定义的流程进行认知加载和状态管理。
-
-#### 1.1 记忆库核心原则与架构
-
-##### a. 最高准则
-
-- **记忆驱动**: 记忆库是所有工作流的核心驱动力。
-- **状态强制明示**: 在每次响应前，**必须**明确标示当前记忆库的激活状态 (`[记忆库: ON]`, `[记忆库: OFF]`, `[记忆库: PAUSED]`, `[记忆库: PADDING]`)。
-
-##### b. 认知压缩引擎架构
-
-采用分层与压缩相结合的记忆架构。
-
-- **记忆分层模型 (Hierarchical Memory Model)**
-
-| 路径                      | 层级           | 描述                                              | 权限与生命周期                                       |
-| ------------------------- | -------------- | ------------------------------------------------- | ---------------------------------------------------- |
-| `.memory/L0_core/`        | **核心记忆**   | 定义 AI 身份、核心指令、价值观。                  | 系统启动时无条件加载，永不卸载、永不修改。           |
-| `.memory/L1_declarative/` | **陈述性记忆** | “是什么”的知识，如项目规范、我偏好、事实数据。    | 按需加载，长期持久化。                               |
-| `.memory/L2_procedural/`  | **程序性记忆** | “如何做”的知识，如可复用的工作流、SOP、代码模板。 | 按需加载，长期持久化。                               |
-| `.memory/L3_episodic/`    | **情景记忆**   | 已完成任务的完整日志，用于复盘和优化。            | 归档，通常不直接参与新任务。                         |
-| `.memory/L4_working/`     | **工作记忆**   | 当前任务的临时上下文。                            | 任务开始时构建，任务执行中动态更新，任务结束后清理。 |
-| `.memory/staging/`        | **暂存区**     | 事务性写入 L1/L2 层前的临时存放区。               | 临时。                                               |
-| `.memory/.trash/`         | **回收站**     | 安全清理，临时存放待删除文件。                    | 临时，可由 `memory` 模式按策略清理。                 |
-
-```mermaid
-graph TD
-    subgraph Memory Architecture
-        direction TB
-        A(记忆库) --> L0(L0 核心记忆);
-        A --> L1(L1 陈述性记忆);
-        A --> L2(L2 程序性记忆);
-        A --> L3(L3 情景记忆);
-        A --> L4(L4 工作记忆);
-        A --> S(暂存区);
-        A --> T(回收站);
-    end
-
-    style L0 fill:#f9f,stroke:#333,stroke-width:2px;
-    style L1 fill:#bbf,stroke:#333,stroke-width:2px;
-    style L2 fill:#bdf,stroke:#333,stroke-width:2px;
-    style L3 fill:#dfb,stroke:#333,stroke-width:2px;
-    style L4 fill:#fdb,stroke:#333,stroke-width:2px;
-    style S fill:#ccc,stroke:#333,stroke-width:1px;
-    style T fill:#f77,stroke:#333,stroke-width:1px;
-```
-
-- **记忆压缩机制 (Memory Compression Mechanism)**
-  - **摘要优先 (Summary First)**:
-    - L1, L2, L3 中的每个记忆 `.json` 文件，都在其层级的 `index.json` 中有一个对应的**摘要 (summary)** 条目。
-    - **检索流程**: `orchestrator` 首先扫描轻量的 `index.json`，通过摘要快速筛选，命中后再加载重量级的 `.json` 文件本体。
-  - **指针化引用 (Pointer Reference)**:
-    - **格式**: `mem://<layer>/<id>#<optional_path_in_json>`
-    - **用途**: 对于代码块、长文档等冗长内容，在存入 L1/L2 时，会被替换为此指针。
-    - **解析**: AI 在工作记忆 (L4) 中遇到指针时，**必须**调用 `memory` 模式的 `resolve_pointer` 工作流来动态获取原始内容。
-
-#### 1.2 核心工作流：认知加载
-
-1.  **认知加载 (Cognitive Loading):**
-    - **前置检查: 读取记忆锁状态:**
-      - 若已明确当前的记忆库状态，则直接使用，不需要重新加载。
-      - **动作:** 读取 `.memory/memory.lock` 文件内容。
-      - **分支 1 (有文件):** 如果文件存在，则严格按照文件内容设置记忆库状态，不进行任何询问。
-      - **分支 2 (无文件):** 如果文件不存在，则将记忆库的状态设置为 `PAUSED`，并询问是否需要初始化记忆库。
-    - **不可跳过的首要动作:** 任务启动时，执行分层、按需、摘要优先的认知加载流程。
-    - **步骤 1: 加载核心记忆 (L0):** 无条件加载 `.memory/L0_core/` 中的所有内容。
-    - **步骤 2: 关联层级判断:** 根据任务关键词和性质，判断需要激活的记忆层级 (L1, L2)。
-    - **步骤 3: 摘要索引检索:** 优先读取对应层级的 `index.json` 文件。
-    - **步骤 4: 精准加载本体:** 仅当摘要匹配成功，才加载该记忆的完整 `.json` 文件本体。
-    - **步骤 5: 构建工作记忆 (L4):** 将加载的 L0 及匹配上的 L1/L2 记忆全部置入 `.memory/L4_working/` 的一个新建 `json` 文件中。
-2.  **强制明示记忆库状态 (Mandatory Status Display):**
-    - 在每次响应前，**必须**明确标示当前记忆库的激活状态。
+> **核心定义**: 关于记忆库的完整架构、工作流和交互协议，请参见权威文档：[`memory.md`]。
+>
+> 本工作流的所有阶段都严格依赖于 [`memory.md`] 中定义的原则。
 
 ### 2. [规划] 需求分析与方案设计 (Requirement Analysis & Solution Design)
 
@@ -1986,108 +1906,27 @@ graph TD
 
 ## 阶段 2：迭代执行与动态学习 (Execution & Dynamic Learning)
 
-1.  **[执行] 任务执行与指针解析:**
-
-    - 严格按照任务清单，并**充分利用工作记忆 (`L4_working`) 中的上下文**来执行每一个步骤。
-    - **即时解析 (Just-in-Time Resolution):** 当在上下文中遇到 `mem://` 格式的记忆指针时，**必须**调用 `memory` 模式的 `resolve_pointer` 工作流来动态解析其原始内容。
-
-2.  **[学习] 动态更新工作记忆:**
-
-    - 在执行过程中，任何新发现的关键信息、临时指令或中间结论，都**必须立即写入**当前的工作记忆 (`L4_working`) `json` 文件中。
-
-3.  **[追踪] 状态维护 (Track Progress):**
-    - 在每个子任务开始和结束时，你**必须**使用 `update_todo_list` 更新任务状态。
+1.  **任务执行**: 严格按照任务清单执行，所有与记忆相关的操作（如指针解析、动态更新、复盘、持久化等）均遵循 [`memory.md`] 中定义的规范。
+2.  **状态维护**: 在每个子任务开始和结束时，**必须**使用 `update_todo_list` 更新任务状态。
 
 ---
 
-## 阶段 3：子任务完成与记忆检查点 (Sub-task Completion & Memory Checkpoint)
+## 阶段 3：任务收尾与交付 (Wrap-up & Delivery)
 
-1.  **[复盘] 强制记忆复盘与提炼:**
-    - 在每个子任务执行完毕后，**必须**立即对该子任务期间的工作记忆 (`L4_working`) 进行复盘。
-    - **强制前置操作**: 在生成记忆卡片前，**必须**先读取 `.memory/README.md` 文件。
-    - 提炼出具有复用价值的关键信息、决策、代码片段或流程。
-2.  **[沉淀] 提请中期持久化:**
-    - **候选卡片生成**: **必须**通过 `ask_followup_question` 向我提请审批“记忆候选卡片”，并建议其应存入的记忆层级 (L1 或 L2)。
-    - 如果我批准，将执行事务性压缩持久化流程。
-
----
-
-## 阶段 4：父任务收尾与最终持久化 (Parent Task Wrap-up & Final Persistence)
-
-1.  **[沉淀] 最终持久化:**
-    - 在整个父任务所有子任务都完成后，进行一次最终的、全面的复盘。
-    - 将整个任务周期内积累的、尚未持久化的有价值信息，按照事务性压缩持久化流程，沉淀到 L1 或 L2 记忆库中。
-    - **事务性压缩持久化流程**:
-      1.  **审批与分层**: 经我批准，并确认记忆层级后，启动持久化流程。
-      2.  **调用压缩**: 委托 `memory` 模式的 `summarize` 工作流。
-      3.  **暂存**: 将处理后的记忆 `.json` 文件写入 `.memory/staging/`。
-      4.  **更新摘要索引**: 调用 `memory` 模式的 `update_index` 工作流。
-      5.  **确认与移动**: **仅在索引更新成功后**，将 `.json` 文件从 `staging` 移到目标层级目录。
-      6.  **失败回滚**: 如果索引更新失败，则删除暂存文件。
-2.  **[归档] 记录任务日志:**
-    - 将完整的执行记录归档至 `.memory/L3_episodic/`。
-3.  **[清理] 清理工作记忆:**
-    - **必须**由 `orchestrator` 遵循“受控清理”原则，在整个父任务完全结束后，调用 `memory` 模式的 `cleanup` 工作流清理 `.memory/L4_working/`。
-
----
-
-## 附录：模式职责与交互协议
-
-### 1. 模式职责与权限 (Mode Responsibilities & Permissions)
-
-- **`orchestrator` (总指挥)**:
-
-  - **唯一权限**: 拥有对 `.memory/` 目录的**编辑权**。
-  - **核心职责**:
-    - 负责驱动整个记忆工作流（加载、传递、清理）。
-    - 负责调用 `memory` 模式执行具体的、标准化的记忆操作。
-    - 负责执行“清理必须受控”原则，在任务结束后发起并管理工作记忆的清理。
-
-- **`memory` (记忆中枢)**:
-
-  - **定位**: 记忆库的结构工程师，提供确定性、原子化的工作流。
-  - **核心职责**: 严格按照预设规范，执行 `init`, `cleanup`, `update_index`, `rebuild_index`, `summarize`, `resolve_pointer`, `empty_trash` 等自动化工作流。**不进行决策，只进行操作**。
-
-- **其他模式**:
-  - **权限**: 默认**只读** `.memory/` 目录。
-  - **核心职责**:
-    - 在 `orchestrator` 构建的 L4 工作记忆上下文中执行任务。
-    - 主动识别有价值信息，并向 `orchestrator` 提请持久化。
-
-### 2. 交互协议 (Interaction Protocols)
-
-- **沉淀必须提请 (Proactive Persisting)**
-
-  - **主动识别**: AI 应在任务执行中主动识别有价值、可复用的新信息。
-  - **附带理由提请**: **必须**通过 `ask_followup_question` 向我提议存入记忆库，并明确说明理由和建议层级。
-    - **示例**: "你注意到我多次强调'API 响应需包含 trace_id'。这是一个需要长期遵守的规范吗？建议存入**长期记忆**，以便在未来所有 API 相关任务中自动遵循。"
-
-- **清理必须受控 (Controlled Cleanup)**
-  - **清理权限**: **仅** `orchestrator` 模式拥有清理工作记忆的权限。
-  - **清理时机 (父任务)**: 在顶层任务完全结束后，`orchestrator` 可直接清理所有相关的短期记忆，无需询问。
-  - # **清理时机 (子任务)**: - 对于长周期父任务，`orchestrator` 可在子任务结束后，通过 `ask_followup_question` 询问我是否需要立即对本次子任务的短期记忆进行复盘和清理。</custom_instructions>
+1.  **最终确认**: 在所有任务完成后，进行最终的复盘和确认。
+2.  **成果交付**: 提交最终的交付物。
+3.  **记忆清理**: 遵循 [`memory.md`] 中的“受控清理”原则，在任务结束后清理工作记忆。</custom_instructions>
 
 REMINDERS
 
 Below is your current list of reminders for this task. Keep them updated as you progress.
 
-| #   | Content                                         | Status      |
-| --- | ----------------------------------------------- | ----------- |
-| 1   | 1. **分析与提取**:                              | Completed   |
-| 2   | 读取 `decision-flow.md` 内容                    | Completed   |
-| 3   | 读取 `task.md` 内容                             | Completed   |
-| 4   | 读取 `workflow-base.md` 内容                    | Completed   |
-| 5   | 提取所有与“记忆”相关的规则片段                  | Completed   |
-| 6   | 2. **整合与创建**:                              | Completed   |
-| 7   | 将提取的片段整合成一个新的 `memory.md` 文件草稿 | Completed   |
-| 8   | 创建并写入 `roo/rules/memory.md`                | Completed   |
-| 9   | 3. **重构与清理**:                              | In Progress |
-| 10  | 从 `decision-flow.md` 中移除相关内容并添加链接  | Completed   |
-| 11  | 从 `task.md` 中移除相关内容并添加链接           | In Progress |
-| 12  | 从 `workflow-base.md` 中移除相关内容并添加链接  | Pending     |
-| 13  | 4. **验证与收尾**:                              | Pending     |
-| 14  | 验证所有链接的正确性                            | Pending     |
-| 15  | 最终确认所有文件修改无误                        | Pending     |
+| #   | Content                                                             | Status      |
+| --- | ------------------------------------------------------------------- | ----------- |
+| 1   | 1. **修改 `decision-flow.md`**: 移除模式切换的决策场景              | Completed   |
+| 2   | 2. **修改 `task.md`**: 将 `switch_mode` 的使用说明替换为 `new_task` | Completed   |
+| 3   | 3. **修改 `tool-usage.md`**: 从工具矩阵中移除 `switch_mode`         | Completed   |
+| 4   | 4. **验证与收尾**: 验证所有修改的正确性并交付                       | In Progress |
 
 IMPORTANT: When task status changes, remember to call the `update_todo_list` tool to update your progress.
 
