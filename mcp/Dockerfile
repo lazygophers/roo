@@ -40,7 +40,7 @@ RUN .venv/bin/nuitka \
 
 # Stage 2: Final Image
 # This stage creates the final, minimal image for production.
-FROM ubuntu AS runner
+FROM gcr.io/distroless/cc-debian12 AS runner
 
 # Set the working directory
 WORKDIR /app
