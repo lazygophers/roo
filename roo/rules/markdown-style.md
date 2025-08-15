@@ -157,7 +157,7 @@
 
 ## 常见问题与避坑指南
 
-- **HTML 混用**：仅在必要时使用（如复杂表格），优先纯 Markdown。
+- **HTML 混用**：禁用HTML 混用，使用 Markdown 语法。
 - **字符编码**：文件统一为 UTF-8 编码。
 - **行尾格式**：使用 LF（Unix 风格）而非 CRLF（Windows 风格）
 - **工具兼容性**：Gitiles 不支持 HTML 渲染，避免使用 HTML 标签
