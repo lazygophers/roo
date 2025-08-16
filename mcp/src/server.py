@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 This module implements the core MCP server logic.
 
@@ -9,7 +8,8 @@ and sends responses to stdout. Logging is directed to stderr.
 import json
 import logging
 import sys
-from typing import Any, Callable, Dict, Union
+from collections.abc import Callable
+from typing import Any
 
 from src.tools import searx, timestamp
 
@@ -21,7 +21,7 @@ def run_server() -> None:
     This function continuously listens for incoming data, parses it as
     JSON-RPC, dispatches to the appropriate tool, and returns the result.
     """
-    tools: Dict[str, Callable[..., Any]] = {
+    tools: dict[str, Callable[..., Any]] = {
         "get_timestamp": timestamp.get_timestamp,
         "searx_search": searx.search,
         "searx_suggestions": searx.search_suggestions,

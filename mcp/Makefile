@@ -1,317 +1,300 @@
-# ========================================
-# Docker Build Management for MCP stdio Service
-# Project: lazygopher (MCP Memory Suite)
-# ========================================
+# ============================================================================
+# lazygopher - Professional Python Project Makefile
+# ============================================================================
+# 
+# Python Version: 3.12+
+# Package Manager: uv
+# Code Formatter: black
+# Linter: ruff
+# Test Framework: pytest
+#
+# Usage: make [target]
+# Run 'make help' to see all available targets
+# ============================================================================
 
-# Configuration Variables
-# ----------------------------------------
+# Variables
+PYTHON := python3.12
+UV := uv
+PYTEST := pytest
+BLACK := black
+RUFF := ruff
 PROJECT_NAME := lazygopher
-IMAGE_NAME := $(PROJECT_NAME)
-REGISTRY ?= 
-VERSION ?= $(shell git describe --tags --always --dirty 2>/dev/null || echo "dev")
-BUILD_DATE := $(shell date -u +'%Y-%m-%dT%H:%M:%SZ')
-GIT_COMMIT := $(shell git rev-parse --short HEAD 2>/dev/null || echo "unknown")
+SRC_DIR := src
+TEST_DIR := tests
+SCRIPT_DIR := scripts
+COVERAGE_DIR := htmlcov
+BENCHMARK_DIR := .benchmarks
 
-# Docker Configuration
-DOCKERFILE := Dockerfile
-DOCKER_CONTEXT := .
-BUILD_ARGS := --build-arg VERSION=$(VERSION) \
-              --build-arg BUILD_DATE=$(BUILD_DATE) \
-              --build-arg GIT_COMMIT=$(GIT_COMMIT) \
-			  --debug=true
+# Python package paths
+PYTHON_PATHS := $(SRC_DIR) $(TEST_DIR) $(SCRIPT_DIR) main.py
 
-# Image Tags
-IMAGE_TAG := $(IMAGE_NAME):$(VERSION)
-IMAGE_LATEST := $(IMAGE_NAME):latest
-FULL_IMAGE_TAG := $(if $(REGISTRY),$(REGISTRY)/$(IMAGE_TAG),$(IMAGE_TAG))
-FULL_IMAGE_LATEST := $(if $(REGISTRY),$(REGISTRY)/$(IMAGE_LATEST),$(IMAGE_LATEST))
-
-# Container Configuration
-CONTAINER_NAME := $(PROJECT_NAME)_mcp
-ENV_FILE ?= .env
-VOLUME_MOUNT ?= $(PWD)/data:/app/data
-
-# Colors for output
-RED := \033[0;31m
-GREEN := \033[0;32m
-YELLOW := \033[1;33m
+# Color codes for beautiful output
 BLUE := \033[0;34m
-PURPLE := \033[0;35m
-CYAN := \033[0;36m
-NC := \033[0m # No Color
+GREEN := \033[0;32m
+YELLOW := \033[0;33m
+RED := \033[0;31m
+RESET := \033[0m
+BOLD := \033[1m
 
 # Default target
 .DEFAULT_GOAL := help
 
-# ========================================
-# Build Commands
-# ========================================
-
-.PHONY: build
-build: ## Build Docker image with current version tag
-	@echo "$(BLUE)Building Docker image: $(IMAGE_TAG)$(NC)"
-	@docker build $(BUILD_ARGS) \
-		-t $(IMAGE_TAG) \
-		-f $(DOCKERFILE) \
-		$(DOCKER_CONTEXT)
-	@echo "$(GREEN)✓ Image built successfully: $(IMAGE_TAG)$(NC)"
-
-.PHONY: build-latest
-build-latest: build ## Build Docker image with latest tag
-	@echo "$(BLUE)Tagging image as latest$(NC)"
-	@docker tag $(IMAGE_TAG) $(IMAGE_LATEST)
-	@echo "$(GREEN)✓ Tagged as: $(IMAGE_LATEST)$(NC)"
-
-.PHONY: build-dev
-build-dev: ## Build Docker image for development (with cache mount)
-	@echo "$(BLUE)Building development image with cache$(NC)"
-	@docker build $(BUILD_ARGS) \
-		--target builder \
-		-t $(IMAGE_NAME):dev \
-		-f $(DOCKERFILE) \
-		$(DOCKER_CONTEXT)
-	@echo "$(GREEN)✓ Development image built$(NC)"
-
-.PHONY: build-no-cache
-build-no-cache: ## Build Docker image without cache
-	@echo "$(YELLOW)Building without cache (this may take longer)$(NC)"
-	@docker build --no-cache $(BUILD_ARGS) \
-		-t $(IMAGE_TAG) \
-		-f $(DOCKERFILE) \
-		$(DOCKER_CONTEXT)
-	@echo "$(GREEN)✓ Image built without cache$(NC)"
-
-.PHONY: build-multi
-build-multi: ## Build multi-platform image (amd64, arm64)
-	@echo "$(BLUE)Building multi-platform image$(NC)"
-	@docker buildx build \
-		--platform linux/amd64,linux/arm64 \
-		$(BUILD_ARGS) \
-		-t $(IMAGE_TAG) \
-		-f $(DOCKERFILE) \
-		$(DOCKER_CONTEXT)
-	@echo "$(GREEN)✓ Multi-platform image built$(NC)"
-
-# ========================================
-# Run Commands (stdio MCP Service)
-# ========================================
-
-.PHONY: run
-run: ## Run MCP service interactively (stdio mode)
-	@echo "$(CYAN)Starting MCP stdio service$(NC)"
-	@echo "$(YELLOW)This is an interactive stdio service - communicate via stdin/stdout$(NC)"
-	@docker run --rm -i \
-		--name $(CONTAINER_NAME) \
-		-v $(VOLUME_MOUNT) \
-		$(if $(wildcard $(ENV_FILE)),--env-file $(ENV_FILE),) \
-		$(IMAGE_TAG)
-
-.PHONY: run-dev
-run-dev: ## Run development container with live reload
-	@echo "$(CYAN)Running development MCP service$(NC)"
-	@docker run --rm -it \
-		--name $(CONTAINER_NAME)_dev \
-		-v $(PWD):/app \
-		-v /app/.venv \
-		$(if $(wildcard $(ENV_FILE)),--env-file $(ENV_FILE),) \
-		-e DEV_MODE=true \
-		$(IMAGE_NAME):dev
-
-.PHONY: run-shell
-run-shell: ## Run container with shell access for debugging
-	@echo "$(BLUE)Starting shell in container$(NC)"
-	@docker run --rm -it \
-		--name $(CONTAINER_NAME)_shell \
-		-v $(VOLUME_MOUNT) \
-		$(if $(wildcard $(ENV_FILE)),--env-file $(ENV_FILE),) \
-		--entrypoint /bin/bash \
-		$(IMAGE_TAG)
-
-.PHONY: test-mcp
-test-mcp: ## Test MCP service with sample input
-	@echo "$(PURPLE)Testing MCP service with sample request$(NC)"
-	@echo '{"jsonrpc": "2.0", "method": "get_timestamp", "id": 1}' | \
-		docker run --rm -i \
-		-v $(VOLUME_MOUNT) \
-		$(if $(wildcard $(ENV_FILE)),--env-file $(ENV_FILE),) \
-		$(IMAGE_TAG)
-
-# ========================================
-# Container Management
-# ========================================
-
-.PHONY: logs
-logs: ## Show logs from recent container runs
-	@echo "$(BLUE)Showing recent Docker logs for $(IMAGE_NAME)$(NC)"
-	@docker logs $(shell docker ps -a -q --filter ancestor=$(IMAGE_TAG) | head -1) 2>/dev/null || \
-		echo "$(YELLOW)No recent container logs found$(NC)"
-
-.PHONY: ps
-ps: ## Show running containers for this project
-	@echo "$(BLUE)Active containers for $(PROJECT_NAME):$(NC)"
-	@docker ps --filter name=$(PROJECT_NAME) --format "table {{.Names}}\t{{.Status}}\t{{.Command}}"
-
-.PHONY: inspect
-inspect: ## Inspect the Docker image
-	@echo "$(BLUE)Image details for $(IMAGE_TAG):$(NC)"
-	@docker inspect $(IMAGE_TAG) | jq '.[0] | {Id: .Id, Created: .Created, Size: .Size, Architecture: .Architecture, Os: .Os}'
-
-# ========================================
-# Cleanup Commands
-# ========================================
-
-.PHONY: clean
-clean: ## Remove all containers and images for this project
-	@echo "$(YELLOW)Cleaning up containers and images$(NC)"
-	@docker rm -f $(shell docker ps -a -q --filter name=$(PROJECT_NAME)) 2>/dev/null || true
-	@docker rmi $(IMAGE_TAG) $(IMAGE_LATEST) $(IMAGE_NAME):dev 2>/dev/null || true
-	@echo "$(GREEN)✓ Cleanup complete$(NC)"
-
-.PHONY: clean-all
-clean-all: clean ## Remove all project images including intermediate layers
-	@echo "$(YELLOW)Removing all related images$(NC)"
-	@docker images -q $(IMAGE_NAME)* | xargs -r docker rmi -f 2>/dev/null || true
-	@echo "$(GREEN)✓ All images removed$(NC)"
-
-.PHONY: prune
-prune: ## Prune unused Docker resources
-	@echo "$(YELLOW)Pruning unused Docker resources$(NC)"
-	@docker system prune -f
-	@echo "$(GREEN)✓ System pruned$(NC)"
-
-# ========================================
-# Registry Commands
-# ========================================
-
-.PHONY: push
-push: ## Push image to registry
-	@if [ -z "$(REGISTRY)" ]; then \
-		echo "$(RED)Error: REGISTRY is not set$(NC)"; \
-		echo "Usage: make push REGISTRY=your-registry.com"; \
-		exit 1; \
-	fi
-	@echo "$(BLUE)Pushing $(FULL_IMAGE_TAG) to registry$(NC)"
-	@docker tag $(IMAGE_TAG) $(FULL_IMAGE_TAG)
-	@docker push $(FULL_IMAGE_TAG)
-	@echo "$(GREEN)✓ Image pushed: $(FULL_IMAGE_TAG)$(NC)"
-
-.PHONY: push-latest
-push-latest: push ## Push image with latest tag
-	@echo "$(BLUE)Pushing $(FULL_IMAGE_LATEST) to registry$(NC)"
-	@docker tag $(IMAGE_TAG) $(FULL_IMAGE_LATEST)
-	@docker push $(FULL_IMAGE_LATEST)
-	@echo "$(GREEN)✓ Latest image pushed: $(FULL_IMAGE_LATEST)$(NC)"
-
-.PHONY: pull
-pull: ## Pull image from registry
-	@if [ -z "$(REGISTRY)" ]; then \
-		echo "$(RED)Error: REGISTRY is not set$(NC)"; \
-		echo "Usage: make pull REGISTRY=your-registry.com"; \
-		exit 1; \
-	fi
-	@echo "$(BLUE)Pulling $(FULL_IMAGE_TAG) from registry$(NC)"
-	@docker pull $(FULL_IMAGE_TAG)
-	@docker tag $(FULL_IMAGE_TAG) $(IMAGE_TAG)
-	@echo "$(GREEN)✓ Image pulled: $(IMAGE_TAG)$(NC)"
-
-# ========================================
-# Utility Commands
-# ========================================
-
-.PHONY: version
-version: ## Show current version
-	@echo "$(CYAN)Project Version Information:$(NC)"
-	@echo "  Version:    $(VERSION)"
-	@echo "  Git Commit: $(GIT_COMMIT)"
-	@echo "  Build Date: $(BUILD_DATE)"
-	@echo "  Image Tag:  $(IMAGE_TAG)"
-
-.PHONY: size
-size: ## Show image size
-	@echo "$(BLUE)Image sizes:$(NC)"
-	@docker images $(IMAGE_NAME) --format "table {{.Repository}}\t{{.Tag}}\t{{.Size}}"
-
-.PHONY: test
-test: ## Run tests inside container
-	@echo "$(PURPLE)Running tests in container$(NC)"
-	@docker run --rm \
-		-v $(VOLUME_MOUNT) \
-		$(if $(wildcard $(ENV_FILE)),--env-file $(ENV_FILE),) \
-		--entrypoint pytest \
-		$(IMAGE_TAG) \
-		tests/ -v
-
-.PHONY: lint
-lint: ## Run linters inside container
-	@echo "$(PURPLE)Running linters$(NC)"
-	@docker run --rm \
-		-v $(PWD):/app \
-		--entrypoint /bin/bash \
-		$(IMAGE_TAG) \
-		-c "ruff check . && mypy src/"
-
-.PHONY: format
-format: ## Format code inside container
-	@echo "$(PURPLE)Formatting code$(NC)"
-	@docker run --rm \
-		-v $(PWD):/app \
-		--entrypoint /bin/bash \
-		$(IMAGE_TAG) \
-		-c "ruff format . && ruff check --fix ."
-
-# ========================================
-# Development Helpers
-# ========================================
-
-.PHONY: dev-setup
-dev-setup: ## Setup development environment
-	@echo "$(CYAN)Setting up development environment$(NC)"
-	@cp .env.example .env 2>/dev/null || echo "$(YELLOW).env file already exists$(NC)"
-	@mkdir -p data 2>/dev/null || true
-	@echo "$(GREEN)✓ Development environment ready$(NC)"
-
-.PHONY: validate
-validate: ## Validate Dockerfile and configuration
-	@echo "$(BLUE)Validating configuration$(NC)"
-	@docker build --check $(DOCKERFILE) 2>/dev/null || docker build --no-cache --target builder -f $(DOCKERFILE) . > /dev/null
-	@echo "$(GREEN)✓ Dockerfile is valid$(NC)"
-	@if [ -f docker-compose.yml ]; then \
-		docker-compose config > /dev/null && echo "$(GREEN)✓ docker-compose.yml is valid$(NC)"; \
-	fi
-
-# ========================================
-# Help Command
-# ========================================
+# ============================================================================
+# Core Targets
+# ============================================================================
 
 .PHONY: help
-help: ## Show this help message
-	@echo "$(CYAN)========================================$(NC)"
-	@echo "$(CYAN)     MCP Docker Build Management$(NC)"
-	@echo "$(CYAN)========================================$(NC)"
+help: ## 显示所有可用命令的帮助信息
+	@echo "$(BOLD)$(BLUE)╔══════════════════════════════════════════════════════════════╗$(RESET)"
+	@echo "$(BOLD)$(BLUE)║          lazygopher - Makefile Command Reference             ║$(RESET)"
+	@echo "$(BOLD)$(BLUE)╚══════════════════════════════════════════════════════════════╝$(RESET)"
 	@echo ""
-	@echo "$(YELLOW)Usage:$(NC)"
-	@echo "  make <target> [VARIABLE=value ...]"
+	@echo "$(BOLD)Available targets:$(RESET)"
 	@echo ""
-	@echo "$(YELLOW)Targets:$(NC)"
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | \
-		awk 'BEGIN {FS = ":.*?## "}; {printf "  $(CYAN)%-18s$(NC) %s\n", $$1, $$2}'
+		awk 'BEGIN {FS = ":.*?## "}; {printf "  $(GREEN)%-20s$(RESET) %s\n", $$1, $$2}'
 	@echo ""
-	@echo "$(YELLOW)Variables:$(NC)"
-	@echo "  $(CYAN)VERSION$(NC)          Docker image version (default: git tag or 'dev')"
-	@echo "  $(CYAN)REGISTRY$(NC)         Docker registry URL for push/pull"
-	@echo "  $(CYAN)ENV_FILE$(NC)         Environment file path (default: .env)"
+	@echo "$(BOLD)$(YELLOW)Quick Start:$(RESET)"
+	@echo "  $$ make install        # 安装项目依赖"
+	@echo "  $$ make run           # 运行主程序"
+	@echo "  $$ make test          # 运行测试"
 	@echo ""
-	@echo "$(YELLOW)Examples:$(NC)"
-	@echo "  make build                     # Build Docker image"
-	@echo "  make run                        # Run MCP service interactively"
-	@echo "  make test-mcp                   # Test MCP service"
-	@echo "  make push REGISTRY=myregistry  # Push to registry"
-	@echo ""
-	@echo "$(GREEN)Note: This is a stdio-based MCP service$(NC)"
-	@echo "$(GREEN)It communicates via stdin/stdout, not network ports$(NC)"
+
+.PHONY: build
+build: ## 构建项目（安装所有依赖）
+	@echo "$(BOLD)$(BLUE)Building $(PROJECT_NAME)...$(RESET)"
+	@$(UV) sync
+	@echo "$(GREEN)✓ Build completed successfully$(RESET)"
+
+.PHONY: install
+install: ## 安装项目依赖
+	@echo "$(BOLD)$(BLUE)Installing dependencies...$(RESET)"
+	@$(UV) sync --no-dev
+	@echo "$(GREEN)✓ Dependencies installed$(RESET)"
+
+.PHONY: dev-install
+dev-install: ## 安装开发依赖
+	@echo "$(BOLD)$(BLUE)Installing development dependencies...$(RESET)"
+	@$(UV) sync --all-extras
+	@echo "$(GREEN)✓ Development dependencies installed$(RESET)"
+
+.PHONY: run
+run: ## 运行主程序
+	@echo "$(BOLD)$(BLUE)Running $(PROJECT_NAME)...$(RESET)"
+	@$(UV) run python main.py
+
+# ============================================================================
+# Testing Targets
+# ============================================================================
+
+.PHONY: test
+test: ## 运行所有测试
+	@echo "$(BOLD)$(BLUE)Running tests...$(RESET)"
+	@$(UV) run $(PYTEST) -v --tb=short
+
+.PHONY: test-quick
+test-quick: ## 快速测试（跳过慢速测试）
+	@echo "$(BOLD)$(YELLOW)Running quick tests (skipping slow tests)...$(RESET)"
+	@$(UV) run $(PYTEST) -v --tb=short -m "not slow"
+
+.PHONY: test-fast
+test-fast: ## 并行运行测试（使用多核加速）
+	@echo "$(BOLD)$(YELLOW)Running tests in parallel...$(RESET)"
+	@$(UV) run $(PYTEST) -v --tb=short -n auto
+
+.PHONY: test-profile
+test-profile: ## 运行测试并显示性能分析
+	@echo "$(BOLD)$(YELLOW)Running tests with profiling...$(RESET)"
+	@$(UV) run $(PYTEST) -v --tb=short --benchmark-only --benchmark-verbose
+
+.PHONY: test-watch
+test-watch: ## 监视模式运行测试（文件变化时自动重新运行）
+	@echo "$(BOLD)$(YELLOW)Running tests in watch mode...$(RESET)"
+	@$(UV) run $(PYTEST) -v --tb=short --looponfail
+
+.PHONY: coverage
+coverage: ## 运行测试并生成覆盖率报告
+	@echo "$(BOLD)$(BLUE)Running tests with coverage...$(RESET)"
+	@$(UV) run $(PYTEST) --cov=$(SRC_DIR) --cov-report=html --cov-report=term
+	@echo "$(GREEN)✓ Coverage report generated in $(COVERAGE_DIR)$(RESET)"
+	@echo "$(YELLOW)Open $(COVERAGE_DIR)/index.html to view the report$(RESET)"
+
+.PHONY: coverage-report
+coverage-report: ## 打开覆盖率报告（浏览器）
+	@echo "$(BOLD)$(BLUE)Opening coverage report...$(RESET)"
+	@open $(COVERAGE_DIR)/index.html 2>/dev/null || xdg-open $(COVERAGE_DIR)/index.html 2>/dev/null || echo "$(RED)Please open $(COVERAGE_DIR)/index.html manually$(RESET)"
+
+# ============================================================================
+# Code Quality Targets
+# ============================================================================
+
+.PHONY: lint
+lint: ## 运行代码检查（ruff）
+	@echo "$(BOLD)$(BLUE)Running linter...$(RESET)"
+	@$(UV) run $(RUFF) check $(PYTHON_PATHS)
+	@echo "$(GREEN)✓ Linting passed$(RESET)"
+
+.PHONY: lint-fix
+lint-fix: ## 自动修复可修复的代码问题
+	@echo "$(BOLD)$(BLUE)Auto-fixing code issues...$(RESET)"
+	@$(UV) run $(RUFF) check --fix $(PYTHON_PATHS)
+	@echo "$(GREEN)✓ Auto-fix completed$(RESET)"
+
+.PHONY: fmt
+fmt: format ## 格式化代码（black）
+format: ## 格式化代码（black）
+	@echo "$(BOLD)$(BLUE)Formatting code...$(RESET)"
+	@$(UV) run $(BLACK) $(PYTHON_PATHS)
+	@echo "$(GREEN)✓ Code formatted$(RESET)"
+
+.PHONY: fmt-check
+fmt-check: ## 检查代码格式（不修改文件）
+	@echo "$(BOLD)$(BLUE)Checking code format...$(RESET)"
+	@$(UV) run $(BLACK) --check --diff $(PYTHON_PATHS)
+	@echo "$(GREEN)✓ Format check completed$(RESET)"
+
+.PHONY: quality
+quality: fmt lint ## 运行所有代码质量检查
+	@echo "$(GREEN)✓ All quality checks passed$(RESET)"
+
+# ============================================================================
+# Cleanup Targets
+# ============================================================================
+
+.PHONY: clean
+clean: ## 清理缓存文件和临时文件
+	@echo "$(BOLD)$(BLUE)Cleaning up...$(RESET)"
+	@find . -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
+	@find . -type d -name ".pytest_cache" -exec rm -rf {} + 2>/dev/null || true
+	@find . -type d -name ".ruff_cache" -exec rm -rf {} + 2>/dev/null || true
+	@find . -type d -name "*.egg-info" -exec rm -rf {} + 2>/dev/null || true
+	@find . -type f -name "*.pyc" -delete 2>/dev/null || true
+	@find . -type f -name "*.pyo" -delete 2>/dev/null || true
+	@find . -type f -name ".coverage" -delete 2>/dev/null || true
+	@rm -rf $(COVERAGE_DIR) 2>/dev/null || true
+	@rm -rf dist/ build/ 2>/dev/null || true
+	@echo "$(GREEN)✓ Cleanup completed$(RESET)"
+
+.PHONY: clean-all
+clean-all: clean ## 深度清理（包括依赖和环境）
+	@echo "$(BOLD)$(RED)Deep cleaning (including .venv)...$(RESET)"
+	@rm -rf .venv 2>/dev/null || true
+	@rm -rf node_modules 2>/dev/null || true
+	@echo "$(GREEN)✓ Deep cleanup completed$(RESET)"
+
+# ============================================================================
+# Development Utilities
+# ============================================================================
+
+.PHONY: shell
+shell: ## 启动交互式 Python Shell (IPython)
+	@echo "$(BOLD)$(BLUE)Starting IPython shell...$(RESET)"
+	@$(UV) run ipython
+
+.PHONY: debug
+debug: ## 运行主程序（调试模式）
+	@echo "$(BOLD)$(YELLOW)Running in debug mode...$(RESET)"
+	@$(UV) run python -m pdb main.py
+
+.PHONY: profile
+profile: ## 运行性能分析
+	@echo "$(BOLD)$(BLUE)Running performance profiling...$(RESET)"
+	@$(UV) run python -m cProfile -s cumulative main.py
+
+.PHONY: benchmark
+benchmark: ## 运行性能基准测试
+	@echo "$(BOLD)$(BLUE)Running benchmarks...$(RESET)"
+	@$(UV) run $(PYTEST) --benchmark-only --benchmark-verbose
+
+.PHONY: typecheck
+typecheck: ## 运行类型检查（如果配置了 mypy）
+	@echo "$(BOLD)$(BLUE)Running type checking...$(RESET)"
+	@$(UV) run mypy $(SRC_DIR) 2>/dev/null || echo "$(YELLOW)mypy not installed, skipping type check$(RESET)"
+
+# ============================================================================
+# Docker Targets (if applicable)
+# ============================================================================
+
+.PHONY: docker-build
+docker-build: ## 构建 Docker 镜像
+	@echo "$(BOLD)$(BLUE)Building Docker image...$(RESET)"
+	@docker build -t $(PROJECT_NAME):latest .
+	@echo "$(GREEN)✓ Docker image built$(RESET)"
+
+.PHONY: docker-run
+docker-run: ## 运行 Docker 容器
+	@echo "$(BOLD)$(BLUE)Running Docker container...$(RESET)"
+	@docker run --rm -it $(PROJECT_NAME):latest
+
+# ============================================================================
+# CI/CD Targets
+# ============================================================================
+
+.PHONY: ci
+ci: install lint fmt-check test ## CI 流程（安装、检查、测试）
+	@echo "$(GREEN)✓ CI pipeline completed successfully$(RESET)"
+
+.PHONY: pre-commit
+pre-commit: quality test-quick ## Git 提交前检查
+	@echo "$(GREEN)✓ Pre-commit checks passed$(RESET)"
+
+# ============================================================================
+# Project Management
+# ============================================================================
+
+.PHONY: version
+version: ## 显示项目版本信息
+	@echo "$(BOLD)Project: $(PROJECT_NAME)$(RESET)"
+	@grep -E '^version = ' pyproject.toml | cut -d'"' -f2 | xargs echo "Version:"
+	@echo "Python: $(PYTHON)"
+	@$(UV) --version | xargs echo "UV:"
+
+.PHONY: deps
+deps: ## 显示项目依赖树
+	@echo "$(BOLD)$(BLUE)Project dependencies:$(RESET)"
+	@$(UV) pip list
+
+.PHONY: outdated
+outdated: ## 检查过期的依赖
+	@echo "$(BOLD)$(BLUE)Checking for outdated dependencies...$(RESET)"
+	@$(UV) pip list --outdated
+
+.PHONY: upgrade
+upgrade: ## 升级所有依赖到最新版本
+	@echo "$(BOLD)$(YELLOW)Upgrading dependencies...$(RESET)"
+	@$(UV) sync --upgrade
+	@echo "$(GREEN)✓ Dependencies upgraded$(RESET)"
+
+# ============================================================================
+# Advanced Targets
+# ============================================================================
 
 .PHONY: all
-all: clean build test ## Clean, build, and test
+all: clean install quality test ## 完整构建流程
+	@echo "$(GREEN)✓ Full build completed successfully$(RESET)"
 
-# Set help as default goal if no target specified
-.DEFAULT: help
+.PHONY: dev
+dev: dev-install quality ## 开发环境设置
+	@echo "$(GREEN)✓ Development environment ready$(RESET)"
+
+.PHONY: release
+release: clean all ## 发布准备（完整测试和构建）
+	@echo "$(BOLD)$(GREEN)✓ Ready for release$(RESET)"
+
+# ============================================================================
+# Special Targets
+# ============================================================================
+
+.PHONY: check
+check: ## 健康检查（验证环境配置）
+	@echo "$(BOLD)$(BLUE)Running health check...$(RESET)"
+	@which $(PYTHON) > /dev/null && echo "$(GREEN)✓ Python found$(RESET)" || echo "$(RED)✗ Python not found$(RESET)"
+	@which $(UV) > /dev/null && echo "$(GREEN)✓ UV found$(RESET)" || echo "$(RED)✗ UV not found$(RESET)"
+	@which $(BLACK) > /dev/null && echo "$(GREEN)✓ Black found$(RESET)" || echo "$(YELLOW)⚠ Black not found (install with 'make dev-install')$(RESET)"
+	@which $(RUFF) > /dev/null && echo "$(GREEN)✓ Ruff found$(RESET)" || echo "$(YELLOW)⚠ Ruff not found (install with 'make dev-install')$(RESET)"
+	@test -f pyproject.toml && echo "$(GREEN)✓ pyproject.toml found$(RESET)" || echo "$(RED)✗ pyproject.toml not found$(RESET)"
+	@test -f main.py && echo "$(GREEN)✓ main.py found$(RESET)" || echo "$(RED)✗ main.py not found$(RESET)"
+
+# Prevent make from treating arguments as targets
+%:
+	@:

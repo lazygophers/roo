@@ -1,6 +1,6 @@
 """A tool to get the current timestamp as a Unix timestamp."""
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 
 def get_timestamp(milliseconds: bool = False) -> int:
@@ -17,7 +17,7 @@ def get_timestamp(milliseconds: bool = False) -> int:
         int: The current UTC time as a Unix timestamp, either in seconds or
              milliseconds based on the `milliseconds` parameter.
     """
-    timestamp = datetime.now(timezone.utc).timestamp()
+    timestamp = datetime.now(UTC).timestamp()
     if milliseconds:
         return int(timestamp * 1000)
     return int(timestamp)

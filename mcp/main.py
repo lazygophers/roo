@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 This script serves as the main entry point for the application.
 
@@ -8,13 +7,12 @@ and will eventually start the server.
 
 import argparse
 import logging
-from typing import List
 
 from src.logger import setup_logger
 from src.server import run_server
 
 
-def main(argv: List[str] | None = None) -> None:
+def main(argv: list[str] | None = None) -> None:
     """
     The main function of the application.
 

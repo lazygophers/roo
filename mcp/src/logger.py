@@ -1,11 +1,9 @@
-# -*- coding: utf-8 -*-
 """
 This module provides a configurable logger for the application.
 """
 
 import logging
 import sys
-from typing import Union
 
 
 def setup_logger(debug: bool) -> None:
@@ -31,10 +29,8 @@ def setup_logger(debug: bool) -> None:
         logger.handlers.clear()
 
     if debug:
-        level: Union[int, str] = logging.DEBUG
-        log_format = (
-            "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-        )
+        level: int | str = logging.DEBUG
+        log_format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
     else:
         # A level higher than any standard level to disable logging
         level = logging.CRITICAL + 1
