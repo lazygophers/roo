@@ -13,8 +13,9 @@ WORKDIR /app
 COPY pyproject.toml .
 COPY uv.lock .
 
-# Install dependencies using uv, including Nuitka for compilation
-RUN uv sync && uv venv --seed && .venv/bin/python -m pip install -U Nuitka
+RUN uv sync
+RUN uv venv --seed
+RUN .venv/bin/python -m pip install -U Nuitka
 
 COPY . .
 # Compile the application with Nuitka
