@@ -116,15 +116,12 @@ class TestGetTimestamp:
     def test_no_float_leakage(self) -> None:
         """Test that internal float calculations don't leak to output.
         
-        The function uses datetime.timestamp() which returns float,
+        The function uses time.time() which returns float,
         but should always convert to int before returning.
         """
-        with patch('src.tools.timestamp.datetime') as mock_datetime:
-            # Create a mock that returns a float with decimals
-            mock_now = MagicMock()
-            mock_now.timestamp.return_value = 1234567890.987654
-            mock_datetime.now.return_value = mock_now
-            mock_datetime.UTC = UTC
+        with patch('src.tools.timestamp.time') as mock_time:
+            # Mock time.time() to return a float with decimals
+            mock_time.time.return_value = 1234567890.987654
             
             # Test seconds
             result_s = get_timestamp(milliseconds=False)
@@ -175,17 +172,14 @@ class TestGetTimestamp:
 
     # ========== Edge Cases and Mock Tests ==========
 
-    @patch('src.tools.timestamp.datetime')
-    def test_mock_specific_time(self, mock_datetime: MagicMock) -> None:
+    @patch('src.tools.timestamp.time')
+    def test_mock_specific_time(self, mock_time: MagicMock) -> None:
         """Test with mocked specific time for deterministic testing.
         
         Uses mock to test exact values and conversions.
         """
         # Mock a specific time: 2024-01-15 12:30:45.123456 UTC
-        mock_now = MagicMock()
-        mock_now.timestamp.return_value = 1705323045.123456
-        mock_datetime.now.return_value = mock_now
-        mock_datetime.UTC = UTC
+        mock_time.time.return_value = 1705323045.123456
         
         # Test seconds
         result_s = get_timestamp(milliseconds=False)
@@ -195,48 +189,39 @@ class TestGetTimestamp:
         result_ms = get_timestamp(milliseconds=True)
         assert result_ms == 1705323045123, "Should return exact millisecond timestamp"
 
-    @patch('src.tools.timestamp.datetime')
-    def test_epoch_time(self, mock_datetime: MagicMock) -> None:
+    @patch('src.tools.timestamp.time')
+    def test_epoch_time(self, mock_time: MagicMock) -> None:
         """Test behavior at Unix epoch (1970-01-01 00:00:00 UTC).
         
         Edge case: ensures correct handling of epoch time.
         """
-        mock_now = MagicMock()
-        mock_now.timestamp.return_value = 0.0
-        mock_datetime.now.return_value = mock_now
-        mock_datetime.UTC = UTC
+        mock_time.time.return_value = 0.0
         
         assert get_timestamp(milliseconds=False) == 0, "Epoch in seconds should be 0"
         assert get_timestamp(milliseconds=True) == 0, "Epoch in milliseconds should be 0"
 
-    @patch('src.tools.timestamp.datetime')
-    def test_negative_timestamp(self, mock_datetime: MagicMock) -> None:
+    @patch('src.tools.timestamp.time')
+    def test_negative_timestamp(self, mock_time: MagicMock) -> None:
         """Test behavior with pre-epoch times (negative timestamps).
         
         Edge case: times before 1970-01-01 should work correctly.
         """
         # Mock a time before epoch: 1969-12-31 23:59:59 UTC
-        mock_now = MagicMock()
-        mock_now.timestamp.return_value = -1.0
-        mock_datetime.now.return_value = mock_now
-        mock_datetime.UTC = UTC
+        mock_time.time.return_value = -1.0
         
         assert get_timestamp(milliseconds=False) == -1, "Should handle negative timestamps"
         assert get_timestamp(milliseconds=True) == -1000, "Should handle negative milliseconds"
 
-    @patch('src.tools.timestamp.datetime')
-    def test_large_future_timestamp(self, mock_datetime: MagicMock) -> None:
+    @patch('src.tools.timestamp.time')
+    def test_large_future_timestamp(self, mock_time: MagicMock) -> None:
         """Test behavior with very large future timestamps.
         
         Edge case: ensures no overflow or precision issues.
         Note: int() rounds towards zero, so 253402300799.999999 becomes 253402300799
         """
         # Mock a far future time: year 9999
-        mock_now = MagicMock()
         # Use a value that won't cause rounding issues
-        mock_now.timestamp.return_value = 253402300799.0
-        mock_datetime.now.return_value = mock_now
-        mock_datetime.UTC = UTC
+        mock_time.time.return_value = 253402300799.0
         
         result_s = get_timestamp(milliseconds=False)
         result_ms = get_timestamp(milliseconds=True)
@@ -360,8 +345,8 @@ class TestEdgeCasesAndValidation:
         result_pos = get_timestamp(True)
         assert isinstance(result_pos, int)
 
-    @patch('src.tools.timestamp.datetime')
-    def test_float_precision_edge_cases(self, mock_datetime: MagicMock) -> None:
+    @patch('src.tools.timestamp.time')
+    def test_float_precision_edge_cases(self, mock_time: MagicMock) -> None:
         """Test edge cases related to float precision.
         
         Ensures proper handling of float precision issues.
@@ -375,10 +360,7 @@ class TestEdgeCasesAndValidation:
         ]
         
         for timestamp_float, expected_s, expected_ms in test_cases:
-            mock_now = MagicMock()
-            mock_now.timestamp.return_value = timestamp_float
-            mock_datetime.now.return_value = mock_now
-            mock_datetime.UTC = UTC
+            mock_time.time.return_value = timestamp_float
             
             assert get_timestamp(False) == expected_s, f"Failed for {timestamp_float} seconds"
             assert get_timestamp(True) == expected_ms, f"Failed for {timestamp_float} milliseconds"
