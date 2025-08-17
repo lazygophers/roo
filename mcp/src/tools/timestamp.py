@@ -29,10 +29,10 @@ def get_timestamp(milliseconds: bool = False) -> int:
     # 2. Avoids timezone object lookup
     # 3. Directly calls system time function
     timestamp = time.time()
-    
+
     if milliseconds:
         # Multiply by 1000 and truncate to integer for milliseconds
         return int(timestamp * 1000)
-    
+
     # Truncate to integer for seconds
     return int(timestamp)

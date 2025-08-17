@@ -99,9 +99,7 @@ class TestKnowledgeManager:
 
     def test_add_and_get_knowledge(self, knowledge_manager: KnowledgeManager):
         """测试添加和精确获取知识"""
-        k = Knowledge(
-            content="Python is dynamically typed", knowledge_type=KnowledgeType.FACT
-        )
+        k = Knowledge(content="Python is dynamically typed", knowledge_type=KnowledgeType.FACT)
         knowledge_manager.add(k)
         retrieved_k = knowledge_manager.get(k.id)
         assert retrieved_k is not None
@@ -138,8 +136,22 @@ class TestKnowledgeManager:
     @pytest.mark.parametrize(
         "tags, expected_count, expected_contents",
         [
-            (["design-pattern"], 2, {"SOLID principles are key to good design.", "Decorator pattern in Python simplifies code."}),
-            (["python"], 2, {"Python's GIL can be a bottleneck for CPU-bound tasks.", "Decorator pattern in Python simplifies code."}),
+            (
+                ["design-pattern"],
+                2,
+                {
+                    "SOLID principles are key to good design.",
+                    "Decorator pattern in Python simplifies code.",
+                },
+            ),
+            (
+                ["python"],
+                2,
+                {
+                    "Python's GIL can be a bottleneck for CPU-bound tasks.",
+                    "Decorator pattern in Python simplifies code.",
+                },
+            ),
             (["performance"], 1, {"Python's GIL can be a bottleneck for CPU-bound tasks."}),
             (["oop", "design-pattern"], 1, {"SOLID principles are key to good design."}),
             (["nonexistent-tag"], 0, set()),
@@ -154,13 +166,9 @@ class TestKnowledgeManager:
         result_contents = {res.content for res in results}
         assert result_contents == expected_contents
 
-    def test_search_combined_query_and_tags(
-        self, populated_knowledge_manager: KnowledgeManager
-    ):
+    def test_search_combined_query_and_tags(self, populated_knowledge_manager: KnowledgeManager):
         """测试查询和标签组合搜索"""
-        results = populated_knowledge_manager.search(
-            query="python", tags=["design-pattern"]
-        )
+        results = populated_knowledge_manager.search(query="python", tags=["design-pattern"])
         assert len(results) == 1
         assert "Decorator pattern" in results[0].content
 
@@ -189,7 +197,7 @@ class TestKnowledgeManager:
         # 添加两次相同的关联
         knowledge_manager.relate(k1.id, k2.id, "related_to")
         knowledge_manager.relate(k1.id, k2.id, "related_to")
-        
+
         updated_k1 = knowledge_manager.get(k1.id)
         assert len(updated_k1.relations) == 1, "重复的关联不应被添加"
 
