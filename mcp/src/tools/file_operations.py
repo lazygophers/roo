@@ -136,6 +136,95 @@ def delete_file(path: str) -> bool:
     except Exception as e:
         raise IOError(f"删除 '{path}' 时发生未知错误: {e}") from e
 
+def move_file(source_path: str, destination_path: str) -> Dict[str, Any]:
+    """
+    移动文件或目录到指定位置。
+
+    Args:
+        source_path (str): 要移动的源文件或目录的路径。
+        destination_path (str): 目标路径。
+
+    Returns:
+        Dict[str, Any]: 包含操作状态和结果的字典。
+    """
+    if not os.path.exists(source_path):
+        return {"status": "error", "message": f"Source file not found: {source_path}"}
+    if os.path.exists(destination_path):
+        return {"status": "error", "message": f"Destination already exists: {destination_path}"}
+    try:
+        shutil.move(source_path, destination_path)
+        return {"status": "success", "destination_path": destination_path}
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+
+def copy_file(source_path: str, destination_path: str) -> Dict[str, Any]:
+    """
+    复制文件或目录到指定位置。
+
+    Args:
+        source_path (str): 要复制的源文件或目录的路径。
+        destination_path (str): 目标路径。
+
+    Returns:
+        Dict[str, Any]: 包含操作状态和结果的字典。
+    """
+    if not os.path.exists(source_path):
+        return {"status": "error", "message": f"Source file not found: {source_path}"}
+    if os.path.exists(destination_path):
+        return {"status": "error", "message": f"Destination already exists: {destination_path}"}
+    try:
+        if os.path.isdir(source_path):
+            shutil.copytree(source_path, destination_path)
+        else:
+            shutil.copy2(source_path, destination_path)
+        return {"status": "success", "destination_path": destination_path}
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+
+def create_directory(path: str) -> Dict[str, Any]:
+    """
+    创建新目录，支持创建多级目录。
+
+    Args:
+        path (str): 要创建的目录的路径。
+
+    Returns:
+        Dict[str, Any]: 包含操作状态和结果的字典。
+    """
+    if os.path.exists(path):
+        return {"status": "error", "message": f"Directory already exists: {path}"}
+    try:
+        os.makedirs(path)
+        return {"status": "success", "directory_path": path}
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+
+def get_file_metadata(path: str) -> Dict[str, Any]:
+    """
+    获取文件或目录的元数据。
+
+    Args:
+        path (str): 目标文件或目录的路径。
+
+    Returns:
+        Dict[str, Any]: 包含操作状态和元数据（如果成功）或错误信息的字典。
+    """
+    if not os.path.exists(path):
+        return {"status": "error", "message": f"File not found: {path}"}
+    try:
+        stat_info = os.stat(path)
+        metadata = {
+            "file_path": os.path.abspath(path),
+            "size_bytes": stat_info.st_size,
+            "last_modified_time": stat_info.st_mtime,
+            "created_time": stat_info.st_ctime,
+            "is_directory": os.path.isdir(path),
+            "is_file": os.path.isfile(path),
+        }
+        return {"status": "success", "metadata": metadata}
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+
 # ==============================================================================
 # MCP Tool Definitions
 # ==============================================================================
@@ -209,6 +298,74 @@ delete_file_tool: MCPTool = {
     }
 }
 
+move_file_tool: MCPTool = {
+    "name": "move_file",
+    "description": "移动文件或目录到新的位置。",
+    "input_schema": {
+        "type": "object",
+        "properties": {
+            "source_path": {
+                "type": "string",
+                "description": "要移动的源文件或目录的路径。"
+            },
+            "destination_path": {
+                "type": "string",
+                "description": "移动的目标路径。"
+            }
+        },
+        "required": ["source_path", "destination_path"]
+    }
+}
+
+copy_file_tool: MCPTool = {
+    "name": "copy_file",
+    "description": "复制文件或目录到新的位置。会保留文件的元数据。",
+    "input_schema": {
+        "type": "object",
+        "properties": {
+            "source_path": {
+                "type": "string",
+                "description": "要复制的源文件或目录的路径。"
+            },
+            "destination_path": {
+                "type": "string",
+                "description": "复制的目标路径。"
+            }
+        },
+        "required": ["source_path", "destination_path"]
+    }
+}
+
+create_directory_tool: MCPTool = {
+    "name": "create_directory",
+    "description": "创建一个新目录。如果父目录不存在，也会一并创建。",
+    "input_schema": {
+        "type": "object",
+        "properties": {
+            "path": {
+                "type": "string",
+                "description": "要创建的目录的完整路径。"
+            }
+        },
+        "required": ["path"]
+    }
+}
+
+get_file_metadata_tool: MCPTool = {
+    "name": "get_file_metadata",
+    "description": "获取指定文件或目录的详细元数据。",
+    "input_schema": {
+        "type": "object",
+        "properties": {
+            "path": {
+                "type": "string",
+                "description": "目标文件或目录的路径。"
+            }
+        },
+        "required": ["path"]
+    }
+}
+
 # 将所有工具定义收集到一个字典中，以便于 MCP 服务器加载
 # 键是工具名，值是对应的可调用函数
 file_operation_tools: Dict[str, Callable] = {
@@ -216,4 +373,8 @@ file_operation_tools: Dict[str, Callable] = {
     "write_file": write_file,
     "list_files": list_files,
     "delete_file": delete_file,
+    "move_file": move_file,
+    "copy_file": copy_file,
+    "create_directory": create_directory,
+    "get_file_metadata": get_file_metadata,
 }
