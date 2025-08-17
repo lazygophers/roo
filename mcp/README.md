@@ -11,40 +11,30 @@
 - **非 Root 容器**: Docker 容器默认使用非 root 用户运行，增强安全性。
 - **工具示例**: 包含一个可配置的 `get_timestamp` 工具，支持秒级和毫秒级时间戳。
 
-- **记忆工具集**: 提供一套完整的 `memory-*` 工具，用于管理和操作记忆库，详情请见 [`MEMORY_TOOLS.md`](MEMORY_TOOLS.md)。
+- **记忆工具集**: 提供一套完整的 `memory-*` 工具，用于管理和操作记忆库，详情请见 [`memory.md`](dosc/memory.md)。
+
 ## 本地运行
 
 请确保您已安装 Python 3.12+ 和 `uv`。
 
-1.  **创建虚拟环境**
-
-    使用 `uv` 创建并激活虚拟环境：
+1.  **初始化环境**
 
     ```shell
-    uv venv
-    source .venv/bin/activate
+    uv sync
     ```
 
-2.  **安装依赖**
-
-    使用 `uv` 同步 `pyproject.toml` 中定义的依赖项：
-
-    ```shell
-    uv pip sync pyproject.toml
-    ```
-
-3.  **运行服务**
+2.  **运行服务**
 
     执行主脚本来启动服务：
 
     ```shell
-    python main.py
+    uv run main.py
     ```
 
     要以 debug 模式运行，请添加 `--debug` 标志：
 
     ```shell
-    python main.py --debug
+    uv run main.py --debug
     ```
 
 ## Docker 运行
@@ -103,7 +93,7 @@
     服务将返回一个以秒为单位的 **整数** Unix 时间戳：
 
     ```json
-    {"jsonrpc": "2.0", "result": 1755063481, "id": 1}
+    { "jsonrpc": "2.0", "result": 1755063481, "id": 1 }
     ```
 
 #### 示例 2: 获取毫秒级时间戳
@@ -140,4 +130,33 @@
     服务将返回一个以毫秒为单位的 **整数** Unix 时间戳：
 
     ```json
-    {"jsonrpc": "2.0", "result": 1755063481123, "id": 2}
+    { "jsonrpc": "2.0", "result": 1755063481123, "id": 2 }
+    ```
+
+## MCP 服务配置样例
+
+`mcp_services.examples.yaml` 文件展示了如何配置 MCP 服务。核心变更是，所有服务现在都统一在 `mcpServers` 顶级键下进行管理。
+
+每个服务都作为 `mcpServers` 对象的一个子属性，以其唯一的服务名（例如 `uv`）作为键。这种结构使得配置更加清晰和模块化。
+
+以下是一个配置示例，展示了 `uv` 服务的具体设置：
+
+```yaml
+mcpServers:
+  # 'uv' 服务示例
+  # 该服务通过 'uv mcp' 命令启动，当前处于启用状态。
+  uv:
+    type: stdio
+    command: uv
+    args: ["mcp"]
+    disabled: false
+```
+
+**关键字段说明:**
+
+- **`type`**: 定义服务的通信方式（例如 `stdio`）。
+- **`command`**: 启动服务所需执行的命令。
+- **`args`**: 传递给命令的参数列表。
+- **`disabled`**: 一个布尔值，用于控制该服务是否启用。`false` 表示启用，`true` 表示禁用。
+
+您可以参考此结构，将示例复制到您自己的配置文件中，并根据需求进行调整，以快速设置和管理您的 MCP 服务。

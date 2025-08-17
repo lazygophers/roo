@@ -1,0 +1,16 @@
+{
+  "mcpServers": {
+    "github": {
+      "command": "docker",
+      "args": [
+        "run",
+        "--rm",
+        "-it",
+        "lazygopher:latest"
+      ],
+      "alwaysAllow": [
+        "get_pull_request"
+      ]
+    }
+  }
+}
