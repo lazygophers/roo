@@ -12,7 +12,7 @@
 - **Docker 支持**: 提供多阶段 `Dockerfile`，用于构建轻量级、安全的生产镜像。
 - **Debug 模式**: 支持 `--debug` 标志，用于输出详细的日志信息，方便开发和调试。
 - **非 Root 容器**: Docker 容器默认使用非 root 用户运行，增强安全性。
-- **核心工具集**: 提供 `search` 等核心工具，用于执行 Searx 查询，并包含一套完整的 `memory-*` 工具用于管理记忆库，详情请见 [docs/memory.md](docs/memory.md)。
+- **核心工具集**: 提供 `search`, `search_suggestions`, `get_cache_info` 等一系列围绕 Searx 的核心工具...
 
 ## 本地运行
 
@@ -97,14 +97,15 @@
 
 1.  **准备请求**
 
-    创建一个名为 `request_search.json` 的文件，指定查询关键词。
+    创建一个名为 `request_search.json` 的文件，指定查询关键词和可选参数（如 `categories`）。
 
     ```json
     {
       "jsonrpc": "2.0",
       "method": "search",
       "params": {
-        "query": "What is Model-Copilot-Protocol?"
+        "query": "What is Model-Copilot-Protocol?",
+        "categories": "general"
       },
       "id": 2
     }
@@ -131,7 +132,9 @@
             "url": "https://example.com/mcp-protocol",
             "content": "The Model-Copilot-Protocol (MCP) is a standardized communication protocol..."
           }
-        ]
+        ],
+        "number_of_results": 1,
+        "suggestions": ["mcp protocol", "model copilot protocol explained"]
       },
       "id": 2
     }
@@ -139,18 +142,15 @@
 
 ## MCP 服务配置样例
 
-`mcp_server_config.json` 文件用于定义 Roo-Code 如何与此服务进行交互。
-
-以下是 `github` 服务的真实配置示例，展示了如何设置命令、参数和启/禁用状态。
+以下是一个 `mcp_server_config.json` 的配置示例，用于将名为 `github` 的 MCP 服务与一个 Docker 容器关联起来。
 
 ```json
 {
   "mcpServers": {
     "github": {
-      "type": "stdio",
-      "command": "python",
-      "args": ["-u", "main.py"],
-      "disabled": false
+      "command": "docker",
+      "args": ["run", "--rm", "-it", "lazygopher:latest"],
+      "alwaysAllow": ["get_pull_request"]
     }
   }
 }
@@ -158,9 +158,8 @@
 
 **关键字段说明:**
 
-- **`type`**: 定义服务的通信方式（例如 `stdio`）。
-- **`command`**: 启动服务所需执行的命令。
-- **`args`**: 传递给命令的参数列表。
-- **`disabled`**: 一个布尔值，用于控制该服务是否启用。`false` 表示启用，`true` 表示禁用。
-
-您可以参考此结构，将示例复制到您自己的配置文件中，并根据需求进行调整。
+- `mcpServers`: 定义所有 MCP 服务的配置。
+- `github`: 服务的唯一名称。
+- `command`: 启动服务所需执行的命令（例如 `docker`, `python`）。
+- `args`: 传递给 `command` 的参数列表。
+- `alwaysAllow`: 一个工具名称的列表，这些工具在执行时将无需用户确认，可被自动授权。
