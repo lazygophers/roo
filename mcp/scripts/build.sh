@@ -3,7 +3,7 @@
 set -e
 
 # Define cache directory using XDG_CACHE_HOME or a local default
-export CACHE_DIR="${XDG_CACHE_HOME:-.nuitka-cache}"
+export CACHE_DIR=".nuitka-cache"
 export CCACHE_DIR="$CACHE_DIR/ccache"
 export PATH="/usr/lib/ccache:$PATH"
 
@@ -16,7 +16,6 @@ mkdir -p "$CACHE_DIR/nuitka"
 uv run nuitka \
     --mode=onefile \
     --assume-yes-for-downloads \
-    --lto=yes \
     --remove-output \
     --output-dir=build \
     --output-filename=lazygopher \
