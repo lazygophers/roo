@@ -36,9 +36,6 @@ share/python-wheels/
 .installed.cfg
 *.egg
 MANIFEST
-# Nuitka build cache
-.nuitka-cache/
-
 
 # Python 虚拟环境
 .venv/
