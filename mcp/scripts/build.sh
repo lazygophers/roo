@@ -3,7 +3,7 @@
 set -e
 
 # Define cache directory using XDG_CACHE_HOME or a local default
-export CACHE_DIR="${XDG_CACHE_HOME:-$PWD/.cache}"
+export CACHE_DIR="${XDG_CACHE_HOME:-.nuitka-cache}"
 export CCACHE_DIR="$CACHE_DIR/ccache"
 export PATH="/usr/lib/ccache:$PATH"
 
@@ -22,7 +22,7 @@ uv run nuitka \
     --output-filename=lazygopher \
     --show-progress \
     --static-libpython=auto \
-    --deployment=no \
+    --deployment \
     --prefer-source-code \
     --enable-plugins=anti-bloat \
     --noinclude-setuptools-mode=nofollow \

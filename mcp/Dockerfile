@@ -22,9 +22,7 @@ COPY . .
 # Compile the application with Nuitka
 # --standalone: Creates a folder with all the necessary files to run the application
 # main.py: The entry point of the application
-ARG CACHE_BUSTER=0
-RUN --mount=type=cache,target=/root/.cache/nuitka \
-    --mount=type=cache,target=/root/.ccache \
+RUN --mount=type=cache,target=/app/.nuitka-cache \
     bash scripts/build.sh
 
 # Stage 2: Final Image

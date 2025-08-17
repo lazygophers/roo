@@ -63,6 +63,7 @@ help: ## 显示所有可用命令的帮助信息
 .PHONY: build
 build: clean ## 使用 Nuitka 编译项目为独立可执行文件
 	@echo "$(BOLD)$(BLUE)Building $(PROJECT_NAME) with Nuitka...$(RESET)"
+	@mkdir -p .nuitka-cache
 	@bash scripts/build.sh
 	@echo "$(GREEN)✓ Build completed successfully$(RESET)"
 
@@ -218,7 +219,7 @@ typecheck: ## 运行类型检查（如果配置了 mypy）
 .PHONY: docker-build
 docker-build: ## 构建 Docker 镜像
 	@echo "$(BOLD)$(BLUE)Building Docker image...$(RESET)"
-	@docker build --build-arg CACHE_BUSTER=$(shell date +%s) -t $(PROJECT_NAME):latest .
+	@docker build -t $(PROJECT_NAME):latest .
 	@echo "$(GREEN)✓ Docker image built$(RESET)"
 
 .PHONY: docker-run

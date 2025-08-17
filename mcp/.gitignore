@@ -260,8 +260,9 @@ uploads/
 static/collected/
 
 # 缓存
+# Nuitka build cache
 cache/
-.cache/
+.nuitka-cache/
 
 # Session 文件
 sessions/
