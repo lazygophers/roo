@@ -11,22 +11,44 @@ import sys
 from collections.abc import Callable
 from typing import Any
 
-from src.tools import searx, timestamp
+from src.tools import file_operations, searx, timestamp
+from src.utils.env_detector import is_running_in_docker
 
 
-def run_server() -> None:
+def get_tools() -> dict[str, Callable[..., Any]]:
     """
-    Runs the main server loop, processing JSON-RPC requests from stdin.
+    构建并返回 MCP 服务器可用的工具集。
 
-    This function continuously listens for incoming data, parses it as
-    JSON-RPC, dispatches to the appropriate tool, and returns the result.
+    根据运行环境（是否在 Docker 内），此函数会条件性地加载文件操作工具。
+
+    :return: 一个从工具名映射到其可调用函数的字典。
     """
+    # 基础工具集
     tools: dict[str, Callable[..., Any]] = {
         "get_timestamp": timestamp.get_timestamp,
         "searx_search": searx.search,
         "searx_suggestions": searx.search_suggestions,
         "searx_engines": searx.get_supported_engines,
     }
+
+    # 条件性地加载文件操作工具
+    if not is_running_in_docker():
+        logging.info("非 Docker 环境，启用文件操作工具。")
+        tools.update(file_operations.file_operation_tools)
+    else:
+        logging.info("Docker 环境，文件操作工具已禁用。")
+
+    return tools
+
+
+def run_server() -> None:
+    """
+    运行主服务器循环，处理来自 stdin 的 JSON-RPC 请求。
+
+    此函数持续监听输入数据，将其解析为 JSON-RPC，分派给相应的工具，
+    并返回结果。
+    """
+    tools = get_tools()
 
     for line in sys.stdin:
         if not line.strip():

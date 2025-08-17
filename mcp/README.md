@@ -13,6 +13,7 @@
 - **Debug 模式**: 支持 `--debug` 标志，用于输出详细的日志信息，方便开发和调试。
 - **非 Root 容器**: Docker 容器默认使用非 root 用户运行，增强安全性。
 - **核心工具集**: 提供 `search`, `search_suggestions`, `get_cache_info` 等一系列围绕 Searx 的核心工具...
+- **文件操作工具集**: 提供 `read_file`, `write_file`, `list_files`, `delete_file` 等文件操作工具，但仅在非 Docker 环境下可用。
 
 ## 本地运行
 
@@ -139,6 +140,15 @@
       "id": 2
     }
     ```
+
+## 文件操作工具 (File Operation Tools)
+
+本服务提供了一系列文件操作工具，包括 `read_file`, `write_file`, `list_files`, 和 `delete_file`。
+
+**重要限制**:
+
+- **可用性**: 这些工具仅在 **非 Docker 环境** 下加载和可用。
+- **安全考量**: 当服务在 Docker 容器中运行时，这些文件操作工具将被 **完全禁用**。这是为了防止容器内的服务意外访问或修改宿主机的文件系统，从而确保系统的安全性和隔离性。
 
 ## MCP 服务配置样例
 
