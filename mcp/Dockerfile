@@ -3,7 +3,7 @@
 FROM python:3.12 AS builder
 
 RUN apt-get update && \
-    apt-get install -y patchelf gcc 
+    apt-get install -y patchelf gcc ccache
 
 # Install uv for package management
 RUN pip install uv
@@ -17,27 +17,15 @@ RUN uv sync
 RUN uv venv --seed
 RUN .venv/bin/python -m pip install -U Nuitka
 
+COPY scripts/build.sh .
 COPY . .
 # Compile the application with Nuitka
 # --standalone: Creates a folder with all the necessary files to run the application
 # main.py: The entry point of the application
-RUN .venv/bin/nuitka \
-    --mode=onefile \
-    --assume-yes-for-downloads \
-    --lto=yes \
-    --remove-output \
-    --output-filename=lazygopher \
-    --show-progress \
-    --static-libpython=auto \
-    --deployment \
-    --prefer-source-code \
-    --enable-plugins=anti-bloat \
-    --noinclude-setuptools-mode=nofollow \
-    --noinclude-pytest-mode=nofollow \
-    --jobs=-1 \
-    --clean-cache=ccache \
-    --onefile-cache-mode=cached \
-    main.py
+ARG CACHE_BUSTER=0
+RUN --mount=type=cache,target=/root/.cache/nuitka \
+    --mount=type=cache,target=/root/.ccache \
+    bash scripts/build.sh
 
 # Stage 2: Final Image
 # This stage creates the final, minimal image for production.
