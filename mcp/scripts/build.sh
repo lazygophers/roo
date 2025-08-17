@@ -2,12 +2,14 @@
 # This script compiles the Python application into a standalone executable using Nuitka.
 set -e
 
-# Explicitly set and export the ccache directory to ensure it's used.
-export CCACHE_DIR=/root/.ccache
+# Define cache directory using XDG_CACHE_HOME or a local default
+export CACHE_DIR="${XDG_CACHE_HOME:-$PWD/.cache}"
+export CCACHE_DIR="$CACHE_DIR/ccache"
 export PATH="/usr/lib/ccache:$PATH"
 
-# Clean up previous build artifacts
-rm -rf build/lazygopher
+# Ensure cache directories exist
+mkdir -p "$CCACHE_DIR"
+mkdir -p "$CACHE_DIR/nuitka"
 
 
 # Run Nuitka compilation
@@ -20,7 +22,7 @@ uv run nuitka \
     --output-filename=lazygopher \
     --show-progress \
     --static-libpython=auto \
-    --deployment \
+    --deployment=no \
     --prefer-source-code \
     --enable-plugins=anti-bloat \
     --noinclude-setuptools-mode=nofollow \
@@ -31,6 +33,3 @@ uv run nuitka \
     --noinclude-data-files=cryptography \
     main.py
 
-
-# Move the final executable to the root directory
-mv build/lazygopher .
