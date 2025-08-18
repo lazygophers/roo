@@ -109,6 +109,31 @@ class SearxConfig(BaseModel):
         return self.searx_hosts.copy()
 
 
+class MemoryConfig(BaseModel):
+    """
+    Memory configuration model.
+
+    Attributes:
+        db_path: Path to the LanceDB database.
+        embedding_model: Name of the embedding model to use.
+        default_ttl_subtask: Default TTL for subtask memories in seconds.
+        default_ttl_roottask: Default TTL for root task memories in seconds.
+    """
+
+    db_path: str = Field(
+        default="data/memory.lancedb", description="Path to the LanceDB database"
+    )
+    embedding_model: str = Field(
+        default="bge-m3", description="Embedding model name"
+    )
+    default_ttl_subtask: int = Field(
+        default=30 * 86400, description="Default TTL for subtask memories in seconds (30 days)"
+    )
+    default_ttl_roottask: int = Field(
+        default=90 * 86400, description="Default TTL for root task memories in seconds (90 days)"
+    )
+
+
 class Config(BaseModel):
     """
     Main configuration model for the MCP server.
@@ -119,6 +144,9 @@ class Config(BaseModel):
 
     searx: SearxConfig = Field(
         default_factory=SearxConfig, description="Searx search engine configuration"
+    )
+    memory: MemoryConfig = Field(
+        default_factory=MemoryConfig, description="Memory service configuration"
     )
 
     @classmethod
@@ -168,6 +196,22 @@ class Config(BaseModel):
 
                     if searx_config:
                         config_data["searx"] = searx_config
+
+                    # Build memory config from file
+                    memory_config = {}
+                    if "memory" in file_config and isinstance(file_config["memory"], dict):
+                        memory_data = file_config["memory"]
+                        if "db_path" in memory_data:
+                            memory_config["db_path"] = memory_data["db_path"]
+                        if "embedding_model" in memory_data:
+                            memory_config["embedding_model"] = memory_data["embedding_model"]
+                        if "default_ttl_subtask" in memory_data:
+                            memory_config["default_ttl_subtask"] = memory_data["default_ttl_subtask"]
+                        if "default_ttl_roottask" in memory_data:
+                            memory_config["default_ttl_roottask"] = memory_data["default_ttl_roottask"]
+
+                    if memory_config:
+                        config_data["memory"] = memory_config
 
                     logging.info("Loaded configuration from %s", config_path)
             except yaml.YAMLError as e:
@@ -246,6 +290,19 @@ class Config(BaseModel):
                 config_data["searx"]["cache_disk_mb"] = int(env_cache_disk)
             except ValueError:
                 logging.warning("Invalid SEARX_CACHE_DISK_MB value: %s", env_cache_disk)
+
+        # Load memory settings from environment
+        memory_env_config = {}
+        if db_path := os.getenv("MEMORY_DB_PATH"):
+            memory_env_config["db_path"] = db_path
+        if embedding_model := os.getenv("MEMORY_EMBEDDING_MODEL"):
+            memory_env_config["embedding_model"] = embedding_model
+        
+        if memory_env_config:
+            if "memory" not in config_data:
+                config_data["memory"] = {}
+            config_data["memory"].update(memory_env_config)
+            logging.info("Overriding Memory settings from environment variables")
 
         # Create and validate configuration
         try:

@@ -184,3 +184,7 @@
 - `command`: 启动服务所需执行的命令（例如 `docker`, `python`）。
 - `args`: 传递给 `command` 的参数列表。
 - `alwaysAllow`: 一个工具名称的列表，这些工具在执行时将无需用户确认，可被自动授权。
+
+## 工具文档
+
+- [记忆库工具](./docs/tools/memory_tools.md)

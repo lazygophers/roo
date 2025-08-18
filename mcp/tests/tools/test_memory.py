@@ -1,66 +1,105 @@
-import unittest
-import sys
-import os
+import pytest
+import numpy as np
+from unittest.mock import MagicMock, patch
 
-from src.tools.memory import MemoryTool
-
-
-class TestMemoryTool(unittest.TestCase):
-
-    def setUp(self):
-        """Set up a new MemoryTool instance before each test."""
-        self.memory_tool = MemoryTool()
-
-    def test_save_and_search_knowledge(self):
-        """Test saving a new piece of knowledge and searching for it."""
-        content = "The sky is blue."
-        metadata = {"source": "observation"}
-        knowledge_id = self.memory_tool.save_knowledge(content, metadata)
-        self.assertIsInstance(knowledge_id, str)
-
-        results = self.memory_tool.search_knowledge(query="sky")
-        self.assertEqual(len(results), 1)
-        self.assertEqual(results[0]["id"], knowledge_id)
-        self.assertEqual(results[0]["content"], content)
-
-    def test_working_memory(self):
-        """Test updating, getting, and clearing working memory."""
-        self.memory_tool.update_working_memory("current_task", "testing memory tool")
-        task = self.memory_tool.get_working_memory("current_task")
-        self.assertEqual(task, "testing memory tool")
-
-        self.memory_tool.clear_working_memory()
-        task_after_clear = self.memory_tool.get_working_memory("current_task")
-        self.assertIsNone(task_after_clear)
-
-    def test_core_memory(self):
-        """Test getting and updating core memory."""
-        core_mem = self.memory_tool.get_core_memory()
-        self.assertIn("persona", core_mem)
-
-        new_core_mem = {"persona": "Advanced AI", "user_preferences": {"theme": "dark"}}
-        self.memory_tool.update_core_memory(new_core_mem)
-        # The mock implementation just prints, so we can't assert a change here.
-        # In a real scenario, we would check the persistent store.
-        # For now, we just ensure the method runs without error.
-        self.assertTrue(True)
-
-    def test_relate_and_forget_knowledge(self):
-        """Test creating a relationship between knowledge and then forgetting it."""
-        id1 = self.memory_tool.save_knowledge("Fact A", {})
-        id2 = self.memory_tool.save_knowledge("Fact B", {})
-
-        # Relate knowledge
-        self.memory_tool.relate_knowledge(id1, id2, "is related to")
-
-        # In a real implementation, we would search and check the relations.
-        # Our mock search doesn't support this, so we check that the method runs.
-
-        # Forget knowledge
-        self.memory_tool.forget_knowledge(id1)
-        results = self.memory_tool.search_knowledge(query="Fact A")
-        self.assertEqual(len(results), 0)
+from src.tools import memory as memory_tools
+from src.memory.models import CoreMemory, KnowledgeMemory, WorkingMemory
 
 
-if __name__ == "__main__":
-    unittest.main()
+@pytest.fixture
+def mock_engine_instance():
+    """
+    提供一个配置好的 IntelligentEngine 模拟实例。
+    """
+    engine_instance = MagicMock()
+    
+    mock_embedding = np.random.rand(768).astype(np.float32)
+    
+    engine_instance.save_core_memory.return_value = CoreMemory(id="core-123", name="Test Core", description="Test Desc", embedding=mock_embedding)
+    engine_instance.save_knowledge_memory.return_value = KnowledgeMemory(id="knowledge-456", core_id="core-123", objective="Test Knowledge", embedding=mock_embedding)
+    engine_instance.save_working_memory.return_value = WorkingMemory(id="work-789", knowledge_id="knowledge-456", details="Test Details", embedding=mock_embedding)
+    
+    mock_search_result = [
+        KnowledgeMemory(id="res-1", core_id="core-123", objective="Relevant knowledge", embedding=mock_embedding, _distance=0.1)
+    ]
+    engine_instance.search_memory.return_value = mock_search_result
+    
+    engine_instance.db_service.get_status.return_value = "ON"
+    
+    return engine_instance
+
+
+@pytest.fixture(autouse=True)
+def patch_get_engine(mock_engine_instance):
+    """
+    自动应用的 Fixture，用模拟实例 patch get_engine 函数。
+    """
+    with patch('src.tools.memory.get_engine', return_value=mock_engine_instance) as mock_get_engine:
+        yield mock_get_engine
+
+
+def test_save_core_memory(mock_engine_instance):
+    """
+    测试保存核心记忆。
+    """
+    result = memory_tools.save_core_memory(name="Test Project", description="A test project.", confidence=95)
+    
+    mock_engine_instance.save_core_memory.assert_called_once_with(name="Test Project", description="A test project.", confidence=95)
+    
+    assert result["id"] == "core-123"
+    assert result["level"] == "CoreMemory"
+
+
+def test_save_knowledge_memory(mock_engine_instance):
+    """
+    测试保存知识记忆。
+    """
+    result = memory_tools.save_knowledge_memory(objective="Test objective", core_id="core-123", confidence=90)
+    
+    mock_engine_instance.save_knowledge_memory.assert_called_once_with(objective="Test objective", core_id="core-123", confidence=90)
+    
+    assert result["id"] == "knowledge-456"
+    assert result["level"] == "KnowledgeMemory"
+
+
+def test_save_working_memory(mock_engine_instance):
+    """
+    测试保存工作记忆。
+    """
+    result = memory_tools.save_working_memory(details="Detailed step-by-step instructions.", knowledge_id="knowledge-456", confidence=99)
+    
+    mock_engine_instance.save_working_memory.assert_called_once_with(details="Detailed step-by-step instructions.", knowledge_id="knowledge-456", confidence=99)
+    
+    assert result["id"] == "work-789"
+    assert result["level"] == "WorkingMemory"
+
+
+def test_search_memory(mock_engine_instance):
+    """
+    测试搜索记忆功能。
+    """
+    results = memory_tools.search_memory(query="relevant", top_k=1, levels=["KnowledgeMemory"])
+    
+    mock_engine_instance.search_memory.assert_called_once_with(
+        query_text="relevant",
+        context=None,
+        top_k=1,
+        levels=["KnowledgeMemory"]
+    )
+    
+    assert len(results) == 1
+    assert results["id"] == "res-1"
+    assert results["content"] == "Relevant knowledge"
+    assert results["similarity_score"] > 0.89
+
+
+def test_set_and_get_memory_status(mock_engine_instance):
+    """
+    测试设置和获取记忆库状态。
+    """
+    status_result = memory_tools.get_memory_status()
+    assert status_result["current_status"] == "ON"
+    mock_engine_instance.db_service.get_status.assert_called_once()
+    
+    memory_tools.set_memory_status("PAUSED")
+    mock_engine_instance.db_service.set_status.assert_called_once_with("PAUSED")

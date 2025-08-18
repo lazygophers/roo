@@ -37,6 +37,9 @@ class TestConditionalToolLoading(unittest.TestCase):
             self.assertIn(tool_name, loaded_tools,
                           f"工具 '{tool_name}' 未能在本地环境中加载。")
         
+        # 验证 memory 工具也已加载
+        self.assertIn("save_core_memory", loaded_tools)
+        
         print("\n[PASS] 本地环境测试：文件操作工具已成功加载。")
 
     @patch('src.server.is_running_in_docker', return_value=True)

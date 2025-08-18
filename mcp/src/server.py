@@ -11,7 +11,7 @@ import sys
 from collections.abc import Callable
 from typing import Any
 
-from src.tools import file_operations, searx, timestamp
+from src.tools import file_operations, memory, searx, timestamp
 from src.utils.env_detector import is_running_in_docker
 
 
@@ -29,6 +29,12 @@ def get_tools() -> dict[str, Callable[..., Any]]:
         "searx_search": searx.search,
         "searx_suggestions": searx.search_suggestions,
         "searx_engines": searx.get_supported_engines,
+        "save_core_memory": memory.save_core_memory,
+        "save_knowledge_memory": memory.save_knowledge_memory,
+        "save_working_memory": memory.save_working_memory,
+        "search_memory": memory.search_memory,
+        "get_memory_status": memory.get_memory_status,
+        "set_memory_status": memory.set_memory_status,
     }
 
     # 条件性地加载文件操作工具

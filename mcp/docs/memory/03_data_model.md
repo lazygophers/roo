@@ -104,7 +104,7 @@ erDiagram
 | `manual_promote_flag` | `bool`        | 手动标记，用于强制提升记忆层级或防止其被自动降级。             | `False`             |
 | `confidence`          | `int`         | 记忆的可信度 (0-100)。值越高表示系统对该记忆的准确性越有信心。 | `100`               |
 
-### `ProjectMemory` (L0: 项目)
+### `CoreMemory (核心记忆)` (L0: 项目)
 
 | 字段名         | 数据类型 | 描述                                | 默认值/说明 |
 | :------------- | :------- | :---------------------------------- | :---------- |
@@ -114,21 +114,21 @@ erDiagram
 | `ttl`          | `int`    | 生命周期（天）。`-1` 表示永不过期。 | `-1`        |
 | `level`        | `int`    | 层级标识，固定为 `0`。              | `0`         |
 
-### `RootTaskMemory` (L1: 根任务)
+### `KnowledgeMemory (知识库)` (L1: 根任务)
 
-| 字段名         | 数据类型 | 描述                                 | 默认值/说明   |
-| :------------- | :------- | :----------------------------------- | :------------ |
-| `project_id`   | `str`    | 所属 `ProjectMemory` 的 `id`。       | N/A           |
-| `objective`    | `str`    | 根任务的核心目标描述。               | N/A           |
-| `content_type` | `str`    | 内容类型标识，固定为 `'root_task'`。 | `'root_task'` |
-| `ttl`          | `int`    | 生命周期（天）。                     | `90`          |
-| `level`        | `int`    | 层级标识，固定为 `1`。               | `1`           |
+| 字段名         | 数据类型 | 描述                                   | 默认值/说明   |
+| :------------- | :------- | :------------------------------------- | :------------ |
+| `project_id`   | `str`    | 所属 `CoreMemory (核心记忆)` 的 `id`。 | N/A           |
+| `objective`    | `str`    | 根任务的核心目标描述。                 | N/A           |
+| `content_type` | `str`    | 内容类型标识，固定为 `'root_task'`。   | `'root_task'` |
+| `ttl`          | `int`    | 生命周期（天）。                       | `90`          |
+| `level`        | `int`    | 层级标识，固定为 `1`。                 | `1`           |
 
-### `SubTaskMemory` (L2: 子任务)
+### `WorkingMemory (工作记忆)` (L2: 子任务)
 
 | 字段名         | 数据类型         | 描述                                                             | 默认值/说明  |
 | :------------- | :--------------- | :--------------------------------------------------------------- | :----------- |
-| `root_task_id` | `str`            | 所属 `RootTaskMemory` 的 `id`。                                  | N/A          |
+| `root_task_id` | `str`            | 所属 `KnowledgeMemory (知识库)` 的 `id`。                        | N/A          |
 | `details`      | `str`            | 子任务的详细内容、代码或思考。                                   | N/A          |
 | `metadata`     | `Dict[str, Any]` | 可扩展的元数据字段，用于存储结构化信息，如代码语言、关联文件等。 | `{}`         |
 | `content_type` | `str`            | 内容类型标识，固定为 `'sub_task'`。                              | `'sub_task'` |
@@ -242,9 +242,9 @@ class BaseMemory(LanceModel):
     embedding: Vector(768)
     # ... 更多字段请参见源文件
 
-class ProjectMemory(BaseMemory):
+class CoreMemory (核心记忆)(BaseMemory):
     name: str = Field(description="项目名称")
     # ... 更多字段请参见源文件
 
-# ... RootTaskMemory 和 SubTaskMemory 定义
+# ... KnowledgeMemory (知识库) 和 WorkingMemory (工作记忆) 定义
 ```

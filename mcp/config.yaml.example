@@ -4,9 +4,7 @@
 # List of Searx instance URLs (required)
 # You can specify multiple hosts for failover
 searx_hosts:
-    - "https://so.ddns-ip.net"
-    # - "https://searx.example.com"
-    # - "https://searx.another-instance.org"
+    - "https://searx.example.com"
 
 # Cache configuration (optional)
 # Enable caching to improve performance and reduce API calls
@@ -14,12 +12,3 @@ cache_enabled: true           # Enable/disable caching (default: true)
 cache_ttl: 3600               # Cache time-to-live in seconds (default: 3600 = 1 hour)
 cache_memory_mb: 50           # Maximum memory cache size in MB (default: 50)
 cache_disk_mb: 200            # Maximum disk cache size in MB (default: 200)
-
-# You can also configure these via environment variables:
-# SEARX_HOSTS="https://searx1.com,https://searx2.com"
-# SEARX_CACHE_ENABLED=true
-# SEARX_CACHE_TTL=3600
-# SEARX_CACHE_MEMORY_MB=50
-# SEARX_CACHE_DISK_MB=200
-#
-# Environment variables take priority over config file settings
