@@ -186,7 +186,46 @@ _原则：将执行与交付作为任务的最后环节。_
       "output_schema": {
         "type": "object",
         "description": "使用 **JSON Schema** 格式，严格定义任务最终交付物的结构，确保交付物是结构化、可机读的。",
-        "minProperties": 1
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": ["success", "failure", "partial_success"],
+            "description": "任务执行的最终状态。"
+          },
+          "summary": {
+            "type": "string",
+            "description": "对任务执行结果的简明总结。"
+          },
+          "artifacts": {
+            "type": "array",
+            "description": "任务产出的文件或资源列表。",
+            "items": {
+              "type": "object",
+              "properties": {
+                "path": {
+                  "type": "string",
+                  "description": "产出文件的路径。"
+                },
+                "description": {
+                  "type": "string",
+                  "description": "对产出文件的简要描述。"
+                }
+              },
+              "required": ["path"]
+            }
+          },
+          "metrics": {
+            "type": "object",
+            "description": "可选的，用于衡量任务完成质量的指标。",
+            "properties": {
+              "coverage": {
+                "type": "number",
+                "description": "例如，代码测试覆盖率。"
+              }
+            }
+          }
+        },
+        "required": ["status", "summary", "artifacts"]
       }
     },
     "required": ["description", "requirements", "boundaries", "output_schema"]
@@ -198,7 +237,7 @@ _原则：将执行与交付作为任务的最后环节。_
 ````xml
 <new_task>
 <mode>code</mode>
-<message>{"description":"为'user-service'的'get_user'函数添加Redis缓存","context":{"reason":"提升用户查询接口的性能","relevant_files":["user_service/logic.py","user_service/tests/test_logic.py"],"user_persona":"后端开发人员"},"requirements":["使用'redis'库","为'get_user'函数添加缓存逻辑","缓存有效期为1小时","必须包含Redis连接失败的错误处理"],"boundaries":{"allowed_files":["user_service/logic.py"],"disallowed_patterns":["database model changes"],"tech_stack_constraints":"Python 3.9+, Redis 6.x"},"dependencies":[],"acceptance_criteria":["单元测试验证缓存命中和未命中场景","压力测试下接口响应时间符合预期"],"todo_list":["[ ] Implement caching logic","[ ] Add error handling","[ ] Write unit tests"],"output_schema":{"type":"object","properties":{"file_path":{"type":"string"},"status":{"type":"string","enum":["success","failure"]},"coverage":{"type":"number"}},"required":["file_path","status"]}}</message>
+<message>{"description":"为'user-service'的'get_user'函数添加Redis缓存","context":{"reason":"提升用户查询接口的性能","relevant_files":["user_service/logic.py","user_service/tests/test_logic.py"],"user_persona":"后端开发人员"},"requirements":["使用'redis'库","为'get_user'函数添加缓存逻辑","缓存有效期为1小时","必须包含Redis连接失败的错误处理"],"boundaries":{"allowed_files":["user_service/logic.py"],"disallowed_patterns":["database model changes"],"tech_stack_constraints":"Python 3.9+, Redis 6.x"},"dependencies":[],"acceptance_criteria":["单元测试验证缓存命中和未命中场景","压力测试下接口响应时间符合预期"],"todo_list":["[ ] Implement caching logic","[ ] Add error handling","[ ] Write unit tests"],"output_schema":{"type":"object","properties":{"status":{"type":"string","enum":["success","failure"]},"summary":{"type":"string"},"artifacts":{"type":"array","items":{"type":"object","properties":{"path":{"type":"string"}},"required":["path"]}}},"required":["status","summary"]}}</message>
 </new_task>
 ```
 
