@@ -100,7 +100,7 @@ _原则：将执行与交付作为任务的最后环节。_
   ```json
   {
     "$schema": "http://json-schema.org/draft-07/schema#",
-    "title": "新任务消息结构",
+    "title": "New Task Message Schema",
     "description": "定义了向特定模式委派新任务的结构。**允许添加额外的自定义属性，但所有属性名必须是可阅读、明确且无歧义的，以确保交付物的可理解性。**",
     "type": "object",
     "properties": {
