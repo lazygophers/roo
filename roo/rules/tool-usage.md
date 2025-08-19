@@ -88,6 +88,37 @@ _原则：将执行与交付作为任务的最后环节。_
   - 由于资源的限制，我处理文件时会对文件按照 500 行为单位进行分片处理（如：1-500, 501-1000），依次处理每个分片。每次分片处理完成后，我会重新加载文件以确保后续分片处理的准确性，因为前面的修改可能会导致行数变化。
   - 你需要确保单次处理文件的总行数不超过 500 行。
 
+### `new_task` 委派规范
+
+- **消息格式**: `message` 字段必须使用单行、压缩后的 JSON 格式。
+- **核心字段**:
+
+  - `description`: (必须) 对任务目标的清晰、简洁描述。
+  - `requirements`: (必须) 任务必须满足的具体要求列表。
+  - `boundaries`: (必须) 明确定义任务的范围，什么该做，什么不该做。
+  - `output_schema`: (必须) 使用 JSON Schema 格式，严格定义任务最终交付物的结构。
+
+- **调用样例**:
+  ```json
+  {
+    "description": "为'user-service'添加Redis缓存",
+    "requirements": [
+      "使用'redis'库",
+      "为'get_user'函数添加缓存逻辑",
+      "缓存有效期为1小时"
+    ],
+    "boundaries": "仅修改'user_service/logic.py'文件，不涉及数据库模型变更",
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "file_path": { "type": "string" },
+        "status": { "type": "string", "enum": ["success", "failure"] }
+      },
+      "required": ["file_path", "status"]
+    }
+  }
+  ```
+
 ### 命令行操作
 
 - **组合命令:** 当进行 command 操作时，你不得使用 `&&` 符号进行命令组合。
