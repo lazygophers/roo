@@ -101,7 +101,7 @@ _原则：将执行与交付作为任务的最后环节。_
   {
     "$schema": "http://json-schema.org/draft-07/schema#",
     "title": "New Task Message Schema",
-    "description": "Defines the structure for delegating a new task to a specialized mode.",
+    "description": "Defines the structure for delegating a new task to a specialized mode.**允许添加额外的自定义属性，但所有属性名必须是可阅读、明确且无歧义的，以确保交付物的可理解性。**",
     "type": "object",
     "properties": {
       "description": {
@@ -185,7 +185,7 @@ _原则：将执行与交付作为任务的最后环节。_
       },
       "output_schema": {
         "type": "object",
-        "description": "使用 **JSON Schema** 格式，严格定义任务最终交付物的结构，确保交付物是结构化、可机读的。",
+        "description": "使用 **JSON Schema** 格式，严格定义任务最终交付物的结构，确保交付物是结构化、可机读的。**允许添加额外的自定义属性，但所有属性名必须是可阅读、明确且无歧义的，以确保交付物的可理解性。**",
         "properties": {
           "status": {
             "type": "string",
@@ -225,7 +225,8 @@ _原则：将执行与交付作为任务的最后环节。_
             }
           }
         },
-        "required": ["status", "summary", "artifacts"]
+        "required": ["status", "summary", "artifacts"],
+        "additionalProperties": true
       }
     },
     "required": ["description", "requirements", "boundaries", "output_schema"]
