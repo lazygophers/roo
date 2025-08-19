@@ -92,20 +92,113 @@ _原则：将执行与交付作为任务的最后环节。_
 
 #### `message` 字段
 
-- **消息格式**: `message` 字段必须使用单行、压缩后的 JSON 格式。
-- **核心字段**:
+- **消息格式**: `message` 字段必须使用单行、压缩后的 JSON 格式，以确保跨平台和工具的兼容性。
 
-  - `description`: (必须) 对任务目标的清晰、简洁描述。
-  - `requirements`: (必须) 任务必须满足的具体要求列表。
-  - `boundaries`: (必须) 明确定义任务的范围，什么该做，什么不该做。
-  - `output_schema`: (必须) 使用 JSON Schema 格式，严格定义任务最终交付物的结构。
+- **字段详解 (JSON Schema)**:
+  为了确保任务定义的标准化和可验证性，`message` 字段的内容**必须**遵循以下 JSON Schema 规范。
+
+  ```json
+  {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "New Task Message Schema",
+    "description": "Defines the structure for delegating a new task to a specialized mode.",
+    "type": "object",
+    "properties": {
+      "description": {
+        "type": "string",
+        "description": "对任务核心目标的**一句话精准描述**。简洁明了，直奔主题。例如：\"为'user-service'添加Redis缓存层\"。"
+      },
+      "context": {
+        "type": "object",
+        "description": "提供任务执行所需的**背景信息和上下文**，帮助执行模式更好地理解任务。",
+        "properties": {
+          "reason": {
+            "type": "string",
+            "description": "解释'为什么'需要执行此任务。"
+          },
+          "relevant_files": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "列出与任务相关的关键文件路径。"
+          },
+          "user_persona": {
+            "type": "string",
+            "description": "描述发起任务的用户角色或意图。"
+          }
+        },
+        "required": ["reason"]
+      },
+      "requirements": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "description": "清晰、可量化地列出任务**必须满足的具体要求**。每个要求都应是可验证的。例如：[\"使用'redis'库实现缓存\", \"缓存有效期必须为1小时\", \"必须包含错误处理逻辑\"]。"
+      },
+      "boundaries": {
+        "type": "object",
+        "description": "明确定义任务的**执行边界**，防止任务范围蔓延。",
+        "properties": {
+          "allowed_files": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "允许修改的文件列表。路径优先级：相对工作目录 > 绝对路径 > 相对路径。"
+          },
+          "disallowed_patterns": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "禁止修改的模块或代码模式。"
+          },
+          "tech_stack_constraints": {
+            "type": "string",
+            "description": "技术栈限制，如\"仅使用标准库\"。"
+          }
+        },
+        "required": ["allowed_files"]
+      },
+      "dependencies": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "description": "列出当前任务所依赖的**前置任务ID**。执行模式可以此判断任务是否可以开始。"
+      },
+      "acceptance_criteria": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "description": "定义任务完成的**验收标准**，是 `requirements` 的具体化和可测试化表达。每个标准都应是清晰、无歧义的。例如：[\"`get_user`函数在缓存命中时，响应时间应小于50ms\", \"单元测试覆盖率达到90%以上\"]。"
+      },
+      "todo_list": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "description": "可选的任务清单。如果当前委派者已经为新任务生成了任务清单，应在此处提供，以便子任务直接使用。"
+      },
+      "output_schema": {
+        "type": "object",
+        "description": "使用 **JSON Schema** 格式，严格定义任务最终交付物的结构，确保交付物是结构化、可机读的。",
+        "minProperties": 1
+      }
+    },
+    "required": ["description", "requirements", "boundaries", "output_schema"]
+  }
+  ```
 
 #### **调用样例**:
 
-```xml
+````xml
 <new_task>
-<mode>{{合适的模式，参考 `核心模式职责` 部分的描述}}</mode>
-<message>{"description":"为'user-service'添加Redis缓存","requirements":["使用'redis'库","为'get_user'函数添加缓存逻辑","缓存有效期为1小时"],"boundaries":"仅修改'user_service/logic.py'文件，不涉及数据库模型变更","output_schema":{"type":"object","properties":{"file_path":{"type":"string"},"status":{"type":"string","enum":["success","failure"]}},"required":["file_path","status"]}}</message>
+<mode>code</mode>
+<message>{"description":"为'user-service'的'get_user'函数添加Redis缓存","context":{"reason":"提升用户查询接口的性能","relevant_files":["user_service/logic.py","user_service/tests/test_logic.py"],"user_persona":"后端开发人员"},"requirements":["使用'redis'库","为'get_user'函数添加缓存逻辑","缓存有效期为1小时","必须包含Redis连接失败的错误处理"],"boundaries":{"allowed_files":["user_service/logic.py"],"disallowed_patterns":["database model changes"],"tech_stack_constraints":"Python 3.9+, Redis 6.x"},"dependencies":[],"acceptance_criteria":["单元测试验证缓存命中和未命中场景","压力测试下接口响应时间符合预期"],"todo_list":["[ ] Implement caching logic","[ ] Add error handling","[ ] Write unit tests"],"output_schema":{"type":"object","properties":{"file_path":{"type":"string"},"status":{"type":"string","enum":["success","failure"]},"coverage":{"type":"number"}},"required":["file_path","status"]}}</message>
 </new_task>
 ```
 
@@ -144,7 +237,7 @@ _原则：将执行与交付作为任务的最后环节。_
 ```yaml
 触发: 工具执行失败或返回错误
 操作: 分析错误类型和原因
-```
+````
 
 **步骤 2: 选择处理策略**
 
