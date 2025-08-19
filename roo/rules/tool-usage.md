@@ -90,6 +90,8 @@ _原则：将执行与交付作为任务的最后环节。_
 
 ### `new_task` 委派规范
 
+#### `message` 字段
+
 - **消息格式**: `message` 字段必须使用单行、压缩后的 JSON 格式。
 - **核心字段**:
 
@@ -98,26 +100,14 @@ _原则：将执行与交付作为任务的最后环节。_
   - `boundaries`: (必须) 明确定义任务的范围，什么该做，什么不该做。
   - `output_schema`: (必须) 使用 JSON Schema 格式，严格定义任务最终交付物的结构。
 
-- **调用样例**:
-  ```json
-  {
-    "description": "为'user-service'添加Redis缓存",
-    "requirements": [
-      "使用'redis'库",
-      "为'get_user'函数添加缓存逻辑",
-      "缓存有效期为1小时"
-    ],
-    "boundaries": "仅修改'user_service/logic.py'文件，不涉及数据库模型变更",
-    "output_schema": {
-      "type": "object",
-      "properties": {
-        "file_path": { "type": "string" },
-        "status": { "type": "string", "enum": ["success", "failure"] }
-      },
-      "required": ["file_path", "status"]
-    }
-  }
-  ```
+#### **调用样例**:
+
+```xml
+<new_task>
+<mode>{{合适的模式，参考 `核心模式职责` 部分的描述}}</mode>
+<message>{"description":"为'user-service'添加Redis缓存","requirements":["使用'redis'库","为'get_user'函数添加缓存逻辑","缓存有效期为1小时"],"boundaries":"仅修改'user_service/logic.py'文件，不涉及数据库模型变更","output_schema":{"type":"object","properties":{"file_path":{"type":"string"},"status":{"type":"string","enum":["success","failure"]}},"required":["file_path","status"]}}</message>
+</new_task>
+```
 
 ### 命令行操作
 
