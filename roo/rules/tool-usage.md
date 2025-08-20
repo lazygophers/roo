@@ -36,6 +36,18 @@ _原则：将执行与交付作为任务的最后环节。_
 - **[`execute_command`]** - 执行命令行操作
 - **[`attempt_completion`]** - 完成任务交付
 
+**网页获取**
+_原则：使用最合适的工具，并确保结果与预期一致。_
+
+- **[`fetch`]** - 获取网页内容
+- **[`fetch_json`]** - 获取 JSON 数据
+- **[`fetch_html`]** - 获取网页内容
+- **[`fetch_xml`]** - 获取 XML 数据
+- **[`fetch_markdown`]** - 获取 Markdown 数据
+- **[`execute_command`]**
+  - **`curl`** - 使用 curl 命令行工具执行 HTTP 请求
+  - **`wget`** - 使用 wget 命令行工具执行 HTTP 请求
+
 ---
 
 ## 最佳实践
