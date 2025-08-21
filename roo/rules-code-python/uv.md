@@ -63,10 +63,10 @@ uv remove fastapi
 
 ```toml
 [project]
-name = "my-awesome-project"
-version = "0.1.0"
+name = "my-project"
+version = "0.0.1"
 dependencies = [
-    "fastapi",
+    "rich",
 ]
 
 [project.optional-dependencies]
