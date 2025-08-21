@@ -1,6 +1,6 @@
 # Markdown 规范
 
-> roo 系统通用的 Markdown 格式与风格指南。
+> AI 系统通用的 Markdown 格式与风格指南。
 
 ---
 
