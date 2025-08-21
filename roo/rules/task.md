@@ -78,7 +78,7 @@
 - **消息格式**: `message` 字段的格式为 `任务要求：{{内容}}\n返回要求：{{内容}}`。
 
   - `任务要求`：一个单行、压缩后的 JSON 字符串，遵循下文定义的 `New Task Message Schema`。
-  - `返回要求`：一个单行、压缩后的 JSON Schema 字符串，定义了任务的交付物结构。
+  - `返回要求`：一个单行、压缩后的 JSON Schema 字符串，定义了任务的交付物结构。用于任务完成后，子任务向付任务输出的交付物结构定义。
 
 **`任务要求`字段规范**
 
@@ -177,179 +177,171 @@
 - **压缩格式**: `返回要求` 的内容必须是**压缩后的单行 JSON 格式字符串**，不允许换行或格式化缩进。
 - **字符串转义**: 作为 JSON 字符串值，内部的双引号必须使用反斜杠转义（`\"`）。
 - **返回格式**: 返回格式是 JSON Schema，定义了任务的最终交付物结构。
-
-```json
-{
-  "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "Task Output Schema",
-  "description": "定义了任务最终交付物的结构，确保交付物是结构化、可机读的。允许添加额外的自定义属性，但所有属性名必须是可阅读、明确且无歧义的。",
-  "type": "object",
-  "properties": {
-    "status": {
-      "type": "string",
-      "description": "任务执行状态，必须是 'success', 'failure', 或 'partial_success' 之一。",
-      "enum": ["success", "failure", "partial_success"]
-    },
-    "summary": {
-      "type": "string",
-      "description": "对任务执行结果的简要描述，清晰传达核心产出或问题。"
-    },
-    "artifacts": {
-      "type": "array",
-      "description": "任务执行过程中生成或修改的文件列表。",
-      "items": {
-        "type": "object",
-        "properties": {
-          "path": {
-            "type": "string",
-            "description": "文件的相对路径。"
-          },
-          "description": {
-            "type": "string",
-            "description": "对文件变更内容的简要说明。"
-          }
-        },
-        "required": ["path"]
-      }
-    },
-    "metrics": {
-      "type": "object",
-      "description": "用于衡量任务执行效果的量化指标。",
-      "properties": {
-        "coverage": {
-          "type": "number",
-          "description": "代码测试覆盖率。"
-        }
-      }
-    },
-    "errors": {
-      "type": "array",
-      "description": "当 status 为 'failure' 或 'partial_success' 时，提供详细的错误信息列表。",
-      "items": {
-        "type": "object",
-        "properties": {
-          "code": {
-            "type": "string",
-            "description": "错误码。"
-          },
-          "message": {
-            "type": "string",
-            "description": "具体的错误描述。"
-          }
-        },
-        "required": ["message"]
-      }
-    },
-    "warnings": {
-      "type": "array",
-      "description": "执行过程中产生的警告信息列表。",
-      "items": {
-        "type": "string"
-      }
-    }
-  },
-  "required": ["status", "summary"],
-  "additionalProperties": true
-}
-```
-
-**扩展性说明**
-
 - **自定义属性**: 允许在 schema 中添加**非 JSON Schema 标准定义**的自定义属性，以满足特定任务需求。
-- **命名规范**: 所有自定义属性名必须：
-  - 使用 **camelCase** 或 **snake_case** 命名
-  - 保持**语义明确**，避免缩写或模糊表述
-  - 使用**英文命名**，确保跨团队协作的一致性
-
-**完整示例**
-
-**场景**: 为微服务添加缓存层的任务交付 schema
-
-```json
-{
-  "type": "object",
-  "properties": {
-    "status": {
-      "type": "string",
-      "enum": ["success", "failure", "partial_success"],
-      "description": "任务执行状态"
-    },
-    "summary": {
-      "type": "string",
-      "description": "执行结果摘要"
-    },
-    "artifacts": {
-      "type": "array",
-      "description": "修改的文件清单",
-      "items": {
+- **扩展性说明**
+  - **命名规范**: 所有自定义属性名必须：
+    - 使用 **camelCase** 或 **snake_case** 命名
+    - 保持**语义明确**，避免缩写或模糊表述
+    - 使用**英文命名**，确保跨团队协作的一致性
+- **JsonSchema**:
+  ```json
+  {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "Task Output Schema",
+    "description": "定义了任务最终交付物的结构，确保交付物是结构化、可机读的。允许添加额外的自定义属性，但所有属性名必须是可阅读、明确且无歧义的。",
+    "type": "object",
+    "properties": {
+      "status": {
+        "type": "string",
+        "description": "任务执行状态，必须是 'success', 'failure', 或 'partial_success' 之一。",
+        "enum": ["success", "failure", "partial_success"]
+      },
+      "summary": {
+        "type": "string",
+        "description": "对任务执行结果的简要描述，清晰传达核心产出或问题。"
+      },
+      "artifacts": {
+        "type": "array",
+        "description": "任务执行过程中生成或修改的文件列表。",
+        "items": {
+          "type": "object",
+          "properties": {
+            "path": {
+              "type": "string",
+              "description": "文件的相对路径。"
+            },
+            "description": {
+              "type": "string",
+              "description": "对文件变更内容的简要说明。"
+            }
+          },
+          "required": ["path"]
+        }
+      },
+      "metrics": {
         "type": "object",
+        "description": "用于衡量任务执行效果的量化指标。",
         "properties": {
-          "path": {
-            "type": "string",
-            "description": "文件路径"
-          },
-          "action": {
-            "type": "string",
-            "enum": ["created", "modified", "deleted"],
-            "description": "操作类型"
-          },
-          "linesChanged": {
+          "coverage": {
             "type": "number",
-            "description": "修改的代码行数"
+            "description": "代码测试覆盖率。"
           }
-        },
-        "required": ["path", "action"]
-      }
-    },
-    "metrics": {
-      "type": "object",
-      "description": "性能指标",
-      "properties": {
-        "responseTimeImprovement": {
-          "type": "string",
-          "description": "响应时间改善百分比"
-        },
-        "cacheHitRate": {
-          "type": "string",
-          "description": "缓存命中率"
-        },
-        "testCoverage": {
-          "type": "number",
-          "description": "测试覆盖率"
+        }
+      },
+      "errors": {
+        "type": "array",
+        "description": "当 status 为 'failure' 或 'partial_success' 时，提供详细的错误信息列表。",
+        "items": {
+          "type": "object",
+          "properties": {
+            "code": {
+              "type": "string",
+              "description": "错误码。"
+            },
+            "message": {
+              "type": "string",
+              "description": "具体的错误描述。"
+            }
+          },
+          "required": ["message"]
+        }
+      },
+      "warnings": {
+        "type": "array",
+        "description": "执行过程中产生的警告信息列表。",
+        "items": {
+          "type": "string"
         }
       }
     },
-    "implementationDetails": {
-      "type": "object",
-      "description": "自定义字段：实现细节",
-      "properties": {
-        "cacheProvider": {
-          "type": "string",
-          "description": "使用的缓存提供商"
-        },
-        "ttlSeconds": {
-          "type": "number",
-          "description": "缓存过期时间（秒）"
-        },
-        "fallbackStrategy": {
-          "type": "string",
-          "description": "缓存失效时的降级策略"
+    "required": ["status", "summary"],
+    "additionalProperties": true
+  }
+  ```
+- **完整示例**
+  ```json
+  {
+    "type": "object",
+    "properties": {
+      "status": {
+        "type": "string",
+        "enum": ["success", "failure", "partial_success"],
+        "description": "任务执行状态"
+      },
+      "summary": {
+        "type": "string",
+        "description": "执行结果摘要"
+      },
+      "artifacts": {
+        "type": "array",
+        "description": "修改的文件清单",
+        "items": {
+          "type": "object",
+          "properties": {
+            "path": {
+              "type": "string",
+              "description": "文件路径"
+            },
+            "action": {
+              "type": "string",
+              "enum": ["created", "modified", "deleted"],
+              "description": "操作类型"
+            },
+            "linesChanged": {
+              "type": "number",
+              "description": "修改的代码行数"
+            }
+          },
+          "required": ["path", "action"]
+        }
+      },
+      "metrics": {
+        "type": "object",
+        "description": "性能指标",
+        "properties": {
+          "responseTimeImprovement": {
+            "type": "string",
+            "description": "响应时间改善百分比"
+          },
+          "cacheHitRate": {
+            "type": "string",
+            "description": "缓存命中率"
+          },
+          "testCoverage": {
+            "type": "number",
+            "description": "测试覆盖率"
+          }
+        }
+      },
+      "implementationDetails": {
+        "type": "object",
+        "description": "自定义字段：实现细节",
+        "properties": {
+          "cacheProvider": {
+            "type": "string",
+            "description": "使用的缓存提供商"
+          },
+          "ttlSeconds": {
+            "type": "number",
+            "description": "缓存过期时间（秒）"
+          },
+          "fallbackStrategy": {
+            "type": "string",
+            "description": "缓存失效时的降级策略"
+          }
         }
       }
-    }
-  },
-  "required": ["status", "summary"],
-  "additionalProperties": true
-}
-```
+    },
+    "required": ["status", "summary"],
+    "additionalProperties": true
+  }
+  ```
 
 **最佳实践**
 
-1. **版本控制**: 在自定义属性中包含 `schemaVersion` 字段，便于后续迭代。
-2. **枚举约束**: 对状态类字段使用 `enum` 限定可选值，提高数据一致性。
-3. **描述信息**: 为每个字段添加 `description`，提升 schema 的自文档性。
-4. **默认值**: 为可选字段设置合理的 `default` 值，简化调用方处理。
-5. **验证工具**: 使用 [JSON Schema Validator](https://www.jsonschemavalidator.net/) 验证 schema 的正确性。
+1. **枚举约束**: 对状态类字段使用 `enum` 限定可选值，提高数据一致性。
+2. **描述信息**: 为每个字段添加 `description`，提升 schema 的自文档性。
+3. **默认值**: 为可选字段设置合理的 `default` 值，简化调用方处理。
 
 **调用样例**:
 
@@ -357,8 +349,8 @@
 <new_task>
 <mode>code</mode>
 <message>
-  任务要求：{"description":"为'user-service'的'get_user'函数添加Redis缓存","context":{"reason":"提升用户查询接口的性能","relevant_files":["user_service/logic.py","user_service/tests/test_logic.py"],"user_persona":"后端开发人员"},"requirements":["使用'redis'库","为'get_user'函数添加缓存逻辑","缓存有效期为1小时","必须包含Redis连接失败的错误处理"],"boundaries":{"allowed_files":["user_service/logic.py"],"disallowed_patterns":["database model changes"],"tech_stack_constraints":"Python 3.9+, Redis 6.x"},"dependencies":[],"acceptance_criteria":["单元测试验证缓存命中和未命中场景","压力测试下接口响应时间符合预期"],"todo_list":["[ ] Implement caching logic","[ ] Add error handling","[ ] Write unit tests"]}
-  返回要求：{"type":"object","properties":{"status":{"type":"string","enum":["success","failure","partial_success"]},"summary":{"type":"string"},"artifacts":{"type":"array","items":{"type":"object","properties":{"path":{"type":"string"},"description":{"type":"string"}},"required":["path"]}},"metrics":{"type":"object","properties":{"coverage":{"type":"number"}}}},"required":["status","summary","artifacts"],"additionalProperties":true}
+  任务要求: {"description":"为'user-service'的'get_user'函数添加Redis缓存","context":{"reason":"提升用户查询接口的性能","relevant_files":["user_service/logic.py","user_service/tests/test_logic.py"],"user_persona":"后端开发人员"},"requirements":["使用'redis'库","为'get_user'函数添加缓存逻辑","缓存有效期为1小时","必须包含Redis连接失败的错误处理"],"boundaries":{"allowed_files":["user_service/logic.py"],"disallowed_patterns":["database model changes"],"tech_stack_constraints":"Python 3.9+, Redis 6.x"},"dependencies":[],"acceptance_criteria":["单元测试验证缓存命中和未命中场景","压力测试下接口响应时间符合预期"],"todo_list":["[ ] Implement caching logic","[ ] Add error handling","[ ] Write unit tests"]}
+  返回要求: {"type":"object","properties":{"status":{"type":"string","enum":["success","failure","partial_success"]},"summary":{"type":"string"},"artifacts":{"type":"array","items":{"type":"object","properties":{"path":{"type":"string"},"description":{"type":"string"}},"required":["path"]}},"metrics":{"type":"object","properties":{"coverage":{"type":"number"}}}},"required":["status","summary","artifacts"],"additionalProperties":true}
   </message>
 </new_task>
 ```
