@@ -75,7 +75,10 @@
 
 **`message` 字段**
 
-- **消息格式**: `message` 字段必须使用单行、压缩后的 JSON 格式，以确保跨平台和工具的兼容性。
+- **消息格式**: `message` 字段的格式为 `任务要求：{{内容}}\n返回要求：{{内容}}`。
+
+  - `任务要求`：一个单行、压缩后的 JSON 字符串，遵循下文定义的 `New Task Message Schema`。
+  - `返回要求`：一个单行、压缩后的 JSON Schema 字符串，定义了任务的交付物结构。
 
 - **字段详解 (JSON Schema)**:
   为了确保任务定义的标准化和可验证性，`message` 字段的内容**必须**遵循以下 JSON Schema 规范。
@@ -164,19 +167,15 @@
           "type": "string"
         },
         "description": "可选的任务清单。如果当前委派者已经为新任务生成了任务清单，应在此处提供，以便子任务直接使用。"
-      },
-      "output_schema": {
-        "type": "string",
-        "description": "使用 **JSON Schema** 格式的字符串，严格定义任务最终交付物的结构，确保交付物是结构化、可机读的。该字段接受一个序列化后的 JSON Schema 字符串，描述输出的结构，包括必需字段、类型定义和验证规则。**允许在 schema 中添加额外的自定义属性，但所有属性名必须是可阅读、明确且无歧义的，以确保交付物的可理解性。**"
       }
     },
-    "required": ["description", "requirements", "boundaries", "output_schema"]
+    "required": ["description", "requirements", "boundaries"]
   }
   ```
 
-**`output_schema` 字段规范**
+**`返回要求` 字段规范**
 
-- **压缩格式**: `output_schema` 必须是**压缩后的单行 JSON 格式字符串**，不允许换行或格式化缩进。
+- **压缩格式**: `返回要求` 的内容必须是**压缩后的单行 JSON 格式字符串**，不允许换行或格式化缩进。
 - **字符串转义**: 作为 JSON 字符串值，内部的双引号必须使用反斜杠转义（`\"`）。
 
 ```json
@@ -357,6 +356,9 @@
 ```xml
 <new_task>
 <mode>code</mode>
-<message>{"description":"为'user-service'的'get_user'函数添加Redis缓存","context":{"reason":"提升用户查询接口的性能","relevant_files":["user_service/logic.py","user_service/tests/test_logic.py"],"user_persona":"后端开发人员"},"requirements":["使用'redis'库","为'get_user'函数添加缓存逻辑","缓存有效期为1小时","必须包含Redis连接失败的错误处理"],"boundaries":{"allowed_files":["user_service/logic.py"],"disallowed_patterns":["database model changes"],"tech_stack_constraints":"Python 3.9+, Redis 6.x"},"dependencies":[],"acceptance_criteria":["单元测试验证缓存命中和未命中场景","压力测试下接口响应时间符合预期"],"todo_list":["[ ] Implement caching logic","[ ] Add error handling","[ ] Write unit tests"],"output_schema":"{\"type\":\"object\",\"properties\":{\"status\":{\"type\":\"string\",\"enum\":[\"success\",\"failure\",\"partial_success\"]},\"summary\":{\"type\":\"string\"},\"artifacts\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"properties\":{\"path\":{\"type\":\"string\"},\"description\":{\"type\":\"string\"}},\"required\":[\"path\"]}},\"metrics\":{\"type\":\"object\",\"properties\":{\"coverage\":{\"type\":\"number\"}}}},\"required\":[\"status\",\"summary\",\"artifacts\"],\"additionalProperties\":true}"}</message>
+<message>
+  任务要求：{"description":"为'user-service'的'get_user'函数添加Redis缓存","context":{"reason":"提升用户查询接口的性能","relevant_files":["user_service/logic.py","user_service/tests/test_logic.py"],"user_persona":"后端开发人员"},"requirements":["使用'redis'库","为'get_user'函数添加缓存逻辑","缓存有效期为1小时","必须包含Redis连接失败的错误处理"],"boundaries":{"allowed_files":["user_service/logic.py"],"disallowed_patterns":["database model changes"],"tech_stack_constraints":"Python 3.9+, Redis 6.x"},"dependencies":[],"acceptance_criteria":["单元测试验证缓存命中和未命中场景","压力测试下接口响应时间符合预期"],"todo_list":["[ ] Implement caching logic","[ ] Add error handling","[ ] Write unit tests"]}
+  返回要求：{"type":"object","properties":{"status":{"type":"string","enum":["success","failure","partial_success"]},"summary":{"type":"string"},"artifacts":{"type":"array","items":{"type":"object","properties":{"path":{"type":"string"},"description":{"type":"string"}},"required":["path"]}},"metrics":{"type":"object","properties":{"coverage":{"type":"number"}}}},"required":["status","summary","artifacts"],"additionalProperties":true}
+  </message>
 </new_task>
 ```
