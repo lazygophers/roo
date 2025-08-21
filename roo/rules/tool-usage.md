@@ -81,7 +81,6 @@ _原则：使用最合适的工具，并确保结果与预期一致。_
 - **批量操作**:
   - 单个 `apply_diff` 处理多个修改
   - 合并多个 `read_file` 请求（最多 5 个）
-  - 使用 `search_and_replace` 替代多次 `apply_diff`
 
 ---
 
