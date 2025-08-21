@@ -80,98 +80,97 @@
   - `任务要求`：一个单行、压缩后的 JSON 字符串，遵循下文定义的 `New Task Message Schema`。
   - `返回要求`：一个单行、压缩后的 JSON Schema 字符串，定义了任务的交付物结构。
 
-- **字段详解 (JSON Schema)**:
-  为了确保任务定义的标准化和可验证性，`message` 字段的内容**必须**遵循以下 JSON Schema 规范。
+**`任务要求`字段规范**
 
-  ```json
-  {
-    "title": "New Task Message Schema",
-    "description": "定义了向特定模式委派新任务的结构。**允许添加额外的自定义属性，但所有属性名必须是可阅读、明确且无歧义的，以确保交付物的可理解性。**",
-    "type": "object",
-    "properties": {
-      "description": {
-        "type": "string",
-        "description": "对任务核心目标的**一句话精准描述**。简洁明了，直奔主题。例如：\"为'user-service'添加Redis缓存层\"。"
-      },
-      "context": {
-        "type": "object",
-        "description": "提供任务执行所需的**背景信息和上下文**，帮助执行模式更好地理解任务。",
-        "properties": {
-          "reason": {
-            "type": "string",
-            "description": "解释'为什么'需要执行此任务。"
-          },
-          "relevant_files": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "description": "列出与任务相关的关键文件路径。"
-          },
-          "user_persona": {
-            "type": "string",
-            "description": "描述发起任务的用户角色或意图。"
-          }
-        },
-        "required": ["reason"]
-      },
-      "requirements": {
-        "type": "array",
-        "items": {
-          "type": "string"
-        },
-        "description": "清晰、可量化地列出任务**必须满足的具体要求**。每个要求都应是可验证的。例如：[\"使用'redis'库实现缓存\", \"缓存有效期必须为1小时\", \"必须包含错误处理逻辑\"]。"
-      },
-      "boundaries": {
-        "type": "object",
-        "description": "明确定义任务的**执行边界**，防止任务范围蔓延。",
-        "properties": {
-          "allowed_files": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "description": "允许修改的文件列表。路径优先级：相对工作目录 > 绝对路径 > 相对路径。"
-          },
-          "disallowed_patterns": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "description": "禁止修改的模块或代码模式。"
-          },
-          "tech_stack_constraints": {
-            "type": "string",
-            "description": "技术栈限制，如\"仅使用标准库\"。"
-          }
-        },
-        "required": ["allowed_files"]
-      },
-      "dependencies": {
-        "type": "array",
-        "items": {
-          "type": "string"
-        },
-        "description": "列出当前任务所依赖的**前置任务ID**。执行模式可以此判断任务是否可以开始。"
-      },
-      "acceptance_criteria": {
-        "type": "array",
-        "items": {
-          "type": "string"
-        },
-        "description": "定义任务完成的**验收标准**，是 `requirements` 的具体化和可测试化表达。每个标准都应是清晰、无歧义的。例如：[\"`get_user`函数在缓存命中时，响应时间应小于50ms\", \"单元测试覆盖率达到90%以上\"]。"
-      },
-      "todo_list": {
-        "type": "array",
-        "items": {
-          "type": "string"
-        },
-        "description": "可选的任务清单。如果当前委派者已经为新任务生成了任务清单，应在此处提供，以便子任务直接使用。"
-      }
+```json
+{
+  "title": "New Task Message Schema",
+  "description": "定义了向特定模式委派新任务的结构。**允许添加额外的自定义属性，但所有属性名必须是可阅读、明确且无歧义的，以确保交付物的可理解性。**",
+  "type": "object",
+  "properties": {
+    "description": {
+      "type": "string",
+      "description": "对任务核心目标的**一句话精准描述**。简洁明了，直奔主题。例如：\"为'user-service'添加Redis缓存层\"。"
     },
-    "required": ["description", "requirements", "boundaries"]
-  }
-  ```
+    "context": {
+      "type": "object",
+      "description": "提供任务执行所需的**背景信息和上下文**，帮助执行模式更好地理解任务。",
+      "properties": {
+        "reason": {
+          "type": "string",
+          "description": "解释'为什么'需要执行此任务。"
+        },
+        "relevant_files": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "列出与任务相关的关键文件路径。"
+        },
+        "user_persona": {
+          "type": "string",
+          "description": "描述发起任务的用户角色或意图。"
+        }
+      },
+      "required": ["reason"]
+    },
+    "requirements": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "清晰、可量化地列出任务**必须满足的具体要求**。每个要求都应是可验证的。例如：[\"使用'redis'库实现缓存\", \"缓存有效期必须为1小时\", \"必须包含错误处理逻辑\"]。"
+    },
+    "boundaries": {
+      "type": "object",
+      "description": "明确定义任务的**执行边界**，防止任务范围蔓延。",
+      "properties": {
+        "allowed_files": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "允许修改的文件列表。路径优先级：相对工作目录 > 绝对路径 > 相对路径。"
+        },
+        "disallowed_patterns": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "禁止修改的模块或代码模式。"
+        },
+        "tech_stack_constraints": {
+          "type": "string",
+          "description": "技术栈限制，如\"仅使用标准库\"。"
+        }
+      },
+      "required": ["allowed_files"]
+    },
+    "dependencies": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "列出当前任务所依赖的**前置任务ID**。执行模式可以此判断任务是否可以开始。"
+    },
+    "acceptance_criteria": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "定义任务完成的**验收标准**，是 `requirements` 的具体化和可测试化表达。每个标准都应是清晰、无歧义的。例如：[\"`get_user`函数在缓存命中时，响应时间应小于50ms\", \"单元测试覆盖率达到90%以上\"]。"
+    },
+    "todo_list": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "可选的任务清单。如果当前委派者已经为新任务生成了任务清单，应在此处提供，以便子任务直接使用。"
+    }
+  },
+  "required": ["description", "requirements", "boundaries"]
+}
+```
 
 **`返回要求` 字段规范**
 
