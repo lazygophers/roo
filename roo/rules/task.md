@@ -100,28 +100,31 @@
 # New Task Message Schema
 # 定义任务委派结构，支持自定义属性
 
-description: string  # 任务核心目标的一句话描述
-                   # 示例: "为 'user-service' 添加 Redis 缓存层"
+description:
+  string # 任务核心目标的一句话描述
+  # 示例: "为 'user-service' 添加 Redis 缓存层"
 
-context:            # 任务背景和上下文
-  reason: string    # 执行任务的原因
-  relevant_files?: [string]  # 相关文件路径
-  user_persona?: string      # 用户角色或意图
+context: # 任务背景和上下文
+  reason: string # 执行任务的原因
+  relevant_files?: [string] # 相关文件路径
+  user_persona?: string # 用户角色或意图
 
-requirements: [string]      # 必须满足的具体要求
-                          # 示例: ["使用 redis 库", "缓存有效期 1 小时"]
+requirements:
+  [string] # 必须满足的具体要求
+  # 示例: ["使用 redis 库", "缓存有效期 1 小时"]
 
-boundaries:                 # 执行边界
-  allowed_files: [string]   # 允许修改的文件列表
-  disallowed_patterns?: [string]  # 禁止修改的模式
-  tech_stack_constraints?: string  # 技术栈限制
+boundaries: # 执行边界
+  allowed_files: [string] # 允许修改的文件列表
+  disallowed_patterns?: [string] # 禁止修改的模式
+  tech_stack_constraints?: string # 技术栈限制
 
-dependencies?: [string]     # 依赖的前置任务 ID
+dependencies?: [string] # 依赖的前置任务 ID
 
-acceptance_criteria?: [string]  # 验收标准
-                            # 示例: ["响应时间 < 50ms", "测试覆盖率 > 90%"]
+acceptance_criteria?:
+  [string] # 验收标准
+  # 示例: ["响应时间 < 50ms", "测试覆盖率 > 90%"]
 
-todo_list?: [string]        # 任务清单
+todo_list?: [string] # 任务清单
 ```
 
 **`返回要求` 字段规范**
@@ -132,27 +135,27 @@ todo_list?: [string]        # 任务清单
 
 type: object
 properties:
-  status:                  # 任务执行状态
+  status: # 任务执行状态
     type: string
     enum: [success, failure, partial_success]
-  
-  summary: string          # 执行结果摘要
-  
-  artifacts:              # 文件变更列表
+
+  summary: string # 执行结果摘要
+
+  artifacts: # 文件变更列表
     type: array
     items:
       type: object
       properties:
-        path: string     # 文件路径
-        description?: string  # 变更说明
+        path: string # 文件路径
+        description?: string # 变更说明
       required: [path]
-  
-  metrics?:               # 性能指标
+
+  metrics?: # 性能指标
     type: object
     properties:
-      coverage?: number  # 测试覆盖率
-  
-  errors?:                # 错误信息
+      coverage?: number # 测试覆盖率
+
+  errors?: # 错误信息
     type: array
     items:
       type: object
@@ -160,11 +163,11 @@ properties:
         code?: string
         message: string
       required: [message]
-  
-  warnings?: [string]     # 警告信息
+
+  warnings?: [string] # 警告信息
 
 required: [status, summary]
-additionalProperties: true  # 允许自定义属性
+additionalProperties: true # 允许自定义属性
 ```
 
 **最佳实践**
@@ -206,32 +209,28 @@ additionalProperties: true  # 允许自定义属性
         - "[ ] Implement caching logic"
         - "[ ] Add error handling"
         - "[ ] Write unit tests"
-    
+
     返回要求: |
-      type: object
-      properties:
-        status:
-          type: string
-          enum: [success, failure, partial_success]
-        summary:
-          type: string
-        artifacts:
-          type: array
-          items:
-            type: object
-            properties:
-              path:
-                type: string
-              description:
-                type: string
-            required: [path]
-        metrics:
+      status:
+        type: string
+        enum: [success, failure, partial_success]
+      summary:
+        type: string
+      artifacts:
+        type: array
+        items:
           type: object
           properties:
-            coverage:
-              type: number
-      required: [status, summary, artifacts]
-      additionalProperties: true
+            path:
+              type: string
+            description:
+              type: string
+          required: [path]
+      metrics:
+        type: object
+        properties:
+          coverage:
+            type: number
   </message>
   <todos>
     [x] 设计登录接口数据结构
@@ -240,3 +239,4 @@ additionalProperties: true  # 允许自定义属性
     [ ] 编写单元测试
   </todos>
 </new_task>
+```
