@@ -122,39 +122,6 @@ AI 系统工具选择和应用指南。
 - 记录错误日志
 - 提供清晰错误信息和恢复建议
 
-## 异常处理指南
-
-### 快速参考表
-
-| 异常类型   | 推荐工具                                    | 处理策略           |
-| ---------- | ------------------------------------------- | ------------------ |
-| 文件不存在 | `list_files` → `ask_followup_question`      | 确认路径或创建文件 |
-| 权限不足   | `ask_followup_question`                     | 请求权限或切换方案 |
-| 工具失败   | `execute_command` → `read_file`             | 查看错误日志并重试 |
-| 信息不足   | `ask_followup_question`                     | 收集必要参数       |
-| 复杂度过高 | `new_task`                                  | 分解任务或委派     |
-| 依赖缺失   | `execute_command` → `ask_followup_question` | 安装依赖或调整方案 |
-| 配置错误   | `read_file` → `apply_diff`                  | 修正配置文件       |
-| 网络问题   | `execute_command` → `ask_followup_question` | 重试或离线方案     |
-
-### 标准处理流程
-
-1. **识别异常**
-
-   - 触发：工具执行失败
-   - 操作：分析错误类型和原因
-
-2. **选择策略**
-
-   - 可自动修复 → 执行修复工具
-   - 需要信息 → `ask_followup_question`
-   - 超出能力 → `new_task` 委派
-
-3. **执行恢复**
-   - 执行：使用相应工具
-   - 验证：确认恢复成功
-   - 记录：`update_todo_list` 更新状态
-
 ## 最佳实践
 
 1. **工具选择**
