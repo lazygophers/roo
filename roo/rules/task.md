@@ -354,10 +354,10 @@
 
 ```xml
 <new_task>
-<mode>code</mode>
-<message>
-  任务要求: {"description":"为'user-service'的'get_user'函数添加Redis缓存","context":{"reason":"提升用户查询接口的性能","relevant_files":["user_service/logic.py","user_service/tests/test_logic.py"],"user_persona":"后端开发人员"},"requirements":["使用'redis'库","为'get_user'函数添加缓存逻辑","缓存有效期为1小时","必须包含Redis连接失败的错误处理"],"boundaries":{"allowed_files":["user_service/logic.py"],"disallowed_patterns":["database model changes"],"tech_stack_constraints":"Python 3.9+, Redis 6.x"},"dependencies":[],"acceptance_criteria":["单元测试验证缓存命中和未命中场景","压力测试下接口响应时间符合预期"],"todo_list":["[ ] Implement caching logic","[ ] Add error handling","[ ] Write unit tests"]}
-  返回要求: {"type":"object","properties":{"status":{"type":"string","enum":["success","failure","partial_success"]},"summary":{"type":"string"},"artifacts":{"type":"array","items":{"type":"object","properties":{"path":{"type":"string"},"description":{"type":"string"}},"required":["path"]}},"metrics":{"type":"object","properties":{"coverage":{"type":"number"}}}},"required":["status","summary","artifacts"],"additionalProperties":true}
+  <mode>code</mode>
+  <message>
+    任务要求: {"description":"为'user-service'的'get_user'函数添加Redis缓存","context":{"reason":"提升用户查询接口的性能","relevant_files":["user_service/logic.py","user_service/tests/test_logic.py"],"user_persona":"后端开发人员"},"requirements":["使用'redis'库","为'get_user'函数添加缓存逻辑","缓存有效期为1小时","必须包含Redis连接失败的错误处理"],"boundaries":{"allowed_files":["user_service/logic.py"],"disallowed_patterns":["database model changes"],"tech_stack_constraints":"Python 3.9+, Redis 6.x"},"dependencies":[],"acceptance_criteria":["单元测试验证缓存命中和未命中场景","压力测试下接口响应时间符合预期"],"todo_list":["[ ] Implement caching logic","[ ] Add error handling","[ ] Write unit tests"]}
+    返回要求: {"type":"object","properties":{"status":{"type":"string","enum":["success","failure","partial_success"]},"summary":{"type":"string"},"artifacts":{"type":"array","items":{"type":"object","properties":{"path":{"type":"string"},"description":{"type":"string"}},"required":["path"]}},"metrics":{"type":"object","properties":{"coverage":{"type":"number"}}}},"required":["status","summary","artifacts"],"additionalProperties":true}
   </message>
   <todos>
     [x] 设计登录接口数据结构
