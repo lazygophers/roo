@@ -275,16 +275,16 @@
             color: white;
         }
 
-        .mode-checkbox input[type="checkbox"]:checked ~ .mode-name {
+        .mode-checkbox input[type="checkbox"]:checked + label .mode-name {
             color: white;
         }
 
-        .mode-checkbox:has(input[type="checkbox"]:checked) {
+        .mode-checkbox.selected {
             background: var(--primary-color);
             border-color: var(--primary-color);
         }
 
-        .mode-checkbox:has(input[type="checkbox"]:checked)::before {
+        .mode-checkbox.selected::before {
             background: var(--warning-color);
             height: 6px;
         }
@@ -635,14 +635,72 @@
                 div.appendChild(checkbox);
                 div.appendChild(label);
                 
-                // 添加点击事件
+                // 为整个卡片添加点击事件
                 div.addEventListener('click', (e) => {
-                    if (e.target !== checkbox) {
-                        checkbox.checked = !checkbox.checked;
+                    console.log('🔍 [DEBUG] 卡片点击事件触发:', {
+                        modelSlug: model.slug,
+                        isRequired: model.required,
+                        currentChecked: checkbox.checked,
+                        target: e.target.tagName,
+                        targetType: e.target.type
+                    });
+                    
+                    // 如果点击的是复选框，不处理，让原生事件处理
+                    if (e.target.type === 'checkbox') {
+                        console.log('🔍 [DEBUG] 点击的是复选框，由原生事件处理');
+                        return;
                     }
-                    if (!model.required) {
-                        updatePreview();
+                    
+                    // 对于必需模式且已选中，不允许取消
+                    if (model.required && checkbox.checked) {
+                        console.log('🔍 [DEBUG] 必需模式已选中，不能取消');
+                        return;
                     }
+                    
+                    // 阻止事件冒泡，避免触发复选框的默认行为
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    // 切换复选框状态
+                    const newState = !checkbox.checked;
+                    checkbox.checked = newState;
+                    console.log('🔍 [DEBUG] 切换复选框状态为:', newState);
+                    
+                    // 触发 change 事件，确保状态同步
+                    const changeEvent = new Event('change', { bubbles: true });
+                    checkbox.dispatchEvent(changeEvent);
+                });
+                
+                // 为复选框添加 change 事件（统一处理状态变化）
+                checkbox.addEventListener('change', (e) => {
+                    console.log('🔍 [DEBUG] 复选框 change 事件:', {
+                        modelSlug: model.slug,
+                        checked: e.target.checked
+                    });
+                    
+                    // 如果是必需模式且试图取消选中，阻止
+                    if (model.required && !e.target.checked) {
+                        e.target.checked = true;
+                        e.stopPropagation();
+                        console.log('🔍 [DEBUG] 必需模式，阻止取消选中');
+                        return;
+                    }
+                    
+                    // 更新样式类
+                    if (e.target.checked) {
+                        div.classList.add('selected');
+                    } else {
+                        div.classList.remove('selected');
+                    }
+                    
+                    // 更新预览
+                    console.log('🔍 [DEBUG] 调用 updatePreview');
+                    updatePreview();
+                });
+                
+                // 阻止标签点击事件冒泡到卡片
+                label.addEventListener('click', (e) => {
+                    e.stopPropagation();
                 });
                 
                 container.appendChild(div);
@@ -661,47 +719,18 @@
                 return '<span class="yaml-comment"># 请选择至少一个模式来查看配置预览</span>';
             }
 
+            // 只显示必需模式的列表
             const requiredModes = allModels.filter(m => m.required && selectedModels.includes(m.slug));
-            const optionalModes = allModels.filter(m => !m.required && selectedModels.includes(m.slug));
-
-            let preview = '<span class="yaml-comment"># AI Mode Configuration</span>\n\n';
             
-            // 基本信息
-            preview += `<span class="yaml-key">selected_count</span>: <span class="yaml-number">${selectedModels.length}</span>\n`;
-            preview += `<span class="yaml-key">timestamp</span>: <span class="yaml-string">${new Date().toISOString()}</span>\n\n`;
+            let preview = '<span class="yaml-comment"># 必需模式列表</span>\n';
+            preview += '<span class="yaml-key">required_modes</span>:\n';
             
-            // 必需模式
             if (requiredModes.length > 0) {
-                preview += `<span class="yaml-comment"># 必需模式 (不可取消选择)</span>\n`;
-                preview += `<span class="yaml-key">required_modes</span>:\n`;
                 requiredModes.forEach(mode => {
                     preview += `  - <span class="yaml-string">${mode.slug}</span>\n`;
                 });
-                preview += '\n';
-            }
-            
-            // 可选模式
-            if (optionalModes.length > 0) {
-                preview += `<span class="yaml-comment"># 可选模式</span>\n`;
-                preview += `<span class="yaml-key">optional_modes</span>:\n`;
-                optionalModes.forEach(mode => {
-                    preview += `  - <span class="yaml-string">${mode.slug}</span>\n`;
-                });
-                preview += '\n';
-            }
-            
-            // 详细模式信息
-            if (selectedModels.length > 0) {
-                preview += `<span class="yaml-comment"># 详细的模式信息</span>\n`;
-                preview += `<span class="yaml-key">selected_modes</span>:\n`;
-                selectedModels.forEach(slug => {
-                    const model = allModels.find(m => m.slug === slug);
-                    if (model) {
-                        preview += `  - <span class="yaml-key">slug</span>: <span class="yaml-string">${model.slug}</span>\n`;
-                        preview += `    <span class="yaml-key">name</span>: <span class="yaml-string">"${model.name}"</span>\n`;
-                        preview += `    <span class="yaml-key">required</span>: <span class="yaml-boolean">${model.required}</span>\n`;
-                    }
-                });
+            } else {
+                preview += '  <span class="yaml-comment"># 无必需模式</span>\n';
             }
             
             return preview;
@@ -718,7 +747,7 @@
 
         // 复制配置
         async function copyConfiguration() {
-            const previewContent = document.getElementById('previewContent').textContent;
+            const previewContent = document.getElementById('previewContent').innerText;
             
             try {
                 await navigator.clipboard.writeText(previewContent);
@@ -775,6 +804,11 @@
             
             // 初始预览
             updatePreview();
+            
+            // 初始化选中状态的样式
+            document.querySelectorAll('.mode-checkbox input[type="checkbox"]:checked').forEach(checkbox => {
+                checkbox.closest('.mode-checkbox').classList.add('selected');
+            });
         });
     </script>
 </body>
