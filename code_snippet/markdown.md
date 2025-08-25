@@ -1,1 +1,0 @@
-当需要编写 markdown 时，可以从 `.memory/guide/markdown.md` 获取 python 的风格指南，如果不存在可以从 https://cdn.jsdelivr.net/gh/lazygophers/roo@master/mcp/library/document/markdown/guide.md 更新最新的 markdown 的风格指南

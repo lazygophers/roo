@@ -1,3 +1,0 @@
-import shutup
-
-shutup.please()

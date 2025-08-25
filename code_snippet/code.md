@@ -1,2 +1,0 @@
-当需要编写 golang 时，可以从 `.memory/guide/golang.md` 获取 golang 的风格指南，如果不存在可以从 https://cdn.jsdelivr.net/gh/lazygophers/roo@master/mcp/library/document/golang/guide.md 更新最新的 golang 的风格指南
-当需要编写 python 时，可以从 `.memory/guide/python.md` 获取 python 的风格指南，如果不存在可以从 https://cdn.jsdelivr.net/gh/lazygophers/roo@master/mcp/library/document/python/guide.md 更新最新的 python 的风格指南
