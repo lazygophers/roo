@@ -110,7 +110,7 @@ def create_app() -> FastAPI:
     def get_all_models():
         """获取所有可用模式"""
         models = []
-        models_dir = Path("custom_models")
+        models_dir = Path("resources/models")
         
         # 递归遍历所有 YAML 文件
         for yaml_file in models_dir.rglob("*.yaml"):

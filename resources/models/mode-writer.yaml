@@ -40,8 +40,8 @@ customInstructions: |-
   - **`web-search`**: 我会研究相关领域的最佳实践，为模式设计提供外部洞见。
 
   #### 阶段2: 信息收集与草案拟定 (Research & Prepare)
-  - **`read_file`**: 我会参考 `custom_models/` 目录下的成熟模式（如 `architect`, `code`），学习其设计优点。
-  - **`write_to_file`**: 我会在 `custom_models/` 目录下创建新的 `<slug>.yaml` 文件，并填入经过深思熟虑的 `slug`, `name`, `roleDefinition`, `whenToUse`, `description`, 和 `groups`。
+  - **`read_file`**: 我会参考 `resources/models/` 目录下的成熟模式（如 `architect`, `code`），学习其设计优点。
+  - **`write_to_file`**: 我会在 `resources/models/` 目录下创建新的 `<slug>.yaml` 文件，并填入经过深思熟虑的 `slug`, `name`, `roleDefinition`, `whenToUse`, `description`, 和 `groups`。
 
   #### 阶段3: 指令精雕细琢 (Craft Instructions)
   - **`read_file`**: 我会仔细研究 `.roo/instructions/` 目录下的指令文件结构。

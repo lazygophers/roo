@@ -155,7 +155,7 @@ def run():
     # --- 路径定义 ---
     before_path = Path("models_hook/before.md")
     after_path = Path("models_hook/after.md")
-    models_dir = Path("custom_models")
+    models_dir = Path("resources/models")
     output_file = Path("custom_models.yaml")
 
     # --- 文件加载 ---
@@ -172,7 +172,7 @@ def run():
     total_models = len(model_paths)
 
     if total_models == 0:
-        logger.warning("在 'custom_models' 目录中未找到任何 .yaml 文件。")
+        logger.warning("在 'resources/models' 目录中未找到任何 .yaml 文件。")
         return
 
     # --- 模型处理 ---
