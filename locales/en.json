@@ -1,0 +1,64 @@
+{
+    "title": "FastAPI Homepage",
+    "app_title": "🚀 FastAPI Web Application",
+    "subtitle": "Supporting port parameters and hot reload functionality",
+    "welcome": "Welcome to FastAPI!",
+    "description": "This is a simple web application example built with FastAPI.",
+    "features": {
+        "title": "✨ Features",
+        "items": [
+            "🎯 Command-line port parameter support",
+            "🔄 Development mode hot reload",
+            "📚 Automatic API documentation generation",
+            "🎨 Jinja2 template engine",
+            "📁 Static file serving"
+        ]
+    },
+    "quick_start": {
+        "title": "🛠️ Quick Start",
+        "commands": {
+            "default_port": "# Use default port (8080)",
+            "custom_port": "# Specify port",
+            "reload": "# Enable hot reload",
+            "debug": "# Debug mode"
+        }
+    },
+    "links": {
+        "api_docs": "View API Documentation",
+        "test_api": "Test API",
+        "health_check": "Health Check"
+    },
+    "related_links": {
+        "title": "📖 Related Links",
+        "items": [
+            {
+                "text": "FastAPI Official Documentation",
+                "url": "https://fastapi.tiangolo.com/"
+            },
+            {
+                "text": "Uvicorn Documentation",
+                "url": "https://www.uvicorn.org/"
+            },
+            {
+                "text": "Jinja2 Documentation",
+                "url": "https://jinja.palletsprojects.com/"
+            }
+        ]
+    },
+    "tips": {
+        "title": "💡 Tips",
+        "content": "Use the <code>--reload</code> parameter during development, the server will automatically restart when code files change."
+    },
+    "footer": "Built with FastAPI | 🐍 Python 3.8+",
+    "opensource": {
+        "title": "📄 Open Source License",
+        "license": "MIT License",
+        "text": "This project is open source under the MIT License",
+        "view_license": "View License"
+    },
+    "language_switcher": {
+        "title": "Language",
+        "chinese": "中文",
+        "english": "English"
+    }
+}

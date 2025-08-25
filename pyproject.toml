@@ -1,0 +1,12 @@
+[project]
+name = "roo"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.116.1",
+    "rich>=14.1.0",
+    "ruamel-yaml>=0.18.15",
+    "uvicorn>=0.35.0",
+]

@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>模式配置预览系统</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <style>
+        /* 全局变量 */
+        :root {
+            --primary-color: #667eea;
+            --secondary-color: #764ba2;
+            --success-color: #48bb78;
+            --danger-color: #e53e3e;
+            --warning-color: #f59e0b;
+            --text-color: #333;
+            --text-secondary: #666;
+            --bg-color: #f5f5f5;
+            --bg-card: #ffffff;
+            --border-color: #e2e8f0;
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.1);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
+            --shadow-xl: 0 20px 25px rgba(0,0,0,0.15);
+            --radius: 12px;
+            --transition: all 0.3s ease;
+        }
+
+        /* 基础样式 */
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        /* 头部样式 */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 25px 30px;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            box-shadow: var(--shadow-md);
+            border-radius: var(--radius);
+            margin: 20px;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 700;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .language-switcher {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .language-switcher select {
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: 2px solid rgba(255,255,255,0.3);
+            background: rgba(255,255,255,0.2);
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        .language-switcher select:hover {
+            background: rgba(255,255,255,0.3);
+            border-color: rgba(255,255,255,0.5);
+        }
+
+        .language-switcher select option {
+            background: #2d3748;
+        }
+
+        /* 容器布局 */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px 20px;
+        }
+
+        /* 主内容区域 */
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        /* 模式选择器样式 - 优化后 */
+        .mode-selector {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            padding: 30px;
+            box-shadow: var(--shadow-lg);
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        .mode-selector h2 {
+            margin-top: 0;
+            margin-bottom: 25px;
+            color: var(--primary-color);
+            font-size: 24px;
+            font-weight: 600;
+            text-align: center;
+            position: relative;
+            padding-bottom: 15px;
+        }
+
+        .mode-selector h2::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            border-radius: 2px;
+        }
+
+        /* 搜索框样式 */
+        .search-container {
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 20px 12px 45px;
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 15px;
+            transition: var(--transition);
+            background: #f8f9fa;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            background: white;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #a0aec0;
+            font-size: 18px;
+        }
+
+        /* 信息提示样式 */
+        .info-message {
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            color: #1565c0;
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            border-left: 4px solid #2196f3;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: var(--shadow-sm);
+        }
+
+        /* 模式卡片样式 - 重新设计 */
+        .mode-checkboxes {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            max-height: 500px;
+            overflow-y: auto;
+            padding: 5px;
+        }
+
+        .mode-checkbox {
+            background: #f8f9fa;
+            border: 2px solid transparent;
+            border-radius: 12px;
+            padding: 20px;
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .mode-checkbox::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: transparent;
+            transition: var(--transition);
+        }
+
+        .mode-checkbox:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.2);
+        }
+
+        .mode-checkbox:hover::before {
+            background: var(--primary-color);
+        }
+
+        .mode-checkbox input[type="checkbox"] {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .mode-checkbox label {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .mode-name {
+            font-weight: 600;
+            font-size: 16px;
+            color: var(--text-color);
+            margin-bottom: 5px;
+        }
+
+        .mode-slug {
+            font-family: 'Fira Code', 'Consolas', monospace;
+            font-size: 13px;
+            color: var(--text-secondary);
+            background: rgba(0,0,0,0.05);
+            padding: 4px 10px;
+            border-radius: 6px;
+            display: inline-block;
+        }
+
+        /* 必需模式样式 */
+        .mode-checkbox.required {
+            border-left: 4px solid var(--warning-color);
+        }
+
+        .mode-checkbox.required .mode-name {
+            color: var(--warning-color);
+        }
+
+        .mode-checkbox.required input[type="checkbox"]:checked + label .mode-name {
+            color: white;
+        }
+
+        /* 选中状态样式 */
+        .mode-checkbox input[type="checkbox"]:checked + label {
+            color: white;
+        }
+
+        .mode-checkbox input[type="checkbox"]:checked + label .mode-slug {
+            background: rgba(255,255,255,0.2);
+            color: white;
+        }
+
+        .mode-checkbox input[type="checkbox"]:checked ~ .mode-name {
+            color: white;
+        }
+
+        .mode-checkbox:has(input[type="checkbox"]:checked) {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .mode-checkbox:has(input[type="checkbox"]:checked)::before {
+            background: var(--warning-color);
+            height: 6px;
+        }
+
+        /* 预览区域样式 - 优化后 */
+        .preview-section {
+            background: #2d3748;
+            border-radius: var(--radius);
+            padding: 30px;
+            box-shadow: var(--shadow-xl);
+            display: flex;
+            flex-direction: column;
+            animation: fadeInUp 0.8s ease-out;
+            animation-delay: 0.2s;
+            animation-fill-mode: both;
+        }
+
+        .preview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #4a5568;
+        }
+
+        .preview-header h2 {
+            margin: 0;
+            color: #e2e8f0;
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .copy-button {
+            padding: 12px 24px;
+            background: var(--success-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 15px;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .copy-button:hover {
+            background: #38a169;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(72, 187, 120, 0.3);
+        }
+
+        .preview-content {
+            flex: 1;
+            background: #1a202c;
+            border-radius: 10px;
+            padding: 25px;
+            font-family: 'Fira Code', 'Consolas', 'Monaco', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            overflow-y: auto;
+            border: 1px solid #4a5568;
+        }
+
+        .preview-content pre {
+            margin: 0;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            color: #e2e8f0;
+        }
+
+        /* YAML 语法高亮 */
+        .preview-content .yaml-key {
+            color: #9f7efe;
+            font-weight: 600;
+        }
+
+        .preview-content .yaml-string {
+            color: #68d391;
+        }
+
+        .preview-content .yaml-number {
+            color: #fbb6ce;
+        }
+
+        .preview-content .yaml-boolean {
+            color: #fbd38d;
+        }
+
+        .preview-content .yaml-comment {
+            color: #a0aec0;
+            font-style: italic;
+        }
+
+        /* 页脚样式 */
+        .footer {
+            text-align: center;
+            padding: 30px;
+            background: var(--bg-card);
+            color: var(--text-secondary);
+            font-size: 14px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-sm);
+            margin: 0 20px;
+        }
+
+        .footer p {
+            margin: 8px 0;
+        }
+
+        /* 加载动画 */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        /* 动画效果 */
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* 滚动条美化 */
+        .mode-checkboxes::-webkit-scrollbar,
+        .preview-content::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .mode-checkboxes::-webkit-scrollbar-track,
+        .preview-content::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+        .mode-checkboxes::-webkit-scrollbar-thumb,
+        .preview-content::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 4px;
+        }
+
+        .mode-checkboxes::-webkit-scrollbar-thumb:hover,
+        .preview-content::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .mode-checkboxes {
+                grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 20px;
+                padding: 20px;
+                text-align: center;
+                margin: 10px;
+                margin-bottom: 20px;
+            }
+            
+            .container {
+                padding: 0 10px 10px;
+            }
+            
+            .mode-selector,
+            .preview-section {
+                padding: 20px;
+            }
+            
+            .mode-checkboxes {
+                grid-template-columns: 1fr;
+                max-height: none;
+            }
+            
+            .preview-header {
+                flex-direction: column;
+                gap: 15px;
+                align-items: flex-start;
+            }
+            
+            .copy-button {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .footer {
+                margin: 0 10px;
+                padding: 20px;
+            }
+        }
+
+        /* 复制成功提示 */
+        .copy-success {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--success-color);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            box-shadow: var(--shadow-lg);
+            z-index: 1000;
+            animation: slideInRight 0.3s ease-out;
+            font-weight: 500;
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>模式配置预览系统</h1>
+        <div class="language-switcher">
+            <span>🌐</span>
+            <select id="languageSelect">
+                <option value="zh-CN">简体中文</option>
+                <option value="en-US">English</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="main-content">
+            <!-- Mode Selector 区域 -->
+            <div class="mode-selector">
+                <h2>🎯 选择模式</h2>
+                <div class="info-message">
+                    💡 orchestrator 是必选项，请至少再选择一个其他模式
+                </div>
+                <!-- 搜索框 -->
+                <div class="search-container">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" class="search-input" id="searchInput" placeholder="搜索模式..." />
+                </div>
+                <div class="mode-checkboxes" id="modeCheckboxes">
+                    <!-- 动态加载模式卡片 -->
+                </div>
+            </div>
+
+            <!-- 预览区域 -->
+            <div class="preview-section">
+                <div class="preview-header">
+                    <h2>📋 配置预览</h2>
+                    <button class="copy-button" id="copyButton">
+                        <span>📋</span>
+                        <span>复制配置</span>
+                    </button>
+                </div>
+                <div class="preview-content" id="previewContent">
+                    <pre>请选择至少一个模式来查看配置预览</pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <p>© 2024 模式配置预览系统 | Powered by FastAPI</p>
+        <p>🚀 让配置管理变得简单高效</p>
+    </footer>
+
+    <script>
+        // 全局变量
+        let allModels = [];
+        let searchTerm = '';
+
+        // 获取所有模式
+        async function fetchAllModels() {
+            try {
+                const response = await fetch('/api/models');
+                if (!response.ok) {
+                    throw new Error('Failed to fetch models');
+                }
+                const data = await response.json();
+                allModels = data.models || [];
+                return data;
+            } catch (error) {
+                console.error('Error fetching models:', error);
+                return { models: [] };
+            }
+        }
+
+        // 渲染模式卡片
+        function renderModeCards() {
+            const container = document.getElementById('modeCheckboxes');
+            container.innerHTML = '';
+            
+            // 过滤模式
+            const filteredModels = allModels.filter(mode => {
+                if (!searchTerm) return true;
+                const term = searchTerm.toLowerCase();
+                return mode.name.toLowerCase().includes(term) ||
+                       mode.slug.toLowerCase().includes(term);
+            });
+            
+            // 添加动画延迟
+            filteredModels.forEach((model, index) => {
+                const div = document.createElement('div');
+                div.className = `mode-checkbox ${model.required ? 'required' : ''}`;
+                div.style.animationDelay = `${index * 0.05}s`;
+                
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.id = `mode-${model.slug}`;
+                checkbox.value = model.slug;
+                checkbox.checked = model.required;
+                checkbox.disabled = model.required;
+                
+                const label = document.createElement('label');
+                label.htmlFor = `mode-${model.slug}`;
+                label.innerHTML = `
+                    <div class="mode-name">${model.name}</div>
+                    <div class="mode-slug">${model.slug}</div>
+                `;
+                
+                div.appendChild(checkbox);
+                div.appendChild(label);
+                
+                // 添加点击事件
+                div.addEventListener('click', (e) => {
+                    if (e.target !== checkbox) {
+                        checkbox.checked = !checkbox.checked;
+                    }
+                    if (!model.required) {
+                        updatePreview();
+                    }
+                });
+                
+                container.appendChild(div);
+            });
+        }
+
+        // 搜索功能
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            searchTerm = e.target.value;
+            renderModeCards();
+        });
+
+        // 生成 YAML 格式预览
+        function generateYAMLPreview(selectedModels) {
+            if (selectedModels.length === 0) {
+                return '<span class="yaml-comment"># 请选择至少一个模式来查看配置预览</span>';
+            }
+
+            const requiredModes = allModels.filter(m => m.required && selectedModels.includes(m.slug));
+            const optionalModes = allModels.filter(m => !m.required && selectedModels.includes(m.slug));
+
+            let preview = '<span class="yaml-comment"># AI Mode Configuration</span>\n\n';
+            
+            // 基本信息
+            preview += `<span class="yaml-key">selected_count</span>: <span class="yaml-number">${selectedModels.length}</span>\n`;
+            preview += `<span class="yaml-key">timestamp</span>: <span class="yaml-string">${new Date().toISOString()}</span>\n\n`;
+            
+            // 必需模式
+            if (requiredModes.length > 0) {
+                preview += `<span class="yaml-comment"># 必需模式 (不可取消选择)</span>\n`;
+                preview += `<span class="yaml-key">required_modes</span>:\n`;
+                requiredModes.forEach(mode => {
+                    preview += `  - <span class="yaml-string">${mode.slug}</span>\n`;
+                });
+                preview += '\n';
+            }
+            
+            // 可选模式
+            if (optionalModes.length > 0) {
+                preview += `<span class="yaml-comment"># 可选模式</span>\n`;
+                preview += `<span class="yaml-key">optional_modes</span>:\n`;
+                optionalModes.forEach(mode => {
+                    preview += `  - <span class="yaml-string">${mode.slug}</span>\n`;
+                });
+                preview += '\n';
+            }
+            
+            // 详细模式信息
+            if (selectedModels.length > 0) {
+                preview += `<span class="yaml-comment"># 详细的模式信息</span>\n`;
+                preview += `<span class="yaml-key">selected_modes</span>:\n`;
+                selectedModels.forEach(slug => {
+                    const model = allModels.find(m => m.slug === slug);
+                    if (model) {
+                        preview += `  - <span class="yaml-key">slug</span>: <span class="yaml-string">${model.slug}</span>\n`;
+                        preview += `    <span class="yaml-key">name</span>: <span class="yaml-string">"${model.name}"</span>\n`;
+                        preview += `    <span class="yaml-key">required</span>: <span class="yaml-boolean">${model.required}</span>\n`;
+                    }
+                });
+            }
+            
+            return preview;
+        }
+
+        // 更新预览
+        function updatePreview() {
+            const checkboxes = document.querySelectorAll('.mode-checkbox input[type="checkbox"]:checked');
+            const selectedModels = Array.from(checkboxes).map(cb => cb.value);
+            
+            const previewContent = document.getElementById('previewContent');
+            previewContent.innerHTML = generateYAMLPreview(selectedModels);
+        }
+
+        // 复制配置
+        async function copyConfiguration() {
+            const previewContent = document.getElementById('previewContent').textContent;
+            
+            try {
+                await navigator.clipboard.writeText(previewContent);
+                
+                // 显示成功提示
+                const successDiv = document.createElement('div');
+                successDiv.className = 'copy-success';
+                successDiv.textContent = '✅ 配置已复制到剪贴板';
+                document.body.appendChild(successDiv);
+                
+                // 更新按钮状态
+                const button = document.getElementById('copyButton');
+                const originalHTML = button.innerHTML;
+                button.innerHTML = '<span>✅</span><span>已复制！</span>';
+                button.style.background = '#38a169';
+                
+                setTimeout(() => {
+                    button.innerHTML = originalHTML;
+                    button.style.background = '';
+                    successDiv.remove();
+                }, 2000);
+            } catch (err) {
+                console.error('Failed to copy:', err);
+                // 显示错误提示
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'copy-success';
+                errorDiv.style.background = 'var(--danger-color)';
+                errorDiv.textContent = '❌ 复制失败，请手动复制';
+                document.body.appendChild(errorDiv);
+                
+                setTimeout(() => {
+                    errorDiv.remove();
+                }, 3000);
+            }
+        }
+
+        // 语言切换
+        function changeLanguage(lang) {
+            console.log('Language changed to:', lang);
+            // 这里可以实现语言切换逻辑
+        }
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', async () => {
+            // 加载模式列表
+            const response = await fetchAllModels();
+            renderModeCards();
+            
+            // 绑定事件
+            document.getElementById('copyButton').addEventListener('click', copyConfiguration);
+            document.getElementById('languageSelect').addEventListener('change', (e) => {
+                changeLanguage(e.target.value);
+            });
+            
+            // 初始预览
+            updatePreview();
+        });
+    </script>
+</body>
+</html>

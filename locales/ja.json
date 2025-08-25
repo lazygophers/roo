@@ -1,0 +1,70 @@
+{
+    "title": "FastAPI ホームページ",
+    "app_title": "🚀 FastAPI Webアプリケーション",
+    "subtitle": "ポートパラメータとホットリロード機能をサポート",
+    "welcome": "FastAPIへようこそ！",
+    "description": "これはFastAPIで構築されたシンプルなWebアプリケーションの例です。",
+    "features": {
+        "title": "✨ 機能特性",
+        "items": [
+            "🎯 コマンドラインポートパラメータサポート",
+            "🔄 開発モードホットリロード",
+            "📚 自動APIドキュメント生成",
+            "🎨 Jinja2テンプレートエンジン",
+            "📁 静的ファイルサービング"
+        ]
+    },
+    "quick_start": {
+        "title": "🛠️ クイックスタート",
+        "commands": {
+            "default_port": "# デフォルトポートを使用 (8080)",
+            "custom_port": "# ポートを指定",
+            "reload": "# ホットリロードを有効化",
+            "debug": "# デバッグモード"
+        }
+    },
+    "links": {
+        "api_docs": "APIドキュメントを表示",
+        "test_api": "APIをテスト",
+        "health_check": "ヘルスチェック"
+    },
+    "related_links": {
+        "title": "📖 関連リンク",
+        "items": [
+            {
+                "text": "FastAPI公式ドキュメント",
+                "url": "https://fastapi.tiangolo.com/"
+            },
+            {
+                "text": "Uvicornドキュメント",
+                "url": "https://www.uvicorn.org/"
+            },
+            {
+                "text": "Jinja2ドキュメント",
+                "url": "https://jinja.palletsprojects.com/"
+            }
+        ]
+    },
+    "tips": {
+        "title": "💡 ヒント",
+        "content": "開発時に<code>--reload</code>パラメータを使用すると、コードファイルが変更されたときにサーバーが自動的に再起動します。"
+    },
+    "footer": "FastAPIで構築 | 🐍 Python 3.8+",
+    "opensource": {
+        "title": "📄 オープンソースライセンス",
+        "license": "MIT License",
+        "text": "このプロジェクトはMITライセンスの下でオープンソースです",
+        "view_license": "ライセンスを表示"
+    },
+    "language_switcher": {
+        "title": "言語切り替え",
+        "chinese": "中文",
+        "english": "English",
+        "traditional_chinese": "繁體中文",
+        "japanese": "日本語",
+        "french": "Français",
+        "arabic": "العربية",
+        "russian": "Русский",
+        "spanish": "Español"
+    }
+}
