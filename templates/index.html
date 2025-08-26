@@ -92,7 +92,7 @@
         /* 主内容区域 */
         .main-content {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: 1fr;
             gap: 30px;
             margin-bottom: 30px;
         }
@@ -289,97 +289,7 @@
             height: 6px;
         }
 
-        /* 预览区域样式 - 优化后 */
-        .preview-section {
-            background: #2d3748;
-            border-radius: var(--radius);
-            padding: 30px;
-            box-shadow: var(--shadow-xl);
-            display: flex;
-            flex-direction: column;
-            animation: fadeInUp 0.8s ease-out;
-            animation-delay: 0.2s;
-            animation-fill-mode: both;
-        }
 
-        .preview-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid #4a5568;
-        }
-
-        .preview-header h2 {
-            margin: 0;
-            color: #e2e8f0;
-            font-size: 24px;
-            font-weight: 600;
-        }
-
-        .copy-button {
-            padding: 12px 24px;
-            background: var(--success-color);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 500;
-            font-size: 15px;
-            transition: var(--transition);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .copy-button:hover {
-            background: #38a169;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(72, 187, 120, 0.3);
-        }
-
-        .preview-content {
-            flex: 1;
-            background: #1a202c;
-            border-radius: 10px;
-            padding: 25px;
-            font-family: 'Fira Code', 'Consolas', 'Monaco', monospace;
-            font-size: 14px;
-            line-height: 1.6;
-            overflow-y: auto;
-            border: 1px solid #4a5568;
-        }
-
-        .preview-content pre {
-            margin: 0;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-            color: #e2e8f0;
-        }
-
-        /* YAML 语法高亮 */
-        .preview-content .yaml-key {
-            color: #9f7efe;
-            font-weight: 600;
-        }
-
-        .preview-content .yaml-string {
-            color: #68d391;
-        }
-
-        .preview-content .yaml-number {
-            color: #fbb6ce;
-        }
-
-        .preview-content .yaml-boolean {
-            color: #fbd38d;
-        }
-
-        .preview-content .yaml-comment {
-            color: #a0aec0;
-            font-style: italic;
-        }
 
         /* 页脚样式 */
         .footer {
@@ -425,25 +335,21 @@
         }
 
         /* 滚动条美化 */
-        .mode-checkboxes::-webkit-scrollbar,
-        .preview-content::-webkit-scrollbar {
+        .mode-checkboxes::-webkit-scrollbar {
             width: 8px;
         }
 
-        .mode-checkboxes::-webkit-scrollbar-track,
-        .preview-content::-webkit-scrollbar-track {
+        .mode-checkboxes::-webkit-scrollbar-track {
             background: #f1f1f1;
             border-radius: 4px;
         }
 
-        .mode-checkboxes::-webkit-scrollbar-thumb,
-        .preview-content::-webkit-scrollbar-thumb {
+        .mode-checkboxes::-webkit-scrollbar-thumb {
             background: #888;
             border-radius: 4px;
         }
 
-        .mode-checkboxes::-webkit-scrollbar-thumb:hover,
-        .preview-content::-webkit-scrollbar-thumb:hover {
+        .mode-checkboxes::-webkit-scrollbar-thumb:hover {
             background: #555;
         }
 
@@ -473,25 +379,13 @@
                 padding: 0 10px 10px;
             }
             
-            .mode-selector,
-            .preview-section {
+            .mode-selector {
                 padding: 20px;
             }
             
             .mode-checkboxes {
                 grid-template-columns: 1fr;
                 max-height: none;
-            }
-            
-            .preview-header {
-                flex-direction: column;
-                gap: 15px;
-                align-items: flex-start;
-            }
-            
-            .copy-button {
-                width: 100%;
-                justify-content: center;
             }
             
             .footer {
@@ -529,7 +423,7 @@
 </head>
 <body>
     <div class="header">
-        <h1>模式配置预览系统</h1>
+        <h1>模式配置系统</h1>
         <div class="language-switcher">
             <span>🌐</span>
             <select id="languageSelect">
@@ -557,24 +451,11 @@
                 </div>
             </div>
 
-            <!-- 预览区域 -->
-            <div class="preview-section">
-                <div class="preview-header">
-                    <h2>📋 配置预览</h2>
-                    <button class="copy-button" id="copyButton">
-                        <span>📋</span>
-                        <span>复制配置</span>
-                    </button>
-                </div>
-                <div class="preview-content" id="previewContent">
-                    <pre>请选择至少一个模式来查看配置预览</pre>
-                </div>
-            </div>
         </div>
     </div>
 
     <footer class="footer">
-        <p>© 2024 模式配置预览系统 | Powered by FastAPI</p>
+        <p>© 2024 模式配置系统 | Powered by FastAPI</p>
         <p>🚀 让配置管理变得简单高效</p>
     </footer>
 
@@ -693,9 +574,6 @@
                         div.classList.remove('selected');
                     }
                     
-                    // 更新预览
-                    console.log('🔍 [DEBUG] 调用 updatePreview');
-                    updatePreview();
                 });
                 
                 // 阻止标签点击事件冒泡到卡片
@@ -713,76 +591,6 @@
             renderModeCards();
         });
 
-        // 生成 YAML 格式预览
-        function generateYAMLPreview(selectedModels) {
-            if (selectedModels.length === 0) {
-                return '<span class="yaml-comment"># 请选择至少一个模式来查看配置预览</span>';
-            }
-
-            // 只显示必需模式的列表
-            const requiredModes = allModels.filter(m => m.required && selectedModels.includes(m.slug));
-            
-            let preview = '<span class="yaml-comment"># 必需模式列表</span>\n';
-            preview += '<span class="yaml-key">required_modes</span>:\n';
-            
-            if (requiredModes.length > 0) {
-                requiredModes.forEach(mode => {
-                    preview += `  - <span class="yaml-string">${mode.slug}</span>\n`;
-                });
-            } else {
-                preview += '  <span class="yaml-comment"># 无必需模式</span>\n';
-            }
-            
-            return preview;
-        }
-
-        // 更新预览
-        function updatePreview() {
-            const checkboxes = document.querySelectorAll('.mode-checkbox input[type="checkbox"]:checked');
-            const selectedModels = Array.from(checkboxes).map(cb => cb.value);
-            
-            const previewContent = document.getElementById('previewContent');
-            previewContent.innerHTML = generateYAMLPreview(selectedModels);
-        }
-
-        // 复制配置
-        async function copyConfiguration() {
-            const previewContent = document.getElementById('previewContent').innerText;
-            
-            try {
-                await navigator.clipboard.writeText(previewContent);
-                
-                // 显示成功提示
-                const successDiv = document.createElement('div');
-                successDiv.className = 'copy-success';
-                successDiv.textContent = '✅ 配置已复制到剪贴板';
-                document.body.appendChild(successDiv);
-                
-                // 更新按钮状态
-                const button = document.getElementById('copyButton');
-                const originalHTML = button.innerHTML;
-                button.innerHTML = '<span>✅</span><span>已复制！</span>';
-                button.style.background = '#38a169';
-                
-                setTimeout(() => {
-                    button.innerHTML = originalHTML;
-                    button.style.background = '';
-                    successDiv.remove();
-                }, 2000);
-            } catch (err) {
-                console.error('Failed to copy:', err);
-                // 显示错误提示
-                const errorDiv = document.createElement('div');
-                errorDiv.className = 'copy-success';
-                errorDiv.style.background = 'var(--danger-color)';
-                errorDiv.textContent = '❌ 复制失败，请手动复制';
-                document.body.appendChild(errorDiv);
-                
-                setTimeout(() => {
-                    errorDiv.remove();
-                }, 3000);
-            }
-        }
 
         // 语言切换
         function changeLanguage(lang) {
@@ -797,13 +605,9 @@
             renderModeCards();
             
             // 绑定事件
-            document.getElementById('copyButton').addEventListener('click', copyConfiguration);
             document.getElementById('languageSelect').addEventListener('change', (e) => {
                 changeLanguage(e.target.value);
             });
-            
-            // 初始预览
-            updatePreview();
             
             // 初始化选中状态的样式
             document.querySelectorAll('.mode-checkbox input[type="checkbox"]:checked').forEach(checkbox => {

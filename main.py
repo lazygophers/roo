@@ -43,9 +43,6 @@ def create_app() -> FastAPI:
     # 配置 Jinja2 模板
     templates = Jinja2Templates(directory="templates")
     
-    # 全局翻译字典
-    translations = {}
-    
     # 加载多语言文件
     def load_translations(lang: str):
         try:
@@ -56,6 +53,9 @@ def create_app() -> FastAPI:
             with open("locales/zh-CN.json", "r", encoding="utf-8") as f:
                 return json.load(f)
     
+    # 全局翻译字典
+    translations = {}
+    
     # 在应用启动时预加载所有语言文件
     @app.on_event("startup")
     async def startup_event():
@@ -64,6 +64,8 @@ def create_app() -> FastAPI:
         supported_languages = ["zh-CN", "en", "zh-TW", "ja", "fr", "ar", "ru", "es"]
         for lang in supported_languages:
             translations[lang] = load_translations(lang)
+        # 将翻译存储到 app.state 中
+        app.state.translations = translations
     
     @app.get("/", response_class=HTMLResponse)
     async def read_root(request: Request):
