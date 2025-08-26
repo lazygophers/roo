@@ -12,7 +12,7 @@ import yaml
 import logging
 from pathlib import Path
 from typing import List, Dict, Any
-from fastapi import FastAPI, Request, HTTPException
+from fastapi import FastAPI, Request, HTTPException, Body
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse, JSONResponse
@@ -260,6 +260,130 @@ def create_app() -> FastAPI:
             "models": models,
             "count": len(models)
         }
+    
+    @app.get("/api/modes/{mode_slug}")
+    async def get_mode(mode_slug: str):
+        """获取特定模式的详细信息"""
+        try:
+            models = get_all_models()
+            mode = None
+            for m in models:
+                if m["slug"] == mode_slug:
+                    mode = m
+                    break
+            
+            if not mode:
+                raise HTTPException(status_code=404, detail="Mode not found")
+            
+            return {"success": True, "data": mode}
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=str(e))
+    
+    @app.patch("/api/modes/{mode_slug}")
+    async def update_mode(mode_slug: str, update_data: dict = Body(...)):
+        """更新模式信息"""
+        try:
+            # 查找指定模式
+            models = get_all_models()
+            mode_index = -1
+            for i, m in enumerate(models):
+                if m["slug"] == mode_slug:
+                    mode_index = i
+                    break
+            
+            if mode_index == -1:
+                raise HTTPException(status_code=404, detail="Mode not found")
+            
+            # 更新允许的字段
+            allowed_fields = ["roleDefinition", "description", "whenToUse"]
+            for field, value in update_data.items():
+                if field in allowed_fields:
+                    models[mode_index][field] = value
+            
+            return {"success": True, "data": models[mode_index]}
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=str(e))
+    
+    @app.post("/api/modes/{mode_slug}/permissions")
+    async def add_permission(mode_slug: str, request: dict = Body(...)):
+        """为模式添加权限"""
+        try:
+            # 查找指定模式
+            models = get_all_models()
+            mode_index = -1
+            for i, m in enumerate(models):
+                if m["slug"] == mode_slug:
+                    mode_index = i
+                    break
+            
+            if mode_index == -1:
+                raise HTTPException(status_code=404, detail="Mode not found")
+            
+            # 添加新权限
+            permission = request.get("permission", "")
+            if permission and permission not in models[mode_index].get("groups", []):
+                if "groups" not in models[mode_index]:
+                    models[mode_index]["groups"] = []
+                models[mode_index]["groups"].append(permission)
+            
+            return {"success": True, "data": models[mode_index]}
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=str(e))
+    
+    @app.put("/api/modes/{mode_slug}/permissions")
+    async def edit_permission(mode_slug: str, request: dict = Body(...)):
+        """编辑模式的权限"""
+        try:
+            # 查找指定模式
+            models = get_all_models()
+            mode_index = -1
+            for i, m in enumerate(models):
+                if m["slug"] == mode_slug:
+                    mode_index = i
+                    break
+            
+            if mode_index == -1:
+                raise HTTPException(status_code=404, detail="Mode not found")
+            
+            # 编辑权限
+            old_permission = request.get("old_permission", "")
+            new_permission = request.get("new_permission", "")
+            
+            if old_permission and new_permission and old_permission != new_permission:
+                groups = models[mode_index].get("groups", [])
+                if old_permission in groups:
+                    index = groups.index(old_permission)
+                    groups[index] = new_permission
+            
+            return {"success": True, "data": models[mode_index]}
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=str(e))
+    
+    @app.delete("/api/modes/{mode_slug}/permissions")
+    async def remove_permission(mode_slug: str, request: dict = Body(...)):
+        """移除模式的权限"""
+        try:
+            # 查找指定模式
+            models = get_all_models()
+            mode_index = -1
+            for i, m in enumerate(models):
+                if m["slug"] == mode_slug:
+                    mode_index = i
+                    break
+            
+            if mode_index == -1:
+                raise HTTPException(status_code=404, detail="Mode not found")
+            
+            # 移除权限
+            permission = request.get("permission", "")
+            if permission:
+                groups = models[mode_index].get("groups", [])
+                if permission in groups:
+                    groups.remove(permission)
+            
+            return {"success": True, "data": models[mode_index]}
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=str(e))
     
     @app.get("/mode-selector", response_class=HTMLResponse)
     async def mode_selector_page(request: Request, lang: str = "zh-CN"):

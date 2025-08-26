@@ -174,6 +174,221 @@ function renderModeCards() {
             // 更新右侧详情展示
             updateModeDetails();
         });
+
+        // 全选按钮事件
+        document.getElementById('selectAllBtn').addEventListener('click', () => {
+            const checkboxes = document.querySelectorAll('.mode-checkbox input[type="checkbox"]:not(:disabled)');
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = true;
+                checkbox.closest('.mode-checkbox').classList.add('selected');
+                selectedModels.add(checkbox.value);
+            });
+            updateModeDetails();
+        });
+
+        // 反选按钮事件
+        document.getElementById('selectInverseBtn').addEventListener('click', () => {
+            const checkboxes = document.querySelectorAll('.mode-checkbox input[type="checkbox"]:not(:disabled)');
+            checkboxes.forEach(checkbox => {
+                const newState = !checkbox.checked;
+                checkbox.checked = newState;
+                if (newState) {
+                    checkbox.closest('.mode-checkbox').classList.add('selected');
+                    selectedModels.add(checkbox.value);
+                } else {
+                    checkbox.closest('.mode-checkbox').classList.remove('selected');
+                    selectedModels.delete(checkbox.value);
+                }
+            });
+            updateModeDetails();
+        });
+
+        // 清空选择按钮事件
+        document.getElementById('clearSelectionBtn').addEventListener('click', () => {
+            const checkboxes = document.querySelectorAll('.mode-checkbox input[type="checkbox"]:not(:disabled)');
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = false;
+                checkbox.closest('.mode-checkbox').classList.remove('selected');
+                selectedModels.delete(checkbox.value);
+            });
+            updateModeDetails();
+        });
+
+        // 高度同步函数
+        function syncHeights() {
+            const leftPanel = document.querySelector('.mode-selection-container');
+            const rightPanel = document.querySelector('.mode-details-container');
+            
+            if (leftPanel && rightPanel) {
+                const leftHeight = leftPanel.offsetHeight;
+                const rightHeight = rightPanel.offsetHeight;
+                const maxHeight = Math.max(leftHeight, rightHeight);
+                
+                leftPanel.style.minHeight = `${maxHeight}px`;
+                rightPanel.style.minHeight = `${maxHeight}px`;
+            }
+        }
+
+        // 监听窗口大小变化和内容变化
+        window.addEventListener('resize', syncHeights);
+        
+        // 在更新详情后同步高度
+        const originalUpdateModeDetails = updateModeDetails;
+        updateModeDetails = function() {
+            originalUpdateModeDetails();
+            setTimeout(syncHeights, 100); // 延迟执行以确保DOM更新完成
+        };
+
+        // 工具权限编辑功能
+        function addPermission(modeSlug) {
+            const newPermission = prompt('请输入新的工具权限名称：');
+            if (newPermission && newPermission.trim()) {
+                // 这里需要调用后端API来添加权限
+                fetch(`/api/modes/${modeSlug}/permissions`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ permission: newPermission.trim() })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // 重新加载数据
+                        loadModes();
+                    } else {
+                        alert('添加权限失败：' + (data.message || '未知错误'));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error adding permission:', error);
+                    alert('添加权限失败，请重试');
+                });
+            }
+        }
+
+        function editPermission(modeSlug, oldPermission) {
+            const newPermission = prompt('编辑权限名称：', oldPermission);
+            if (newPermission !== null && newPermission.trim() && newPermission !== oldPermission) {
+                // 这里需要调用后端API来编辑权限
+                fetch(`/api/modes/${modeSlug}/permissions`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        old_permission: oldPermission,
+                        new_permission: newPermission.trim()
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // 重新加载数据
+                        loadModes();
+                    } else {
+                        alert('编辑权限失败：' + (data.message || '未知错误'));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error editing permission:', error);
+                    alert('编辑权限失败，请重试');
+                });
+            }
+        }
+
+        function removePermission(modeSlug, permission) {
+            if (confirm(`确定要移除权限 "${permission}" 吗？`)) {
+                // 这里需要调用后端API来删除权限
+                fetch(`/api/modes/${modeSlug}/permissions`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ permission: permission })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // 重新加载数据
+                        loadModes();
+                    } else {
+                        alert('移除权限失败：' + (data.message || '未知错误'));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error removing permission:', error);
+                    alert('移除权限失败，请重试');
+                });
+            }
+        }
+
+        // 模式详情编辑功能
+        function editModeField(modeSlug, field, currentValue) {
+            const fieldLabels = {
+                roleDefinition: '角色定义',
+                description: '描述',
+                whenToUse: '使用场景'
+            };
+            
+            const newValue = prompt(`编辑${fieldLabels[field]}：`, currentValue);
+            if (newValue !== null && newValue.trim() !== currentValue) {
+                // 这里需要调用后端API来更新模式字段
+                fetch(`/api/modes/${modeSlug}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        [field]: newValue.trim()
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // 重新加载数据
+                        loadModes();
+                    } else {
+                        alert('更新失败：' + (data.message || '未知错误'));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error updating mode field:', error);
+                    alert('更新失败，请重试');
+                });
+            }
+        }
+
+        // 为动态添加的按钮绑定事件（使用事件委托）
+        document.addEventListener('click', function(e) {
+            // 添加权限按钮
+            if (e.target.matches('.add-permission-btn')) {
+                const modeSlug = e.target.dataset.mode;
+                addPermission(modeSlug);
+            }
+            
+            // 编辑权限按钮
+            if (e.target.matches('.edit-permission-btn')) {
+                const modeSlug = e.target.dataset.mode;
+                const permission = e.target.dataset.permission;
+                editPermission(modeSlug, permission);
+            }
+            
+            // 删除权限按钮
+            if (e.target.matches('.remove-permission-btn')) {
+                const modeSlug = e.target.dataset.mode;
+                const permission = e.target.dataset.permission;
+                removePermission(modeSlug, permission);
+            }
+            
+            // 编辑模式字段
+            if (e.target.matches('.editable-field')) {
+                const modeSlug = e.target.dataset.mode;
+                const field = e.target.dataset.field;
+                const currentValue = e.target.textContent;
+                editModeField(modeSlug, field, currentValue);
+            }
+        });
         
         // 阻止标签点击事件冒泡到卡片
         label.addEventListener('click', (e) => {
@@ -235,25 +450,6 @@ function updateModeDetails() {
                 <div class="detail-section">
                     <h4>⏰ 使用时机</h4>
                     <p>${model.whenToUse || '暂无使用时机说明'}</p>
-                </div>
-                <div class="detail-section">
-                    <h4>🎯 核心职责</h4>
-                    <ul>
-                        ${(model.core_responsibilities || ['暂无职责信息']).map(resp =>
-                            `<li>${resp}</li>`
-                        ).join('')}
-                    </ul>
-                </div>
-                <div class="detail-section">
-                    <h4>🛠️ 工具权限</h4>
-                    <div class="tool-permissions">
-                        ${model.tool_permissions && model.tool_permissions.length > 0
-                            ? model.tool_permissions.map(tool => `
-                                <span class="tool-tag">${tool}</span>
-                            `).join('')
-                            : '<span class="no-tools">无特殊工具权限</span>'
-                        }
-                    </div>
                 </div>
                 ${model.groups && model.groups.length > 0 ? `
                 <div class="detail-section">

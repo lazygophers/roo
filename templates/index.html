@@ -892,6 +892,191 @@
                 opacity: 1;
             }
         }
+
+        /* 批量操作按钮样式 */
+        .batch-actions {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            justify-content: center;
+        }
+
+        .batch-btn {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(102, 126, 234, 0.2);
+        }
+
+        .batch-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
+        }
+
+        .batch-btn:active {
+            transform: translateY(0);
+        }
+
+        /* 编辑功能样式 */
+        .editable-field {
+            position: relative;
+            padding: 8px 12px;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .editable-field:hover {
+            background: rgba(102, 126, 234, 0.05);
+            outline: 2px solid rgba(102, 126, 234, 0.2);
+        }
+
+        .editable-field.editing {
+            background: white;
+            outline: 2px solid var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .edit-input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 2px solid var(--primary-color);
+            border-radius: 6px;
+            font-size: 15px;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 100px;
+            line-height: 1.6;
+            color: #4a5568;
+        }
+
+        .edit-input:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .edit-actions {
+            margin-top: 10px;
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .edit-btn {
+            padding: 6px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .edit-btn.save {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .edit-btn.save:hover {
+            background: #38a169;
+            transform: translateY(-1px);
+        }
+
+        .edit-btn.cancel {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+
+        .edit-btn.cancel:hover {
+            background: #cbd5e0;
+            transform: translateY(-1px);
+        }
+
+        /* 工具标签编辑 */
+        .tool-tag {
+            position: relative;
+            padding-right: 30px;
+        }
+
+        .edit-tag-btn {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.3);
+            border: none;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .edit-tag-btn:hover {
+            background: rgba(255, 255, 255, 0.5);
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .add-tag-btn {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: white;
+            border: none;
+            padding: 6px 16px;
+            border-radius: 16px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 4px rgba(72, 187, 120, 0.2);
+        }
+
+        .add-tag-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(72, 187, 120, 0.3);
+        }
+
+        /* 标签编辑输入框 */
+        .tag-edit-input {
+            background: white;
+            border: 2px solid var(--primary-color);
+            border-radius: 16px;
+            padding: 6px 16px;
+            font-size: 13px;
+            font-weight: 500;
+            color: #4a5568;
+            margin-right: 10px;
+            min-width: 150px;
+        }
+
+        .tag-edit-input:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        /* 编辑模式提示 */
+        .edit-hint {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            z-index: 1000;
+            animation: fadeInUp 0.3s ease-out;
+        }
     </style>
 </head>
 <body>
@@ -917,6 +1102,18 @@
                 <div class="search-container">
                     <span class="search-icon">🔍</span>
                     <input type="text" class="search-input" id="searchInput" placeholder="搜索模式..." />
+                </div>
+                <!-- 批量操作按钮 -->
+                <div class="batch-actions">
+                    <button class="batch-btn" id="selectAllBtn" title="全选">
+                        ✓ 全选
+                    </button>
+                    <button class="batch-btn" id="selectInverseBtn" title="反向选择">
+                        ⇄ 反选
+                    </button>
+                    <button class="batch-btn" id="clearSelectionBtn" title="取消选择">
+                        ✕ 清空
+                    </button>
                 </div>
                 <div class="mode-checkboxes" id="modeCheckboxes">
                     <!-- 动态加载模式卡片 -->
