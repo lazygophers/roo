@@ -89,22 +89,495 @@
             padding: 0 20px 20px;
         }
 
-        /* 主内容区域 */
+        /* 主内容区域 - 双列布局 */
         .main-content {
-            display: grid;
-            grid-template-columns: 1fr;
+            display: flex;
             gap: 30px;
             margin-bottom: 30px;
+            min-height: calc(100vh - 300px);
         }
 
-        /* 模式选择器样式 - 优化后 */
+        /* 左侧模式选择器 */
         .mode-selector {
+            flex: 0 0 35%;
             background: var(--bg-card);
             border-radius: var(--radius);
             padding: 30px;
             box-shadow: var(--shadow-lg);
             animation: fadeInUp 0.6s ease-out;
+            display: flex;
+            flex-direction: column;
         }
+        
+        /* 右侧详情面板 - 重新设计 */
+        .details-panel {
+            flex: 0 0 65%;
+            background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+            border-radius: 20px;
+            padding: 32px;
+            box-shadow:
+                0 10px 15px -3px rgba(0, 0, 0, 0.1),
+                0 4px 6px -2px rgba(0, 0, 0, 0.05),
+                0 0 0 1px rgba(102, 126, 234, 0.05);
+            animation: fadeInUp 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s;
+            animation-fill-mode: both;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .details-panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color), var(--primary-color));
+            background-size: 200% 100%;
+            animation: gradientShift 3s ease infinite;
+        }
+        
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .details-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid rgba(102, 126, 234, 0.1);
+        }
+        
+        .details-header h2 {
+            margin: 0;
+            color: var(--primary-color);
+            font-size: 26px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .details-header h2::before {
+            content: '📋';
+            font-size: 28px;
+        }
+        
+        .selected-count {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 24px;
+            font-size: 15px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 4px 6px -1px rgba(102, 126, 234, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .selected-count:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 8px -1px rgba(102, 126, 234, 0.4);
+        }
+        
+        .details-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 5px;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(102, 126, 234, 0.3) transparent;
+        }
+        
+        .details-content::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .details-content::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        
+        .details-content::-webkit-scrollbar-thumb {
+            background: rgba(102, 126, 234, 0.3);
+            border-radius: 4px;
+        }
+        
+        .details-content::-webkit-scrollbar-thumb:hover {
+            background: rgba(102, 126, 234, 0.5);
+        }
+        
+        /* 空状态 - 重新设计 */
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            min-height: 400px;
+            color: #a0aec0;
+            text-align: center;
+            padding: 40px;
+        }
+        
+        .empty-icon {
+            font-size: 80px;
+            margin-bottom: 24px;
+            opacity: 0.4;
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .empty-state p {
+            font-size: 18px;
+            margin: 0;
+            color: #718096;
+            font-weight: 500;
+        }
+        
+        .empty-state .empty-subtitle {
+            font-size: 14px;
+            color: #a0aec0;
+            margin-top: 8px;
+            font-weight: 400;
+        }
+        
+        /* 模式详情卡片 - 重新设计 */
+        .mode-detail-card {
+            background: linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%);
+            border: 1px solid rgba(102, 126, 234, 0.1);
+            border-radius: 16px;
+            margin-bottom: 24px;
+            overflow: hidden;
+            box-shadow:
+                0 4px 6px -1px rgba(0, 0, 0, 0.05),
+                0 2px 4px -1px rgba(0, 0, 0, 0.03),
+                0 0 0 1px rgba(102, 126, 234, 0.05);
+            animation: slideInUp 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            animation-fill-mode: both;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .mode-detail-card:hover {
+            transform: translateY(-2px);
+            box-shadow:
+                0 10px 15px -3px rgba(0, 0, 0, 0.1),
+                0 4px 6px -2px rgba(0, 0, 0, 0.05),
+                0 0 0 1px rgba(102, 126, 234, 0.1);
+        }
+        
+        .detail-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            padding: 24px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .detail-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: shimmer 3s infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .detail-title {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .detail-title .mode-icon {
+            font-size: 32px;
+            background: rgba(255, 255, 255, 0.2);
+            width: 56px;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 16px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        
+        .detail-title h3 {
+            margin: 0;
+            font-size: 22px;
+            font-weight: 700;
+            line-height: 1.2;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .required-badge {
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+            color: white;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            box-shadow: 0 2px 4px rgba(245, 158, 11, 0.3);
+            margin-top: 8px;
+        }
+        
+        .mode-slug-detail {
+            font-family: 'Fira Code', 'Consolas', monospace;
+            font-size: 14px;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 6px 12px;
+            border-radius: 8px;
+            margin-top: 12px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .detail-content {
+            padding: 28px;
+        }
+        
+        .detail-section {
+            margin-bottom: 28px;
+            position: relative;
+        }
+        
+        .detail-section:last-child {
+            margin-bottom: 0;
+        }
+        
+        .detail-section::before {
+            content: '';
+            position: absolute;
+            bottom: -14px;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.1), transparent);
+        }
+        
+        .detail-section:last-child::before {
+            display: none;
+        }
+        
+        .detail-section h4 {
+            margin: 0 0 16px 0;
+            color: var(--primary-color);
+            font-size: 17px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            position: relative;
+        }
+        
+        .detail-section h4::before {
+            content: '';
+            position: absolute;
+            left: -20px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 4px;
+            height: 20px;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            border-radius: 2px;
+        }
+        
+        .detail-section p {
+            margin: 0;
+            line-height: 1.7;
+            color: #4a5568;
+            font-size: 15px;
+        }
+        
+        .detail-section ul {
+            margin: 0;
+            padding-left: 20px;
+            color: #4a5568;
+        }
+        
+        .detail-section li {
+            margin-bottom: 8px;
+            line-height: 1.6;
+            font-size: 15px;
+            position: relative;
+            padding-left: 8px;
+        }
+        
+        .detail-section li::before {
+            content: '▸';
+            position: absolute;
+            left: -12px;
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+        
+        .detail-section li:last-child {
+            margin-bottom: 0;
+        }
+        
+        /* 工具权限标签 - 重新设计 */
+        .tool-permissions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .tool-tag {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 2px 4px rgba(102, 126, 234, 0.2);
+            transition: all 0.2s ease;
+        }
+        
+        .tool-tag:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
+        }
+        
+        .no-tools {
+            color: #a0aec0;
+            font-style: italic;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .no-tools::before {
+            content: 'ℹ️';
+        }
+        
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+            
+        
+        /* 响应式设计 */
+        @media (max-width: 1024px) {
+            .main-content {
+                flex-direction: column;
+            }
+            
+            .mode-selection {
+                width: 100%;
+                margin-bottom: 20px;
+            }
+            
+            .mode-details {
+                width: 100%;
+                margin-left: 0;
+            }
+            
+            .mode-grid {
+                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 28px;
+            }
+            
+            .mode-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .detail-header {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .detail-title {
+                width: 100%;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .header {
+                margin: 5px;
+                margin-bottom: 15px;
+                padding: 15px;
+            }
+            
+            .header h1 {
+                font-size: 20px;
+            }
+            
+            .mode-selector,
+            .details-panel {
+                padding: 15px;
+            }
+            
+            .details-header h2 {
+                font-size: 18px;
+            }
+            
+            .mode-name {
+                font-size: 15px;
+            }
+            
+            .mode-slug {
+                font-size: 12px;
+            }
+            
+            .detail-section h4 {
+                font-size: 15px;
+            }
+            
+            .empty-state {
+                padding: 20px 15px;
+            }
+            
+            .empty-icon {
+                font-size: 48px;
+            }
+        }
+        
+        /* 响应式设计 - 优化 */
 
         .mode-selector h2 {
             margin-top: 0;
@@ -182,9 +655,20 @@
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
             gap: 15px;
-            max-height: 500px;
+            max-height: 70vh;
             overflow-y: auto;
             padding: 5px;
+        }
+        
+        /* 确保模式卡片有足够高度显示内容 */
+        .mode-checkbox {
+            min-height: 100px;
+            height: auto;
+        }
+        
+        .mode-checkbox label {
+            min-height: 80px;
+            justify-content: center;
         }
 
         .mode-checkbox {
@@ -353,17 +837,6 @@
             background: #555;
         }
 
-        /* 响应式设计 */
-        @media (max-width: 1024px) {
-            .main-content {
-                grid-template-columns: 1fr;
-                gap: 20px;
-            }
-            
-            .mode-checkboxes {
-                grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-            }
-        }
 
         @media (max-width: 768px) {
             .header {
@@ -427,15 +900,14 @@
         <div class="language-switcher">
             <span>🌐</span>
             <select id="languageSelect">
-                <option value="zh-CN">简体中文</option>
-                <option value="en-US">English</option>
+                <!-- 动态加载语言选项 -->
             </select>
         </div>
     </div>
 
     <div class="container">
         <div class="main-content">
-            <!-- Mode Selector 区域 -->
+            <!-- 左侧模式选择区域 -->
             <div class="mode-selector">
                 <h2>🎯 选择模式</h2>
                 <div class="info-message">
@@ -451,6 +923,18 @@
                 </div>
             </div>
 
+            <!-- 右侧详情展示区域 -->
+            <div class="details-panel">
+                <div class="details-header">
+                    <h2>📋 模式详情</h2>
+                    <div class="selected-count">
+                        已选择 <span id="selectedCount">0</span> 个模式
+                    </div>
+                </div>
+                <div class="details-content" id="modeDetails">
+                    <!-- 动态加载模式详情 -->
+                </div>
+            </div>
         </div>
     </div>
 
@@ -459,161 +943,6 @@
         <p>🚀 让配置管理变得简单高效</p>
     </footer>
 
-    <script>
-        // 全局变量
-        let allModels = [];
-        let searchTerm = '';
-
-        // 获取所有模式
-        async function fetchAllModels() {
-            try {
-                const response = await fetch('/api/models');
-                if (!response.ok) {
-                    throw new Error('Failed to fetch models');
-                }
-                const data = await response.json();
-                allModels = data.models || [];
-                return data;
-            } catch (error) {
-                console.error('Error fetching models:', error);
-                return { models: [] };
-            }
-        }
-
-        // 渲染模式卡片
-        function renderModeCards() {
-            const container = document.getElementById('modeCheckboxes');
-            container.innerHTML = '';
-            
-            // 过滤模式
-            const filteredModels = allModels.filter(mode => {
-                if (!searchTerm) return true;
-                const term = searchTerm.toLowerCase();
-                return mode.name.toLowerCase().includes(term) ||
-                       mode.slug.toLowerCase().includes(term);
-            });
-            
-            // 添加动画延迟
-            filteredModels.forEach((model, index) => {
-                const div = document.createElement('div');
-                div.className = `mode-checkbox ${model.required ? 'required' : ''}`;
-                div.style.animationDelay = `${index * 0.05}s`;
-                
-                const checkbox = document.createElement('input');
-                checkbox.type = 'checkbox';
-                checkbox.id = `mode-${model.slug}`;
-                checkbox.value = model.slug;
-                checkbox.checked = model.required;
-                checkbox.disabled = model.required;
-                
-                const label = document.createElement('label');
-                label.htmlFor = `mode-${model.slug}`;
-                label.innerHTML = `
-                    <div class="mode-name">${model.name}</div>
-                    <div class="mode-slug">${model.slug}</div>
-                `;
-                
-                div.appendChild(checkbox);
-                div.appendChild(label);
-                
-                // 为整个卡片添加点击事件
-                div.addEventListener('click', (e) => {
-                    console.log('🔍 [DEBUG] 卡片点击事件触发:', {
-                        modelSlug: model.slug,
-                        isRequired: model.required,
-                        currentChecked: checkbox.checked,
-                        target: e.target.tagName,
-                        targetType: e.target.type
-                    });
-                    
-                    // 如果点击的是复选框，不处理，让原生事件处理
-                    if (e.target.type === 'checkbox') {
-                        console.log('🔍 [DEBUG] 点击的是复选框，由原生事件处理');
-                        return;
-                    }
-                    
-                    // 对于必需模式且已选中，不允许取消
-                    if (model.required && checkbox.checked) {
-                        console.log('🔍 [DEBUG] 必需模式已选中，不能取消');
-                        return;
-                    }
-                    
-                    // 阻止事件冒泡，避免触发复选框的默认行为
-                    e.preventDefault();
-                    e.stopPropagation();
-                    
-                    // 切换复选框状态
-                    const newState = !checkbox.checked;
-                    checkbox.checked = newState;
-                    console.log('🔍 [DEBUG] 切换复选框状态为:', newState);
-                    
-                    // 触发 change 事件，确保状态同步
-                    const changeEvent = new Event('change', { bubbles: true });
-                    checkbox.dispatchEvent(changeEvent);
-                });
-                
-                // 为复选框添加 change 事件（统一处理状态变化）
-                checkbox.addEventListener('change', (e) => {
-                    console.log('🔍 [DEBUG] 复选框 change 事件:', {
-                        modelSlug: model.slug,
-                        checked: e.target.checked
-                    });
-                    
-                    // 如果是必需模式且试图取消选中，阻止
-                    if (model.required && !e.target.checked) {
-                        e.target.checked = true;
-                        e.stopPropagation();
-                        console.log('🔍 [DEBUG] 必需模式，阻止取消选中');
-                        return;
-                    }
-                    
-                    // 更新样式类
-                    if (e.target.checked) {
-                        div.classList.add('selected');
-                    } else {
-                        div.classList.remove('selected');
-                    }
-                    
-                });
-                
-                // 阻止标签点击事件冒泡到卡片
-                label.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                });
-                
-                container.appendChild(div);
-            });
-        }
-
-        // 搜索功能
-        document.getElementById('searchInput').addEventListener('input', (e) => {
-            searchTerm = e.target.value;
-            renderModeCards();
-        });
-
-
-        // 语言切换
-        function changeLanguage(lang) {
-            console.log('Language changed to:', lang);
-            // 这里可以实现语言切换逻辑
-        }
-
-        // 初始化
-        document.addEventListener('DOMContentLoaded', async () => {
-            // 加载模式列表
-            const response = await fetchAllModels();
-            renderModeCards();
-            
-            // 绑定事件
-            document.getElementById('languageSelect').addEventListener('change', (e) => {
-                changeLanguage(e.target.value);
-            });
-            
-            // 初始化选中状态的样式
-            document.querySelectorAll('.mode-checkbox input[type="checkbox"]:checked').forEach(checkbox => {
-                checkbox.closest('.mode-checkbox').classList.add('selected');
-            });
-        });
-    </script>
+    <script src="/static/js/main.js"></script>
 </body>
 </html>

@@ -1,0 +1,100 @@
+{
+  "title": "Selector de modo IA multilingüe",
+  "mode_selector": {
+    "title": "Selector de modo",
+    "description": "Selecciona el modo IA que mejor se adapte a tus necesidades",
+    "mode_name": "Nombre del modo",
+    "mode_description": "Descripción del modo",
+    "select_mode": "Seleccionar modo",
+    "current_mode": "Modo actual"
+  },
+  "mode_info": {
+    "architect": {
+      "name": "Arquitecto de élite",
+      "description": "Cuando tu tarea implica diseño de arquitectura de sistemas, evaluación de selección tecnológica, planificación de refactorización y cualquier actividad que requiera diseño de alto nivel, es tu momento de brillar. Recuerda, no necesito un 'dibujante', sino un verdadero arquitecto capaz de construir excelentes cimientos de sistema para mí."
+    },
+    "code": {
+      "name": "Mago del código",
+      "description": "Cuando tu tarea implica escribir código, implementar funcionalidades, depurar y solucionar problemas, y cualquier actividad de desarrollo de software, es tu momento de mostrar tus habilidades."
+    },
+    "ask": {
+      "name": "Asesor académico",
+      "description": "Utilizado para explicación de código, exploración de conceptos y aprendizaje técnico, proporcionándote respuestas detalladas ilustradas."
+    },
+    "debug": {
+      "name": "Analista de excepciones",
+      "description": "Utilizado para rastrear errores, diagnosticar problemas y resolver problemas complejos."
+    },
+    "orchestrator": {
+      "name": "Cerebro",
+      "description": "Usa este modo cuando necesites que descomponga tareas, tome decisiones complejas o planifique tareas de múltiples pasos para ti."
+    },
+    "code-golang": {
+      "name": "Mago del código Go",
+      "description": "Cuando tu tarea implica escribir código Go, implementar funcionalidades concurrentes, depurar y solucionar problemas, y cualquier actividad de desarrollo de software Go, es tu momento de mostrar tus habilidades."
+    },
+    "code-java": {
+      "name": "Mago del código Java",
+      "description": "Cuando tu tarea implica escribir código Java, implementar funcionalidades concurrentes, depurar y solucionar problemas, y cualquier actividad de desarrollo de software Java, es tu momento de mostrar tus habilidades."
+    },
+    "code-python": {
+      "name": "Mago del código Python",
+      "description": "Cuando tu tarea implica escribir código Python, implementar funcionalidades, depurar y solucionar problemas, y cualquier actividad de desarrollo Python, es tu momento de mostrar tus habilidades."
+    },
+    "code-react": {
+      "name": "Mago del código React",
+      "description": "Cuando tu tarea implica escribir código React, implementar funcionalidades, depurar y solucionar problemas, y cualquier actividad de desarrollo de software relacionada, es tu momento de mostrar tus habilidades."
+    },
+    "code-rust": {
+      "name": "Mago del código Rust",
+      "description": "Cuando tu tarea implica escribir código Rust, implementar funcionalidades concurrentes, depurar y solucionar problemas, y cualquier actividad de desarrollo de software Rust, es tu momento de mostrar tus habilidades."
+    },
+    "code-vue": {
+      "name": "Mago del código Vue",
+      "description": "Cuando tu tarea implica escribir código Vue, implementar funcionalidades, depurar y solucionar problemas, y cualquier actividad de desarrollo de software relacionada, es tu momento de mostrar tus habilidades."
+    },
+    "doc-writer": {
+      "name": "Ingeniero de documentación",
+      "description": "Cambia a este modo cuando necesito crear, actualizar o mejorar la documentación del proyecto."
+    },
+    "giter": {
+      "name": "Experto en control de versiones",
+      "description": "Cuando se necesitan operaciones relacionadas con Git"
+    },
+    "mode-writer": {
+      "name": "Maestro de ingeniería de modos",
+      "description": "Usa este modo cuando necesitas diseñar, crear, refactorizar o optimizar cuidadosamente un modo para Roo-Code."
+    },
+    "project-research": {
+      "name": "Investigador de proyectos",
+      "description": "Activo este modo cuando necesito comprender profundamente una base de código, realizar análisis de selección tecnológica o análisis previo a la refactorización."
+    },
+    "researcher": {
+      "name": "Investigador principal",
+      "description": "Usa este modo cuando necesitas organizar sistemáticamente el conocimiento técnico, realizar análisis comparativos de soluciones técnicas o construir sistemas de conocimiento del dominio"
+    },
+    "memory": {
+      "name": "Centro de memoria",
+      "description": "Utilizado para gestión de memoria, recuperación de información y organización del conocimiento."
+    }
+  },
+  "language_switcher": {
+    "chinese": "Chino",
+    "english": "Inglés",
+    "japanese": "Japonés",
+    "french": "Francés",
+    "arabic": "Árabe",
+    "russian": "Ruso",
+    "spanish": "Español",
+    "traditional_chinese": "Chino tradicional"
+  },
+  "language": {
+    "select": "Seleccionar idioma",
+    "chinese": "Chino",
+    "english": "Inglés"
+  },
+  "footer": {
+    "copyright": "© 2024 Selector de modo IA multilingüe",
+    "all_rights_reserved": "Todos los derechos reservados"
+  }
+}

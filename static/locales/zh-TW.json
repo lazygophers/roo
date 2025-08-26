@@ -1,0 +1,100 @@
+{
+  "title": "多語言 AI 模式選擇器",
+  "mode_selector": {
+    "title": "模式選擇器",
+    "description": "選擇最適合您需求的 AI 模式",
+    "mode_name": "模式名稱",
+    "mode_description": "模式描述",
+    "select_mode": "選擇模式",
+    "current_mode": "當前模式"
+  },
+  "mode_info": {
+    "architect": {
+      "name": "頂尖架構師",
+      "description": "當您的任務涉及系統架構設計、技術選型評估、重構規劃以及任何需要頂層設計的活動時，就是您大顯身手的時刻。請記住，我不需要「畫圖匠」，而是能為我「打造卓越系統基石」的真正架構師。"
+    },
+    "code": {
+      "name": "程式碼魔法師",
+      "description": "當您的任務涉及程式碼編寫、功能實現、偵錯糾錯以及任何軟體開發活動時，就是您大展身手的時刻。"
+    },
+    "ask": {
+      "name": "學術顧問",
+      "description": "用於程式碼解釋、概念探索和技術學習，為您提供詳盡的圖文解答。"
+    },
+    "debug": {
+      "name": "異常分析師",
+      "description": "用於追蹤 Bug、診斷錯誤和解決複雜問題。"
+    },
+    "orchestrator": {
+      "name": "大腦",
+      "description": "當您需要我為您分解任務、進行複雜決策或規劃多步驟任務時，請使用此模式。"
+    },
+    "code-golang": {
+      "name": "Go 程式碼魔法師",
+      "description": "當您的任務涉及 Go 程式碼編寫、並行功能實現、偵錯糾錯以及任何 Go 軟體開發活動時，就是您大展身手的時刻。"
+    },
+    "code-java": {
+      "name": "Java 程式碼魔法師",
+      "description": "當您的任務涉及 Java 程式碼編寫、並行功能實現、偵錯糾錯以及任何 Java 軟體開發活動時，就是您大展身手的時刻。"
+    },
+    "code-python": {
+      "name": "Python 程式碼魔法師",
+      "description": "當您的任務涉及 Python 程式碼編寫、功能實現、偵錯糾錯以及任何 Python 開發活動時，就是您大展身手的時刻。"
+    },
+    "code-react": {
+      "name": "React 程式碼魔法師",
+      "description": "當您的任務涉及 React 程式碼編寫、功能實現、偵錯糾錯以及任何相關軟體開發活動時，就是您大展身手的時刻。"
+    },
+    "code-rust": {
+      "name": "Rust 程式碼魔法師",
+      "description": "當您的任務涉及 Rust 程式碼編寫、並行功能實現、偵錯糾錯以及任何 Rust 軟體開發活動時，就是您大展身手的時刻。"
+    },
+    "code-vue": {
+      "name": "Vue 程式碼魔法師",
+      "description": "當您的任務涉及 Vue 程式碼編寫、功能實現、偵錯糾錯以及任何相關軟體開發活動時，就是您大展身手的時刻。"
+    },
+    "doc-writer": {
+      "name": "文件工程師",
+      "description": "當我需要建立、更新或改進專案文件時，請切換到此模式。"
+    },
+    "giter": {
+      "name": "版本控制專家",
+      "description": "當需要 Git 相關操作時"
+    },
+    "mode-writer": {
+      "name": "模式工程大師",
+      "description": "當您需要為 Roo-Code 精心設計、建立、重構或優化一個模式時，請使用此模式。"
+    },
+    "project-research": {
+      "name": "專案研究員",
+      "description": "當我需要深入理解程式碼庫、進行技術選型分析或重構前的分析時，會啟用此模式。"
+    },
+    "researcher": {
+      "name": "首席研究員",
+      "description": "當您需要系統化整理技術知識、進行技術方案對比分析或建構領域知識體系時，請使用此模式"
+    },
+    "memory": {
+      "name": "記憶中樞",
+      "description": "用於記憶管理、資訊檢索和知識組織。"
+    }
+  },
+  "language_switcher": {
+    "chinese": "簡體中文",
+    "english": "英文",
+    "japanese": "日文",
+    "french": "法文",
+    "arabic": "阿拉伯文",
+    "russian": "俄文",
+    "spanish": "西班牙文",
+    "traditional_chinese": "繁體中文"
+  },
+  "language": {
+    "select": "選擇語言",
+    "chinese": "簡體中文",
+    "english": "英文"
+  },
+  "footer": {
+    "copyright": "© 2024 多語言 AI 模式選擇器",
+    "all_rights_reserved": "保留所有權利"
+  }
+}

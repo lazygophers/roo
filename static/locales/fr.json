@@ -1,0 +1,100 @@
+{
+  "title": "Sélecteur de mode IA multilingue",
+  "mode_selector": {
+    "title": "Sélecteur de mode",
+    "description": "Sélectionnez le mode IA qui convient le mieux à vos besoins",
+    "mode_name": "Nom du mode",
+    "mode_description": "Description du mode",
+    "select_mode": "Sélectionner un mode",
+    "current_mode": "Mode actuel"
+  },
+  "mode_info": {
+    "architect": {
+      "name": "Architecte de premier ordre",
+      "description": "Lorsque votre tâche implique la conception d'architecture système, l'évaluation de sélection technologique, la planification de refactoring et toute activité nécessitant une conception de haut niveau, c'est le moment pour vous de briller. Souvenez-vous, je n'ai pas besoin d'un 'dessinateur', mais d'un véritable architecte capable de construire d'excellentes fondations système pour moi."
+    },
+    "code": {
+      "name": "Magicien du code",
+      "description": "Lorsque votre tâche implique l'écriture de code, l'implémentation de fonctionnalités, le débogage et le dépannage, et toute activité de développement logiciel, c'est le moment pour vous de montrer vos compétences."
+    },
+    "ask": {
+      "name": "Conseiller académique",
+      "description": "Utilisé pour l'explication du code, l'exploration de concepts et l'apprentissage technique, vous fournissant des réponses détaillées illustrées."
+    },
+    "debug": {
+      "name": "Analyste d'exceptions",
+      "description": "Utilisé pour le suivi des bugs, le diagnostic des erreurs et la résolution de problèmes complexes."
+    },
+    "orchestrator": {
+      "name": "Cerveau",
+      "description": "Utilisez ce mode lorsque vous avez besoin que je décompose les tâches, prenne des décisions complexes ou planifie des tâches à plusieurs étapes pour vous."
+    },
+    "code-golang": {
+      "name": "Magicien du code Go",
+      "description": "Lorsque votre tâche implique l'écriture de code Go, l'implémentation de fonctionnalités concurrentes, le débogage et le dépannage, et toute activité de développement logiciel Go, c'est le moment pour vous de montrer vos compétences."
+    },
+    "code-java": {
+      "name": "Magicien du code Java",
+      "description": "Lorsque votre tâche implique l'écriture de code Java, l'implémentation de fonctionnalités concurrentes, le débogage et le dépannage, et toute activité de développement logiciel Java, c'est le moment pour vous de montrer vos compétences."
+    },
+    "code-python": {
+      "name": "Magicien du code Python",
+      "description": "Lorsque votre tâche implique l'écriture de code Python, l'implémentation de fonctionnalités, le débogage et le dépannage, et toute activité de développement Python, c'est le moment pour vous de montrer vos compétences."
+    },
+    "code-react": {
+      "name": "Magicien du code React",
+      "description": "Lorsque votre tâche implique l'écriture de code React, l'implémentation de fonctionnalités, le débogage et le dépannage, et toute activité de développement logiciel connexe, c'est le moment pour vous de montrer vos compétences."
+    },
+    "code-rust": {
+      "name": "Magicien du code Rust",
+      "description": "Lorsque votre tâche implique l'écriture de code Rust, l'implémentation de fonctionnalités concurrentes, le débogage et le dépannage, et toute activité de développement logiciel Rust, c'est le moment pour vous de montrer vos compétences."
+    },
+    "code-vue": {
+      "name": "Magicien du code Vue",
+      "description": "Lorsque votre tâche implique l'écriture de code Vue, l'implémentation de fonctionnalités, le débogage et le dépannage, et toute activité de développement logiciel connexe, c'est le moment pour vous de montrer vos compétences."
+    },
+    "doc-writer": {
+      "name": "Ingénieur de documentation",
+      "description": "Basculez vers ce mode lorsque j'ai besoin de créer, mettre à jour ou améliorer la documentation du projet."
+    },
+    "giter": {
+      "name": "Expert en contrôle de version",
+      "description": "Lorsque des opérations liées à Git sont nécessaires"
+    },
+    "mode-writer": {
+      "name": "Maître en ingénierie de mode",
+      "description": "Utilisez ce mode lorsque vous avez besoin de concevoir, créer, refactoriser ou optimiser soigneusement un mode pour Roo-Code."
+    },
+    "project-research": {
+      "name": "Chercheur de projet",
+      "description": "J'active ce mode lorsque j'ai besoin de comprendre en profondeur une base de code, d'effectuer une analyse de sélection technologique ou une analyse pré-refactoring."
+    },
+    "researcher": {
+      "name": "Chercheur principal",
+      "description": "Utilisez ce mode lorsque vous avez besoin d'organiser systématiquement les connaissances techniques, d'effectuer des analyses comparatives de solutions techniques ou de construire des systèmes de connaissances de domaine"
+    },
+    "memory": {
+      "name": "Centre de mémoire",
+      "description": "Utilisé pour la gestion de la mémoire, la récupération d'informations et l'organisation des connaissances."
+    }
+  },
+  "language_switcher": {
+    "chinese": "Chinois",
+    "english": "Anglais",
+    "japanese": "Japonais",
+    "french": "Français",
+    "arabic": "Arabe",
+    "russian": "Russe",
+    "spanish": "Espagnol",
+    "traditional_chinese": "Chinois traditionnel"
+  },
+  "language": {
+    "select": "Sélectionner la langue",
+    "chinese": "Chinois",
+    "english": "Anglais"
+  },
+  "footer": {
+    "copyright": "© 2024 Sélecteur de mode IA multilingue",
+    "all_rights_reserved": "Tous droits réservés"
+  }
+}

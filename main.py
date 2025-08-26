@@ -9,11 +9,13 @@ import uvicorn
 import json
 import os
 import yaml
+import logging
 from pathlib import Path
-from fastapi import FastAPI, Request
+from typing import List, Dict, Any
+from fastapi import FastAPI, Request, HTTPException
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 
 
@@ -43,15 +45,54 @@ def create_app() -> FastAPI:
     # 配置 Jinja2 模板
     templates = Jinja2Templates(directory="templates")
     
-    # 加载多语言文件
-    def load_translations(lang: str):
+    # 配置日志
+    logging.basicConfig(level=logging.INFO)
+    logger = logging.getLogger(__name__)
+    
+    # 动态扫描 static/locales 目录获取所有语言文件
+    def scan_available_languages() -> List[str]:
+        """扫描 static/locales 目录，返回所有可用的语言代码"""
+        locales_dir = Path("static/locales")
+        if not locales_dir.exists():
+            logger.warning("static/locales 目录不存在")
+            return ["zh-CN"]  # 默认语言
+        
+        language_files = []
         try:
-            with open(f"locales/{lang}.json", "r", encoding="utf-8") as f:
-                return json.load(f)
-        except FileNotFoundError:
-            # 如果找不到请求的语言文件，默认使用中文
-            with open("locales/zh-CN.json", "r", encoding="utf-8") as f:
-                return json.load(f)
+            for file_path in locales_dir.glob("*.json"):
+                # 从文件名提取语言代码（去除 .json 扩展名）
+                lang_code = file_path.stem
+                language_files.append(lang_code)
+            logger.info(f"发现语言文件: {language_files}")
+        except Exception as e:
+            logger.error(f"扫描语言文件时出错: {e}")
+            return ["zh-CN"]  # 出错时返回默认语言
+        
+        return sorted(language_files)
+    
+    # 加载多语言文件
+    def load_translations(lang: str) -> Dict[str, Any]:
+        """加载指定语言的翻译文件"""
+        try:
+            file_path = Path(f"static/locales/{lang}.json")
+            if not file_path.exists():
+                logger.warning(f"语言文件不存在: {file_path}")
+                # 如果找不到请求的语言文件，默认使用中文
+                file_path = Path("static/locales/zh-CN.json")
+                if not file_path.exists():
+                    logger.error("默认中文语言文件也不存在")
+                    return {}
+            
+            with open(file_path, "r", encoding="utf-8") as f:
+                translations = json.load(f)
+                logger.info(f"成功加载语言文件: {lang}")
+                return translations
+        except json.JSONDecodeError as e:
+            logger.error(f"解析语言文件 {lang} 时出错: {e}")
+            return {}
+        except Exception as e:
+            logger.error(f"加载语言文件 {lang} 时出错: {e}")
+            return {}
     
     # 全局翻译字典
     translations = {}
@@ -60,12 +101,21 @@ def create_app() -> FastAPI:
     @app.on_event("startup")
     async def startup_event():
         nonlocal translations
-        # 支持的语言列表
-        supported_languages = ["zh-CN", "en", "zh-TW", "ja", "fr", "ar", "ru", "es"]
-        for lang in supported_languages:
+        # 动态扫描获取所有可用语言
+        available_languages = scan_available_languages()
+        
+        if not available_languages:
+            logger.error("没有找到任何语言文件")
+            available_languages = ["zh-CN"]  # 默认语言
+        
+        # 预加载所有语言文件
+        for lang in available_languages:
             translations[lang] = load_translations(lang)
-        # 将翻译存储到 app.state 中
+        
+        # 将翻译和可用语言列表存储到 app.state 中
         app.state.translations = translations
+        app.state.available_languages = available_languages
+        logger.info(f"应用启动完成，已加载 {len(available_languages)} 种语言")
     
     @app.get("/", response_class=HTMLResponse)
     async def read_root(request: Request):
@@ -87,16 +137,77 @@ def create_app() -> FastAPI:
             }
         )
     
+    @app.get("/api/languages")
+    async def get_languages(request: Request):
+        """获取所有可用语言的 API 端点"""
+        try:
+            # 如果 app.state 中没有可用语言列表，重新扫描
+            if not hasattr(app.state, 'available_languages'):
+                available_languages = scan_available_languages()
+                app.state.available_languages = available_languages
+            else:
+                available_languages = app.state.available_languages
+            
+            # 获取每个语言的名称（从翻译文件中读取）
+            languages_info = []
+            for lang in available_languages:
+                # 尝试从翻译文件中获取语言名称
+                if lang in translations and translations[lang]:
+                    # 优先从language_switcher部分获取语言名称
+                    if "language_switcher" in translations[lang]:
+                        # 根据语言代码映射到对应的语言名称
+                        lang_map = {
+                            "zh-CN": "chinese",
+                            "en": "english",
+                            "en-US": "english",
+                            "ja": "japanese",
+                            "fr": "french",
+                            "ar": "arabic",
+                            "ru": "russian",
+                            "es": "spanish",
+                            "zh-TW": "traditional_chinese"
+                        }
+                        lang_key = lang_map.get(lang, lang)
+                        lang_name = translations[lang]["language_switcher"].get(lang_key, lang)
+                    else:
+                        # 如果没有language_switcher字段，使用语言代码
+                        lang_name = lang
+                else:
+                    lang_name = lang
+                
+                languages_info.append({
+                    "code": lang,
+                    "name": lang_name
+                })
+            
+            return JSONResponse(
+                content={
+                    "success": True,
+                    "languages": languages_info,
+                    "count": len(languages_info)
+                }
+            )
+        except Exception as e:
+            logger.error(f"获取语言列表时出错: {e}")
+            raise HTTPException(status_code=500, detail="获取语言列表失败")
+    
     @app.get("/api/switch-language")
     async def switch_language(lang: str, request: Request):
         """切换语言的 API 端点"""
-        if lang not in translations:
-            return {"error": "Language not supported"}
+        # 检查语言是否在可用列表中
+        if not hasattr(app.state, 'available_languages'):
+            available_languages = scan_available_languages()
+            app.state.available_languages = available_languages
+        else:
+            available_languages = app.state.available_languages
+        
+        if lang not in available_languages:
+            return {"error": f"Language '{lang}' is not supported"}
         
         return {
             "success": True,
             "language": lang,
-            "translations": translations[lang]
+            "translations": translations.get(lang, {})
         }
     
     @app.get("/api/hello")
