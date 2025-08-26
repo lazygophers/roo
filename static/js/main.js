@@ -175,44 +175,6 @@ function renderModeCards() {
             updateModeDetails();
         });
 
-        // 全选按钮事件
-        document.getElementById('selectAllBtn').addEventListener('click', () => {
-            const checkboxes = document.querySelectorAll('.mode-checkbox input[type="checkbox"]:not(:disabled)');
-            checkboxes.forEach(checkbox => {
-                checkbox.checked = true;
-                checkbox.closest('.mode-checkbox').classList.add('selected');
-                selectedModels.add(checkbox.value);
-            });
-            updateModeDetails();
-        });
-
-        // 反选按钮事件
-        document.getElementById('selectInverseBtn').addEventListener('click', () => {
-            const checkboxes = document.querySelectorAll('.mode-checkbox input[type="checkbox"]:not(:disabled)');
-            checkboxes.forEach(checkbox => {
-                const newState = !checkbox.checked;
-                checkbox.checked = newState;
-                if (newState) {
-                    checkbox.closest('.mode-checkbox').classList.add('selected');
-                    selectedModels.add(checkbox.value);
-                } else {
-                    checkbox.closest('.mode-checkbox').classList.remove('selected');
-                    selectedModels.delete(checkbox.value);
-                }
-            });
-            updateModeDetails();
-        });
-
-        // 清空选择按钮事件
-        document.getElementById('clearSelectionBtn').addEventListener('click', () => {
-            const checkboxes = document.querySelectorAll('.mode-checkbox input[type="checkbox"]:not(:disabled)');
-            checkboxes.forEach(checkbox => {
-                checkbox.checked = false;
-                checkbox.closest('.mode-checkbox').classList.remove('selected');
-                selectedModels.delete(checkbox.value);
-            });
-            updateModeDetails();
-        });
 
         // 高度同步函数
         function syncHeights() {
@@ -530,5 +492,44 @@ document.addEventListener('DOMContentLoaded', async () => {
     // 初始化选中状态的样式
     document.querySelectorAll('.mode-checkbox input[type="checkbox"]:checked').forEach(checkbox => {
         checkbox.closest('.mode-checkbox').classList.add('selected');
+    });
+    
+    // 全选按钮事件
+    document.getElementById('selectAllBtn')?.addEventListener('click', () => {
+        const checkboxes = document.querySelectorAll('.mode-checkbox input[type="checkbox"]:not(:disabled)');
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = true;
+            checkbox.closest('.mode-checkbox').classList.add('selected');
+            selectedModels.add(checkbox.value);
+        });
+        updateModeDetails();
+    });
+
+    // 反选按钮事件
+    document.getElementById('selectInverseBtn')?.addEventListener('click', () => {
+        const checkboxes = document.querySelectorAll('.mode-checkbox input[type="checkbox"]:not(:disabled)');
+        checkboxes.forEach(checkbox => {
+            const newState = !checkbox.checked;
+            checkbox.checked = newState;
+            if (newState) {
+                checkbox.closest('.mode-checkbox').classList.add('selected');
+                selectedModels.add(checkbox.value);
+            } else {
+                checkbox.closest('.mode-checkbox').classList.remove('selected');
+                selectedModels.delete(checkbox.value);
+            }
+        });
+        updateModeDetails();
+    });
+
+    // 清空选择按钮事件
+    document.getElementById('clearSelectionBtn')?.addEventListener('click', () => {
+        const checkboxes = document.querySelectorAll('.mode-checkbox input[type="checkbox"]:not(:disabled)');
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = false;
+            checkbox.closest('.mode-checkbox').classList.remove('selected');
+            selectedModels.delete(checkbox.value);
+        });
+        updateModeDetails();
     });
 });
