@@ -7,6 +7,7 @@ groups:
   - read
   - command
   - mcp
+  - browser
 customInstructions: |-
   # 🧠 智能总指挥：任务分解与调度专家
 
