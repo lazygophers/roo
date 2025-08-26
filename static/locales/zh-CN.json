@@ -1,7 +1,7 @@
 {
-  "title": "多语言AI模式选择器",
+  "title": "多语言AI选择模式器",
   "mode_selector": {
-    "title": "模式选择器",
+    "title": "选择模式器",
     "description": "选择最适合您需求的AI模式",
     "mode_name": "模式名称",
     "mode_description": "模式描述",
@@ -94,7 +94,7 @@
     "english": "English"
   },
   "footer": {
-    "copyright": "© 2024 多语言AI模式选择器",
+    "copyright": "© 2024 多语言AI选择模式器",
     "all_rights_reserved": "保留所有权利"
   }
 }

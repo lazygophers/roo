@@ -2,6 +2,7 @@
 let allModels = [];
 let searchTerm = '';
 let selectedModels = new Set();
+let currentMainTab = 'before'; // 记录当前主tab
 
 // 获取所有模式
 async function fetchAllModels() {
@@ -423,11 +424,85 @@ function updateModeDetails() {
                     </div>
                 </div>
                 ` : ''}
+                <div class="detail-section">
+                    <h4>📋 公共指令</h4>
+                    <div class="custom-instructions-tabs">
+                        <div class="tab-buttons">
+                            <button class="tab-button active" data-tab="before" data-model="${model.slug}">公共开头</button>
+                            <button class="tab-button" data-tab="after" data-model="${model.slug}">公共结尾</button>
+                        </div>
+                        <div class="tab-content">
+                            <div class="tab-pane active" id="before-content-${model.slug}">
+                                <div class="markdown-content">加载中...</div>
+                            </div>
+                            <div class="tab-pane" id="after-content-${model.slug}">
+                                <div class="markdown-content">加载中...</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         `;
         
         detailsContainer.appendChild(detailCard);
     });
+    
+    // 为新添加的tab绑定事件
+    setTimeout(() => {
+        // Tab切换事件
+        document.querySelectorAll('.tab-button').forEach(button => {
+            button.addEventListener('click', (e) => {
+                const tabName = e.target.dataset.tab;
+                const modelSlug = e.target.dataset.model;
+                
+                // 更新按钮状态
+                e.target.closest('.tab-buttons').querySelectorAll('.tab-button').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                e.target.classList.add('active');
+                
+                // 更新内容显示
+                e.target.closest('.custom-instructions-tabs').querySelectorAll('.tab-pane').forEach(pane => {
+                    pane.classList.remove('active');
+                });
+                document.getElementById(`${tabName}-content-${modelSlug}`).classList.add('active');
+                
+                // 加载markdown内容
+                loadMarkdownContent(tabName, modelSlug);
+            });
+        });
+        
+        // 初始加载第一个tab的内容
+        selectedModeData.forEach(model => {
+            loadMarkdownContent('before', model.slug);
+        });
+    }, 100);
+}
+
+// 加载markdown内容
+async function loadMarkdownContent(type, modelSlug) {
+    const contentElement = document.getElementById(`${type}-content-${modelSlug}`);
+    if (!contentElement) return;
+    
+    const markdownElement = contentElement.querySelector('.markdown-content');
+    if (!markdownElement) return;
+    
+    // 如果已经加载过，不再重复加载
+    if (markdownElement.dataset.loaded === 'true') return;
+    
+    try {
+        const response = await fetch(`/api/models/${modelSlug}/custom-instructions/${type}`);
+        if (!response.ok) {
+            throw new Error('Failed to fetch markdown content');
+        }
+        
+        const text = await response.text();
+        markdownElement.textContent = text;
+        markdownElement.dataset.loaded = 'true';
+    } catch (error) {
+        console.error('Error loading markdown content:', error);
+        markdownElement.textContent = '加载失败，请稍后重试';
+    }
 }
 
 // 获取模式图标
@@ -532,4 +607,80 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
         updateModeDetails();
     });
+
+    // 主Tab切换功能
+    document.querySelectorAll('.main-tabs .tab-button').forEach(button => {
+        button.addEventListener('click', (e) => {
+            const tabName = e.target.dataset.tab;
+            
+            // 更新按钮状态
+            document.querySelectorAll('.main-tabs .tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            e.target.classList.add('active');
+            
+            // 更新内容显示
+            document.querySelectorAll('.main-content .tab-pane').forEach(pane => {
+                pane.classList.remove('active');
+            });
+            
+            const targetPane = document.getElementById(`${tabName}-pane`);
+            if (targetPane) {
+                targetPane.classList.add('active');
+            }
+            
+            // 记录当前tab
+            currentMainTab = tabName;
+            
+            // 根据tab加载内容和控制显示
+            if (tabName === 'before') {
+                // 点击"公共开头"时隐藏其他tab按钮
+                document.querySelectorAll('.main-tabs .tab-button').forEach(btn => {
+                    if (btn.dataset.tab === 'modes' || btn.dataset.tab === 'after') {
+                        btn.style.display = 'none';
+                    }
+                });
+                loadBeforeAfterContent('before');
+            } else if (tabName === 'after') {
+                // 点击"公共结尾"时隐藏其他tab按钮
+                document.querySelectorAll('.main-tabs .tab-button').forEach(btn => {
+                    if (btn.dataset.tab === 'before' || btn.dataset.tab === 'modes') {
+                        btn.style.display = 'none';
+                    }
+                });
+                loadBeforeAfterContent('after');
+            } else if (tabName === 'modes') {
+                // 点击"选择模式"时显示所有tab按钮
+                document.querySelectorAll('.main-tabs .tab-button').forEach(btn => {
+                    btn.style.display = '';
+                });
+                // 确保模式选择器内容正确显示
+                renderModeCards();
+                updateModeDetails();
+            }
+        });
+    });
 });
+
+// 加载before/after内容
+async function loadBeforeAfterContent(type) {
+    const contentElement = document.getElementById(`${type}Content`);
+    if (!contentElement) return;
+    
+    // 如果已经加载过，不再重复加载
+    if (contentElement.dataset.loaded === 'true') return;
+    
+    try {
+        const response = await fetch(`/models_hook/${type}.md`);
+        if (!response.ok) {
+            throw new Error('Failed to load content');
+        }
+        
+        const text = await response.text();
+        contentElement.textContent = text;
+        contentElement.dataset.loaded = 'true';
+    } catch (error) {
+        console.error('Error loading content:', error);
+        contentElement.textContent = '加载失败，请稍后重试';
+    }
+}

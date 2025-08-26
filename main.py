@@ -385,6 +385,35 @@ def create_app() -> FastAPI:
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
     
+    @app.get("/api/models/{model_slug}/custom-instructions/{type}")
+    async def get_custom_instructions(model_slug: str, type: str):
+        """获取公共自定义指令内容（before.md 或 after.md）"""
+        try:
+            # 验证 type 参数
+            if type not in ["before", "after"]:
+                raise HTTPException(status_code=400, detail="Type must be 'before' or 'after'")
+            
+            # 构建文件路径
+            file_path = Path(f"models_hook/{type}.md")
+            
+            # 检查文件是否存在
+            if not file_path.exists():
+                raise HTTPException(status_code=404, detail=f"{type}.md file not found")
+            
+            # 读取文件内容
+            with open(file_path, 'r', encoding='utf-8') as f:
+                content = f.read()
+            
+            # 返回纯文本内容
+            return HTMLResponse(content=content)
+            
+        except HTTPException:
+            # 重新抛出 HTTP 异常
+            raise
+        except Exception as e:
+            logger.error(f"读取 {type}.md 文件时出错: {e}")
+            raise HTTPException(status_code=500, detail=f"Failed to read {type}.md file")
+    
     @app.get("/mode-selector", response_class=HTMLResponse)
     async def mode_selector_page(request: Request, lang: str = "zh-CN"):
         """模式选择器页面"""
