@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHashHistory } from 'vue-router'
 import type { RouteRecordRaw } from 'vue-router'
 
 const routes: RouteRecordRaw[] = [
@@ -8,6 +8,14 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/views/HomeView.vue'),
     meta: {
       title: '首页'
+    }
+  },
+  {
+    path: '/config',
+    name: 'Config',
+    component: () => import('@/views/ConfigSelector.vue'),
+    meta: {
+      title: '配置选择器'
     }
   },
   {
@@ -29,7 +37,7 @@ const routes: RouteRecordRaw[] = [
 ]
 
 const router = createRouter({
-  history: createWebHistory(),
+  history: createWebHashHistory(),
   routes
 })
 
