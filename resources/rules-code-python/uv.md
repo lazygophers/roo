@@ -123,14 +123,11 @@ uv run pytest
 ### 依赖锁定与同步
 
 - **编译 (Compile)**: 将 `pyproject.toml` 或 `requirements.in` 中的高级依赖解析为具体的、可复现的 `requirements.txt` 文件。
-
   ```bash
   # 从 pyproject.toml 生成 requirements.txt
   uv pip compile pyproject.toml -o requirements.txt
   ```
-
 - **同步 (Sync)**: 确保当前虚拟环境中的包与 `requirements.txt` 文件**完全一致**，不多不少。
-
   ```bash
   # 根据 requirements.txt 同步环境
   uv pip sync requirements.txt

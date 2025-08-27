@@ -30,7 +30,6 @@ sections:
 ### 字段说明
 
 - **类型 (type)**: **必须**。用于说明提交的类别。
-
   - **feat**: 新功能 (feature)
   - **fix**: 修复 bug
   - **docs**: 文档变更
@@ -42,17 +41,12 @@ sections:
   - **ci**: 更改持续集成文件和脚本 (例如: Travis, Circle, BrowserStack, SauceLabs)
   - **chore**: 其他不修改 `src` 或 `test` 文件的更改
   - **revert**: 撤销之前的提交
-
 - **作用域 (scope)**: **可选**。用于标识提交影响的范围 (如: `view`, `component`, `api`)。
-
 - **主题 (subject)**: **必须**。简短描述提交目的，不超过 50 字符。
-
   - 使用祈使句，如 "change" 而不是 "changed" 或 "changes"。
   - 首字母小写。
   - 结尾不加句号 (`.`)。
-
 - **正文 (body)**: **可选**。提供更详细的上下文信息，如变更的动机、之前行为与当前行为的对比。
-
 - **脚注 (footer)**: **可选**。用于包含元信息。
   - **BREAKING CHANGE**: 包含重大变更的说明。
   - **Closes #issue-number**: 关联并关闭指定的 issue。
@@ -86,11 +80,9 @@ BREAKING CHANGE: The user model now requires an 'encryptedPassword' field.
    - 前置条件:
      - **多仓库检测**: 自动扫描工作区识别所有 Git 仓库
      - **无变更处理**: 如果工作区干净，流程自动终止
-
 2. **暂存文件 (Staging Files)**
    - 检查暂存区状态
    - 如果暂存区为空但存在未暂存变更，自动执行 `git add .`
-
 3. **生成提交信息 (Message Generation)**
    - 执行 `git diff --staged` 获取暂存变更的详细差异
    - AI 分析差异内容，理解变更的意图和性质
@@ -99,11 +91,9 @@ BREAKING CHANGE: The user model now requires an 'encryptedPassword' field.
      - 自动推荐 `type` 和 `scope`
      - 自动化 `subject` 和 `body` 撰写
      - 多语言支持（优先简体中文）
-
 4. **执行提交 (Executing Commit)**
    - 在确认提交信息后，执行 `git commit -m "<generated_message>"`
    - 将暂存的变更作为原子操作记录到本地仓库
-
 5. **推送到远程仓库 (Pushing to Remote)**
    - 检查是否存在远程跟踪分支
    - 如果存在，自动执行 `git push`
@@ -114,6 +104,7 @@ BREAKING CHANGE: The user model now requires an 'encryptedPassword' field.
 **目标**: 将远程分支的最新变更同步到本地，并保持提交历史清晰。
 
 **执行步骤**:
+
 1. **检查状态**: 确保工作区是干净的
 2. **执行拉取**: 使用 `git pull --rebase origin <current-branch>`（默认使用 rebase 策略）
 3. **处理冲突**: 如果发生冲突，转入冲突处理流程
@@ -123,6 +114,7 @@ BREAKING CHANGE: The user model now requires an 'encryptedPassword' field.
 **目标**: 将本地已经提交的变更安全地推送到远程仓库。
 
 **执行步骤**:
+
 1. **确认本地状态**: 确保所有需要推送的变更都已经提交
 2. **执行推送**: 使用 `git push origin <current-branch>`
 3. **处理推送失败**: 如果推送被拒绝，自动转入同步远程更新流程
@@ -132,6 +124,7 @@ BREAKING CHANGE: The user model now requires an 'encryptedPassword' field.
 **目标**: 将一个分支的变更安全地合并到另一个分支。
 
 **执行步骤**:
+
 1. **切换目标分支**: 使用 `git checkout <target-branch>`
 2. **同步目标分支**: 执行同步远程更新确保目标分支为最新
 3. **执行合并**: 使用 `git merge <source-branch>`
@@ -143,6 +136,7 @@ BREAKING CHANGE: The user model now requires an 'encryptedPassword' field.
 **目标**: 在用户指导下，清晰、安全地解决合并或变基时产生的代码冲突。
 
 **执行步骤**:
+
 1. **立即停止**: 停止自动化操作，并向用户报告冲突
 2. **识别冲突**: 运行 `git status` 并读取冲突文件，展示冲突详情
 3. **请求决策**: 提供解决方案选项

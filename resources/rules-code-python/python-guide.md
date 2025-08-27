@@ -168,7 +168,6 @@ from typing import List
 
 from pydantic import Field
 
-
 async def calculate_statistics(
 		data: List[float] = Field(description="要计算的数据集"),
 		method: str = Field(description="计算方法", default="mean", enum=["mean", "median", "std"]),
@@ -215,12 +214,10 @@ except APIError as e:
 import pytest
 from pydantic import ValidationError
 
-
 def test_product_validation():
 	product = Product(id="P001", name="电脑", price=4999.0)
 	assert product.name == "电脑"
 	assert product.price > 0
-
 
 def test_invalid_product():
 	with pytest.raises(ValidationError):

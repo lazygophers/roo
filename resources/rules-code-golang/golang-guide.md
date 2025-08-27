@@ -253,25 +253,18 @@ references:
 ### 核心原则
 
 - **作为第一个参数**: `Context` 应始终作为函数的第一个参数，且通常命名为 `ctx`。
-
   ```go
   func DoSomething(ctx context.Context, arg1, arg2 string) error {
       // ...
   }
   ```
-
 - **禁止存储在结构体中**: 不应将 `Context` 作为结构体字段。它应该在函数调用链中显式传递，以保持其请求范围的生命周期。
-
 - **不要传递 `nil` Context**: 如果不确定使用哪个 `Context`，应使用 `context.Background()` 或 `context.TODO()`。
-
   - `context.Background()`: 通常用于主函数、初始化和测试中，是所有 `Context` 的根。
   - `context.TODO()`: 当不确定使用哪个 `Context`，或函数未来计划支持 `Context` 但目前尚未实现时使用。
-
 - **小心使用 `WithValue`**:
-
   - `WithValue` 不应用于传递可选参数，这会降低代码的可读性和健-壮性。
   - 它主要用于在进程和 API 边界传递请求范围的元数据，如追踪 ID、我身份信息等。
-
 - **及时取消**: `Context` 的 `cancel` 函数被调用后，应尽快让使用该 `Context` 的 Goroutine 停止工作并返回。
   ```go
   ctx, cancel := context.WithTimeout(context.Background(), 50*time.Millisecond)
@@ -286,7 +279,6 @@ Go 1.18 引入了泛型，为处理通用数据结构和函数提供了强大的
 
 - **适用场景**: 优先将泛型用于操作通用数据结构（如切片、map、channel）的函数，例如 `Filter`、`Map`、`Reduce` 等。
 - **避免滥用**: 如果接口可以清晰地解决问题，则不必强制使用泛型。泛型并非旨在取代接口。
-
 - **类型参数命名**:
   - 类型参数建议使用单个大写字母，如 `T`。
   - 如果函数有多个类型参数，应选择有意义的名称，如 `K` (Key), `V` (Value)。

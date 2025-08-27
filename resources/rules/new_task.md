@@ -5,6 +5,7 @@ description: "定义 new_task 工具的消息格式规范，包含任务定义�
 category: rule
 tags: [任务委派, 消息格式, 规范]
 ---
+
 # new_task 委派规范
 
 ## 工具参数说明
@@ -525,17 +526,14 @@ debug_specific:
    - 分析任务复杂度
    - 识别所需专业领域
    - 制定任务分解策略
-
 2. **任务分解** → `orchestrator`
    - 创建子任务清单
    - 确定任务依赖关系
    - 分配执行模式
-
 3. **专业执行** → 各专业模式
    - 按专业领域执行
    - 必要时进行模式间协作
    - 保持上下文传递
-
 4. **结果汇总** → `orchestrator`
    - 收集各子任务结果
    - 验证整体完成度
@@ -573,17 +571,14 @@ orchestrator → debug → code → ask → doc-writer
    - 每个模式专注于自己的专业领域
    - 通过 `new_task` 进行任务委派
    - 避免模式职责重叠
-
 2. **上下文传递**
    - 使用 `task_id_list` 追踪任务来源
    - 在 `metadata.dependencies` 中声明依赖
    - 保持信息精简但完整
-
 3. **质量保证**
    - 每个模式输出前进行自检
    - 通过 `acceptance.criteria` 定义验收标准
    - 使用 `output.validation` 确保输出质量
-
 4. **持续优化**
    - 记录协作中的问题和改进点
    - 定期优化模式间接口
@@ -775,3 +770,4 @@ output:
       sections:
         - "架构设计文档"
         - "API规范"
+```
