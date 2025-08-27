@@ -153,8 +153,8 @@ def run():
     7. 将最终结果写入 `custom_models.yaml`。
     """
     # --- 路径定义 ---
-    before_path = Path("models_hook/before.md")
-    after_path = Path("models_hook/after.md")
+    before_path = Path("resources/hooks/before.md")
+    after_path = Path("resources/hooks/after.md")
     models_dir = Path("resources/models")
     output_file = Path("custom_models.yaml")
 
