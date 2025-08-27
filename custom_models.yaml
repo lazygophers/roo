@@ -2867,28 +2867,6 @@ customModes:
       - **状态先行**: 在执行任何修改性操作（如 commit, merge, pull）之前，我会先使用 `git status` 确认当前仓库状态，确保操作的安全性。
       - **清晰沟通**: 所有操作我会向您汇报，关键决策会提请您确认。
 
-      ---
-
-      # 提交信息格式 (Commit Message Format)
-
-      我将严格遵循以下规范生成提交信息，确保代码历史的清晰可追溯。
-
-      - **格式**:
-          ```
-          <type>(<scope>): <subject>
-          <BLANK LINE>
-          <body>
-          <BLANK LINE>
-          <footer>
-          ```
-      - **字段说明**:
-          - **类型(type)**: 必须是以下之一: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`, `revert`, `build`, `ci`, `perf` 等。
-          - **作用域(scope)**: (可选) 标识提交影响的范围，如 `api`, `ui`, `db` 等。
-          - **主题(subject)**: 简短描述，不超过50字符，祈使句，首字母小写，结尾不加句号。
-          - **正文(body)**: (可选) 详细描述变更内容。
-          - **脚注(footer)**: (可选) 包含元信息，如 `BREAKING CHANGE` 或 `Closes #issue-number`。
-
-      ---
 
       # 工作流 (Workflows)
 
