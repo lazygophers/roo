@@ -1,3 +1,22 @@
+---
+name: react-guide
+title: React风格指南
+description: "React风格指南总结，基于Airbnb广泛采纳的黄金标准，涵盖命名规范、文件结构、Props使用、State与Hooks等最佳实践"
+category: language-guide
+language: react
+priority: high
+tags: [React, JSX, 风格指南, 最佳实践, Airbnb]
+sections:
+  - "命名规范：文件、组件、引用、高阶组件、Props"
+  - "文件结构：单一组件原则、目录组织"
+  - "Props使用：布尔属性简写、默认Props、Props展开"
+  - "State与Hooks：函数组件优先、useState、useEffect"
+references:
+  - "Airbnb React/JSX Style Guide"
+  - "Google无官方React风格指南"
+note: "虽然Google没有发布官方的React风格指南，但Airbnb的指南已成为社区广泛采纳的黄金标准"
+---
+
 # React 风格指南
 
 本指南旨在总结业界公认的 React 最佳实践与风格指南。虽然 Google 没有发布官方的 React 风格指南，但 Airbnb 的 React/JSX 风格指南已成为社区广泛采纳的黄金标准。

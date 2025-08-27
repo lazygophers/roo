@@ -1,3 +1,30 @@
+---
+name: uv
+title: UV包管理工具指南
+description: "下一代Python包管理工具完整指南，提供极速的包解析、安装和编译功能，是pip、pip-tools和virtualenv的直接替代品"
+category: tool-guide
+tool: uv
+priority: high
+tags: [Python, 包管理, uv, 虚拟环境]
+sections:
+  - "核心特性：极致性能、一体化工具链、pip兼容"
+  - "核心工作流：虚拟环境、依赖管理、命令执行"
+  - "高级应用：依赖锁定、同步、缓存管理"
+  - "与传统pip工作流对比"
+features:
+  - "速度比pip快10-100倍"
+  - "单个可执行文件处理所有任务"
+  - "完全兼容pip API"
+  - "内置全局缓存机制"
+  - "基于Rust构建，高性能且内存安全"
+workflows:
+  - "创建环境：uv venv"
+  - "添加依赖：uv add <package>"
+  - "运行命令：uv run <command>"
+  - "编译锁定：uv pip compile"
+  - "同步环境：uv pip sync"
+---
+
 # uv：下一代 Python 包管理工具
 
 > `uv` 是一个用 Rust 编写的、速度极快的 Python 包解析器、安装器、编译器和解析器。它旨在成为 `pip`、`pip-tools` 和 `virtualenv` 的直接替代品，提供一个统一、高效的工具链。

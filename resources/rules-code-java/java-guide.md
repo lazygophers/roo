@@ -1,3 +1,22 @@
+---
+name: java-guide
+title: Google Java风格指南
+description: "Google Java Style Guide核心规则总结，涵盖源文件基础、格式化、命名约定、编程实践和Javadoc规范"
+category: language-guide
+language: java
+priority: high
+tags: [Java, 编程规范, Google风格指南]
+sections:
+  - "源文件基础：文件名、编码、特殊字符"
+  - "源文件结构：许可证、package语句、import语句、类声明"
+  - "格式化：大括号、缩进、列宽、换行、空白"
+  - "命名约定：通用规则、包名、类名、方法名等"
+  - "编程实践：@Override、异常处理、静态成员、final使用"
+  - "Javadoc：基本格式、摘要片段、使用场景"
+references:
+  - "Google Java Style Guide官方文档"
+---
+
 # Google Java 风格指南核心规则总结
 
 本指南是对 [Google Java Style Guide](https://google.github.io/styleguide/javaguide.html) 的核心内容进行总结，旨在提供一个快速参考，帮助开发者理解和应用 Google 的 Java 编程规范。

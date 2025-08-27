@@ -1,3 +1,27 @@
+---
+name: markdown
+title: Markdown文档编写规范
+description: "AI系统通用的Markdown格式与风格指南，涵盖基本规范、内容元素、项目约定等完整规范"
+category: documentation
+priority: high
+tags: [Markdown, 文档规范, 格式指南, 最佳实践]
+sections:
+  - "基本规范：标题、代码块、列表、链接"
+  - "内容元素：表格、图表（Mermaid）"
+  - "项目约定：文件标准、编码、换行"
+standards:
+  - "编码：UTF-8"
+  - "换行：LF（Unix风格）"
+  - "禁止：文件末尾尾随空格"
+requirements:
+  - "标题：H1与文件名一致且唯一"
+  - "代码块：必须指定语言类型"
+  - "内联代码：使用反引号包裹"
+  - "无序列表：优先使用-符号"
+  - "内部链接：使用相对路径"
+  - "Mermaid流程图：优先使用graph TD方向"
+---
+
 # Markdown 规范
 
 > AI 系统通用的 Markdown 格式与风格指南。

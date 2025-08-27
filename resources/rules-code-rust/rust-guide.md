@@ -1,3 +1,24 @@
+---
+name: rust-guide
+title: Rust编程风格指南
+description: "Rust编程语言风格指南权威总结，综合官方文档与社区最佳实践，涵盖命名约定、格式化、工具使用等核心规范"
+category: language-guide
+language: rust
+priority: high
+tags: [Rust, 编程规范, 风格指南, 最佳实践]
+sections:
+  - "核心原则：清晰性、一致性、惯例优于配置"
+  - "命名约定：crates、modules、types、functions等"
+  - "格式化：行长、缩进、use声明"
+  - "工具推荐：rustfmt、clippy"
+tools:
+  - "rustfmt：官方格式化工具"
+  - "clippy：代码检查工具"
+references:
+  - "Rust官方文档"
+  - "社区广泛认可的最佳实践"
+---
+
 # Rust 编程语言风格指南权威总结
 
 本指南旨在综合 Rust 官方文档与社区广泛认可的最佳实践，为您提供一份关于 Rust 编程风格的权威、详尽的参考。遵循统一的风格不仅能提升代码的可读性、可维护性，也是成为一名专业 Rust 开发者（Rustacean）的必经之路。

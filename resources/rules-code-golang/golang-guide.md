@@ -1,3 +1,25 @@
+---
+name: golang-guide
+title: Go编程规范指南
+description: "Go语言编程规范和最佳实践指南，涵盖代码风格、命名约定、错误处理、并发编程和测试规范"
+category: language-guide
+language: go
+priority: high
+tags: [Go, 编程规范, 最佳实践, 并发编程]
+sections:
+  - "代码风格：格式化要求和命名约定"
+  - "编码规范：减少嵌套、变量初始化"
+  - "错误处理：基本原则、错误判断与提取"
+  - "并发编程：Goroutine管理、并发原语"
+  - "Context使用：核心原则、最佳实践"
+  - "泛型使用：使用原则、示例"
+  - "性能优化：内存分配、字符串操作"
+  - "测试规范：命名规范、断言库、表驱动测试"
+references:
+  - "Uber Go 编程规范"
+  - "Google Go 编程规范"
+---
+
 # Go 编程规范
 
 ### 主要参考：

@@ -1,3 +1,25 @@
+---
+name: python-guide
+title: Python编程规范指南
+description: "Python编程规范技术文档，优先使用uv作为环境管理工具，包含编码规范、类型注解、pydantic模型、函数规范和测试指南"
+category: language-guide
+language: python
+priority: high
+tags: [Python, 编程规范, uv, pydantic, 类型注解]
+sections:
+  - "编码规范：命名规范、代码格式"
+  - "类型注解规范：基础类型、pydantic模型"
+  - "函数参数与返回值规范：参数规范、返回值规范"
+  - "pydantic最佳实践：模型定义、数据验证"
+  - "注释规范：文档字符串、注释内容原则"
+  - "异常处理规范：异常处理、自定义异常"
+  - "测试规范：命名规范、断言库、表驱动测试"
+tools:
+  - "包管理：uv"
+  - "类型验证：pydantic"
+  - "测试框架：pytest"
+---
+
 # Python 编程规范技术文档
 
 > 优先很实用 `uv` 作为环境管理和包管理工具

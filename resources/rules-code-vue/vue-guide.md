@@ -1,3 +1,25 @@
+---
+name: vue-guide
+title: Vue.js官方风格指南
+description: "Vue.js官方风格指南完整版，提供优先级分类的规范和最佳实践，涵盖必要规则、强烈推荐、推荐使用和谨慎使用等多个级别"
+category: language-guide
+language: vue
+priority: high
+tags: [Vue.js, 风格指南, 官方规范, 最佳实践]
+sections:
+  - "优先级A（必要）：组件命名、data函数、v-for的key、避免v-if/v-for同用、scoped样式"
+  - "优先级B（强烈推荐）：组件文件、单文件组件命名、Prop定义、属性分行"
+  - "优先级C（推荐）：选项顺序、attribute顺序、组件和v-for的key"
+  - "优先级D（谨慎使用）：v-html、scoped元素选择器、隐式父子通信"
+priority_levels:
+  - "A：必要（避免错误）"
+  - "B：强烈推荐（提高可读性）"
+  - "C：推荐（保持一致）"
+  - "D：谨慎使用（潜在风险）"
+references:
+  - "Vue.js官方风格指南"
+---
+
 # Vue.js 官方风格指南
 
 本指南旨在提供一套统一的 Vue.js 代码风格规范，以提高代码的可读性、可维护性和团队协作效率。

@@ -1,3 +1,38 @@
+---
+name: mode-specification
+title: 模式规范说明
+description: "AI Code中自定义模式的结构和配置规范文档，定义模式的构成要素、YAML属性详情、文件/目录设置特定于模式的指令等完整规范"
+category: specification
+priority: critical
+tags: [模式定义, 配置规范, AI Code, 自定义模式]
+sections:
+  - "模式的构成要素：slug、name、description、roleDefinition等"
+  - "YAML属性详情：每个属性的用途、格式、用法说明"
+  - "通过文件/目录设置特定于模式的指令"
+  - "模式选择策略：根据任务性质选择最专业模式"
+core_attributes:
+  - "slug：唯一内部标识符"
+  - "name：显示名称"
+  - "description：用途摘要"
+  - "roleDefinition：核心身份和专业知识"
+  - "groups：允许工具集和文件访问权限"
+  - "whenToUse：自动化决策指导"
+  - "customInstructions：特定行为指南"
+example_yaml: |
+  slug: doc-engineer
+  name: 📝 文档工程师
+  description: 一个专门用于编写和编辑技术文档的模式。
+  roleDefinition: 你是一位专注于清晰文档的技术作家。
+  whenToUse: 当需要编写或编辑文档时使用此模式。
+  customInstructions: 在文档中应注重清晰性和完整性。
+  groups:
+    - read
+    - - edit
+      - fileRegex: \.(md|mdx)$
+        description: 仅限 Markdown 文件
+    - browser
+---
+
 # 模式规范说明
 
 本文档定义了 AI Code 中自定义模式的结构和配置规范。
