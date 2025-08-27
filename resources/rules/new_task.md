@@ -5,7 +5,6 @@ description: "定义 new_task 工具的消息格式规范，包含任务定义�
 category: rule
 tags: [任务委派, 消息格式, 规范]
 ---
-
 # new_task 委派规范
 
 ## 工具参数说明
@@ -24,7 +23,6 @@ tags: [任务委派, 消息格式, 规范]
       tags?: [string]  # 标签列表
       assignee?: string  # 指定的执行模式
       dependencies?: [string]  # 依赖的任务ID列表
-
     task:
       # 任务定义部分
       description: string  # 必填: 一句话描述任务目标
@@ -40,7 +38,6 @@ tags: [任务委派, 消息格式, 规范]
         disallowed_patterns?: [string]  # 禁止修改的模式
       acceptance:
         criteria?: [string]  # 验收标准
-
     output:
       # 输出规范部分
       format:
@@ -78,7 +75,6 @@ metadata:
   tags?: [string] # 标签列表
   assignee?: string # 指定的执行模式
   dependencies?: [string] # 依赖的任务ID列表
-
 task:
   # 任务定义部分
   description: string # 必填: 一句话描述任务目标
@@ -94,7 +90,6 @@ task:
     disallowed_patterns?: [string] # 禁止修改的模式
   acceptance:
     criteria?: [string] # 验收标准
-
 output:
   # 输出规范部分
   format:
@@ -119,16 +114,13 @@ metadata:
   # 任务标识信息
   task_id?: string # 唯一任务ID，格式: TASK-YYYY-NNN
   task_id_list?: [string] # 父任务ID链，用于追踪任务来源
-
   # 分类和标签
   category: string # 必填: feature | bugfix | refactor | docs | research
   tags?: [string] # 标签列表，用于分类和筛选
-
   # 协作信息
   assignee?: string # 指定的执行模式
   reviewer?: string # 审核者
   dependencies?: [string] # 依赖的任务ID列表
-
   # 自定义属性
   custom?: object # 自定义扩展字段
 ```
@@ -140,68 +132,55 @@ task:
   # 核心描述
   description: string       # 必填: 一句话清晰描述任务目标
   summary?: string          # 详细描述（1-3段）
-
   # 上下文信息
   context:
     reason: string         # 必填: 执行此任务的背景原因
     background?: string    # 背景故事或历史信息
     problem_statement?: string  # 解决什么问题
-
     # 相关资源
     relevant_files?: [string]     # 相关文件路径
     relevant_code?: string         # 关键代码片段
     references?: [string]         # 参考资料、文档链接
-
     # 用户和场景
     user_persona?: string          # 目标用户角色
     use_cases?: [string]          # 使用场景列表
     stakeholder?: [string]        # 相关利益方
-
     # 环境信息
     environment?: object           # 执行环境信息
     constraints?: [string]        # 已知的约束条件
-
   # 具体需求
   requirements:
     # 功能需求
     functional?: [string]         # 功能性需求列表
     non_functional?: [string]     # 非功能性需求（性能、安全等）
-
     # 技术要求
     technical?: [string]          # 技术规范要求
     compliance?: [string]         # 合规性要求
-
     # 约束条件
     must_haves?: [string]         # 必须满足的需求
     nice_to_haves?: [string]      # 最好有的需求
-
     # 用户故事格式（可选）
     user_stories?: [string]       # 用户故事格式: "作为X，我想要Y，以便Z"
-
   # 执行边界
   boundaries:
     # 文件权限
     allowed_files?: [string]      # 允许修改的文件列表
     readonly_files?: [string]     # 只读文件列表
     disallowed_files?: [string]   # 禁止访问的文件
-
     # 模式约束
     allowed_patterns?: [string]    # 允许修改的代码模式
     disallowed_patterns?: [string] # 禁止修改的模式
-
     # 技术栈约束
     tech_stack?: object           # 技术栈限制
       language?: string           # 编程语言
       framework?: string          # 框架
       libraries?: [string]        # 库限制
       version_constraints?: string # 版本约束
-
     # 时间和资源
     time_limit?: string           # 时间限制
     resource_limits?: object      # 资源限制
       memory?: string             # 内存限制
       cpu?: string                # CPU限制
-
   # 验收标准
   acceptance:
     criteria?: [string]           # 验收标准列表
@@ -210,16 +189,13 @@ task:
       response_time?: string      # 响应时间要求
       throughput?: string         # 吞吐量要求
       availability?: string       # 可用性要求
-
     # 质量标准
     quality_standards?: object    # 质量标准
       code_coverage?: string      # 代码覆盖率
       complexity_limit?: string   # 复杂度限制
       bug_tolerance?: string      # 缺陷容忍度
-
     # 演示要求
     demo_requirements?: [string]  # 演示要求
-
   # 执行计划
   execution:
     # 任务分解
@@ -229,24 +205,19 @@ task:
         description: string       # 子任务描述
         estimated_time?: string   # 预估时间
         dependencies?: [string]   # 依赖的子任务
-
     # 实现策略
     approach?: string             # 实现方法描述
     alternatives?: [string]       # 备选方案
-
     # 风险评估
     risks?: [object]              # 风险评估
       - description: string      # 风险描述
         impact: string           # 影响程度
         probability: string       # 发生概率
         mitigation: string        # 缓解措施
-
     # 回滚计划
     rollback_plan?: string        # 回滚策略
-
     # 检查点
     checkpoints?: [string]        # 关键检查点
-
   # 任务清单管理
   todo?: object                   # 任务清单规范
     # 格式规范
@@ -266,14 +237,12 @@ task:
         due_date?: string         # 截止日期
         tags?: [string]           # 标签
         metadata?: object         # 自定义元数据
-
     # 状态管理
     state_management?: object      # 状态管理规则
       auto_transition?: boolean    # 是否自动转换状态
       state_triggers?: object     # 状态触发条件
         pending_to_in_progress?: [string]  # 从待办到进行的条件
         in_progress_to_completed?: [string] # 从进行到完成的条件
-
     # 最佳实践
     best_practices?: [string]     # 最佳实践建议
       - "任务描述应简洁明确"
@@ -281,7 +250,6 @@ task:
       - "及时更新任务状态"
       - "保持任务粒度适中"
       - "记录任务执行过程中的关键决策"
-
     # 任务组织
     organization?: object        # 任务组织方式
       groups?: [object]          # 任务分组
@@ -303,39 +271,32 @@ output:
     structure?: object            # 输出结构要求
       sections?: [string]         # 必须包含的章节
       template?: string           # 输出模板
-
     # 内容要求
     content_requirements?: [string]  # 内容要求
     style_guide?: string         # 风格指南
-
     # 文档要求
     documentation?: object       # 文档要求
       api_docs?: boolean          # 是否需要API文档
       user_guide?: boolean        # 是否需要用户指南
       examples?: boolean          # 是否需要示例
-
     # 代码要求
     code_standards?: object       # 代码标准
       linting?: boolean           # 是否需要代码检查
       formatting?: boolean        # 是否需要格式化
       comments?: boolean          # 是否需要注释
-
   # 验证规则
   validation:
     # 自动验证
     automated_tests?: [string]   # 自动测试要求
     test_coverage?: string        # 测试覆盖率要求
-
     # 手动验证
     manual_checks?: [string]      # 手动检查项
     review_criteria?: [string]   # 审查标准
-
     # 验证环境
     test_environment?: object     # 测试环境要求
       os?: string                # 操作系统
       dependencies?: [string]     # 依赖项
       configuration?: object     # 配置要求
-
   # 交付物清单
   deliverables:
     files?: [object]              # 文件交付物
@@ -343,32 +304,27 @@ output:
         type: string             # 文件类型
         description?: string     # 文件描述
         required: boolean        # 是否必需
-
     # 功能交付物
     features?: [string]          # 功能列表
     endpoints?: [object]         # API端点
       - method: string           # HTTP方法
         path: string             # 路径
         description: string       # 描述
-
     # 文档交付物
     documentation?: [object]      # 文档列表
       - title: string            # 文档标题
         format: string           # 格式
         location: string         # 位置
-
     # 测试交付物
     tests?: [object]             # 测试交付物
       - type: string            # 测试类型
         coverage?: string        # 覆盖范围
         framework: string        # 测试框架
-
     # 其他交付物
     artifacts?: [object]         # 其他产物
       - name: string            # 产物名称
         type: string            # 类型
         location: string        # 位置
-
   # 报告要求
   reporting:
     progress_updates?: [string]   # 进度更新要求
@@ -392,13 +348,11 @@ code_specific:
     design_patterns?: [string] # 期望使用的设计模式
     architecture_pattern?: string # 架构模式
     naming_convention?: string # 命名规范
-
   # 测试要求
   testing:
     unit_test_framework?: string # 单元测试框架
     integration_tests?: boolean # 是否需要集成测试
     mocking_required?: boolean # 是否需要模拟
-
   # 代码质量
   quality_metrics:
     cyclomatic_complexity?: number # 圈复杂度上限
@@ -414,13 +368,11 @@ architecture_specific:
   # 设计原则
   design_principles?: [string]    # SOLID、KISS等
   scalability_requirements?: string # 可扩展性要求
-
   # 架构决策
   architectural_decisions?: [object] # 架构决策记录
     - decision: string           # 决策内容
       rationale: string          # 决策理由
       alternatives: [string]    # 备选方案
-
   # 文档要求
   documentation_requirements:
     diagrams_required?: [string] # 需要的图表类型
@@ -437,7 +389,6 @@ debug_specific:
     error_message?: string # 错误信息
     stack_trace?: string # 堆栈跟踪
     reproduction_steps?: [string] # 复现步骤
-
   # 调试环境
   debug_environment:
     debugging_tools?: [string] # 调试工具
@@ -571,19 +522,16 @@ debug_specific:
 ##### 标准协作流程
 
 1. **任务接收** → `orchestrator`
-
    - 分析任务复杂度
    - 识别所需专业领域
    - 制定任务分解策略
 
 2. **任务分解** → `orchestrator`
-
    - 创建子任务清单
    - 确定任务依赖关系
    - 分配执行模式
 
 3. **专业执行** → 各专业模式
-
    - 按专业领域执行
    - 必要时进行模式间协作
    - 保持上下文传递
@@ -622,19 +570,16 @@ orchestrator → debug → code → ask → doc-writer
 ##### 协作最佳实践
 
 1. **明确边界**
-
    - 每个模式专注于自己的专业领域
    - 通过 `new_task` 进行任务委派
    - 避免模式职责重叠
 
 2. **上下文传递**
-
    - 使用 `task_id_list` 追踪任务来源
    - 在 `metadata.dependencies` 中声明依赖
    - 保持信息精简但完整
 
 3. **质量保证**
-
    - 每个模式输出前进行自检
    - 通过 `acceptance.criteria` 定义验收标准
    - 使用 `output.validation` 确保输出质量
@@ -656,14 +601,12 @@ metadata:
   tags: ["api", "user-management"]
 task:
   description: "为用户服务添加密码重置功能"
-
   context:
     reason: "用户反馈无法重置忘记的密码"
     relevant_files:
       - "src/services/user_service.py"
       - "tests/test_user_service.py"
     user_persona: "后端开发工程师"
-
   requirements:
     functional:
       - "发送密码重置邮件"
@@ -672,7 +615,6 @@ task:
     non_functional:
       - "令牌有效期1小时"
       - "邮件发送5分钟内"
-
   boundaries:
     allowed_files:
       - "src/services/user_service.py"
@@ -680,7 +622,6 @@ task:
     tech_stack:
       language: "Python"
       framework: "FastAPI"
-
   acceptance:
     criteria:
       - "邮件发送成功"
@@ -691,13 +632,11 @@ output:
     code_standards:
       linting: true
       comments: true
-
   validation:
     automated_tests:
       - "单元测试覆盖所有功能"
       - "集成测试验证邮件发送"
     test_coverage: "95%"
-
   deliverables:
     files:
       - path: "src/services/user_service.py"
@@ -717,7 +656,6 @@ metadata:
   assignee: "architect"
 task:
   description: "将单体应用拆分为微服务架构"
-
   context:
     reason: "应用规模增长，单体架构难以维护"
     background: "现有应用超过10万行代码，部署时间长"
@@ -727,7 +665,6 @@ task:
       - "src/models/"
       - "src/services/"
       - "docker-compose.yml"
-
   requirements:
     functional:
       - "识别服务边界"
@@ -742,7 +679,6 @@ task:
       - "使用容器化部署"
       - "实现配置中心"
       - "日志聚合"
-
   boundaries:
     disallowed_patterns:
       - "直接数据库共享"
@@ -751,7 +687,6 @@ task:
       framework: "Spring Boot"
       communication: "gRPC"
       infrastructure: "Kubernetes"
-
   acceptance:
     criteria:
       - "服务响应时间<100ms"
@@ -760,7 +695,6 @@ task:
     performance_targets:
       response_time: "<100ms"
       throughput: "1000 req/s"
-
   execution:
     phases:
       - "服务拆分设计"
@@ -772,7 +706,6 @@ task:
         impact: "高"
         probability: "中"
         mitigation: "使用分布式事务"
-
   # 任务清单管理
   todo:
     items:
@@ -799,7 +732,6 @@ task:
         assignee: "code"
         dependencies: ["T001", "T002"]
         estimated_time: "10天"
-
     state_management:
       auto_transition: true
       state_triggers:
@@ -809,7 +741,6 @@ task:
         in_progress_to_completed:
           - "所有服务成功迁移"
           - "性能测试通过"
-
     organization:
       groups:
         - name: "设计阶段"
@@ -825,7 +756,6 @@ task:
         - name: "微服务上线"
           date: "2025-03-01"
           tasks: ["T002", "T003"]
-
   architecture_specific:
     design_principles:
       - "单一职责"
@@ -845,4 +775,3 @@ output:
       sections:
         - "架构设计文档"
         - "API规范"
-```
