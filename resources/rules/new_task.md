@@ -8,35 +8,104 @@ tags: [任务委派, 消息格式, 规范]
 
 ## new_task 委派规范
 
-### 三段式 Message 格式设计
+### 工具参数说明
+
+`new_task` 工具接受以下参数：
+
+```xml
+<new_task>
+  <mode>模式 slug</mode>  <!-- 必填：目标模式的 slug，如 "code"、"architect" 等 -->
+  <message>
+    metadata:
+      # 元数据部分
+      task_id?: string  # 唯一任务ID，格式: TASK-YYYY-NNN
+      task_id_list?: [string]  # 父任务ID链
+      category: string  # 必填: feature | bugfix | refactor | docs | research
+      tags?: [string]  # 标签列表
+      assignee?: string  # 指定的执行模式
+      dependencies?: [string]  # 依赖的任务ID列表
+
+    task:
+      # 任务定义部分
+      description: string  # 必填: 一句话描述任务目标
+      context:
+        reason: string  # 必填: 执行此任务的背景原因
+        relevant_files?: [string]  # 相关文件路径
+        user_persona?: string  # 用户角色
+      requirements:
+        functional?: [string]  # 功能需求
+        non_functional?: [string]  # 非功能需求
+      boundaries:
+        allowed_files?: [string]  # 允许修改的文件
+        disallowed_patterns?: [string]  # 禁止修改的模式
+      acceptance:
+        criteria?: [string]  # 验收标准
+
+    output:
+      # 输出规范部分
+      format:
+        code_standards?: object  # 代码标准
+        documentation?: object  # 文档要求
+      validation:
+        automated_tests?: [string]  # 自动测试要求
+        test_coverage?: string  # 测试覆盖率
+      deliverables:
+        files?: [object]  # 文件交付物
+        documentation?: [object]  # 文档交付物
+  </message>
+  <todos>
+    ...  # 任务清单（可选）
+  </todos>
+</new_task>
+```
+
+**参数说明**：
+
+- `mode`：必填参数，指定要委派的目标模式，只能填写模式的 slug（如 `code`、`architect`、`debug` 等）
+- `message`：必填参数，包含任务定义和返回要求的完整消息内容
+- `todos`：可选参数，推荐的子任务清单，供子任务参考执行
+
+### 单一 YAML 格式设计
 
 **整体结构**:
 
-```
-message: |
-  ---
+```yaml
+metadata:
   # 元数据部分
-  metadata:
-    task_id: "TASK-2025-001"
-    task_id_list: ["TASK-2025-000"]  # 父任务ID链
-    tags: ["performance", "cache"]
+  task_id?: string # 唯一任务ID，格式: TASK-YYYY-NNN
+  task_id_list?: [string] # 父任务ID链
+  category: string # 必填: feature | bugfix | refactor | docs | research
+  tags?: [string] # 标签列表
+  assignee?: string # 指定的执行模式
+  dependencies?: [string] # 依赖的任务ID列表
 
-  ---
+task:
   # 任务定义部分
-  task:
-    description: "一句话描述任务目标"
-    context: {任务上下文信息}
-    requirements: {具体需求列表}
-    boundaries: {执行边界}
-    acceptance: {验收标准}
-    execution: {执行计划}
+  description: string # 必填: 一句话描述任务目标
+  context:
+    reason: string # 必填: 执行此任务的背景原因
+    relevant_files?: [string] # 相关文件路径
+    user_persona?: string # 用户角色
+  requirements:
+    functional?: [string] # 功能需求
+    non_functional?: [string] # 非功能需求
+  boundaries:
+    allowed_files?: [string] # 允许修改的文件
+    disallowed_patterns?: [string] # 禁止修改的模式
+  acceptance:
+    criteria?: [string] # 验收标准
 
-  ---
+output:
   # 输出规范部分
-  output:
-    format: {输出格式要求}
-    validation: {验证规则}
-    deliverables: {交付物清单}
+  format:
+    code_standards?: object # 代码标准
+    documentation?: object # 文档要求
+  validation:
+    automated_tests?: [string] # 自动测试要求
+    test_coverage?: string # 测试覆盖率
+  deliverables:
+    files?: [object] # 文件交付物
+    documentation?: [object] # 文档交付物
 ```
 
 ---
@@ -177,6 +246,52 @@ task:
 
     # 检查点
     checkpoints?: [string]        # 关键检查点
+
+  # 任务清单管理
+  todo?: object                   # 任务清单规范
+    # 格式规范
+    # - [ ] 待办任务 (未开始)
+    # - [-] 进行中任务 (正在执行)
+    # - [x] 已完成任务 (已完成)
+    items?: [object]              # 任务项列表
+      - id: string                # 任务唯一标识
+        title: string             # 任务标题
+        description?: string      # 任务描述
+        status: enum              # 任务状态: pending | in_progress | completed
+        priority?: enum           # 优先级: low | medium | high | critical
+        assignee?: string         # 负责人/模式
+        dependencies?: [string]   # 依赖的任务ID
+        estimated_time?: string    # 预估时间
+        actual_time?: string      # 实际用时
+        due_date?: string         # 截止日期
+        tags?: [string]           # 标签
+        metadata?: object         # 自定义元数据
+
+    # 状态管理
+    state_management?: object      # 状态管理规则
+      auto_transition?: boolean    # 是否自动转换状态
+      state_triggers?: object     # 状态触发条件
+        pending_to_in_progress?: [string]  # 从待办到进行的条件
+        in_progress_to_completed?: [string] # 从进行到完成的条件
+
+    # 最佳实践
+    best_practices?: [string]     # 最佳实践建议
+      - "任务描述应简洁明确"
+      - "每个任务应该是可独立验证的"
+      - "及时更新任务状态"
+      - "保持任务粒度适中"
+      - "记录任务执行过程中的关键决策"
+
+    # 任务组织
+    organization?: object        # 任务组织方式
+      groups?: [object]          # 任务分组
+        - name: string           # 分组名称
+          tasks: [string]        # 包含的任务ID
+          description?: string   # 分组描述
+      milestones?: [object]      # 里程碑
+        - name: string           # 里程碑名称
+          date: string           # 目标日期
+          tasks: [string]        # 关联任务
 ```
 
 ### 3. 输出规范部分 (output)
@@ -534,13 +649,11 @@ orchestrator → debug → code → ask → doc-writer
 ### 基础示例 - 简单功能开发
 
 ```yaml
----
 metadata:
   task_id: "TASK-2025-001"
   task_id_list: ["TASK-2025-000"] # 来自父任务
   category: "feature"
   tags: ["api", "user-management"]
----
 task:
   description: "为用户服务添加密码重置功能"
 
@@ -573,7 +686,6 @@ task:
       - "邮件发送成功"
       - "令牌验证通过"
       - "密码更新成功"
----
 output:
   format:
     code_standards:
@@ -597,14 +709,12 @@ output:
 ### 中级示例 - 架构重构
 
 ```yaml
----
 metadata:
   task_id: "TASK-2025-002"
   task_id_list: ["TASK-2025-000", "TASK-2025-001"] # 任务链
   category: "refactor"
   tags: ["architecture", "microservices"]
   assignee: "architect"
----
 task:
   description: "将单体应用拆分为微服务架构"
 
@@ -663,6 +773,59 @@ task:
         probability: "中"
         mitigation: "使用分布式事务"
 
+  # 任务清单管理
+  todo:
+    items:
+      - id: "T001"
+        title: "服务拆分设计"
+        description: "识别服务边界并设计服务拆分方案"
+        status: "pending"
+        priority: "high"
+        assignee: "architect"
+        estimated_time: "3天"
+      - id: "T002"
+        title: "基础架构搭建"
+        description: "搭建微服务基础设施（服务发现、配置中心等）"
+        status: "pending"
+        priority: "high"
+        assignee: "code"
+        dependencies: ["T001"]
+        estimated_time: "5天"
+      - id: "T003"
+        title: "服务迁移"
+        description: "将现有功能迁移到微服务架构"
+        status: "pending"
+        priority: "medium"
+        assignee: "code"
+        dependencies: ["T001", "T002"]
+        estimated_time: "10天"
+
+    state_management:
+      auto_transition: true
+      state_triggers:
+        pending_to_in_progress:
+          - "架构设计文档完成"
+          - "基础设施准备就绪"
+        in_progress_to_completed:
+          - "所有服务成功迁移"
+          - "性能测试通过"
+
+    organization:
+      groups:
+        - name: "设计阶段"
+          tasks: ["T001"]
+          description: "架构设计和规划"
+        - name: "实施阶段"
+          tasks: ["T002", "T003"]
+          description: "基础设施搭建和服务迁移"
+      milestones:
+        - name: "架构设计完成"
+          date: "2025-02-15"
+          tasks: ["T001"]
+        - name: "微服务上线"
+          date: "2025-03-01"
+          tasks: ["T002", "T003"]
+
   architecture_specific:
     design_principles:
       - "单一职责"
@@ -673,7 +836,6 @@ task:
         - "架构图"
         - "服务依赖图"
         - "部署图"
----
 output:
   format:
     documentation:
@@ -683,306 +845,4 @@ output:
       sections:
         - "架构设计文档"
         - "API规范"
-        - "部署指南"
-
-  validation:
-    automated_tests:
-      - "集成测试"
-      - "性能测试"
-      - "混沌工程测试"
-
-  deliverables:
-    documentation:
-      - title: "微服务架构设计"
-        format: "markdown"
-        location: "docs/architecture/"
-    files:
-      - path: "docker-compose.yml"
-        required: true
-      - path: "k8s/"
-        required: true
 ```
-
-### 高级示例 - 研究项目
-
-```yaml
----
-metadata:
-  task_id: "TASK-2025-003"
-  task_id_list: ["TASK-2025-000", "TASK-2025-001", "TASK-2025-002"] # 完整任务链
-  category: "research"
-  tags: ["ai", "optimization", "performance"]
-  assignee: "researcher"
-  dependencies: ["TASK-2025-001", "TASK-2025-002"]
----
-task:
-  description: "研究并实现AI模型推理优化方案"
-
-  context:
-    reason: "当前模型推理延迟过高，影响用户体验"
-    background: "模型规模增长带来性能挑战"
-    problem_statement: "需要在保持精度的前提下，将推理延迟降低50%"
-
-    relevant_files:
-      - "models/production_model.py"
-      - "benchmark/performance_tests.py"
-      - "docs/model_architecture.md"
-
-    references:
-      - "https://arxiv.org/abs/2301.02698"
-      - "https://pytorch.org/tutorials/intermediate/quantization.html"
-
-    environment:
-      hardware: "NVIDIA A100"
-      framework: "PyTorch 2.0"
-
-    constraints:
-      - "模型精度损失<2%"
-      - "兼容现有API"
-      - "零停机部署"
-
-  requirements:
-    functional:
-      - "评估模型量化方案"
-      - "实现推理引擎优化"
-      - "设计A/B测试框架"
-      - "建立性能监控"
-    non_functional:
-      - "推理吞吐量提升100%"
-      - "GPU利用率>80%"
-      - "内存占用减少30%"
-    technical:
-      - "支持FP16/INT8量化"
-      - "实现动态批处理"
-      - "模型并行推理"
-    research:
-      - "对比TensorRT/ONNX Runtime"
-      - "评估知识蒸馏效果"
-      - "研究稀疏化方案"
-
-  boundaries:
-    allowed_patterns:
-      - "模型优化算法"
-      - "性能测试代码"
-    disallowed_patterns:
-      - "修改模型架构"
-      - "改变训练数据"
-    time_limit: "4周"
-    resource_limits:
-      gpu_hours: "1000"
-      storage: "1TB"
-
-  acceptance:
-    criteria:
-      - "P99延迟<50ms"
-      - "吞吐量>1000 QPS"
-      - "精度损失<2%"
-    quality_standards:
-      code_coverage: "90%"
-      bug_tolerance: "0 critical"
-
-  execution:
-    phases:
-      - "文献调研和方案设计"
-      - "原型开发和测试"
-      - "性能优化和调优"
-      - "生产部署和监控"
-    subtasks:
-      - name: "量化方案评估"
-        description: "对比不同量化技术的效果"
-        estimated_time: "1周"
-      - name: "推理引擎优化"
-        description: "实现自定义推理优化"
-        estimated_time: "2周"
-        dependencies: ["量化方案评估"]
-
-    approach: |
-      1. 使用TensorRT进行模型优化
-      2. 实现动态批处理和请求调度
-      3. 部署多实例负载均衡
-      4. 建立实时性能监控
-
-    alternatives:
-      - "使用ONNX Runtime + OpenVINO"
-      - "自研推理引擎"
-
-    risks:
-      - description: "量化精度损失过大"
-        impact: "高"
-        probability: "中"
-        mitigation: "使用混合精度量化"
-      - description: "优化后稳定性问题"
-        impact: "高"
-        probability: "低"
-        mitigation: "渐进式部署和回滚机制"
----
-output:
-  format:
-    content_requirements:
-      - "详细的性能对比报告"
-      - "部署和维护指南"
-      - "性能监控dashboard"
-    documentation:
-      api_docs: true
-      examples: true
-
-  validation:
-    automated_tests:
-      - "性能基准测试"
-      - "准确性验证测试"
-      - "负载测试"
-      - "稳定性测试"
-    test_coverage: "95%"
-    test_environment:
-      os: "Ubuntu 20.04"
-      dependencies:
-        - "NVIDIA driver 515"
-        - "Docker 20.10"
-
-  deliverables:
-    files:
-      - path: "models/optimized_model.py"
-        required: true
-      - path: "inference_engine/"
-        required: true
-      - path: "benchmark/results/"
-        required: true
-      - path: "monitoring/dashboard/"
-        required: true
-
-    documentation:
-      - title: "AI模型优化研究报告"
-        format: "PDF"
-        location: "docs/research/"
-      - title: "性能优化技术文档"
-        format: "markdown"
-        location: "docs/optimization/"
-
-    artifacts:
-      - name: "优化模型文件"
-        type: "model"
-        location: "models/optimized/"
-      - name: "性能测试数据集"
-        type: "dataset"
-        location: "data/test_sets/"
-
-  reporting:
-    progress_updates:
-      - "周报"
-      - "里程碑演示"
-    final_report:
-      sections:
-        - "执行摘要"
-        - "技术方案"
-        - "性能对比"
-        - "部署指南"
-        - "后续优化建议"
-      format: "markdown"
-```
-
----
-
-## 编写指南和最佳实践
-
-### 编写原则
-
-1. **简洁明确**
-
-   - 每个字段只包含必要信息
-   - 避免冗余描述
-   - 使用标准术语
-
-2. **结构化思维**
-
-   - 按照元数据 → 任务 → 输出的逻辑组织
-   - 相关字段分组放置
-   - 使用层级关系表达复杂信息
-
-3. **可扩展性**
-   - 使用 `custom` 字段添加扩展信息
-   - 保持向后兼容
-   - 支持版本升级
-
-### 最佳实践
-
-1. **元数据部分**
-
-   - 始终填写 `category`
-   - 使用 `task_id_list` 追踪任务来源链
-   - 使用 `tags` 提高任务可发现性
-   - 记录 `dependencies` 管理任务依赖
-
-2. **任务定义部分**
-
-   - `description` 必须简洁明了
-   - `context.reason` 解释任务价值
-   - `requirements` 区分功能和非功能需求
-   - `boundaries` 明确限制条件
-
-3. **输出规范部分**
-   - 明确定义交付物
-   - 设置可验证的验收标准
-   - 指定文档和测试要求
-
-### 常见模式
-
-1. **迭代开发**
-
-   ```yaml
-   execution:
-     phases:
-       - "MVP开发"
-       - "功能扩展"
-       - "性能优化"
-   ```
-
-2. **A/B 测试**
-
-   ```yaml
-   acceptance:
-     demo_requirements:
-       - "准备A/B测试方案"
-       - "设置流量分配"
-   ```
-
-3. **迁移任务**
-   ```yaml
-   execution:
-     rollback_plan: "保留原系统24小时"
-     checkpoints:
-       - "数据迁移完成"
-       - "功能验证通过"
-   ```
-
-### 工具集成
-
-1. **与 Jira 集成**
-
-   ```yaml
-   metadata:
-     custom:
-       jira_ticket: "PROJ-1234"
-       epic_link: "PROJ-1000"
-   ```
-
-2. **与 CI/CD 集成**
-
-   ```yaml
-   output:
-     validation:
-       test_environment:
-         ci_pipeline: "github-actions"
-         deployment_env: "staging"
-   ```
-
-3. **监控集成**
-   ```yaml
-   output:
-     reporting:
-       metrics:
-         - "performance_metrics"
-         - "error_rates"
-         - "user_satisfaction"
-   ```
-
----
