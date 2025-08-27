@@ -18,6 +18,14 @@ python_executables:
 | 安装依赖 | `uv add <package>` | 添加新包到项目 |
 | 运行程序 | `uv run <main.py>` | 在虚拟环境中执行脚本 |
 
+### 网络请求工具
+
+**curl 超时要求**：
+- 所有 curl 命令必须设置超时时间（推荐 5 秒）
+- 连接超时：`--connect-timeout 5`
+- 总体超时：`--max-time 10`
+- 示例：`curl --connect-timeout 5 --max-time 10 https://api.example.com`
+
 ## 🏗️ 技术栈
 
 ### 主要技术
