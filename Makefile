@@ -31,28 +31,28 @@ install:
 # 启动生产模式（仅后端）
 run:
 	@echo "启动生产模式（仅后端）..."
-	@echo "后端服务将在 http://localhost:8001 启动"
-	@echo "API文档: http://localhost:8001/docs"
+	@echo "后端服务将在 http://localhost:14001 启动"
+	@echo "API文档: http://localhost:14001/docs"
 	@echo "按 Ctrl+C 停止服务"
-	@uv run uvicorn app.main:app --host 0.0.0.0 --port 8001
+	@uv run uvicorn app.main:app --host 0.0.0.0 --port 14001
 
 # 启动开发模式（前后端）
 run-dev:
 	@echo "启动开发模式（前后端）..."
-	@echo "后端服务将在 http://localhost:8001 启动"
+	@echo "后端服务将在 http://localhost:14001 启动"
 	@echo "前端服务将在 http://localhost:3005 启动"
 	@echo "按 Ctrl+C 停止服务"
 	# 在后台启动后端
-	@uv run uvicorn app.main:app --reload --host 0.0.0.0 --port 8000 &
+	@uv run uvicorn app.main:app --reload --host 0.0.0.0 --port 14001 &
 	# 启动前端
 	cd app/frontend && yarn run dev --port 3005
 
 # 仅启动后端
 run-backend:
 	@echo "启动后端服务..."
-	@echo "访问地址: http://localhost:8001"
-	@echo "API文档: http://localhost:8001/docs"
-	@uv run uvicorn app.main:app --reload --host 0.0.0.0 --port 8001
+	@echo "访问地址: http://localhost:14001"
+	@echo "API文档: http://localhost:14001/docs"
+	@uv run uvicorn app.main:app --reload --host 0.0.0.0 --port 14001
 
 # 仅启动前端
 run-frontend:

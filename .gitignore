@@ -7,3 +7,4 @@ __pycache__/
 update.sh
 app/frontend/node_modules/
 data/
+logs/

@@ -35,7 +35,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import axios from 'axios'
+import api from '@/api'
 
 const inputText = ref('')
 const responseMessage = ref('')
@@ -46,10 +46,10 @@ const sendToBackend = async () => {
   
   loading.value = true
   try {
-    const response = await axios.get('/api/hello', {
-      params: { message: inputText.value }
+    const response = await api.post('/api/hello', {
+      message: inputText.value
     })
-    responseMessage.value = response.data.message || `收到消息: ${inputText.value}`
+    responseMessage.value = response.message || `收到消息: ${inputText.value}`
   } catch (error) {
     console.error('API 调用失败:', error)
     responseMessage.value = 'API 调用失败，请确保后端服务正在运行'

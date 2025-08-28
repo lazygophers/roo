@@ -85,8 +85,8 @@ const fetchItems = async () => {
   loading.value = true
   error.value = ''
   try {
-    const response = await axios.get('/api/items')
-    items.value = response.data
+    const response = await axios.post('/api/items')
+    items.value = response
   } catch (err) {
     error.value = '获取项目列表失败'
     console.error(err)
@@ -100,7 +100,7 @@ const saveItem = async () => {
   try {
     if (editingItem.value?.id) {
       // 更新
-      await axios.put(`/api/items/${editingItem.value.id}`, formData.value)
+      await axios.post('/api/items/update', formData.value)
     } else {
       // 创建
       await axios.post('/api/items', formData.value)
@@ -125,7 +125,7 @@ const deleteItem = async (id: number) => {
   if (!confirm('确定要删除这个项目吗？')) return
   
   try {
-    await axios.delete(`/api/items/${id}`)
+    await axios.post('/api/items/delete', { id })
     await fetchItems()
   } catch (err) {
     console.error('删除失败:', err)

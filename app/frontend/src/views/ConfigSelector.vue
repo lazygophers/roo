@@ -101,7 +101,7 @@
                     </div>
                     <div class="model-rules-list">
                       <div
-                        v-for="(rule, name) in modelRules[model.slug]"
+                        v-for="(rule, name) in (modelRules[model.slug] || {})"
                         :key="name"
                         class="rule-item"
                         :class="{
@@ -152,7 +152,7 @@
 
           <!-- Roles 选择 -->
           <div class="config-section">
-            <h2>角色 (可选)</h2>
+            <h2>角色（可选）</h2>
             <div class="items-list">
               <div
                 v-for="(role, name) in availableRoles"
@@ -198,7 +198,7 @@
 
           <!-- Commands 选择 -->
           <div class="config-section">
-            <h2>命令</h2>
+            <h2>命令（可选）</h2>
             <div class="items-list">
               <div
                 v-for="(command, name) in availableCommands"
@@ -436,6 +436,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, watch, nextTick } from 'vue'
+import api from '@/api'
 import axios from 'axios'
 import type { Model, Rule, Role, Command } from '@/types'
 import SearchFilter from '@/components/SearchFilter.vue'
@@ -474,6 +475,16 @@ const hooks = ref({
 })
 const modelRules = ref<Record<string, Record<string, Rule>>>({})
 const selectedModelRules = ref<Record<string, string[]>>({})
+
+// 初始化函数
+const initializeModelRules = (modelSlug: string) => {
+  if (!modelRules.value[modelSlug]) {
+    modelRules.value[modelSlug] = {}
+  }
+  if (!selectedModelRules.value[modelSlug]) {
+    selectedModelRules.value[modelSlug] = []
+  }
+}
 const modelSearch = ref('')
 const previewMode = ref<'detailed' | 'simple'>('detailed')
 const isLoading = ref(false)
@@ -529,11 +540,13 @@ const getAllRulesSelected = (modelSlug: string) => {
 // 使用计算属性优化搜索过滤
 const filteredModels = computed(() => {
   const searchTerm = modelSearch.value.toLowerCase()
+  const modelsArray = models.value || []
+  
   if (!searchTerm) {
-    return models.value
+    return modelsArray
   }
   
-  return models.value.filter(model =>
+  return modelsArray.filter(model =>
     model.name.toLowerCase().includes(searchTerm) ||
     model.slug.toLowerCase().includes(searchTerm) ||
     model.description?.toLowerCase().includes(searchTerm) ||
@@ -557,13 +570,19 @@ const clearError = () => {
 const fetchModels = async () => {
   clearError()
   try {
-    const response = await axios.get('/api/models')
-    models.value = response.data
+    const response = await api.post('/api/models')
+    console.log('API Response from /api/models:', response)
+    models.value = response || []
+    console.log('Models value after assignment:', models.value)
+    console.log('Models length:', models.value?.length)
     
     // 自动选择 orchestrator 模型
-    const orchestratorModel = models.value.find(m => m.slug === BRAIN_MODEL_SLUG)
+    const orchestratorModel = (models.value || []).find(m => m.slug === BRAIN_MODEL_SLUG)
+    console.log('Found orchestrator model:', orchestratorModel)
     if (orchestratorModel) {
+      console.log('Adding orchestrator to selected models')
       selectedModels.value.push(orchestratorModel)
+      console.log('Selected models after push:', selectedModels.value)
       await fetchModelRules(BRAIN_MODEL_SLUG)
     }
   } catch (error) {
@@ -575,8 +594,11 @@ const fetchModels = async () => {
 const fetchModelRules = async (slug: string) => {
   clearError()
   try {
-    const response = await axios.get(`/api/rules/${slug}`)
-    const rules = response.data
+    const response = await api.post(`/api/rules/${slug}`)
+    const rules = response || {}
+    
+    // 确保数据结构存在
+    initializeModelRules(slug)
     
     // 存储模型的规则
     modelRules.value[slug] = rules
@@ -595,8 +617,8 @@ const fetchModelRules = async (slug: string) => {
 
 const fetchModelDetails = async (slug: string) => {
   try {
-    const response = await axios.get(`/api/models/${slug}`)
-    return response.data
+    const response = await api.post(`/api/models/${slug}`)
+    return response || {}
   } catch (error) {
     console.error('Failed to fetch model details:', error)
     return null
@@ -605,8 +627,8 @@ const fetchModelDetails = async (slug: string) => {
 
 const fetchRoles = async () => {
   try {
-    const response = await axios.get('/api/roles')
-    availableRoles.value = response.data
+    const response = await api.post('/api/roles')
+    availableRoles.value = response || {}
   } catch (error) {
     console.error('Failed to fetch roles:', error)
   }
@@ -614,8 +636,9 @@ const fetchRoles = async () => {
 
 const fetchCommands = async () => {
   try {
-    const response = await axios.get('/api/commands')
-    availableCommands.value = response.data
+    const response = await api.post('/api/commands')
+    console.log(response)
+    availableCommands.value = response || {}
   } catch (error) {
     console.error('Failed to fetch commands:', error)
   }
@@ -624,12 +647,12 @@ const fetchCommands = async () => {
 const fetchHooks = async () => {
   try {
     const [beforeResponse, afterResponse] = await Promise.all([
-      axios.get('/api/hooks/before'),
-      axios.get('/api/hooks/after')
+      api.post('/api/hooks/before'),
+      api.post('/api/hooks/after')
     ])
     hooks.value = {
-      before: beforeResponse.data,
-      after: afterResponse.data
+      before: beforeResponse || '',
+      after: afterResponse || ''
     }
   } catch (error) {
     console.error('Failed to fetch hooks:', error)
@@ -654,8 +677,11 @@ const toggleModel = async (model: Model) => {
     
     // 获取该 model 的 rules
     try {
-      const response = await axios.get(`/api/rules/${model.slug}`)
-      const newRules = response.data
+      const response = await api.post(`/api/rules/${model.slug}`)
+      const newRules = response || {}
+      
+      // 确保数据结构存在
+      initializeModelRules(model.slug)
       
       // 存储模型的 rules
       modelRules.value[model.slug] = newRules
@@ -697,9 +723,8 @@ const toggleModelRule = (modelSlug: string, ruleName: string, rule: Rule) => {
     return
   }
   
-  if (!selectedModelRules.value[modelSlug]) {
-    selectedModelRules.value[modelSlug] = []
-  }
+  // 确保数据结构存在
+  initializeModelRules(modelSlug)
   
   const index = selectedModelRules.value[modelSlug].indexOf(ruleName)
   if (index > -1) {
@@ -780,22 +805,37 @@ const exportConfig = () => {
 }
 
 // 生命周期
+console.log('🎯 ConfigSelector 组件开始初始化')
+
 onMounted(async () => {
-  await Promise.all([
-    fetchModels(),
-    fetchRoles(),
-    fetchCommands(),
-    fetchHooks()
-  ])
+  console.log('🚀 ConfigSelector 组件已挂载，开始获取数据')
+  try {
+    await Promise.all([
+      fetchModels(),
+      fetchRoles(),
+      fetchCommands(),
+      fetchHooks()
+    ])
+    console.log('✅ 所有初始数据获取完成')
+  } catch (error) {
+    console.error('❌ 初始数据获取失败:', error)
+  }
   
   // 初始化时自动选择 orchestrator
   nextTick(() => {
-    if (models.value.length > 0 && !selectedModels.value.some(m => m.slug === BRAIN_MODEL_SLUG)) {
-      const orchestratorModel = models.value.find(m => m.slug === BRAIN_MODEL_SLUG)
+    console.log('🔄 nextTick 回调执行')
+    console.log('当前 models 长度:', (models.value || [])?.length)
+    console.log('当前 selectedModels:', selectedModels.value)
+    if (((models.value || [])?.length || 0) > 0 && !(selectedModels.value || []).some(m => m.slug === BRAIN_MODEL_SLUG)) {
+      console.log('准备自动选择 orchestrator')
+      const orchestratorModel = (models.value || []).find(m => m.slug === BRAIN_MODEL_SLUG)
       if (orchestratorModel) {
+        console.log('添加 orchestrator 到已选择')
         selectedModels.value.push(orchestratorModel)
         fetchModelRules(orchestratorModel.slug)
       }
+    } else {
+      console.log('orchestrator 已经存在或 models 为空')
     }
   })
 })
@@ -804,40 +844,9 @@ onMounted(async () => {
 const handleGlobalSearch = (query: string, filters: any) => {
   globalSearchQuery.value = query
   
-  // 根据查询和过滤器过滤数据
-  const filterByQuery = (items: any[], fields: string[]) => {
-    if (!query) return items
-    const lowerQuery = query.toLowerCase()
-    return items.filter(item =>
-      fields.some(field => {
-        const value = item[field]
-        if (typeof value === 'string') {
-          return value.toLowerCase().includes(lowerQuery)
-        }
-        return false
-      })
-    )
-  }
-
-  // 根据作用域过滤
-  switch (filters.scope) {
-    case 'models':
-      filteredModels.value = filterByQuery(models.value, ['name', 'slug', 'description'])
-      break
-    case 'rules':
-      // 过滤规则（这里需要在后续实现）
-      break
-    case 'roles':
-      // 过滤角色（这里需要在后续实现）
-      break
-    case 'commands':
-      // 过滤命令（这里需要在后续实现）
-      break
-    default:
-      // 全局搜索 - 过滤所有数据
-      filteredModels.value = filterByQuery(models.value, ['name', 'slug', 'description'])
-      // TODO: 添加其他数据的过滤
-  }
+  // 更新搜索查询，但不过滤计算属性
+  // 计算属性会根据 globalSearchQuery.value 自动更新
+  // 实际的过滤逻辑在 filteredModels 计算属性中处理
 }
 
 // 处理搜索过滤器变化
