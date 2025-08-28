@@ -18,22 +18,6 @@ const routes: RouteRecordRaw[] = [
       title: '配置选择器'
     }
   },
-  {
-    path: '/items',
-    name: 'Items',
-    component: () => import('@/views/ItemsView.vue'),
-    meta: {
-      title: '项目管理'
-    }
-  },
-  {
-    path: '/about',
-    name: 'About',
-    component: () => import('@/views/AboutView.vue'),
-    meta: {
-      title: '关于'
-    }
-  }
 ]
 
 const router = createRouter({

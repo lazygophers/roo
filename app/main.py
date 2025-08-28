@@ -36,75 +36,118 @@ async def get_data():
 # 添加路由来服务前端页面
 @app.get("/", response_class=HTMLResponse)
 async def read_root():
-    try:
-        # 尝试读取构建好的前端文件
-        with open("app/static/dist/index.html", "r", encoding="utf-8") as f:
-            return HTMLResponse(content=f.read())
-    except FileNotFoundError:
-        # 如果找不到构建文件，返回默认页面
-        return """
-        <!DOCTYPE html>
-        <html lang="zh-CN">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Python + Vue3 示例</title>
-            <style>
-                body {
-                    font-family: Arial, sans-serif;
-                    margin: 40px;
-                    background-color: #f5f5f5;
-                }
-                .container {
-                    max-width: 800px;
-                    margin: 0 auto;
-                    background-color: white;
-                    padding: 30px;
-                    border-radius: 8px;
-                    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-                }
-                h1 {
-                    color: #333;
-                    text-align: center;
-                }
-                .message {
-                    margin-top: 30px;
-                    padding: 20px;
-                    background-color: #e3f2fd;
-                    border-radius: 4px;
-                    text-align: center;
-                }
-                .api-link {
-                    display: inline-block;
-                    margin: 10px;
-                    padding: 10px 20px;
-                    background-color: #2196F3;
-                    color: white;
-                    text-decoration: none;
-                    border-radius: 4px;
-                }
-                .api-link:hover {
-                    background-color: #1976D2;
-                }
-            </style>
-        </head>
-        <body>
-            <div class="container">
-                <h1>Python + Vue3 + TypeScript 示例服务</h1>
-                <div class="message">
-                    <p>欢迎使用示例服务！</p>
-                    <p>后端已使用 FastAPI 框架成功启动</p>
-                    <p>前端需要先构建: <code>cd app/frontend && npm run build</code></p>
-                </div>
-                <div style="text-align: center; margin-top: 30px;">
-                    <a href="/api/hello" class="api-link">访问 Hello API</a>
-                    <a href="/api/data" class="api-link">访问数据 API</a>
-                    <a href="/docs" class="api-link">查看 API 文档</a>
+    # 开发模式下重定向到前端开发服务器
+    return """
+    <!DOCTYPE html>
+    <html lang="zh-CN">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Python + Vue3 示例</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                margin: 40px;
+                background-color: #0f172a;
+                color: #e2e8f0;
+            }
+            .container {
+                max-width: 800px;
+                margin: 0 auto;
+                background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+                padding: 30px;
+                border-radius: 16px;
+                box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+                border: 1px solid rgba(255,255,255,0.1);
+            }
+            h1 {
+                color: #60a5fa;
+                text-align: center;
+                margin-bottom: 30px;
+                font-size: 2.5em;
+                text-shadow: 0 0 20px rgba(96,165,250,0.5);
+            }
+            .message {
+                margin-top: 30px;
+                padding: 25px;
+                background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+                border-radius: 12px;
+                text-align: center;
+                border: 1px solid rgba(96,165,250,0.3);
+            }
+            .dev-info {
+                margin: 30px 0;
+                padding: 20px;
+                background: rgba(59,130,246,0.1);
+                border-radius: 8px;
+                border-left: 4px solid #60a5fa;
+            }
+            .dev-link {
+                display: inline-block;
+                margin: 15px 10px;
+                padding: 12px 30px;
+                background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+                color: white;
+                text-decoration: none;
+                border-radius: 8px;
+                font-weight: bold;
+                transition: all 0.3s ease;
+                box-shadow: 0 4px 15px rgba(96,165,250,0.4);
+            }
+            .dev-link:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 20px rgba(96,165,250,0.6);
+            }
+            .api-link {
+                display: inline-block;
+                margin: 10px;
+                padding: 10px 20px;
+                background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+                color: white;
+                text-decoration: none;
+                border-radius: 6px;
+                transition: all 0.3s ease;
+            }
+            .api-link:hover {
+                transform: translateY(-1px);
+                box-shadow: 0 4px 12px rgba(16,185,129,0.4);
+            }
+            code {
+                background: rgba(0,0,0,0.3);
+                padding: 2px 6px;
+                border-radius: 4px;
+                color: #a78bfa;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>🚀 Python + Vue3 + TypeScript</h1>
+            <div class="message">
+                <p style="font-size: 1.2em; margin-bottom: 15px;">✨ 欢迎使用开发服务器！</p>
+                <p>后端已使用 FastAPI 框架成功启动 🎯</p>
+            </div>
+            
+            <div class="dev-info">
+                <h3>📱 前端开发服务器</h3>
+                <p>前端正在开发模式下运行，请访问以下链接：</p>
+                <div style="text-align: center; margin-top: 20px;">
+                    <a href="http://localhost:3005" class="dev-link" target="_blank">
+                        打开前端应用 (端口 3005)
+                    </a>
                 </div>
             </div>
-        </body>
-        </html>
-        """
+            
+            <div style="text-align: center; margin-top: 40px;">
+                <h3 style="color: #94a3b8; margin-bottom: 20px;">API 测试链接</h3>
+                <a href="/api/hello" class="api-link">Hello API</a>
+                <a href="/api/data" class="api-link">数据 API</a>
+                <a href="/docs" class="api-link">API 文档</a>
+            </div>
+        </div>
+    </body>
+    </html>
+    """
 
 if __name__ == "__main__":
     import uvicorn

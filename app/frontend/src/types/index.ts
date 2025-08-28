@@ -10,16 +10,36 @@ export interface Model {
 export interface Rule {
   name: string
   content: string
+  metadata?: {
+    title?: string
+    description?: string
+    category?: string
+    priority?: string
+    tags?: string[]
+  }
 }
 
 export interface Command {
   name: string
   content: string
+  metadata?: {
+    title?: string
+    description?: string
+    category?: string
+    usage?: string
+    examples?: string[]
+  }
 }
 
 export interface Role {
   name: string
   content: string
+  metadata?: {
+    title?: string
+    description?: string
+    traits?: string[]
+    features?: string[]
+  }
 }
 
 export interface SelectedConfig {
@@ -30,7 +50,22 @@ export interface SelectedConfig {
   hooks: {
     before: string
     after: string
+    beforeMetadata?: any
+    afterMetadata?: any
   }
+}
+
+// 元数据接口
+export interface Metadata {
+  title?: string
+  description?: string
+  category?: string
+  priority?: string
+  tags?: string[]
+  traits?: string[]
+  features?: string[]
+  usage?: string
+  examples?: string[]
 }
 
 export interface ApiResponse<T> {

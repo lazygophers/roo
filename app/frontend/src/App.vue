@@ -7,8 +7,6 @@
       <div class="nav-links">
         <router-link to="/">首页</router-link>
         <router-link to="/config">配置选择器</router-link>
-        <router-link to="/items">项目管理</router-link>
-        <router-link to="/about">关于</router-link>
       </div>
     </nav>
     
