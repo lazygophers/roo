@@ -6,5 +6,4 @@ mcp/cache/
 __pycache__/
 update.sh
 app/frontend/node_modules/
-app/static/dist/
 data/
