@@ -1,7 +1,8 @@
-from fastapi import FastAPI, Query
+from fastapi import FastAPI, Query, Request
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, RedirectResponse
 from pathlib import Path
+import os
 from app.api.routes import router as api_router
 
 app = FastAPI(
@@ -12,6 +13,12 @@ app = FastAPI(
 
 # 挂载静态文件目录
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
+
+# 检查是否存在前端构建文件
+frontend_build_path = Path("app/static/dist")
+if frontend_build_path.exists():
+    # 生产模式：挂载前端构建文件
+    app.mount("/", StaticFiles(directory="app/static/dist", html=True), name="frontend")
 
 # 注册API路由
 app.include_router(api_router, prefix="/api")
@@ -33,9 +40,15 @@ async def get_data():
         ]
     }
 
-# 添加路由来服务前端页面
+# 添加路由来服务前端页面（仅在开发模式或没有构建文件时）
 @app.get("/", response_class=HTMLResponse)
-async def read_root():
+async def read_root(request: Request):
+    # 如果存在前端构建文件，FastAPI会自动通过StaticFiles服务
+    # 这里只处理开发模式的情况
+    if frontend_build_path.exists():
+        # 生产模式下不应该到达这里，但以防万一
+        return RedirectResponse(url="/index.html")
+    
     # 开发模式下重定向到前端开发服务器
     return """
     <!DOCTYPE html>
