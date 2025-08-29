@@ -122,44 +122,48 @@
                       <div
                         v-for="(rule, name) in (modelRules[model.slug] || {})"
                         :key="name"
-                        class="rule-item"
+                        class="rule-card"
                         :class="{
                           selected: isRuleSelected(model.slug, name),
                           disabled: model.slug === BRAIN_MODEL_SLUG
                         }"
                         @click.stop="model.slug !== BRAIN_MODEL_SLUG && toggleModelRule(model.slug, name, rule)"
                       >
-                        <div class="rule-header">
-                          <input
-                            type="checkbox"
-                            :checked="isRuleSelected(model.slug, name)"
-                            @change.stop="toggleModelRule(model.slug, name, rule)"
-                            :disabled="model.slug === BRAIN_MODEL_SLUG"
-                            class="custom-checkbox"
-                          />
-                          <div class="rule-info">
-                            <h5 class="text-primary">{{ name }}</h5>
+                        <div class="rule-card-header">
+                          <div class="rule-checkbox">
+                            <input
+                              type="checkbox"
+                              :checked="isRuleSelected(model.slug, name)"
+                              @change.stop="toggleModelRule(model.slug, name, rule)"
+                              :disabled="model.slug === BRAIN_MODEL_SLUG"
+                              class="custom-checkbox"
+                            />
                           </div>
-                        </div>
-                        <div class="rule-preview" v-if="rule.content || rule.metadata">
-                          <!-- 简洁模式：只显示标题和描述 -->
-                          <div v-if="previewMode === 'simple' && rule.metadata" class="rule-metadata-simple">
-                            <h5 v-if="rule.metadata.title" class="rule-title">{{ rule.metadata.title }}</h5>
-                            <p v-if="rule.metadata.description" class="rule-description">{{ rule.metadata.description }}</p>
-                            <div v-if="rule.metadata.category || rule.metadata.tags" class="rule-meta-info">
-                              <span v-if="rule.metadata.category" class="category-tag">{{ rule.metadata.category }}</span>
-                              <span v-if="rule.metadata.tags && rule.metadata.tags.length > 0" class="tags">
-                                {{ rule.metadata.tags.join(', ') }}
+                          <div class="rule-title-section">
+                            <h5 class="rule-title">{{ rule.metadata?.title || formatRuleName(name) }}</h5>
+                            <div class="rule-badges" v-if="rule.metadata?.category || rule.metadata?.priority">
+                              <span v-if="rule.metadata.category" class="category-badge">{{ rule.metadata.category }}</span>
+                              <span v-if="rule.metadata.priority" class="priority-badge" :class="rule.metadata.priority">
+                                {{ rule.metadata.priority }}
                               </span>
                             </div>
                           </div>
-                          <!-- 详细模式：显示内容预览 -->
-                          <div v-else class="rule-content-preview">
-                            <div v-if="rule.metadata" class="rule-metadata-header">
-                              <h5>{{ rule.metadata.title || name }}</h5>
-                              <p v-if="rule.metadata.description" class="meta-description">{{ rule.metadata.description }}</p>
-                            </div>
-                            <pre v-if="rule.content">{{ rule.content.substring(0, PREVIEW_LENGTH) }}{{ rule.content.length > PREVIEW_LENGTH ? '...' : '' }}</pre>
+                          <div class="rule-status">
+                            <span v-if="isRuleSelected(model.slug, name)" class="status-indicator selected">✓</span>
+                            <span v-else class="status-indicator"></span>
+                          </div>
+                        </div>
+                        <div class="rule-card-body">
+                          <div class="rule-description" v-if="rule.metadata?.description">
+                            {{ rule.metadata.description }}
+                          </div>
+                          <div class="rule-tags" v-if="rule.metadata?.tags && rule.metadata.tags.length > 0">
+                            <span v-for="tag in rule.metadata.tags" :key="tag" class="tag">{{ tag }}</span>
+                          </div>
+                        </div>
+                        <div class="rule-card-footer" v-if="previewMode === 'detailed' && rule.content">
+                          <div class="content-preview">
+                            <pre>{{ rule.content.substring(0, PREVIEW_LENGTH) }}{{ rule.content.length > PREVIEW_LENGTH ? '...' : '' }}</pre>
                           </div>
                         </div>
                       </div>
@@ -1518,7 +1522,7 @@ h1 {
   justify-content: center;
 }
 
-.item-card:has(.item-header) {
+.item-card:has(.rule-header) {
   min-height: auto;
 }
 
@@ -1551,28 +1555,15 @@ h1 {
     inset 0 0 20px rgba(120, 255, 214, 0.1);
 }
 
-.item-header {
+.rule-header {
   display: flex;
   align-items: center;
   gap: 1rem;
   min-height: 44px;
   padding: 12px 0;
-}
-
-.item-header input[type="radio"],
-.item-header input[type="checkbox"] {
-  width: 24px;
-  height: 24px;
-  min-width: 24px;
-  min-height: 24px;
-  margin-right: 16px;
-  accent-color: var(--accent-cyan);
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
+.rule-header input[type="radio"],
 /* 自定义checkbox样式 */
-.item-header input[type="checkbox"] {
+.rule-header input[type="checkbox"] {
   appearance: none;
   -webkit-appearance: none;
   position: relative;
@@ -1587,12 +1578,12 @@ h1 {
   transition: all 0.3s ease;
 }
 
-.item-header input[type="checkbox"]:checked {
+.rule-header input[type="checkbox"]:checked {
   background: var(--accent-cyan);
   border-color: var(--accent-cyan);
 }
 
-.item-header input[type="checkbox"]:checked::after {
+.rule-header input[type="checkbox"]:checked::after {
   content: '✓';
   position: absolute;
   top: 50%;
@@ -1603,18 +1594,18 @@ h1 {
   font-weight: bold;
 }
 
-.item-header input[type="checkbox"]:hover:not(:disabled) {
+.rule-header input[type="checkbox"]:hover:not(:disabled) {
   border-color: var(--accent-cyan);
   transform: scale(1.1);
 }
 
-.item-header input[type="checkbox"]:disabled {
+.rule-header input[type="checkbox"]:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
 
 /* 自定义radio样式 */
-.item-header input[type="radio"] {
+.rule-header input[type="radio"] {
   appearance: none;
   -webkit-appearance: none;
   position: relative;
@@ -1629,12 +1620,12 @@ h1 {
   transition: all 0.3s ease;
 }
 
-.item-header input[type="radio"]:checked {
+.rule-header input[type="radio"]:checked {
   background: var(--accent-cyan);
   border-color: var(--accent-cyan);
 }
 
-.item-header input[type="radio"]:checked::after {
+.rule-header input[type="radio"]:checked::after {
   content: '';
   position: absolute;
   top: 50%;
@@ -1646,12 +1637,12 @@ h1 {
   background: white;
 }
 
-.item-header input[type="radio"]:hover:not(:disabled) {
+.rule-header input[type="radio"]:hover:not(:disabled) {
   border-color: var(--accent-cyan);
   transform: scale(1.1);
 }
 
-.item-header input[type="radio"]:disabled {
+.rule-header input[type="radio"]:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
@@ -2299,7 +2290,163 @@ h1 {
   }
 
   .model-rules-list {
+    gap: 0.75rem;
+  }
+  
+  /* 规则卡片样式 */
+  .model-rules-list .rule-item {
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    padding: 1rem;
+    background: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow:
+      0 4px 12px rgba(0, 0, 0, 0.2),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .model-rules-list .rule-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(120, 255, 214, 0.1), transparent);
+    transition: left 0.5s ease;
+  }
+  
+  .model-rules-list .rule-item:hover {
+    border-color: var(--accent-cyan);
+    transform: translateY(-2px);
+    box-shadow:
+      0 8px 24px rgba(0, 0, 0, 0.3),
+      0 0 16px rgba(120, 255, 214, 0.2),
+      inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  }
+  
+  .model-rules-list .rule-item:hover::before {
+    left: 100%;
+  }
+  
+  .model-rules-list .rule-item.selected {
+    border-color: var(--accent-cyan);
+    background: var(--glass-bg-selected);
+    box-shadow:
+      0 8px 24px rgba(120, 255, 214, 0.3),
+      inset 0 0 20px rgba(120, 255, 214, 0.1);
+  }
+  
+  .model-rules-list .rule-item.selected::before {
+    display: none;
+  }
+  
+  .model-rules-list .rule-item.disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
+  
+  .model-rules-list .rule-item.disabled:hover {
+    transform: none;
+    box-shadow:
+      0 4px 12px rgba(0, 0, 0, 0.2),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  }
+  
+  /* 规则卡片头部 */
+  .model-rules-list .rule-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem 0;
+    gap: 1rem;
+  }
+  
+  .model-rules-list .rule-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  
+  .model-rules-list .rule-info h5 {
+    margin: 0;
+    color: var(--text-primary);
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.4;
+  }
+  
+  .model-rules-list .rule-description {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    line-height: 1.5;
+    margin: 0;
+  }
+  
+  /* 规则参数区域 */
+  .model-rules-list .rule-params {
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  .model-rules-list .param-item {
+    display: flex;
+    align-items: center;
     gap: 0.5rem;
+    padding: 0.25rem 0;
+    font-size: 0.875rem;
+  }
+  
+  .model-rules-list .param-name {
+    color: var(--accent-cyan);
+    font-weight: 600;
+    font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  }
+  
+  .model-rules-list .param-value {
+    color: var(--text-secondary);
+    font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+    background: rgba(59, 130, 246, 0.1);
+    padding: 0.125rem 0.5rem;
+    border-radius: 4px;
+  }
+  
+  /* 响应式调整 */
+  @media (max-width: 768px) {
+    .model-rules-list {
+      gap: 0.5rem;
+    }
+    
+    .model-rules-list .rule-item {
+      padding: 0.75rem;
+    }
+    
+    .model-rules-list .rule-info h5 {
+      font-size: 0.95rem;
+    }
+    
+    .model-rules-list .rule-description {
+      font-size: 0.8rem;
+    }
+    
+    .model-rules-list .param-item {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.25rem;
+    }
+    
+    .model-rules-list .param-value {
+      width: 100%;
+      text-align: left;
+    }
+  }
   }
 
   .rule-item {
@@ -2756,3 +2903,256 @@ h1 {
     background: linear-gradient(135deg, #10b981 0%, #059669 100%);
     color: white;
   }
+
+/* Rule Card Styles */
+.rule-card {
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  padding: 1rem;
+  margin-bottom: 0.75rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: var(--glass-bg);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  position: relative;
+  overflow: hidden;
+  box-shadow: 
+    0 4px 12px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.rule-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(120, 255, 214, 0.2), transparent);
+  transition: left 0.5s ease;
+}
+
+.rule-card:hover {
+  border-color: var(--accent-cyan);
+  transform: translateY(-2px);
+  box-shadow: 
+    0 8px 24px rgba(0, 0, 0, 0.3),
+    0 0 16px rgba(120, 255, 214, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.rule-card:hover::before {
+  left: 100%;
+}
+
+.rule-card.selected {
+  border-color: var(--accent-cyan);
+  background: var(--glass-bg-selected);
+  box-shadow: 
+    0 8px 24px rgba(120, 255, 214, 0.3),
+    inset 0 0 20px rgba(120, 255, 214, 0.1);
+}
+
+.rule-card.selected::before {
+  display: none;
+}
+
+.rule-card.disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.rule-card.disabled:hover {
+  transform: none;
+  box-shadow: 
+    0 4px 12px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.rule-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+  gap: 1rem;
+}
+
+.rule-checkbox {
+  flex-shrink: 0;
+}
+
+.rule-title-section {
+  flex: 1;
+  min-width: 0;
+}
+
+.rule-title {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.rule-badges {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-top: 0.25rem;
+}
+
+.category-badge {
+  background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-purple) 100%);
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  display: inline-block;
+  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+}
+
+.priority-badge {
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.priority-badge.critical {
+  background: linear-gradient(135deg, #ef4444 0%, #991b1b 100%);
+  color: white;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.priority-badge.high {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  color: white;
+}
+
+.priority-badge.medium {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  color: white;
+}
+
+.priority-badge.low {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+}
+
+.rule-status {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.status-indicator {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--glass-bg);
+  border: 2px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: bold;
+  transition: all 0.3s ease;
+}
+
+.status-indicator.selected {
+  background: var(--accent-cyan);
+  border-color: var(--accent-cyan);
+  color: white;
+}
+
+.rule-card-body {
+  margin-bottom: 0.75rem;
+}
+
+.rule-description {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.rule-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.rule-tags .tag {
+  background: rgba(59, 130, 246, 0.1);
+  color: var(--text-secondary);
+  padding: 0.25rem 0.75rem;
+  border-radius: 16px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  transition: all 0.3s ease;
+}
+
+.rule-tags .tag:hover {
+  background: rgba(59, 130, 246, 0.2);
+  color: var(--text-primary);
+  transform: scale(1.05);
+}
+
+.rule-card-footer {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 0.75rem;
+}
+
+.content-preview pre {
+  background: var(--code-bg);
+  color: var(--code-text);
+  padding: 0.75rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow-x: auto;
+  margin: 0;
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+  .rule-card {
+    padding: 0.75rem;
+  }
+  
+  .rule-card-header {
+    margin-bottom: 0.5rem;
+  }
+  
+  .rule-title {
+    font-size: 0.95rem;
+  }
+  
+  .rule-description {
+    font-size: 0.85rem;
+  }
+  
+  .rule-badges {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+  }
+  
+  .rule-tags {
+    margin-top: 0.25rem;
+  }
+  
+  .content-preview pre {
+    font-size: 0.8rem;
+    padding: 0.5rem;
+  }
+}

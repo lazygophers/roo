@@ -36,12 +36,12 @@ class ColoredFormatter(logging.Formatter):
         return super().format(record)
 
 
-def setup_logger(name: str, log_dir: Path = None) -> logging.Logger:
+def setup_logger(name: str = None, log_dir: Path = None) -> logging.Logger:
     """
     设置日志记录器
     
     Args:
-        name: 日志记录器名称
+        name: 日志记录器名称（现在仅用于标识模块，不影响文件名）
         log_dir: 日志目录，默认为项目根目录下的logs文件夹
         
     Returns:
@@ -53,7 +53,9 @@ def setup_logger(name: str, log_dir: Path = None) -> logging.Logger:
     log_dir.mkdir(exist_ok=True)
     
     # 创建日志记录器
-    logger = logging.getLogger(name)
+    # 使用统一的名称，确保所有模块共享同一个logger实例
+    logger_name = "app unified"
+    logger = logging.getLogger(logger_name)
     logger.setLevel(logging.DEBUG)
     
     # 避免重复添加处理器
@@ -77,9 +79,9 @@ def setup_logger(name: str, log_dir: Path = None) -> logging.Logger:
     console_handler.setFormatter(console_formatter)
     logger.addHandler(console_handler)
     
-    # 文件处理器 - 按小时分割
+    # 文件处理器 - 按小时分割，使用统一的文件名
     current_time = datetime.now(pytz.timezone('Asia/Shanghai'))
-    log_file = log_dir / f"{name}_{current_time.strftime('%Y-%m-%d_%H')}.log"
+    log_file = log_dir / f"app_{current_time.strftime('%Y-%m-%d_%H')}.log"
     
     file_handler = logging.handlers.TimedRotatingFileHandler(
         filename=log_file,
@@ -93,27 +95,26 @@ def setup_logger(name: str, log_dir: Path = None) -> logging.Logger:
     logger.addHandler(file_handler)
     
     # 清理旧日志文件（保留3小时内的）
-    cleanup_old_logs(log_dir, name, hours=3)
+    cleanup_old_logs(log_dir, hours=3)
     
     return logger
 
 
-def cleanup_old_logs(log_dir: Path, logger_name: str, hours: int = 3):
+def cleanup_old_logs(log_dir: Path, hours: int = 3):
     """
     清理指定小时数之前的日志文件
     
     Args:
         log_dir: 日志目录
-        logger_name: 日志记录器名称
         hours: 要保留的小时数
     """
     try:
         cutoff_time = datetime.now(pytz.timezone('Asia/Shanghai')) - timedelta(hours=hours)
         
-        for log_file in log_dir.glob(f"{logger_name}_*.log"):
+        for log_file in log_dir.glob("app_*.log"):
             # 从文件名提取时间
             try:
-                # 文件名格式: logger_name_YYYY-MM-DD_HH.log
+                # 文件名格式: app_YYYY-MM-DD_HH.log
                 time_str = log_file.stem.split('_', 1)[1]
                 file_time = datetime.strptime(time_str, '%Y-%m-%d_%H')
                 file_time = pytz.timezone('Asia/Shanghai').localize(file_time)
@@ -150,8 +151,11 @@ def get_logger(name: str, log_dir: Path = None) -> logging.Logger:
     return setup_logger(name, log_dir)
 
 
-# 预配置的日志记录器
-app_logger = setup_logger('app')
-db_logger = setup_logger('database')
-utils_logger = setup_logger('utils')
-test_logger = setup_logger('test')
+# 预配置的统一日志记录器
+logger = setup_logger('app unified')
+
+# 为了向后兼容，保留原有名称的别名
+app_logger = logger
+db_logger = logger
+utils_logger = logger
+test_logger = logger
