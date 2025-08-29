@@ -20,6 +20,28 @@ python_executables:
 | 添加依赖 | `uv add <package>` | 将新包添加到项目依赖 |
 | 运行程序 | `uv run <main.py>` | 在虚拟环境中执行脚本 |
 
+### Yarn 包管理（前端）
+
+**核心原则**：
+- 前端项目必须使用 Yarn 作为包管理器
+- 禁止使用 npm 直接安装依赖
+- 所有依赖版本必须锁定在 `yarn.lock` 文件中
+
+| 操作 | 命令 | 功能说明 |
+|------|------|----------|
+| 安装依赖 | `yarn install` | 根据 package.json 安装所有依赖 |
+| 添加依赖 | `yarn add <package>` | 添加生产环境依赖 |
+| 添加开发依赖 | `yarn add -D <package>` | 添加开发环境依赖 |
+| 升级依赖 | `yarn upgrade <package>` | 升级指定包到最新版本 |
+| 移除依赖 | `yarn remove <package>` | 移除指定依赖 |
+| 运行脚本 | `yarn <script>` | 执行 package.json 中定义的脚本 |
+
+**工作流程**：
+1. 新建前端项目时先执行 `yarn init` 创建 package.json
+2. 使用 `yarn add` 添加所需依赖
+3. 提交代码时必须包含 `yarn.lock` 文件
+4. 团队成员使用 `yarn install` 同步依赖
+
 ### 网络请求规范
 
 **curl 超时配置**：
@@ -69,10 +91,12 @@ build:
 languages:
   - python    # 后端语言
   - vue       # 前端框架
+  - react     # 前端框架
 
 frameworks:
   backend: "fastapi"    # 后端框架
   frontend: "vuepy"     # 前端框架
+  frontend_react: "react"  # 前端框架
   database: "tinydb"    # 数据库
 ```
 
@@ -84,6 +108,59 @@ frameworks:
 - **代码质量**: 严格遵循代码规范
 - **架构设计**: 合理的分层分包
 - **开发方式**: 渐进式开发
+
+### CSS 样式分离要求
+
+**核心原则**：
+- 严格遵循样式与结构分离的原则
+- 禁止在组件文件中使用内联样式
+- 禁止使用 `!important` 覆盖样式优先级
+
+**样式组织规范**：
+
+1. **模块化样式**
+   - 每个组件必须有独立的样式文件
+   - 样式文件命名：`ComponentName.module.css`（React）或 `ComponentName.scss`（Vue）
+   - 使用 CSS Modules 或 scoped 样式避免全局污染
+
+2. **样式文件结构**
+   ```
+   src/
+   ├── styles/
+   │   ├── variables.css      # CSS 变量定义
+   │   ├── mixins.css         # 混合器定义
+   │   ├── global.css         # 全局样式
+   │   └── components/        # 组件样式目录
+   │       ├── Button.module.css
+   │       └── Card.module.css
+   └── components/
+       ├── Button/
+       │   ├── Button.jsx
+       │   └── Button.module.css
+       └── Card/
+           ├── Card.jsx
+           └── Card.module.css
+   ```
+
+3. **CSS 命名规范**
+   - 使用 BEM（Block Element Modifier）命名规范
+   - 类名使用小写字母，单词间用连字符 `-` 连接
+   - 避免使用标签选择器和 ID 选择器
+
+4. **响应式设计**
+   - 必须使用相对单位（rem、em、%、vw、vh）
+   - 使用 CSS Grid 或 Flexbox 进行布局
+   - 媒体查询必须使用移动优先（mobile-first）策略
+
+5. **主题支持**
+   - 所有颜色、字体、间距等必须使用 CSS 变量
+   - 支持亮色/暗色主题切换
+   - 主题变量统一在 `variables.css` 中定义
+
+**样式检查**：
+- 使用 Stylelint 进行代码检查
+- 配合 Prettier 进行格式化
+- 在 CI/CD 流程中加入样式检查环节
 
 ### 开发流程
 
