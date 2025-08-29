@@ -34,6 +34,8 @@ python_executables:
 - 项目必须提供 [`Makefile`](Makefile)
 - 通用操作必须通过 Makefile 执行
 - 禁止直接使用 `uv run` 等命令
+- **禁止直接使用 `python` 或 `pip` 命令**
+- **所有 Python 相关操作必须通过 `uv` 命令或 Makefile 目标执行**
 - Makefile 需包含：开发、测试、构建、部署等目标
 
 **标准 Makefile 模板**：
@@ -117,6 +119,22 @@ resources/
 └── hooks/                   # 钩子脚本
     ├── before.md            # 全局前置规则 ✨
     └── after.md             # 全局后置规则
+
+# 其他重要目录
+logs/                         # 日志文件目录
+    ├── app.log              # 应用程序日志
+    ├── error.log             # 错误日志
+    └── access.log            # 访问日志
+
+data/                         # 数据库文件目录
+    ├── database.json         # TinyDB 数据库文件
+    ├── backup/               # 数据库备份目录
+    └── cache/                # 缓存数据目录
+
+tests/                        # 测试文件目录
+    ├── unit/                 # 单元测试
+    ├── integration/          # 集成测试
+    └── fixtures/             # 测试数据
 ```
 
 ### 核心功能
