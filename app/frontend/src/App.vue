@@ -24,7 +24,8 @@
         -->
         <router-link to="/">Roo Code 配置管理工具</router-link>
       </div>
-      <!-- 导航链接区域 -->
+      
+      <!-- 桌面端导航链接 -->
       <div class="nav-links">
         <!--
           主导航菜单
@@ -35,7 +36,20 @@
         <router-link to="/">首页</router-link>
         <router-link to="/config">配置选择器</router-link>
       </div>
+      
+      <!-- 移动端菜单按钮 -->
+      <button class="mobile-menu-btn" @click="toggleMobileMenu" aria-label="打开菜单">
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+      </button>
     </nav>
+    
+    <!-- 移动端导航菜单 -->
+    <MobileMenu
+      :is-open="isMobileMenuOpen"
+      @close="closeMobileMenu"
+    />
     
     <!--
       主内容区域
@@ -46,7 +60,12 @@
         * 支持路由过渡动画和嵌套路由
     -->
     <main class="main-content">
-      <router-view />
+      <!-- Vue Router 页面切换动画 -->
+      <router-view v-slot="{ Component }">
+        <transition name="page-transition" mode="out-in">
+          <component :is="Component" />
+        </transition>
+      </router-view>
     </main>
     
     <!--
@@ -81,6 +100,22 @@
  * @author 开发团队
  * @since 2024
  */
+
+import { ref } from 'vue'
+import MobileMenu from './components/MobileMenu.vue'
+
+// 移动端菜单状态管理
+const isMobileMenuOpen = ref(false)
+
+// 切换移动端菜单
+const toggleMobileMenu = () => {
+  isMobileMenuOpen.value = !isMobileMenuOpen.value
+}
+
+// 关闭移动端菜单
+const closeMobileMenu = () => {
+  isMobileMenuOpen.value = false
+}
 </script>
 
 <style>
@@ -109,9 +144,9 @@
  */
 :root {
   /* 背景色系 - 深色主题 */
-  --bg-primary: #0a0e1a;           /* 主背景色 - 深蓝黑色 */
-  --bg-secondary: rgba(20, 25, 40, 0.7);  /* 次要背景色 - 半透明深蓝 */
-  --bg-card: rgba(30, 35, 55, 0.6);     /* 卡片背景色 - 半透明灰蓝 */
+  --bg-primary: #000000;           /* 主背景色 - 纯黑色 */
+  --bg-secondary: rgba(26, 26, 26, 0.8);  /* 次要背景色 - 深灰色半透明 */
+  --bg-card: rgba(26, 26, 26, 0.6);     /* 卡片背景色 - 深灰色半透明 */
   
   /* 文本色系 */
   --text-primary: #e0e6ed;         /* 主要文字颜色 - 浅灰白 */
@@ -315,5 +350,106 @@ body {
 /* 淡入动画类 */
 .fade-in {
   animation: fadeIn 0.6s ease-out;        /* 应用淡入动画，持续0.6秒，缓出效果 */
+}
+
+/* 移动端菜单按钮样式 */
+.mobile-menu-btn {
+  display: none;                          /* 默认隐藏，只在移动端显示 */
+  background: none;                         /* 透明背景 */
+  border: none;                            /* 无边框 */
+  cursor: pointer;                         /* 手型指针 */
+  padding: 0.5rem;                         /* 内边距 */
+  z-index: 101;                            /* 确保在导航栏最上层 */
+}
+
+/* 汉堡包线条样式 */
+.hamburger-line {
+  display: block;                          /* 块级显示 */
+  width: 24px;                             /* 宽度 */
+  height: 2px;                             /* 高度 */
+  background: var(--text-primary);          /* 使用主要文字颜色 */
+  margin: 4px 0;                           /* 上下间距 */
+  transition: var(--transition-smooth);   /* 平滑过渡效果 */
+  border-radius: 2px;                     /* 圆角边框 */
+}
+
+/* 移动端菜单按钮悬停效果 */
+.mobile-menu-btn:hover .hamburger-line {
+  background: var(--accent-primary);        /* 悬停时变为强调色 */
+}
+
+/* 移动端菜单按钮激活状态 */
+.mobile-menu-btn.active .hamburger-line:nth-child(1) {
+  transform: rotate(45deg) translate(5px, 5px); /* 第一条线旋转45度并右下移动 */
+}
+
+.mobile-menu-btn.active .hamburger-line:nth-child(2) {
+  opacity: 0;                              /* 第二条线透明 */
+}
+
+.mobile-menu-btn.active .hamburger-line:nth-child(3) {
+  transform: rotate(-45deg) translate(7px, -6px); /* 第三条线旋转-45度并右上移动 */
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  /* 导航栏移动端适配 */
+  .navbar {
+    padding: 1rem;                           /* 减小内边距 */
+  }
+  
+  /* 品牌Logo移动端适配 */
+  .nav-brand a {
+    font-size: 1.25rem;                     /* 减小字体尺寸 */
+  }
+  
+  /* 桌面端导航链接隐藏 */
+  .nav-links {
+    display: none;
+  }
+  
+  /* 移动端菜单按钮显示 */
+  .mobile-menu-btn {
+    display: block;
+  }
+  
+  /* 主内容区域移动端适配 */
+  .main-content {
+    padding: 1rem;                           /* 减小内边距 */
+    max-width: 100%;                        /* 占满全宽 */
+  }
+  
+  /* 页脚移动端适配 */
+  .footer {
+    padding: 1rem;                           /* 减小内边距 */
+    font-size: 0.875rem;                      /* 减小字体尺寸 */
+  }
+}
+
+/* 平板端适配 */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .navbar {
+    padding: 1rem 1.5rem;                    /* 适度内边距 */
+  }
+  
+  .nav-links {
+    gap: 1rem;                               /* 减小链接间距 */
+  }
+  
+  .nav-links a {
+    padding: 0.4rem 0.8rem;                   /* 减小内边距 */
+    font-size: 0.9rem;                       /* 减小字体尺寸 */
+  }
+  
+  .main-content {
+    padding: 1.5rem;                         /* 适度内边距 */
+  }
+}
+
+/* 大屏幕优化 */
+@media (min-width: 1401px) {
+  .main-content {
+    max-width: 1600px;                       /* 增加最大宽度 */
+  }
 }
 </style>

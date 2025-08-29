@@ -197,6 +197,141 @@
       style="display: none"
       @change="handleFileImport"
     />
+    
+    <!-- 规则详情模态框 -->
+    <div v-if="showDetailsModal" class="details-modal" @click="closeDetailsModal">
+      <div class="details-modal-backdrop"></div>
+      <div class="details-modal-content" @click.stop>
+        <!-- 模态框头部 -->
+        <div class="details-modal-header">
+          <h3>配置详情</h3>
+          <button class="details-close-btn" @click="closeDetailsModal">✕</button>
+        </div>
+        
+        <!-- 模态框内容 -->
+        <div class="details-modal-body">
+          <div v-if="selectedConfig" class="config-details">
+            <!-- 基本信息 -->
+            <div class="details-section">
+              <h4>基本信息</h4>
+              <div class="details-grid">
+                <div class="detail-item">
+                  <span class="detail-label">名称:</span>
+                  <span class="detail-value">{{ selectedConfig.name }}</span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">创建时间:</span>
+                  <span class="detail-value">{{ formatDate(selectedConfig.createdAt) }}</span>
+                </div>
+                <div class="detail-item" v-if="selectedConfig.updatedAt !== selectedConfig.createdAt">
+                  <span class="detail-label">更新时间:</span>
+                  <span class="detail-value">{{ formatDate(selectedConfig.updatedAt) }}</span>
+                </div>
+                <div class="detail-item" v-if="selectedConfig.description">
+                  <span class="detail-label">描述:</span>
+                  <span class="detail-value">{{ selectedConfig.description }}</span>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Models -->
+            <div class="details-section" v-if="selectedConfig.config.models?.length">
+              <h4>Models ({{ selectedConfig.config.models.length }})</h4>
+              <div class="models-list">
+                <div v-for="model in selectedConfig.config.models" :key="model.slug" class="model-item">
+                  <div class="model-header">
+                    <span class="model-slug">{{ model.slug }}</span>
+                    <span class="model-name">{{ model.name }}</span>
+                  </div>
+                  <div class="model-details">
+                    <div class="model-description">{{ model.description }}</div>
+                    <div class="model-meta">
+                      <span class="model-provider">提供商: {{ model.provider }}</span>
+                      <span class="model-category">类别: {{ model.category }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Rules -->
+            <div class="details-section" v-if="selectedConfig.config.rules?.length">
+              <h4>Rules ({{ selectedConfig.config.rules.length }})</h4>
+              <div class="rules-list">
+                <div v-for="rule in selectedConfig.config.rules" :key="rule.name" class="rule-item">
+                  <div class="rule-header">
+                    <span class="rule-name">{{ rule.name }}</span>
+                    <span class="rule-category" v-if="rule.metadata?.category">{{ rule.metadata.category }}</span>
+                  </div>
+                  <div class="rule-content">
+                    <div class="rule-description" v-if="rule.metadata?.description">
+                      {{ rule.metadata.description }}
+                    </div>
+                    <div class="rule-tags" v-if="rule.metadata?.tags?.length">
+                      <span v-for="tag in rule.metadata.tags" :key="tag" class="rule-tag">{{ tag }}</span>
+                    </div>
+                    <details class="rule-details-toggle">
+                      <summary>查看规则内容</summary>
+                      <pre class="rule-code">{{ rule.content }}</pre>
+                    </details>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Commands -->
+            <div class="details-section" v-if="selectedConfig.config.commands?.length">
+              <h4>Commands ({{ selectedConfig.config.commands.length }})</h4>
+              <div class="commands-list">
+                <div v-for="command in selectedConfig.config.commands" :key="command.name" class="command-item">
+                  <div class="command-header">
+                    <span class="command-name">{{ command.name }}</span>
+                  </div>
+                  <div class="command-content">
+                    <div class="command-description" v-if="command.description">
+                      {{ command.description }}
+                    </div>
+                    <details class="command-details-toggle">
+                      <summary>查看命令内容</summary>
+                      <pre class="command-code">{{ command.content }}</pre>
+                    </details>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Roles -->
+            <div class="details-section" v-if="selectedConfig.config.roles?.length">
+              <h4>Roles ({{ selectedConfig.config.roles.length }})</h4>
+              <div class="roles-list">
+                <div v-for="role in selectedConfig.config.roles" :key="role.slug" class="role-item">
+                  <div class="role-header">
+                    <span class="role-slug">{{ role.slug }}</span>
+                    <span class="role-name">{{ role.name }}</span>
+                  </div>
+                  <div class="role-content">
+                    <div class="role-description">{{ role.description }}</div>
+                    <div class="role-traits" v-if="role.traits?.length">
+                      <strong>特征:</strong> {{ role.traits.join(', ') }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 模态框底部 -->
+        <div class="details-modal-footer">
+          <button class="btn btn-primary" @click="applyConfig(selectedConfig)">
+            应用此配置
+          </button>
+          <button class="btn btn-secondary" @click="closeDetailsModal">
+            关闭
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -232,6 +367,8 @@ const configDescription = ref('')
 const isLoading = ref(false)
 const errors = ref<Record<string, string>>({})
 const fileInput = ref<HTMLInputElement>()
+const showDetailsModal = ref(false)
+const selectedConfig = ref<SavedConfig | null>(null)
 
 // 计算属性
 const savedConfigs = computed(() => configStore.savedConfigs)
@@ -299,8 +436,13 @@ const applyConfig = (config: SavedConfig) => {
 }
 
 const loadConfigDetails = (config: SavedConfig) => {
-  // 这里可以显示配置详情
-  console.log('Load config details:', config)
+  selectedConfig.value = config
+  showDetailsModal.value = true
+}
+
+const closeDetailsModal = () => {
+  showDetailsModal.value = false
+  selectedConfig.value = null
 }
 
 const exportSingleConfig = async (id: string) => {
@@ -1003,6 +1145,49 @@ watch(() => props.show, (newVal) => {
   .config-actions {
     justify-content: center;
   }
+  
+  .mobile-menu-btn {
+    display: flex;
+  }
+  
+  .sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100%;
+    z-index: 50;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+  }
+  
+  .sidebar.open {
+    transform: translateX(0);
+  }
+  
+  .main {
+    padding-left: 0;
+  }
+  
+  .main-header {
+    padding-left: 1rem;
+  }
+  
+  .mode-grid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 0.75rem;
+  }
+  
+  .mode-card {
+    padding: 1rem;
+  }
+  
+  .mode-card h3 {
+    font-size: 1rem;
+  }
+  
+  .mode-emoji {
+    font-size: 1.5rem;
+  }
 }
 
 @media (max-width: 480px) {
@@ -1034,6 +1219,539 @@ watch(() => props.show, (newVal) => {
   .btn-sm {
     padding: 0.375rem 0.75rem;
     font-size: 0.75rem;
+  }
+}
+
+/* 规则详情模态框样式 */
+.details-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.details-modal-backdrop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.details-modal-content {
+  position: relative;
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.95) 0%, rgba(15, 23, 42, 0.98) 100%);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  box-shadow: 0 25px 80px rgba(0, 0, 0, 0.6);
+  width: 90%;
+  max-width: 900px;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: modalSlideIn 0.3s ease-out;
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-30px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.details-modal-header {
+  padding: 2rem 2rem 1.5rem;
+  border-bottom: 1px solid var(--glass-border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.details-modal-header h3 {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 1.5rem;
+  font-weight: 600;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.details-close-btn {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: var(--text-secondary);
+  padding: 0.5rem;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.details-close-btn:hover {
+  background: rgba(255, 59, 48, 0.1);
+  color: #ff3b30;
+  transform: rotate(90deg);
+}
+
+.details-modal-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 2rem;
+  color: var(--text-primary);
+}
+
+/* 自定义滚动条 */
+.details-modal-body::-webkit-scrollbar {
+  width: 8px;
+}
+
+.details-modal-body::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+}
+
+.details-modal-body::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, rgba(120, 255, 214, 0.3) 0%, rgba(120, 255, 214, 0.1) 100%);
+  border-radius: 4px;
+  border: 1px solid rgba(120, 255, 214, 0.2);
+}
+
+.details-modal-body::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, rgba(120, 255, 214, 0.5) 0%, rgba(120, 255, 214, 0.3) 100%);
+}
+
+.details-section {
+  margin-bottom: 2rem;
+}
+
+.details-section:last-child {
+  margin-bottom: 0;
+}
+
+.details-section h4 {
+  margin: 0 0 1rem 0;
+  color: var(--text-primary);
+  font-size: 1.25rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.details-section h4::before {
+  content: '';
+  width: 4px;
+  height: 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 2px;
+}
+
+.details-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+}
+
+.detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.detail-label {
+  color: #94a3b8;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.detail-value {
+  color: var(--text-primary);
+  font-weight: 600;
+  word-break: break-word;
+}
+
+/* Models 列表样式 */
+.models-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.model-item {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(99, 102, 241, 0.05) 100%);
+  border: 1px solid rgba(99, 102, 241, 0.2);
+  border-radius: 12px;
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.model-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(99, 102, 241, 0.2);
+  border-color: rgba(99, 102, 241, 0.4);
+}
+
+.model-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.model-slug {
+  font-family: 'Courier New', monospace;
+  background: rgba(99, 102, 241, 0.2);
+  color: #a5b4fc;
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.model-name {
+  color: var(--text-primary);
+  font-weight: 600;
+  font-size: 1.125rem;
+}
+
+.model-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.model-description {
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.model-meta {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.875rem;
+}
+
+.model-provider,
+.model-category {
+  color: #94a3b8;
+}
+
+/* Rules 列表样式 */
+.rules-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.rule-item {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.05) 0%, rgba(248, 113, 113, 0.02) 100%);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  border-radius: 12px;
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.rule-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(239, 68, 68, 0.2);
+  border-color: rgba(239, 68, 68, 0.4);
+}
+
+.rule-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.rule-name {
+  color: var(--text-primary);
+  font-weight: 600;
+  font-size: 1.125rem;
+  font-family: 'Courier New', monospace;
+}
+
+.rule-category {
+  background: rgba(239, 68, 68, 0.2);
+  color: #f87171;
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.rule-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.rule-description {
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.rule-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.rule-tag {
+  background: rgba(99, 102, 241, 0.1);
+  color: #a5b4fc;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  border: 1px solid rgba(99, 102, 241, 0.2);
+}
+
+.rule-details-toggle {
+  margin-top: 0.5rem;
+}
+
+.rule-details-toggle summary {
+  cursor: pointer;
+  color: var(--accent-cyan);
+  font-weight: 500;
+  padding: 0.5rem;
+  background: rgba(120, 255, 214, 0.1);
+  border-radius: 6px;
+  transition: all 0.3s ease;
+}
+
+.rule-details-toggle summary:hover {
+  background: rgba(120, 255, 214, 0.2);
+}
+
+.rule-code {
+  margin-top: 0.5rem;
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  overflow-x: auto;
+  font-family: 'Courier New', monospace;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: #e2e8f0;
+  white-space: pre-wrap;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+/* Commands 列表样式 */
+.commands-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.command-item {
+  background: linear-gradient(135deg, rgba(120, 255, 214, 0.05) 0%, rgba(120, 255, 214, 0.02) 100%);
+  border: 1px solid rgba(120, 255, 214, 0.2);
+  border-radius: 12px;
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.command-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(120, 255, 214, 0.2);
+  border-color: rgba(120, 255, 214, 0.4);
+}
+
+.command-header {
+  margin-bottom: 0.75rem;
+}
+
+.command-name {
+  color: var(--text-primary);
+  font-weight: 600;
+  font-size: 1.125rem;
+  font-family: 'Courier New', monospace;
+}
+
+.command-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.command-description {
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.command-details-toggle {
+  margin-top: 0.5rem;
+}
+
+.command-details-toggle summary {
+  cursor: pointer;
+  color: var(--accent-cyan);
+  font-weight: 500;
+  padding: 0.5rem;
+  background: rgba(120, 255, 214, 0.1);
+  border-radius: 6px;
+  transition: all 0.3s ease;
+}
+
+.command-details-toggle summary:hover {
+  background: rgba(120, 255, 214, 0.2);
+}
+
+.command-code {
+  margin-top: 0.5rem;
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  overflow-x: auto;
+  font-family: 'Courier New', monospace;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: #e2e8f0;
+  white-space: pre-wrap;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+/* Roles 列表样式 */
+.roles-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.role-item {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.05) 0%, rgba(139, 92, 246, 0.02) 100%);
+  border: 1px solid rgba(139, 92, 246, 0.2);
+  border-radius: 12px;
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.role-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(139, 92, 246, 0.2);
+  border-color: rgba(139, 92, 246, 0.4);
+}
+
+.role-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.role-slug {
+  font-family: 'Courier New', monospace;
+  background: rgba(139, 92, 246, 0.2);
+  color: #c4b5fd;
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.role-name {
+  color: var(--text-primary);
+  font-weight: 600;
+  font-size: 1.125rem;
+}
+
+.role-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.role-description {
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.role-traits {
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+
+.role-traits strong {
+  color: #c4b5fd;
+}
+
+.details-modal-footer {
+  padding: 1.5rem 2rem;
+  border-top: 1px solid var(--glass-border);
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .details-modal-content {
+    width: 95%;
+    margin: 1rem;
+    max-height: 90vh;
+  }
+  
+  .details-modal-header {
+    padding: 1.5rem 1.5rem 1rem;
+  }
+  
+  .details-modal-header h3 {
+    font-size: 1.25rem;
+  }
+  
+  .details-modal-body {
+    padding: 1.5rem;
+  }
+  
+  .details-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .model-meta,
+  .rule-tags {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .details-modal-footer {
+    flex-direction: column;
+  }
+  
+  .details-modal-footer .btn {
+    width: 100%;
   }
 }
 </style>

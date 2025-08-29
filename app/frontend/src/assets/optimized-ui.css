@@ -6,11 +6,11 @@
   --primary-light: #60a5fa;
   --primary-dark: #1d4ed8;
   
-  /* 背景色 */
-  --bg-primary: #0f172a;
-  --bg-secondary: #1e293b;
-  --bg-tertiary: #334155;
-  --bg-hover: #475569;
+  /* 背景色 - 深色主题优化 */
+  --bg-primary: #000000;        /* 纯黑色背景 */
+  --bg-secondary: rgba(26, 26, 26, 0.8);  /* 深灰色卡片背景，带透明度 */
+  --bg-tertiary: #1a1a1a;       /* 深灰黑色，用于层次区分 */
+  --bg-hover: #2a2a2a;         /* 悬停效果，比主背景稍亮 */
   
   /* 文字颜色 - 优化对比度 */
   --text-primary: #f8fafc;
@@ -1345,3 +1345,717 @@
     @apply ml-1.5 text-sm;
   }
 }
+/* ========================================
+   页面切换动画
+   ======================================== */
+
+/* Vue Router 页面切换过渡 */
+.page-transition-enter-active,
+.page-transition-leave-active {
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.page-transition-enter-from {
+  opacity: 0;
+  transform: translateX(-30px);
+}
+
+.page-transition-leave-to {
+  opacity: 0;
+  transform: translateX(30px);
+}
+
+/* 淡入淡出效果 */
+.page-fade-enter-active,
+.page-fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.page-fade-enter-from,
+.page-fade-leave-to {
+  opacity: 0;
+}
+
+/* 缩放效果 */
+.page-scale-enter-active,
+.page-scale-leave-active {
+  transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.page-scale-enter-from {
+  opacity: 0;
+  transform: scale(0.9);
+}
+
+.page-scale-leave-to {
+  opacity: 0;
+  transform: scale(1.1);
+}
+
+/* 滑动效果 */
+.page-slide-enter-active,
+.page-slide-leave-active {
+  transition: all 0.5s ease;
+}
+
+.page-slide-enter-from {
+  opacity: 0;
+  transform: translateY(30px);
+}
+
+.page-slide-leave-to {
+  opacity: 0;
+  transform: translateY(-30px);
+}
+
+/* ========================================
+   骨架屏加载动画
+   ======================================== */
+
+/* 基础骨架屏样式 */
+.skeleton {
+  background: linear-gradient(90deg, 
+    var(--bg-secondary) 0%, 
+    var(--bg-hover) 50%, 
+    var(--bg-secondary) 100%);
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s ease-in-out infinite;
+  border-radius: 0.375rem;
+}
+
+@keyframes skeleton-loading {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* 文本骨架屏 */
+.skeleton-text {
+  height: 1rem;
+  margin-bottom: 0.5rem;
+  border-radius: 0.25rem;
+}
+
+.skeleton-text:last-child {
+  width: 70%;
+}
+
+/* 标题骨架屏 */
+.skeleton-title {
+  height: 1.5rem;
+  width: 40%;
+  margin-bottom: 1rem;
+  border-radius: 0.375rem;
+}
+
+/* 卡片骨架屏 */
+.skeleton-card {
+  height: 180px;
+  border-radius: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+/* 圆形骨架屏（头像等） */
+.skeleton-circle {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+}
+
+/* 按钮骨架屏 */
+.skeleton-button {
+  height: 2.5rem;
+  width: 8rem;
+  border-radius: 0.375rem;
+}
+
+/* 骨架屏脉冲效果 */
+.skeleton-pulse {
+  animation: skeleton-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes skeleton-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* ========================================
+   微交互动画效果
+   ======================================== */
+
+/* 悬停放大效果 */
+.hover-scale {
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hover-scale:hover {
+  transform: scale(1.05);
+}
+
+/* 悬停旋转效果 */
+.hover-rotate {
+  transition: transform 0.3s ease;
+}
+
+.hover-rotate:hover {
+  transform: rotate(5deg);
+}
+
+/* 悬停浮起效果 */
+.hover-float {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hover-float:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
+/* 心跳动画 */
+@keyframes heartbeat {
+  0% {
+    transform: scale(1);
+  }
+  14% {
+    transform: scale(1.1);
+  }
+  28% {
+    transform: scale(1);
+  }
+  42% {
+    transform: scale(1.1);
+  }
+  70% {
+    transform: scale(1);
+  }
+}
+
+.heartbeat {
+  animation: heartbeat 1.5s ease-in-out infinite;
+}
+
+/* 摇晃动画 */
+@keyframes shake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  10%, 30%, 50%, 70%, 90% {
+    transform: translateX(-5px);
+  }
+  20%, 40%, 60%, 80% {
+    transform: translateX(5px);
+  }
+}
+
+.shake {
+  animation: shake 0.5s ease-in-out;
+}
+
+/* 闪烁效果 */
+@keyframes blink {
+  0%, 50%, 100% {
+    opacity: 1;
+  }
+  25%, 75% {
+    opacity: 0;
+  }
+}
+
+.blink {
+  animation: blink 1s ease-in-out infinite;
+}
+
+/* 弹跳进入 */
+@keyframes bounce-in {
+  0% {
+    transform: scale(0.1);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.bounce-in {
+  animation: bounce-in 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+/* 渐变发光 */
+@keyframes glow-pulse {
+  0%, 100% {
+    box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.8);
+  }
+}
+
+.glow-pulse {
+  animation: glow-pulse 2s ease-in-out infinite;
+}
+
+/* ========================================
+   视差滚动效果
+   ======================================== */
+
+/* 基础视差容器 */
+.parallax-container {
+  position: relative;
+  overflow: hidden;
+  height: 100vh;
+}
+
+/* 视差层 */
+.parallax-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+/* 不同速度的视差层 */
+.parallax-layer-back {
+  transform: translateZ(-1px) scale(2);
+}
+
+.parallax-layer-base {
+  transform: translateZ(0);
+}
+
+.parallax-layer-fore {
+  transform: translateZ(1px) scale(0.8);
+}
+
+/* 视差元素 */
+.parallax-element {
+  will-change: transform;
+  transition: transform 0.1s ease-out;
+}
+
+/* 鼠标跟随视差效果 */
+.parallax-mouse {
+  transition: transform 0.2s ease-out;
+}
+
+/* 滚动触发动画 */
+.scroll-reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 0.6s ease-out;
+}
+
+.scroll-reveal.revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ========================================
+   性能优化和可访问性
+   ======================================== */
+
+/* GPU 加速优化 */
+.gpu-accelerated {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+  will-change: transform;
+}
+
+/* 减少动画优化 */
+.reduced-motion * {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+}
+
+/* 可访问性媒体查询 */
+@media (prefers-reduced-motion: reduce) {
+  .page-transition-enter-active,
+  .page-transition-leave-active,
+  .page-fade-enter-active,
+  .page-fade-leave-active,
+  .page-scale-enter-active,
+  .page-scale-leave-active,
+  .page-slide-enter-active,
+  .page-slide-leave-active {
+    transition: none !important;
+  }
+  
+  .skeleton {
+    animation: none !important;
+    background: var(--bg-hover);
+  }
+  
+  .heartbeat,
+  .shake,
+  .blink,
+  .glow-pulse {
+    animation: none !important;
+  }
+  
+  .hover-scale:hover,
+  .hover-rotate:hover,
+  .hover-float:hover {
+    transform: none !important;
+  }
+}
+
+/* 高性能动画类 */
+.animate-smooth {
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.animate-bounce {
+  animation-timing-function: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+/* 帧率优化 */
+@keyframes slide-in {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.optimize-60fps {
+  transform: translate3d(0, 0, 0);
+  will-change: transform, opacity;
+}
+/* ========================================
+    响应式字体和间距优化
+    ======================================== */
+
+/* 设计系统基础变量 */
+:root {
+  /* 文本大小 - 移动端优先 */
+  --text-size-xs: 0.75rem;      /* 超小文本：12px → 适合注释 */
+  --text-size-sm: 0.875rem;     /* 小文本：14px → 适合次要信息 */
+  --text-size-base: 1rem;      /* 基础文本：16px → 正文阅读 */
+  --text-size-lg: 1.125rem;   /* 大文本：18px → 小标题 */
+  --text-size-xl: 1.25rem;    /* 超大文本：20px → 页面标题 */
+  --text-size-2xl: 1.5rem;    /* 2倍大文本：24px → 主要标题 */
+  --text-size-3xl: 1.875rem;   /* 3倍大文本：30px → 大标题 */
+  --text-size-4xl: 2.25rem;   /* 4倍大文本：36px → 英雄标题 */
+  --text-size-5xl: 3rem;      /* 5倍大文本：48px → 超大标题 */
+
+  /* 行高 - 优化可读性 */
+  --line-height-none: 1;         /* 无行高 */
+  --line-height-tight: 1.25;    /* 紧凑：1.25 → 适合密集信息 */
+  --line-height-snug: 1.375;   /* 适中：1.375 → 正文舒适阅读 */
+  --line-height-normal: 1.5;   /* 正常：1.5 → 默认行高 */
+  --line-height-relaxed: 1.625;/* 宽松：1.625 → 段落分隔 */
+  --line-height-loose: 1.75;   /* 松散：1.75 → 引用块 */
+
+  /* 字间距 - 微调可读性 */
+  --letter-spacing-tighter: -0.025em; /* 更紧：-0.025em */
+  --letter-spacing-tight: -0.0125em; /* 紧：-0.0125em */
+  --letter-spacing-normal: 0;         /* 正常：0 */
+  --letter-spacing-wide: 0.025em;    /* 宽：0.025em */
+  --letter-spacing-wider: 0.05em;   /* 更宽：0.05em */
+  --letter-spacing-widest: 0.1em;   /* 最宽：0.1em */
+
+  /* 间距系统 - 基于 4px 网格 */
+  --space-px: 1px;                    /* 像素：1px */
+  --space-0-5: 0.125rem;              /* 2px：最小间距 */
+  --space-1: 0.25rem;                /* 4px：极小间距 */
+  --space-2: 0.5rem;                  /* 8px：小间距 */
+  --space-3: 0.75rem;                 /* 12px：标准间距 */
+  --space-4: 1rem;                    /* 16px：中等间距 */
+  --space-5: 1.25rem;                 /* 20px：大间距 */
+  --space-6: 1.5rem;                  /* 24px：较大间距 */
+  --space-7: 1.75rem;                 /* 28px：大间距 */
+  --space-8: 2rem;                    /* 32px：很大间距 */
+  --space-9: 2.25rem;                 /* 36px：超大间距 */
+  --space-10: 2.5rem;                /* 40px：最大间距 */
+  --space-11: 2.75rem;                /* 44px：超最大间距 */
+  --space-12: 3rem;                   /* 48px：巨间距 */
+
+  /* 边框圆角 */
+  --radius-xs: 0.25rem;               /* 4px：极小圆角 */
+  --radius-sm: 0.375rem;              /* 6px：小圆角 */
+  --radius-md: 0.5rem;                /* 8px：中等圆角 */
+  --radius-lg: 0.625rem;              /* 10px：大圆角 */
+  --radius-xl: 0.75rem;               /* 12px：超大圆角 */
+  --radius-2xl: 1rem;                 /* 16px：2倍大圆角 */
+  --radius-3xl: 1.5rem;               /* 24px：3倍大圆角 */
+}
+
+/* 响应式文本大小调整 */
+@media (max-width: 768px) {
+  :root {
+    /* 文本大小 - 移动端优化 */
+    --text-size-xs: 0.6875rem; /* 超小文本：11px → 适合注释 */
+    --text-size-sm: 0.75rem;   /* 小文本：12px → 适合次要信息 */
+    --text-size-base: 0.8125rem; /* 基础文本：13px → 正文阅读 */
+    --text-size-lg: 0.875rem;      /* 大文本：14px → 小标题 */
+    --text-size-xl: 1rem;      /* 超大文本：16px → 页面标题 */
+    --text-size-2xl: 1.125rem;  /* 2倍大文本：18px → 主要标题 */
+    --text-size-3xl: 1.25rem;   /* 3倍大文本：20px → 大标题 */
+    --text-size-4xl: 1.5rem; /* 4倍大文本：24px → 英雄标题 */
+    --text-size-5xl: 1.75rem;  /* 5倍大文本：28px → 超大标题 */
+
+    /* 行高 - 移动端更紧凑 */
+    --line-height-tight: 1.2;    /* 紧凑：1.2 → 适合密集信息 */
+    --line-height-snug: 1.325;  /* 适中：1.325 → 正文舒适阅读 */
+    --line-height-normal: 1.45;  /* 正常：1.45 → 默认行高 */
+    --line-height-relaxed: 1.55; /* 宽松：1.55 → 段落分隔 */
+    --line-height-loose: 1.65;   /* 松散：1.65 → 引用块 */
+
+    /* 字间距 - 移动端微调 */
+    --letter-spacing-tighter: -0.02em; /* 更紧：-0.02em */
+    --letter-spacing-tight: -0.01em;  /* 紧：-0.01em */
+    --letter-spacing-normal: 0;          /* 正常：0 */
+    --letter-spacing-wide: 0.02em;     /* 宽：0.02em */
+    --letter-spacing-wider: 0.04em;    /* 更宽：0.04em */
+    --letter-spacing-widest: 0.08em;   /* 最宽：0.08em */
+
+    /* 间距 - 移动端紧凑化 */
+    --space-px: 1px;                    /* 像素：1px */
+    --space-0-5: 0.125rem;              /* 2px：最小间距 */
+    --space-1: 0.1875rem;              /* 3px：极小间距 */
+    --space-2: 0.25rem;                /* 4px：小间距 */
+    --space-3: 0.375rem;              /* 6px：标准间距 */
+    --space-4: 0.5rem;                /* 8px：中等间距 */
+    --space-5: 0.625rem;              /* 10px：大间距 */
+    --space-6: 0.75rem;               /* 12px：较大间距 */
+    --space-7: 0.875rem;              /* 14px：大间距 */
+    --space-8: 1rem;                  /* 16px：很大间距 */
+    --space-9: 1.25rem;               /* 20px：超大间距 */
+    --space-10: 1.5rem;               /* 24px：最大间距 */
+    --space-11: 1.75rem;              /* 28px：超最大间距 */
+    --space-12: 2rem;                 /* 32px：巨间距 */
+
+    /* 边框圆角 - 移动端适度 */
+    --radius-xs: 0.25rem;               /* 4px：极小圆角 */
+    --radius-sm: 0.375rem;              /* 6px：小圆角 */
+    --radius-md: 0.5rem;                /* 8px：中等圆角 */
+    --radius-lg: 0.625rem;              /* 10px：大圆角 */
+    --radius-xl: 0.75rem;               /* 12px：超大圆角 */
+    --radius-2xl: 1rem;                 /* 16px：2倍大圆角 */
+    --radius-3xl: 1.5rem;               /* 24px：3倍大圆角 */
+  }
+}
+
+/* 平板端优化 */
+@media (min-width: 769px) and (max-width: 1024px) {
+  :root {
+    /* 文本大小 - 平板端适中 */
+    --text-size-xs: 0.6875rem; /* 超小文本：11px */
+    --text-size-sm: 0.8125rem;  /* 小文本：13px */
+    --text-size-base: 0.875rem; /* 基础文本：14px */
+    --text-size-lg: 1rem;      /* 大文本：16px */
+    --text-size-xl: 1.125rem;  /* 超大文本：18px */
+    --text-size-2xl: 1.25rem;  /* 2倍大文本：20px */
+    --text-size-3xl: 1.5rem;   /* 3倍大文本：24px */
+    --text-size-4xl: 1.875rem; /* 4倍大文本：30px */
+    --text-size-5xl: 2.25rem;  /* 5倍大文本：36px */
+
+    /* 行高 - 平板端适中 */
+    --line-height-tight: 1.25;
+    --line-height-snug: 1.4;
+    --line-height-normal: 1.5;
+    --line-height-relaxed: 1.6;
+    --line-height-loose: 1.7;
+
+    /* 间距 - 平板端适度 */
+    --space-1: 0.25rem;
+    --space-2: 0.375rem;
+    --space-3: 0.5rem;
+    --space-4: 0.75rem;
+    --space-5: 1rem;
+    --space-6: 1.25rem;
+    --space-7: 1.5rem;
+    --space-8: 1.75rem;
+    --space-9: 2rem;
+    --space-10: 2.25rem;
+    --space-11: 2.5rem;
+    --space-12: 3rem;
+  }
+}
+
+/* 小屏幕手机优化（< 480px） */
+@media (max-width: 480px) {
+  :root {
+    /* 更小的文本尺寸 */
+    --text-size-xs: 0.625rem; /* 10px */
+    --text-size-sm: 0.6875rem; /* 11px */
+    --text-size-base: 0.75rem;   /* 12px */
+    --text-size-lg: 0.8125rem;      /* 13px */
+    --text-size-xl: 0.875rem;      /* 14px */
+    --text-size-2xl: 1rem;  /* 16px */
+    --text-size-3xl: 1.125rem;   /* 18px */
+    --text-size-4xl: 1.25rem; /* 20px */
+    --text-size-5xl: 1.5rem;   /* 24px */
+
+    /* 更紧凑的间距 */
+    --space-1: 0.1875rem; /* 3px */
+    --space-2: 0.25rem;   /* 4px */
+    --space-3: 0.375rem; /* 6px */
+    --space-4: 0.5rem;   /* 8px */
+    --space-5: 0.625rem; /* 10px */
+    --space-6: 0.75rem;  /* 12px */
+    --space-7: 0.875rem; /* 14px */
+    --space-8: 1rem;     /* 16px */
+    --space-9: 1.125rem; /* 18px */
+    --space-10: 1.25rem; /* 20px */
+    --space-11: 1.375rem; /* 22px */
+    --space-12: 1.5rem;   /* 24px */
+
+    /* 更小的圆角 */
+    --radius-xs: 0.125rem;
+    --radius-sm: 0.25rem;
+    --radius-md: 0.375rem;
+    --radius-lg: 0.5rem;
+  }
+}
+
+/* 大屏幕优化 */
+@media (min-width: 1921px) {
+  :root {
+    /* 更大的文本尺寸 */
+    --text-size-xs: 0.875rem;     /* 14px */
+    --text-size-sm: 1rem;         /* 16px */
+    --text-size-base: 1.125rem;   /* 18px */
+    --text-size-lg: 1.25rem;      /* 20px */
+    --text-size-xl: 1.5rem;      /* 24px */
+    --text-size-2xl: 1.875rem;   /* 30px */
+    --text-size-3xl: 2.25rem;   /* 36px */
+    --text-size-4xl: 3rem;      /* 48px */
+    --text-size-5xl: 3.75rem;   /* 60px */
+
+    /* 更宽松的间距 */
+    --space-1: 0.375rem;
+    --space-2: 0.5rem;
+    --space-3: 0.75rem;
+    --space-4: 1rem;
+    --space-5: 1.5rem;
+    --space-6: 2rem;
+    --space-7: 2.5rem;
+    --space-8: 3rem;
+    --space-9: 3.5rem;
+    --space-10: 4rem;
+    --space-11: 4.5rem;
+    --space-12: 5rem;
+  }
+}
+
+/* 横屏模式特殊优化 */
+@media (max-width: 768px) and (orientation: landscape) {
+  :root {
+    /* 横屏模式适度增大文本 */
+    --text-size-xs: 0.75rem;   /* 12px */
+    --text-size-sm: 0.875rem;  /* 14px */
+    --text-size-base: 1rem;   /* 16px */
+    --text-size-lg: 1.125rem; /* 18px */
+    --text-size-xl: 1.25rem; /* 20px */
+    --text-size-2xl: 1.5rem; /* 24px */
+    --text-size-3xl: 1.75rem; /* 28px */
+    
+    /* 减小行高以适应横屏 */
+    --line-height-tight: 1.15;
+    --line-height-snug: 1.25;
+    --line-height-normal: 1.35;
+    --line-height-relaxed: 1.45;
+    --line-height-loose: 1.55;
+  }
+}
+
+/* 文本工具类 - 使用设计系统变量 */
+.text-xs { 
+  font-size: var(--text-size-xs); 
+  line-height: var(--line-height-tight);
+  letter-spacing: var(--letter-spacing-normal);
+}
+.text-sm { 
+  font-size: var(--text-size-sm); 
+  line-height: var(--line-height-snug);
+  letter-spacing: var(--letter-spacing-normal);
+}
+.text-base { 
+  font-size: var(--text-size-base); 
+  line-height: var(--line-height-normal);
+  letter-spacing: var(--letter-spacing-normal);
+}
+.text-lg { 
+  font-size: var(--text-size-lg); 
+  line-height: var(--line-height-normal);
+  letter-spacing: var(--letter-spacing-normal);
+}
+.text-xl { 
+  font-size: var(--text-size-xl); 
+  line-height: var(--line-height-relaxed);
+  letter-spacing: var(--letter-spacing-tight);
+}
+.text-2xl { 
+  font-size: var(--text-size-2xl); 
+  line-height: var(--line-height-relaxed);
+  letter-spacing: var(--letter-spacing-tight);
+}
+.text-3xl { 
+  font-size: var(--text-size-3xl); 
+  line-height: var(--line-height-relaxed);
+  letter-spacing: var(--letter-spacing-tighter);
+}
+.text-4xl { 
+  font-size: var(--text-size-4xl); 
+  line-height: var(--line-height-loose);
+  letter-spacing: var(--letter-spacing-tighter);
+}
+.text-5xl { 
+  font-size: var(--text-size-5xl); 
+  line-height: var(--line-height-loose);
+  letter-spacing: var(--letter-spacing-wider);
+}
+
+/* 间距工具类 */
+.p-0 { padding: var(--space-0); }
+.p-1 { padding: var(--space-1); }
+.p-2 { padding: var(--space-2); }
+.p-3 { padding: var(--space-3); }
+.p-4 { padding: var(--space-4); }
+.p-5 { padding: var(--space-5); }
+.p-6 { padding: var(--space-6); }
+.p-7 { padding: var(--space-7); }
+.p-8 { padding: var(--space-8); }
+.p-9 { padding: var(--space-9); }
+.p-10 { padding: var(--space-10); }
+.p-11 { padding: var(--space-11); }
+.p-12 { padding: var(--space-12); }
+
+.m-0 { margin: var(--space-0); }
+.m-1 { margin: var(--space-1); }
+.m-2 { margin: var(--space-2); }
+.m-3 { margin: var(--space-3); }
+.m-4 { margin: var(--space-4); }
+.m-5 { margin: var(--space-5); }
+.m-6 { margin: var(--space-6); }
+.m-7 { margin: var(--space-7); }
+.m-8 { margin: var(--space-8); }
+.m-9 { margin: var(--space-9); }
+.m-10 { margin: var(--space-10); }
+.m-11 { margin: var(--space-11); }
+.m-12 { margin: var(--space-12); }
+
+/* 圆角工具类 */
+.rounded-xs { border-radius: var(--radius-xs); }
+.rounded-sm { border-radius: var(--radius-sm); }
+.rounded { border-radius: var(--radius-md); }
+.rounded-lg { border-radius: var(--radius-lg); }
+.rounded-xl { border-radius: var(--radius-xl); }
+.rounded-2xl { border-radius: var(--radius-2xl); }
+.rounded-3xl { border-radius: var(--radius-3xl); }
+.rounded-full { border-radius: 9999px; }
