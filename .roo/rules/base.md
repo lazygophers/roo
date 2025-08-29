@@ -26,6 +26,38 @@ python_executables:
 - 总体超时：`--max-time 10`
 - 示例：`curl --connect-timeout 5 --max-time 10 https://api.example.com`
 
+### Makefile 优先使用
+
+**通用指令原则**：
+- 项目必须提供 [`Makefile`](Makefile)
+- 所有通用指令应优先更新到 Makefile 中
+- 禁止直接使用 `uv run` 等命令，应使用 `make <target>`
+- Makefile 应包含常用操作：开发、测试、构建、部署等
+
+**Makefile 目标示例**：
+```makefile
+# 开发环境
+dev:
+	uv run main.py
+
+# 运行测试
+test:
+	uv run pytest
+
+# 代码格式化
+fmt:
+	uv run ruff check --fix .
+	uv run ruff format .
+
+# 安装依赖
+install:
+	uv sync
+
+# 构建项目
+build:
+	@echo "Building project..."
+```
+
 ## 🏗️ 技术栈
 
 ### 主要技术
