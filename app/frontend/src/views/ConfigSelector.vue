@@ -594,7 +594,7 @@ const fetchModels = async () => {
 const fetchModelRules = async (slug: string) => {
   clearError()
   try {
-    const response = await api.post(`/api/rules/${slug}`)
+    const response = await api.post('/api/rules/get', { slug })
     const rules = response || {}
     
     // 确保数据结构存在
@@ -617,7 +617,7 @@ const fetchModelRules = async (slug: string) => {
 
 const fetchModelDetails = async (slug: string) => {
   try {
-    const response = await api.post(`/api/models/${slug}`)
+    const response = await api.post('/api/models/get', { slug })
     return response || {}
   } catch (error) {
     console.error('Failed to fetch model details:', error)
@@ -677,7 +677,7 @@ const toggleModel = async (model: Model) => {
     
     // 获取该 model 的 rules
     try {
-      const response = await api.post(`/api/rules/${model.slug}`)
+      const response = await api.post('/api/rules/get', { slug: model.slug })
       const newRules = response || {}
       
       // 确保数据结构存在

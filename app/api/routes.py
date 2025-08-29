@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Query, UploadFile, File, Body, Request
+from fastapi import APIRouter, HTTPException, UploadFile, File, Body, Request
 from fastapi.responses import StreamingResponse
 from typing import List, Dict, Any, Optional
 import os
@@ -9,7 +9,7 @@ from pathlib import Path
 from datetime import datetime
 from pydantic import BaseModel, Field
 from app.database import ConfigDatabase, Q
-from app.utils.frontmatter_parser import parse_markdown_with_frontmatter
+from app.utils.frontmatter_parser import parse_markdown_with_frontmatter, parse_frontmatter
 from app.utils.logger import get_logger
 
 router = APIRouter()
@@ -95,10 +95,11 @@ async def get_models():
     return result
 
 
-@router.post("/models/{slug}", response_model=Dict[str, Any])
-async def get_model_by_slug(slug: str, request: ModelRequest = Body(default={})):
+@router.post("/models/get", response_model=Dict[str, Any])
+async def get_model_by_slug(request: ModelRequest = Body(...)):
     """根据slug获取models目录下具体文件的完整内容"""
     models_dir = RESOURCES_DIR / "models"
+    slug = request.slug
 
     # 查找匹配的文件
     for file_path in models_dir.rglob(f"{slug}.yaml"):
@@ -130,10 +131,11 @@ async def get_hooks_after():
     return result
 
 
-@router.post("/rules/{slug}", response_model=Dict[str, Dict[str, Any]])
-async def get_rules_by_slug(slug: str, request: ModelRequest = Body(default={})):
+@router.post("/rules/get", response_model=Dict[str, Dict[str, Any]])
+async def get_rules_by_slug(request: ModelRequest = Body(...)):
     """根据slug获取rules目录下的所有文件内容和frontmatter元数据"""
     result = {}
+    slug = request.slug
 
     # 搜索规则文件的顺序：rules/ -> rules-{slug} -> rules-{slug}-{subslug}
     search_paths = [
@@ -220,7 +222,13 @@ async def save_configuration(config_data: Dict[str, Any]):
     """保存配置到数据库"""
     try:
         db = ConfigDatabase()
-        config_id = db.save_configuration(config_data)
+        config = db.create_config(
+            name=config_data.get("name", "导入的配置"),
+            config_data=config_data.get("config", {}),
+            description=config_data.get("description", ""),
+            user_id=config_data.get("user_id")
+        )
+        config_id = config.get("id")
         return {
             "success": True,
             "message": "配置保存成功",
@@ -231,13 +239,13 @@ async def save_configuration(config_data: Dict[str, Any]):
         raise HTTPException(status_code=500, detail=f"保存配置失败: {str(e)}")
 
 
-@router.get("/configurations", response_model=List[Dict[str, Any]])
-async def get_configurations(user_id: Optional[str] = Query(None, description="用户ID")):
+@router.post("/configurations", response_model=List[Dict[str, Any]])
+async def get_configurations(request: ConfigRequest = Body(...)):
     """获取所有配置或用户专属配置"""
     try:
         db = ConfigDatabase()
-        if user_id:
-            configs = db.get_user_configurations(user_id)
+        if request.user_id:
+            configs = db.get_all_configs(request.user_id)
         else:
             configs = db.get_all_configs()
         return configs
@@ -245,12 +253,12 @@ async def get_configurations(user_id: Optional[str] = Query(None, description="�
         raise HTTPException(status_code=500, detail=f"获取配置失败: {str(e)}")
 
 
-@router.post("/configurations/{config_id}", response_model=Dict[str, Any])
+@router.post("/configurations/get", response_model=Dict[str, Any])
 async def get_configuration(request: ConfigIdRequest = Body(...)):
     """根据ID获取单个配置"""
     try:
         db = ConfigDatabase()
-        config = db.get_configuration(request.config_id)
+        config = db.get_config(request.config_id)
         if not config:
             raise HTTPException(status_code=404, detail="配置不存在")
         return config
@@ -260,12 +268,18 @@ async def get_configuration(request: ConfigIdRequest = Body(...)):
         raise HTTPException(status_code=500, detail=f"获取配置失败: {str(e)}")
 
 
-@router.post("/configurations/{config_id}/update", response_model=Dict[str, Any])
+@router.post("/configurations/update", response_model=Dict[str, Any])
 async def update_configuration(request: UpdateConfigRequest = Body(...)):
     """更新配置"""
     try:
         db = ConfigDatabase()
-        updated_config = db.update_configuration(request.config_data.get("config_id"), request.config_data)
+        updated_config = db.update_config(
+            config_id=request.config_data.get("config_id"),
+            config_data=request.config_data.get("config", {}),
+            name=request.config_data.get("name"),
+            description=request.config_data.get("description"),
+            user_id=request.config_data.get("user_id")
+        )
         if not updated_config:
             raise HTTPException(status_code=404, detail="配置不存在")
         return {
@@ -279,12 +293,12 @@ async def update_configuration(request: UpdateConfigRequest = Body(...)):
         raise HTTPException(status_code=500, detail=f"更新配置失败: {str(e)}")
 
 
-@router.post("/configurations/{config_id}/delete")
+@router.post("/configurations/delete", response_model=Dict[str, Any])
 async def delete_configuration(request: ConfigIdRequest = Body(...)):
     """删除配置"""
     try:
         db = ConfigDatabase()
-        success = db.delete_configuration(request.config_id)
+        success = db.delete_config(request.config_id, request.user_id)
         if not success:
             raise HTTPException(status_code=404, detail="配置不存在")
         return {"success": True, "message": "配置删除成功"}
@@ -294,8 +308,8 @@ async def delete_configuration(request: ConfigIdRequest = Body(...)):
         raise HTTPException(status_code=500, detail=f"删除配置失败: {str(e)}")
 
 
-@router.post("/configurations/{config_id}/export/yaml")
-async def export_configuration_yaml(config_id: str):
+@router.post("/configurations/export/yaml")
+async def export_configuration_yaml(request: ConfigIdRequest = Body(...)):
     """导出配置为 YAML 文件
 
     将配置数据导出为 YAML 格式的文件，供用户下载。
@@ -321,7 +335,7 @@ async def export_configuration_yaml(config_id: str):
     """
     try:
         db = ConfigDatabase()
-        config = db.get_configuration(config_id)
+        config = db.get_configuration(request.config_id)
         if not config:
             raise HTTPException(status_code=404, detail="配置不存在")
 
@@ -340,8 +354,8 @@ async def export_configuration_yaml(config_id: str):
         yaml_file = StringIO(yaml_content)
         yaml_file.seek(0)
 
-        filename = f"configuration_{config_id}.yaml"
-        route_logger.info(f"导出 YAML 配置: {config_id}")
+        filename = f"configuration_{request.config_id}.yaml"
+        route_logger.info(f"导出 YAML 配置: {request.config_id}")
         return StreamingResponse(
             iter([yaml_file.getvalue().encode('utf-8')]),
             media_type="application/x-yaml",
@@ -354,8 +368,8 @@ async def export_configuration_yaml(config_id: str):
         raise HTTPException(status_code=500, detail=f"导出YAML失败: {str(e)}")
 
 
-@router.post("/configurations/{config_id}/export/json")
-async def export_configuration_json(config_id: str):
+@router.post("/configurations/export/json")
+async def export_configuration_json(request: ConfigIdRequest = Body(...)):
     """导出配置为 JSON 文件
 
     将配置数据导出为 JSON 格式的文件，供用户下载。
@@ -381,7 +395,7 @@ async def export_configuration_json(config_id: str):
     """
     try:
         db = ConfigDatabase()
-        config = db.get_configuration(config_id)
+        config = db.get_configuration(request.config_id)
         if not config:
             raise HTTPException(status_code=404, detail="配置不存在")
 
@@ -399,8 +413,8 @@ async def export_configuration_json(config_id: str):
         json_file = StringIO(json_content)
         json_file.seek(0)
 
-        filename = f"configuration_{config_id}.json"
-        route_logger.info(f"导出 JSON 配置: {config_id}")
+        filename = f"configuration_{request.config_id}.json"
+        route_logger.info(f"导出 JSON 配置: {request.config_id}")
         return StreamingResponse(
             iter([json_file.getvalue().encode('utf-8')]),
             media_type="application/json",
@@ -416,7 +430,7 @@ async def export_configuration_json(config_id: str):
 @router.post("/configurations/import/yaml", response_model=Dict[str, Any])
 async def import_configuration_yaml(
     file: UploadFile = File(...),
-    user_id: Optional[str] = Query(None, description="用户ID，用于关联配置")
+    user_id: Optional[str] = None
 ):
     """从YAML文件导入配置"""
     try:
@@ -435,7 +449,13 @@ async def import_configuration_yaml(
 
         # 保存到数据库
         db = ConfigDatabase()
-        config_id = db.save_configuration(config_data)
+        config = db.create_config(
+            name=config_data.get("name", "导入的配置"),
+            config_data=config_data.get("config", {}),
+            description=config_data.get("description", ""),
+            user_id=config_data.get("user_id")
+        )
+        config_id = config.get("id")
 
         return {
             "success": True,
@@ -454,7 +474,7 @@ async def import_configuration_yaml(
 @router.post("/configurations/import/json", response_model=Dict[str, Any])
 async def import_configuration_json(
     file: UploadFile = File(...),
-    user_id: Optional[str] = Query(None, description="用户ID，用于关联配置")
+    user_id: Optional[str] = None
 ):
     """从JSON文件导入配置"""
     try:
@@ -473,7 +493,13 @@ async def import_configuration_json(
 
         # 保存到数据库
         db = ConfigDatabase()
-        config_id = db.save_configuration(config_data)
+        config = db.create_config(
+            name=config_data.get("name", "导入的配置"),
+            config_data=config_data.get("config", {}),
+            description=config_data.get("description", ""),
+            user_id=config_data.get("user_id")
+        )
+        config_id = config.get("id")
 
         return {
             "success": True,
@@ -508,11 +534,17 @@ class RoleResponse(BaseModel):
     content: str = Field(description="角色完整内容")
 
 
+class CommandExecuteRequest(BaseModel):
+    """命令执行请求模型"""
+    command: str = Field(description="要执行的命令字符串")
+    working_dir: Optional[str] = Field(default=None, description="工作目录路径")
+    user_id: Optional[str] = Field(default=None, description="用户ID，用于权限控制")
+
+
 @router.post("/commands/execute", response_model=Dict[str, Any])
 async def execute_command(
-    command: CommandRequest,
-    request: Request,
-    user_id: Optional[str] = Query(None, description="用户ID，用于权限控制")
+    request: CommandExecuteRequest = Body(...),
+    http_request: Request = None
 ):
     """执行系统命令并返回输出结果
 
@@ -520,9 +552,8 @@ async def execute_command(
     命令在隔离的子进程中执行，避免影响主服务器进程。
 
     Args:
-        command: 包含要执行的命令和工作目录的请求对象
-        request: FastAPI 请求对象，用于获取认证信息
-        user_id: 可选的用户ID，用于权限验证
+        request: 包含要执行的命令、工作目录和用户ID的请求对象
+        http_request: FastAPI 请求对象，用于获取认证信息
 
     Returns:
         Dict[str, Any]: 命令执行结果，包含：
@@ -544,31 +575,31 @@ async def execute_command(
 
     Example:
         >>> # 执行简单命令
-        >>> request = CommandRequest(command="ls -la")
-        >>> result = await execute_command(request, request, "user123")
+        >>> request = CommandExecuteRequest(command="ls -la")
+        >>> result = await execute_command(request)
         >>> print(result["exit_code"])  # 0
     """
     try:
         # 验证用户身份
-        if user_id:
+        if request.user_id:
             # 从请求头获取认证信息
-            auth_header = request.headers.get("Authorization")
+            auth_header = http_request.headers.get("Authorization")
             if not auth_header or not auth_header.startswith("Bearer "):
                 raise HTTPException(status_code=401, detail="无效的认证信息")
             # TODO: 验证token有效性
 
         # 记录命令执行日志
-        route_logger.info(f"用户 {user_id or 'anonymous'} 执行命令: {command.command}")
+        route_logger.info(f"用户 {request.user_id or 'anonymous'} 执行命令: {request.command}")
 
         # 创建子进程执行命令
         import subprocess
         import shlex
 
         # 解析命令字符串为参数列表
-        cmd_list = shlex.split(command.command)
+        cmd_list = shlex.split(request.command)
 
         # 设置工作目录
-        cwd = command.working_dir if command.working_dir else None
+        cwd = request.working_dir if request.working_dir else None
 
         # 执行命令并捕获输出
         process = subprocess.Popen(
@@ -585,13 +616,13 @@ async def execute_command(
         # 记录执行结果
         exit_code = process.returncode
         if exit_code == 0:
-            route_logger.info(f"命令执行成功: {command.command}")
+            route_logger.info(f"命令执行成功: {request.command}")
         else:
             route_logger.warning(f"命令执行失败，退出码: {exit_code}, 错误: {stderr[:200]}")
 
         return {
             "success": exit_code == 0,
-            "command": command.command,
+            "command": request.command,
             "exit_code": exit_code,
             "stdout": stdout,
             "stderr": stderr
@@ -605,15 +636,20 @@ async def execute_command(
 
 # 角色管理 API 端点
 
-@router.get("/roles/{role_name}", response_model=RoleResponse)
-async def get_role(role_name: str):
+class RoleRequest(BaseModel):
+    """角色请求模型"""
+    role_name: str = Field(description="角色名称")
+
+
+@router.post("/roles/get", response_model=RoleResponse)
+async def get_role(request: RoleRequest = Body(...)):
     """获取指定角色的详细信息
 
     根据角色名称查找对应的角色文件，解析其 frontmatter 元数据和内容。
     角色文件存储在 resources/roles/ 目录下，使用 Markdown 格式。
 
     Args:
-        role_name: 角色名称，用于查找对应的角色文件
+        request: 包含角色名称的请求对象
 
     Returns:
         RoleResponse: 包含角色完整信息的响应对象
@@ -628,12 +664,13 @@ async def get_role(role_name: str):
 
     Example:
         >>> # 获取角色信息
-        >>> role = await get_role("bunny_maid")
+        >>> request = RoleRequest(role_name="bunny_maid")
+        >>> role = await get_role(request)
         >>> print(role.title)  # "小兔女仆角色设定"
     """
     try:
         # 构建角色文件路径
-        role_path = RESOURCES_DIR / "roles" / f"{role_name}.md"
+        role_path = RESOURCES_DIR / "roles" / f"{request.role_name}.md"
 
         # 检查文件是否存在
         if not role_path.exists():
@@ -645,13 +682,13 @@ async def get_role(role_name: str):
             raise HTTPException(status_code=500, detail="角色文件内容为空")
 
         # 解析 frontmatter 元数据
-        frontmatter = parse_frontmatter(content)
+        frontmatter = parse_markdown_with_frontmatter(content)
         if not frontmatter:
             raise HTTPException(status_code=500, detail="无法解析角色文件的frontmatter")
 
         # 构建响应数据
         return {
-            "name": role_name,
+            "name": request.role_name,
             "title": frontmatter.get("title", ""),
             "description": frontmatter.get("description", ""),
             "category": frontmatter.get("category", ""),
@@ -710,7 +747,7 @@ async def list_roles():
                     continue
 
                 # 解析 frontmatter
-                frontmatter = parse_frontmatter(content)
+                frontmatter = parse_markdown_with_frontmatter(content)
                 if not frontmatter:
                     route_logger.warning(f"无法解析角色文件的frontmatter: {role_file}")
                     # 使用默认值

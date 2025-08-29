@@ -218,3 +218,34 @@ def parse_markdown_with_frontmatter(file_path: Path) -> Dict[str, Any]:
                       f"内容长度: {len(result['content'])}")
     
     return result
+
+
+def parse_frontmatter(file_path: Path) -> Dict[str, Any]:
+    """解析文件的 YAML frontmatter（兼容函数）
+    
+    这是一个兼容性包装函数，为了保持与现有代码的兼容性而提供。
+    内部直接调用 FrontmatterParser.parse_file() 方法。
+    
+    Args:
+        file_path: 文件路径
+        
+    Returns:
+        Dict[str, Any]: 解析结果，包含 metadata 和 content
+        
+    Note:
+        此函数的存在是为了向后兼容，建议在新代码中使用
+        FrontmatterParser.parse_file() 或 parse_markdown_with_frontmatter()
+    """
+    utils_logger.info(f"解析 frontmatter (兼容函数): {file_path}")
+    
+    # 使用核心解析器
+    metadata, content = FrontmatterParser.parse_file(file_path)
+    
+    # 返回与原函数兼容的格式
+    result = {
+        'metadata': metadata,
+        'content': content
+    }
+    
+    utils_logger.debug(f"解析完成 - 元数据键: {list(metadata.keys()) if metadata else '无'}")
+    return result
