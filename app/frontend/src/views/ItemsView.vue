@@ -317,7 +317,7 @@ onMounted(() => {
 
 .btn:active::after {
   width: 300px;
-  height: 300px;
+  min-height: 300px;
 }
 
 /* 主要按钮 - 青色渐变 */

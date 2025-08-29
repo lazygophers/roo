@@ -30,8 +30,27 @@
       <div class="config-layout">
         <!-- 左侧选择区域 -->
         <div class="selection-panel">
+          <!-- 标签页导航 -->
+          <div class="tab-navigation">
+            <div class="tab-header">
+              <div
+                v-for="tab in tabs"
+                :key="tab.id"
+                class="tab-item"
+                :class="{ active: activeTab === tab.id }"
+                @click="activeTab = tab.id"
+              >
+                <span class="tab-icon">{{ tab.icon }}</span>
+                <span class="tab-label">{{ tab.label }}</span>
+                <span v-if="tab.required" class="required-mark">*</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 标签页内容 -->
+          <div class="tab-content">
             <!-- Models 选择 -->
-            <div class="config-section">
+            <div v-show="activeTab === 'models'" class="config-section">
               <h2>模式 <span class="required">*</span></h2>
               <div class="search-box">
                 <div class="search-icon">🔍</div>
@@ -149,9 +168,10 @@
                 </div>
               </div>
             </div>
+          </div>
 
           <!-- Roles 选择 -->
-          <div class="config-section">
+          <div v-show="activeTab === 'roles'" class="config-section">
             <h2>角色（可选）</h2>
             <div class="items-list">
               <div
@@ -195,9 +215,9 @@
               </div>
             </div>
           </div>
-
-          <!-- Commands 选择 -->
-          <div class="config-section">
+  
+            <!-- Commands 选择 -->
+          <div v-show="activeTab === 'commands'" class="config-section">
             <h2>命令（可选）</h2>
             <div class="items-list">
               <div
@@ -293,9 +313,11 @@
                           </span>
                         </div>
                       </div>
-                      <!-- 详细模式：显示规则数量 -->
-                      <div v-else-if="selectedModelRules[model.slug] && selectedModelRules[model.slug].length > 0" class="rules-count">
-                        <span class="count-badge">{{ selectedModelRules[model.slug].length }} rules</span>
+                      <!-- 详细模式：显示具体规则标题 -->
+                      <div v-else-if="selectedModelRules[model.slug] && selectedModelRules[model.slug].length > 0" class="rules-list">
+                        <div v-for="ruleName in selectedModelRules[model.slug]" :key="ruleName" class="rule-item-small">
+                          <span class="rule-name">{{ modelRules[model.slug]?.[ruleName]?.metadata?.title || ruleName }}</span>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -486,6 +508,14 @@ const initializeModelRules = (modelSlug: string) => {
   }
 }
 const modelSearch = ref('')
+
+// 标签页相关
+const activeTab = ref('models')
+const tabs = ref([
+  { id: 'models', label: '模式', icon: '🤖', required: true },
+  { id: 'roles', label: '角色', icon: '🎭', required: false },
+  { id: 'commands', label: '命令', icon: '⚡', required: false }
+])
 const previewMode = ref<'detailed' | 'simple'>('detailed')
 const isLoading = ref(false)
 const error = ref<string | null>(null)
@@ -1125,6 +1155,154 @@ const handleLoadConfig = async (config: any) => {
   margin-right: 0.5rem;
 }
 
+/* Tab Navigation Styles */
+.tab-navigation {
+  margin-bottom: 1.5rem;
+  position: relative;
+}
+
+.tab-navigation::after {
+  content: '';
+  position: absolute;
+  bottom: -1rem;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(120, 255, 214, 0.3), transparent);
+  opacity: 0.5;
+}
+
+.tab-header {
+  display: flex;
+  gap: 0.5rem;
+  background: var(--glass-bg);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  padding: 0.25rem;
+  overflow-x: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(120, 255, 214, 0.3) transparent;
+}
+
+.tab-header::-webkit-scrollbar {
+  height: 4px;
+}
+
+.tab-header::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.tab-header::-webkit-scrollbar-thumb {
+  background: rgba(120, 255, 214, 0.3);
+  border-radius: 2px;
+}
+
+.tab-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  user-select: none;
+  position: relative;
+  overflow: hidden;
+}
+
+.tab-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(120, 255, 214, 0.2), transparent);
+  transition: left 0.5s ease;
+}
+
+.tab-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+  transform: translateY(-2px);
+}
+
+.tab-item:hover::before {
+  left: 100%;
+}
+
+.tab-item.active {
+  background: linear-gradient(135deg, var(--accent-cyan) 0%, var(--accent-purple) 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(120, 255, 214, 0.4);
+}
+
+.tab-item.active::before {
+  display: none;
+}
+
+.tab-icon {
+  font-size: 1.2rem;
+  filter: grayscale(0.5);
+  transition: all 0.3s ease;
+}
+
+.tab-item.active .tab-icon {
+  filter: grayscale(0);
+  transform: scale(1.1);
+}
+
+.tab-label {
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+.tab-item:not(.active) .tab-label {
+  color: var(--text-secondary);
+}
+
+.required-mark {
+  color: var(--accent-pink);
+  font-weight: bold;
+  margin-left: 0.25rem;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+/* Tab Content Styles */
+.tab-content {
+  min-height: 400px;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Tab content sections should have consistent spacing */
+.tab-content .config-section {
+  animation: slideIn 0.4s ease;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
 /* Global Search Section */
 .global-search-section {
   margin-bottom: 2rem;
@@ -1317,8 +1495,8 @@ h1 {
 }
 
 .items-list {
-  max-height: 300px;
-  overflow-y: auto;
+  max-height: none;
+  overflow-y: visible;
   padding-right: 0.5rem;
 }
 
@@ -1537,8 +1715,8 @@ h1 {
   font-size: 0.8rem;
   white-space: pre-wrap;
   word-wrap: break-word;
-  max-height: 100px;
-  overflow: hidden;
+  max-height: none;
+  overflow: visible;
 }
 
 .role-preview p {
@@ -1582,8 +1760,8 @@ h1 {
 .preview-content {
   flex: 1;
   margin-bottom: 2rem;
-  max-height: 400px;
-  overflow-y: auto;
+  max-height: none;
+  overflow-y: visible;
   padding-right: 0.5rem;
 }
 
@@ -1750,6 +1928,38 @@ h1 {
   box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
 }
 
+/* 规则列表样式 */
+.rules-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.rule-item-small {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 0.75rem;
+  background: rgba(59, 130, 246, 0.1);
+  border-radius: 8px;
+  border-left: 3px solid var(--accent-cyan);
+  transition: all 0.3s ease;
+}
+
+.rule-item-small:hover {
+  background: rgba(59, 130, 246, 0.15);
+  transform: translateX(4px);
+}
+
+.rule-item-small .rule-name {
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .preview-card .commands-grid {
   display: flex;
   flex-wrap: wrap;
@@ -1766,7 +1976,7 @@ h1 {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 200px;
+  min-height: 120px;
   color: var(--text-secondary);
   background: var(--glass-bg);
   backdrop-filter: blur(5px);
@@ -1857,108 +2067,422 @@ h1 {
 }
 
 /* 响应式设计 */
-@media (max-width: 1024px) {
-  .config-layout {
-    flex-direction: column;
+@media (max-width: 1200px) {
+  .config-container {
+    padding: 1.5rem;
   }
-  
-  .preview-panel {
-    flex: 1;
-    max-width: none;
+
+  .config-content {
+    grid-template-columns: 1fr 300px;
+  }
+}
+
+@media (max-width: 968px) {
+  .config-container {
+    padding: 1rem;
+  }
+
+  .config-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .config-content {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .selection-panel {
+    order: 2;
+  }
+
+  .config-summary {
+    order: 1;
+    position: sticky;
+    top: 1rem;
+  }
+
+  .tab-header {
+    padding: 0.25rem;
+    border-radius: 8px;
+  }
+
+  .tab-item {
+    padding: 0.6rem 1rem;
+    font-size: 0.9rem;
+  }
+
+  .tab-icon {
+    font-size: 1rem;
   }
 }
 
 @media (max-width: 768px) {
-  .container {
-    padding: 0 1rem;
+  .config-container {
+    padding: 0.75rem;
   }
-  
-  .header {
-    text-align: center;
+
+  .config-header h1 {
+    font-size: 1.5rem;
   }
-  
-  .stats-bar {
-    flex-wrap: wrap;
-    gap: 1rem;
-    justify-content: center;
+
+  .config-header p {
+    font-size: 0.9rem;
   }
-  
-  .config-section {
+
+  .selection-panel {
     padding: 1rem;
   }
-  
+
+  .section-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .section-title {
+    font-size: 1.1rem;
+  }
+
   .search-box {
     position: relative;
   }
-  
+
   .search-box input {
+    padding: 0.6rem 2.25rem 0.6rem 0.875rem;
     font-size: 0.9rem;
   }
-  
+
+  .search-icon {
+    left: 0.75rem;
+    font-size: 1rem;
+  }
+
+  .item-card {
+    padding: 0.875rem;
+    border-radius: 8px;
+  }
+
+  .item-title {
+    font-size: 1rem;
+  }
+
+  .item-description {
+    font-size: 0.85rem;
+    line-height: 1.4;
+  }
+
+  .item-actions {
+    width: 100%;
+    gap: 0.5rem;
+  }
+
+  .action-button {
+    flex: 1;
+    padding: 0.5rem;
+    font-size: 0.85rem;
+    min-height: 36px;
+  }
+
+  .config-summary {
+    padding: 1rem;
+    border-radius: 12px;
+  }
+
+  .summary-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .summary-title {
+    font-size: 1.1rem;
+  }
+
+  .selection-stats {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .stats-card {
+    padding: 0.75rem;
+  }
+
+  .stats-value {
+    font-size: 1.25rem;
+  }
+
+  .stats-label {
+    font-size: 0.85rem;
+  }
+
+  .selected-items {
+    max-height: 300px;
+  }
+
+  .selected-item {
+    padding: 0.6rem;
+    font-size: 0.85rem;
+  }
+
+  .empty-state {
+    padding: 2rem 1rem;
+  }
+
+  .empty-icon {
+    font-size: 3rem;
+  }
+
+  .export-button {
+    width: 100%;
+    padding: 0.75rem;
+    justify-content: center;
+  }
+
+  /* Tab navigation adjustments for mobile */
+  .tab-navigation {
+    margin-bottom: 1rem;
+  }
+
+  .tab-navigation::after {
+    bottom: -0.75rem;
+  }
+
+  .tab-header {
+    gap: 0.25rem;
+    padding: 0.125rem;
+    background: rgba(255, 255, 255, 0.03);
+  }
+
+  .tab-item {
+    padding: 0.5rem 0.875rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+  }
+
+  .tab-item.active {
+    transform: scale(1.02);
+  }
+
+  .tab-icon {
+    font-size: 0.9rem;
+  }
+
+  .required-mark {
+    font-size: 0.8rem;
+  }
+
+  .tab-content {
+    min-height: 350px;
+  }
+
+  /* Global search section adjustments */
+  .global-search-section {
+    margin-bottom: 1rem;
+  }
+
+  .global-search-section::after {
+    bottom: -0.75rem;
+  }
+
+  /* Model rules adjustments */
+  .model-rules-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .model-rules-actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .model-rules-list {
+    gap: 0.5rem;
+  }
+
+  .rule-item {
+    padding: 0.75rem;
+  }
+
+  .rule-header {
+    padding: 0.75rem 0;
+  }
+
+  /* Preview adjustments */
   .preview-panel {
     margin-top: 1rem;
   }
-  
+
   .preview-section {
     padding: 1.5rem;
   }
-  
-  .actions {
-    flex-direction: row;
-    justify-content: center;
+
+  .preview-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
   }
-  
+
+  .preview-controls {
+    width: 100%;
+  }
+
+  .mode-toggle {
+    width: 100%;
+  }
+
+  .preview-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .preview-card {
+    padding: 1rem;
+  }
+
+  .preview-header {
+    margin-bottom: 12px;
+  }
+
+  .preview-title {
+    font-size: 1rem;
+  }
+
+  .preview-title .icon {
+    width: 20px;
+    height: 20px;
+    font-size: 12px;
+  }
+
+  .preview-count {
+    padding: 0.25rem 0.75rem;
+    font-size: 12px;
+  }
+
+  /* Actions adjustments */
+  .actions {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
   .btn {
-    flex: 1;
-    max-width: 200px;
+    width: 100%;
+    max-width: none;
   }
 }
 
 @media (max-width: 480px) {
-  h1 {
-    font-size: 1.5rem;
+  .config-container {
+    padding: 0.5rem;
   }
-  
-  .description {
-    font-size: 0.9rem;
+
+  .config-header h1 {
+    font-size: 1.25rem;
   }
-  
-  .stats-bar {
-    gap: 0.5rem;
+
+  .config-header p {
+    font-size: 0.85rem;
+    margin-bottom: 1.5rem;
   }
-  
-  .stat-item {
-    min-width: 60px;
+
+  .global-search-section {
+    margin-bottom: 0.75rem;
   }
-  
-  .stat-value {
-    font-size: 1.2rem;
+
+  .search-box {
+    margin-bottom: 0.75rem;
   }
-  
-  .stat-label {
-    font-size: 0.7rem;
+
+  .search-box input {
+    padding: 0.5rem 2.125rem 0.5rem 0.875rem;
   }
-  
+
+  .item-card {
+    padding: 0.75rem;
+  }
+
+  .item-actions {
+    flex-direction: column;
+  }
+
+  .action-button {
+    width: 100%;
+    min-height: 44px;
+  }
+
+  .config-summary {
+    padding: 0.75rem;
+  }
+
+  .stats-card {
+    padding: 0.625rem;
+  }
+
+  .stats-value {
+    font-size: 1.125rem;
+  }
+
+  .selected-items {
+    max-height: 250px;
+  }
+
+  .selected-item {
+    padding: 0.5rem;
+  }
+
+  .empty-state {
+    padding: 1.5rem 0.75rem;
+  }
+
+  .empty-icon {
+    font-size: 2.5rem;
+  }
+
+  /* Touch-friendly adjustments */
+  .tab-item {
+    min-height: 44px;
+    padding: 0.625rem 1rem;
+  }
+
+  .action-button {
+    min-height: 44px;
+  }
+
+  /* Compact mode for very small screens */
+  .tab-header {
+    gap: 0.125rem;
+  }
+
+  .tab-item {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.8rem;
+  }
+
+  .tab-icon {
+    font-size: 0.85rem;
+  }
+
+  .required-mark {
+    font-size: 0.75rem;
+  }
+
   .config-section h2 {
-    font-size: 1.1rem;
-  }
-  
-  .item-info h3 {
     font-size: 1rem;
   }
-  
+
+  .item-info h3 {
+    font-size: 0.95rem;
+  }
+
   .preview-section h2 {
-    font-size: 1.1rem;
+    font-size: 1rem;
   }
-  
-  .mode-toggle {
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-  
+
   .mode-btn {
-    padding: 0.5rem 1rem;
-    font-size: 0.9rem;
+    padding: 0.5rem 0.875rem;
+    font-size: 0.85rem;
   }
 }
 </style>

@@ -22,7 +22,7 @@
           - 点击返回首页（"/"）
           - 使用渐变色文字效果增强视觉吸引力
         -->
-        <router-link to="/">FastAPI + Vue3 示例</router-link>
+        <router-link to="/">Roo Code 配置管理工具</router-link>
       </div>
       <!-- 导航链接区域 -->
       <div class="nav-links">
@@ -55,7 +55,7 @@
       - 使用半透明背景与整体设计风格保持一致
     -->
     <footer class="footer">
-      <p>&copy; 2024 FastAPI + Vue3 示例项目</p>
+      <p>&copy; 2025 Roo Code 配置管理工具</p>
     </footer>
   </div>
 </template>
