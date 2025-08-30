@@ -5,7 +5,7 @@
         <h1>配置选择器</h1>
         <p class="description">选择您需要的 models、rules、roles 和 commands</p>
       </div>
-      
+
       <!-- Global Search Filter -->
       <div class="global-search-section">
         <SearchFilter
@@ -26,7 +26,7 @@
           @filter-change="handleFilterChange"
         />
       </div>
-      
+
       <div class="config-layout">
         <!-- 左侧选择区域 -->
         <div class="selection-panel">
@@ -103,7 +103,7 @@
                       {{ model.tags.join(', ') }}
                     </span>
                   </div>
-                  
+
                   <!-- 每个Model的Rules选择区域 -->
                   <div class="model-rules" v-if="selectedModels.some(m => m.slug === model.slug) && modelRules[model.slug]">
                     <div class="model-rules-header">
@@ -161,11 +161,6 @@
                             <span v-for="tag in rule.metadata.tags" :key="tag" class="tag">{{ tag }}</span>
                           </div>
                         </div>
-                        <div class="rule-card-footer" v-if="previewMode === 'detailed' && rule.content">
-                          <div class="content-preview">
-                            <pre>{{ rule.content.substring(0, PREVIEW_LENGTH) }}{{ rule.content.length > PREVIEW_LENGTH ? '...' : '' }}</pre>
-                          </div>
-                        </div>
                       </div>
                     </div>
                   </div>
@@ -219,7 +214,7 @@
               </div>
             </div>
           </div>
-  
+
             <!-- Commands 选择 -->
           <div v-show="activeTab === 'commands'" class="config-section">
             <h2>命令（可选）</h2>
@@ -326,7 +321,7 @@
                     </div>
                   </div>
                 </div>
-                
+
                 <!-- Role 预览 -->
                 <div class="preview-card" v-if="selectedRole">
                   <div class="card-header">
@@ -347,7 +342,7 @@
                     </div>
                   </div>
                 </div>
-                
+
                 <!-- Commands 预览 -->
                 <div class="preview-card" v-if="selectedCommands.length > 0">
                   <div class="card-header">
@@ -374,7 +369,7 @@
                 </div>
               </div>
             </div>
-            
+
             <!-- Hooks 预览 -->
             <div class="preview-card" v-if="hooks.before || hooks.after">
               <div class="card-header">
@@ -450,7 +445,7 @@
         </div>
       </div>
     </div>
-    
+
     <!-- 配置管理器组件 -->
     <ConfigManager
       v-model:show="showConfigManager"
@@ -575,11 +570,11 @@ const getAllRulesSelected = (modelSlug: string) => {
 const filteredModels = computed(() => {
   const searchTerm = modelSearch.value.toLowerCase()
   const modelsArray = models.value || []
-  
+
   if (!searchTerm) {
     return modelsArray
   }
-  
+
   return modelsArray.filter(model =>
     model.name.toLowerCase().includes(searchTerm) ||
     model.slug.toLowerCase().includes(searchTerm) ||
@@ -609,7 +604,7 @@ const fetchModels = async () => {
     models.value = response || []
     console.log('Models value after assignment:', models.value)
     console.log('Models length:', models.value?.length)
-    
+
     // 自动选择 orchestrator 模型
     const orchestratorModel = (models.value || []).find(m => m.slug === BRAIN_MODEL_SLUG)
     console.log('Found orchestrator model:', orchestratorModel)
@@ -630,13 +625,13 @@ const fetchModelRules = async (slug: string) => {
   try {
     const response = await api.post('/api/rules/get', { slug })
     const rules = response || {}
-    
+
     // 确保数据结构存在
     initializeModelRules(slug)
-    
+
     // 存储模型的规则
     modelRules.value[slug] = rules
-    
+
     // 如果是brain模式，默认选中所有规则
     if (slug === BRAIN_MODEL_SLUG) {
       selectedModelRules.value[slug] = Object.keys(rules)
@@ -695,31 +690,31 @@ const fetchHooks = async () => {
 
 const toggleModel = async (model: Model) => {
   const index = selectedModels.value.findIndex(m => m.slug === model.slug)
-  
+
   if (index > -1) {
     // 不能取消选择 orchestrator 模型
     if (model.slug === BRAIN_MODEL_SLUG) {
       return
     }
     selectedModels.value.splice(index, 1)
-    
+
     // 清理该模型的 rules 选择
     delete selectedModelRules.value[model.slug]
     delete modelRules.value[model.slug]
   } else {
     selectedModels.value.push(model)
-    
+
     // 获取该 model 的 rules
     try {
       const response = await api.post('/api/rules/get', { slug: model.slug })
       const newRules = response || {}
-      
+
       // 确保数据结构存在
       initializeModelRules(model.slug)
-      
+
       // 存储模型的 rules
       modelRules.value[model.slug] = newRules
-      
+
       // 如果是orchestrator模式，默认选中所有规则
       if (model.slug === BRAIN_MODEL_SLUG) {
         selectedModelRules.value[model.slug] = Object.keys(newRules)
@@ -756,10 +751,10 @@ const toggleModelRule = (modelSlug: string, ruleName: string, rule: Rule) => {
   if (modelSlug === BRAIN_MODEL_SLUG) {
     return
   }
-  
+
   // 确保数据结构存在
   initializeModelRules(modelSlug)
-  
+
   const index = selectedModelRules.value[modelSlug].indexOf(ruleName)
   if (index > -1) {
     selectedModelRules.value[modelSlug].splice(index, 1)
@@ -774,10 +769,10 @@ const toggleAllModelRules = (modelSlug: string) => {
   if (modelSlug === BRAIN_MODEL_SLUG) {
     return
   }
-  
+
   const modelRuleNames = Object.keys(modelRules.value[modelSlug] || {})
   const selectedRuleNames = selectedModelRules.value[modelSlug] || []
-  
+
   if (getAllRulesSelected(modelSlug)) {
     // 取消全选
     selectedModelRules.value[modelSlug] = []
@@ -796,7 +791,7 @@ const resetSelection = () => {
   selectedRole.value = null
   selectedCommands.value = []
   modelSearch.value = ''
-  
+
   // 如果保留了 orchestrator，重新加载它的 rules
   if (orchestratorModel) {
     fetchModelRules(orchestratorModel.slug)
@@ -812,7 +807,7 @@ const exportConfig = () => {
     commands: selectedCommands.value,
     hooks: hooks.value
   }
-  
+
   // 为每个model添加其选中的rules
   selectedModels.value.forEach(model => {
     const selectedRules = selectedModelRules.value[model.slug] || []
@@ -824,7 +819,7 @@ const exportConfig = () => {
       }
     })
   })
-  
+
   // 创建下载链接
   const blob = new Blob([JSON.stringify(config, null, 2)], { type: 'application/json' })
   const url = URL.createObjectURL(blob)
@@ -854,7 +849,7 @@ onMounted(async () => {
   } catch (error) {
     console.error('❌ 初始数据获取失败:', error)
   }
-  
+
   // 初始化时自动选择 orchestrator
   nextTick(() => {
     console.log('🔄 nextTick 回调执行')
@@ -877,7 +872,7 @@ onMounted(async () => {
 // 全局搜索处理函数
 const handleGlobalSearch = (query: string, filters: any) => {
   globalSearchQuery.value = query
-  
+
   // 更新搜索查询，但不过滤计算属性
   // 计算属性会根据 globalSearchQuery.value 自动更新
   // 实际的过滤逻辑在 filteredModels 计算属性中处理
@@ -902,7 +897,7 @@ const handleSaveConfig = async (configName: string) => {
     commands: selectedCommands.value,
     hooks: hooks.value
   }
-  
+
   // 为每个model添加其选中的rules
   selectedModels.value.forEach(model => {
     const selectedRules = selectedModelRules.value[model.slug] || []
@@ -914,11 +909,11 @@ const handleSaveConfig = async (configName: string) => {
       }
     })
   })
-  
+
   // 使用配置存储保存
   const { useConfigStore } = await import('@/stores/config')
   const configStore = useConfigStore()
-  
+
   try {
     await configStore.saveConfig(configName, config)
     // 可以在这里添加成功提示
@@ -931,28 +926,28 @@ const handleSaveConfig = async (configName: string) => {
 const handleLoadConfig = async (config: any) => {
   // 重置当前选择
   resetSelection()
-  
+
   // 加载models
   if (config.models && Array.isArray(config.models)) {
     selectedModels.value = config.models
-    
+
     // 为每个model加载rules
     for (const model of config.models) {
       await fetchModelRules(model.slug)
-      
+
       // 加载该model选中的rules
       if (config.rules && config.rules[model.slug]) {
         selectedModelRules.value[model.slug] = config.rules[model.slug].map((rule: any) => rule.name)
       }
     }
   }
-  
+
   // 加载role
   if (config.roles && config.roles.length > 0) {
     const role = config.roles[0]
     selectedRole.value = role
   }
-  
+
   // 加载commands
   if (config.commands && Array.isArray(config.commands)) {
     selectedCommands.value = config.commands
@@ -2292,7 +2287,7 @@ h1 {
   .model-rules-list {
     gap: 0.75rem;
   }
-  
+
   /* 规则卡片样式 */
   .model-rules-list .rule-item {
     border: 1px solid var(--glass-border);
@@ -2309,7 +2304,7 @@ h1 {
     position: relative;
     overflow: hidden;
   }
-  
+
   .model-rules-list .rule-item::before {
     content: '';
     position: absolute;
@@ -2320,7 +2315,7 @@ h1 {
     background: linear-gradient(90deg, transparent, rgba(120, 255, 214, 0.1), transparent);
     transition: left 0.5s ease;
   }
-  
+
   .model-rules-list .rule-item:hover {
     border-color: var(--accent-cyan);
     transform: translateY(-2px);
@@ -2329,11 +2324,11 @@ h1 {
       0 0 16px rgba(120, 255, 214, 0.2),
       inset 0 1px 0 rgba(255, 255, 255, 0.2);
   }
-  
+
   .model-rules-list .rule-item:hover::before {
     left: 100%;
   }
-  
+
   .model-rules-list .rule-item.selected {
     border-color: var(--accent-cyan);
     background: var(--glass-bg-selected);
@@ -2341,23 +2336,23 @@ h1 {
       0 8px 24px rgba(120, 255, 214, 0.3),
       inset 0 0 20px rgba(120, 255, 214, 0.1);
   }
-  
+
   .model-rules-list .rule-item.selected::before {
     display: none;
   }
-  
+
   .model-rules-list .rule-item.disabled {
     opacity: 0.7;
     cursor: not-allowed;
   }
-  
+
   .model-rules-list .rule-item.disabled:hover {
     transform: none;
     box-shadow:
       0 4px 12px rgba(0, 0, 0, 0.2),
       inset 0 1px 0 rgba(255, 255, 255, 0.1);
   }
-  
+
   /* 规则卡片头部 */
   .model-rules-list .rule-header {
     display: flex;
@@ -2366,14 +2361,14 @@ h1 {
     padding: 0.5rem 0;
     gap: 1rem;
   }
-  
+
   .model-rules-list .rule-info {
     flex: 1;
     display: flex;
     flex-direction: column;
     gap: 0.25rem;
   }
-  
+
   .model-rules-list .rule-info h5 {
     margin: 0;
     color: var(--text-primary);
@@ -2381,21 +2376,21 @@ h1 {
     font-weight: 600;
     line-height: 1.4;
   }
-  
+
   .model-rules-list .rule-description {
     color: var(--text-secondary);
     font-size: 0.875rem;
     line-height: 1.5;
     margin: 0;
   }
-  
+
   /* 规则参数区域 */
   .model-rules-list .rule-params {
     margin-top: 0.75rem;
     padding-top: 0.75rem;
     border-top: 1px solid rgba(255, 255, 255, 0.1);
   }
-  
+
   .model-rules-list .param-item {
     display: flex;
     align-items: center;
@@ -2403,13 +2398,13 @@ h1 {
     padding: 0.25rem 0;
     font-size: 0.875rem;
   }
-  
+
   .model-rules-list .param-name {
     color: var(--accent-cyan);
     font-weight: 600;
     font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
   }
-  
+
   .model-rules-list .param-value {
     color: var(--text-secondary);
     font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
@@ -2417,31 +2412,31 @@ h1 {
     padding: 0.125rem 0.5rem;
     border-radius: 4px;
   }
-  
+
   /* 响应式调整 */
   @media (max-width: 768px) {
     .model-rules-list {
       gap: 0.5rem;
     }
-    
+
     .model-rules-list .rule-item {
       padding: 0.75rem;
     }
-    
+
     .model-rules-list .rule-info h5 {
       font-size: 0.95rem;
     }
-    
+
     .model-rules-list .rule-description {
       font-size: 0.8rem;
     }
-    
+
     .model-rules-list .param-item {
       flex-direction: column;
       align-items: flex-start;
       gap: 0.25rem;
     }
-    
+
     .model-rules-list .param-value {
       width: 100%;
       text-align: left;
@@ -2815,7 +2810,7 @@ h1 {
   .metadata-simple {
     padding: 0.5rem;
   }
-  
+
   .rule-meta-info,
   .command-meta-info,
   .model-meta-info {
@@ -2823,7 +2818,7 @@ h1 {
     align-items: flex-start;
     gap: 0.25rem;
   }
-  
+
   .role-traits {
     flex-direction: column;
     align-items: flex-start;
@@ -2831,7 +2826,7 @@ h1 {
   }
 }
 </style>
-  
+
   /* Hooks 特定样式 */
   .hook-metadata-simple .hook-title {
     color: var(--text-primary);
@@ -2842,12 +2837,12 @@ h1 {
     align-items: center;
     gap: 0.5rem;
   }
-  
+
   .hook-metadata-simple .hook-title::before {
     content: '🔗';
     font-size: 1.1rem;
   }
-  
+
   .hook-metadata-simple .hook-description {
     color: var(--text-secondary);
     font-size: 0.9rem;
@@ -2855,7 +2850,7 @@ h1 {
     margin: 0 0 0.5rem 0;
     font-weight: 500;
   }
-  
+
   .hook-metadata-simple .hook-type {
     display: inline-block;
     padding: 0.25rem 0.5rem;
@@ -2866,7 +2861,7 @@ h1 {
     font-weight: 500;
     margin-left: 0.5rem;
   }
-  
+
   .hook-meta-info {
     display: flex;
     align-items: center;
@@ -2874,31 +2869,31 @@ h1 {
     flex-wrap: wrap;
     margin-top: 0.5rem;
   }
-  
+
   .hook-name {
     display: flex;
     align-items: center;
     gap: 0.5rem;
     margin-bottom: 0.5rem;
   }
-  
+
   .hook-name .name-text {
     color: var(--text-primary);
     font-weight: 600;
   }
-  
+
   .hook-name .hook-type {
     font-size: 0.85rem;
     padding: 0.25rem 0.75rem;
     border-radius: 12px;
     font-weight: 500;
   }
-  
+
   .hook-name .hook-type.before {
     background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
     color: white;
   }
-  
+
   .hook-name .hook-type.after {
     background: linear-gradient(135deg, #10b981 0%, #059669 100%);
     color: white;
@@ -2917,7 +2912,7 @@ h1 {
   -webkit-backdrop-filter: blur(10px);
   position: relative;
   overflow: hidden;
-  box-shadow: 
+  box-shadow:
     0 4px 12px rgba(0, 0, 0, 0.2),
     inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
@@ -2936,7 +2931,7 @@ h1 {
 .rule-card:hover {
   border-color: var(--accent-cyan);
   transform: translateY(-2px);
-  box-shadow: 
+  box-shadow:
     0 8px 24px rgba(0, 0, 0, 0.3),
     0 0 16px rgba(120, 255, 214, 0.2),
     inset 0 1px 0 rgba(255, 255, 255, 0.2);
@@ -2949,7 +2944,7 @@ h1 {
 .rule-card.selected {
   border-color: var(--accent-cyan);
   background: var(--glass-bg-selected);
-  box-shadow: 
+  box-shadow:
     0 8px 24px rgba(120, 255, 214, 0.3),
     inset 0 0 20px rgba(120, 255, 214, 0.1);
 }
@@ -2965,7 +2960,7 @@ h1 {
 
 .rule-card.disabled:hover {
   transform: none;
-  box-shadow: 
+  box-shadow:
     0 4px 12px rgba(0, 0, 0, 0.2),
     inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
@@ -3128,29 +3123,29 @@ h1 {
   .rule-card {
     padding: 0.75rem;
   }
-  
+
   .rule-card-header {
     margin-bottom: 0.5rem;
   }
-  
+
   .rule-title {
     font-size: 0.95rem;
   }
-  
+
   .rule-description {
     font-size: 0.85rem;
   }
-  
+
   .rule-badges {
     flex-direction: column;
     align-items: flex-start;
     gap: 0.25rem;
   }
-  
+
   .rule-tags {
     margin-top: 0.25rem;
   }
-  
+
   .content-preview pre {
     font-size: 0.8rem;
     padding: 0.5rem;
