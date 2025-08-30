@@ -4,7 +4,7 @@
 该模块提供了统一的日志配置功能，支持：
 - 同时输出到控制台和文件
 - 按小时自动分割日志文件
-- 只保留3小时内的日志文件
+- 只保留1小时内的日志文件
 - 使用文本格式而非JSON格式
 """
 
@@ -87,20 +87,20 @@ def setup_logger(name: str = None, log_dir: Path = None) -> logging.Logger:
         filename=log_file,
         when='H',  # 按小时分割
         interval=1,
-        backupCount=3,  # 保留3个小时的日志
+        backupCount=1,  # 保留1个小时的日志
         encoding='utf-8'
     )
     file_handler.setLevel(logging.DEBUG)
     file_handler.setFormatter(file_formatter)
     logger.addHandler(file_handler)
     
-    # 清理旧日志文件（保留3小时内的）
-    cleanup_old_logs(log_dir, hours=3)
+    # 清理旧日志文件（保留1小时内的）
+    cleanup_old_logs(log_dir, hours=1)
     
     return logger
 
 
-def cleanup_old_logs(log_dir: Path, hours: int = 3):
+def cleanup_old_logs(log_dir: Path, hours: int = 1):
     """
     清理指定小时数之前的日志文件
     
