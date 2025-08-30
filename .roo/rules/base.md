@@ -304,7 +304,6 @@ frameworks:
    └── components/
        ├── Button/
        │   ├── Button.vue
-       │   └── Button.module.css（可选）
        └── Card/
            ├── Card.vue（包含 <style> 标签）
    ```
