@@ -29,6 +29,7 @@ export interface Command {
         category?: string
         usage?: string
         examples?: string[]
+        tags?: string[]
     }
 }
 

@@ -237,10 +237,10 @@
                     <p v-if="command.metadata.description" class="command-description">{{
                         command.metadata.description
                       }}</p>
-                    <div v-if="command.metadata.category || command.metadata.tags" class="command-meta-info">
+                    <div v-if="command.metadata.category || command.metadata?.tags" class="command-meta-info">
                       <span v-if="command.metadata.category" class="category-tag">{{ command.metadata.category }}</span>
-                      <span v-if="command.metadata.tags && command.metadata.tags.length > 0" class="tags">
-                        {{ command.metadata.tags.join(', ') }}
+                      <span v-if="command.metadata?.tags && command.metadata?.tags.length > 0" class="tags">
+                        {{ command.metadata?.tags.join(', ') }}
                       </span>
                     </div>
                   </div>

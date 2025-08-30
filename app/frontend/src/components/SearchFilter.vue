@@ -33,7 +33,7 @@
           ⚙️
         </button>
       </div>
-      
+
       <!-- 搜索历史下拉 -->
       <div
         v-if="showHistory && searchHistory.length > 0 && !searchQuery"
@@ -60,7 +60,7 @@
           </button>
         </div>
       </div>
-      
+
       <!-- 搜索建议下拉 -->
       <div
         v-if="showSuggestions && searchSuggestions.length > 0"
@@ -78,7 +78,7 @@
           <span class="suggestion-text">{{ suggestion }}</span>
         </div>
       </div>
-      
+
       <!-- 筛选面板 -->
       <transition name="slide-down">
         <div v-if="showFilterPanel" class="filter-panel">
@@ -96,7 +96,7 @@
               </label>
             </div>
           </div>
-          
+
           <div class="filter-section">
             <h3>搜索选项</h3>
             <div class="filter-options">
@@ -126,7 +126,7 @@
               </label>
             </div>
           </div>
-          
+
           <div class="filter-section">
             <h3>排序方式</h3>
             <select v-model="sortOption" @change="handleFilterChange" class="sort-select">
@@ -139,9 +139,9 @@
         </div>
       </transition>
     </div>
-    
+
     <!-- 快速筛选标签 -->
-    <div v-if="quickFilters.length > 0" class="quick-filters">
+    <div v-if="(quickFilters?.length || 0) > 0" class="quick-filters">
       <span class="quick-filter-label">快速筛选:</span>
       <button
         v-for="filter in quickFilters"
@@ -153,7 +153,7 @@
         {{ filter.label }}
       </button>
     </div>
-    
+
     <!-- 搜索统计 -->
     <div v-if="showStats && searchQuery" class="search-stats">
       <span class="stats-text">
@@ -167,7 +167,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
+import { ref, watch, onMounted, onUnmounted } from 'vue'
 import { debounce } from 'lodash-es'
 
 interface Props {
@@ -242,7 +242,7 @@ const searchTime = ref(0)
 const debouncedSearch = debounce((query: string) => {
   if (query.trim()) {
     const startTime = performance.now()
-    
+
     emit('search', query, {
       scopes: selectedScopes.value,
       caseSensitive: searchOptions.value.caseSensitive,
@@ -250,7 +250,7 @@ const debouncedSearch = debounce((query: string) => {
       highlightMatches: searchOptions.value.highlightMatches,
       sortBy: sortOption.value
     })
-    
+
     // 模拟搜索时间（实际应用中应该从后端获取）
     searchTime.value = Math.round(performance.now() - startTime)
     showStats.value = true
@@ -260,11 +260,11 @@ const debouncedSearch = debounce((query: string) => {
 // 方法
 const handleSearchInput = () => {
   emit('update:modelValue', searchQuery.value)
-  
+
   if (searchQuery.value) {
     showHistory.value = false
     debouncedSearch(searchQuery.value)
-    
+
     // 生成搜索建议
     generateSuggestions()
   } else {
@@ -276,22 +276,22 @@ const handleSearchInput = () => {
 const generateSuggestions = () => {
   // 这里可以根据实际需求生成更智能的建议
   const suggestions: string[] = []
-  
+
   if (searchQuery.value.length > 2) {
     // 基于历史记录生成建议
-    const relevantHistory = searchHistory.value.filter(item => 
+    const relevantHistory = searchHistory.value.filter(item =>
       item.toLowerCase().includes(searchQuery.value.toLowerCase())
     )
     suggestions.push(...relevantHistory.slice(0, 2))
-    
+
     // 基于常见搜索词生成建议
     const commonTerms = ['code', 'debug', 'architect', 'brain', 'hook', 'before', 'after']
-    const matchingTerms = commonTerms.filter(term => 
+    const matchingTerms = commonTerms.filter(term =>
       term.toLowerCase().includes(searchQuery.value.toLowerCase())
     )
     suggestions.push(...matchingTerms.slice(0, 3 - suggestions.length))
   }
-  
+
   searchSuggestions.value = [...new Set(suggestions)].slice(0, 5)
   showSuggestions.value = suggestions.length > 0
 }
@@ -344,7 +344,7 @@ const toggleQuickFilter = (value: string) => {
   } else {
     activeQuickFilters.value.push(value)
   }
-  
+
   // 如果有搜索词，重新搜索
   if (searchQuery.value) {
     debouncedSearch(searchQuery.value)
@@ -370,21 +370,21 @@ const applySuggestion = (suggestion: string) => {
 const addToHistory = (query: string) => {
   const trimmedQuery = query.trim()
   if (!trimmedQuery) return
-  
+
   // 移除重复项
   const index = searchHistory.value.indexOf(trimmedQuery)
   if (index > -1) {
     searchHistory.value.splice(index, 1)
   }
-  
+
   // 添加到开头
   searchHistory.value.unshift(trimmedQuery)
-  
+
   // 限制历史记录数量
   if (searchHistory.value.length > props.maxHistory) {
     searchHistory.value = searchHistory.value.slice(0, props.maxHistory)
   }
-  
+
   // 保存到 localStorage
   localStorage.setItem(HISTORY_KEY, JSON.stringify(searchHistory.value))
 }
@@ -392,7 +392,7 @@ const addToHistory = (query: string) => {
 const removeFromHistory = (index: number) => {
   searchHistory.value.splice(index, 1)
   localStorage.setItem(HISTORY_KEY, JSON.stringify(searchHistory.value))
-  
+
   if (searchHistory.value.length === 0) {
     showHistory.value = false
   }
@@ -414,8 +414,8 @@ const highlightNext = () => {
 const highlightPrevious = () => {
   const items = showHistory.value ? searchHistory.value : searchSuggestions.value
   if (items.length > 0) {
-    highlightedIndex.value = highlightedIndex.value <= 0 
-      ? items.length - 1 
+    highlightedIndex.value = highlightedIndex.value <= 0
+      ? items.length - 1
       : highlightedIndex.value - 1
   }
 }
@@ -475,7 +475,7 @@ onMounted(() => {
   } catch (error) {
     console.error('Failed to load search history:', error)
   }
-  
+
   // 添加键盘快捷键
   document.addEventListener('keydown', handleKeyDown)
 })
@@ -490,7 +490,7 @@ const handleKeyDown = (e: KeyboardEvent) => {
     e.preventDefault()
     searchInput.value?.focus()
   }
-  
+
   // Esc 关闭面板
   if (e.key === 'Escape') {
     if (showFilterPanel.value) {
@@ -950,17 +950,17 @@ const handleKeyDown = (e: KeyboardEvent) => {
   .search-input-wrapper {
     border-radius: 20px;
   }
-  
+
   .search-icon {
     left: 0.75rem;
     font-size: 1.1rem;
   }
-  
+
   .search-input-wrapper input {
     padding: 1rem 1rem 1rem 2.75rem;
     font-size: 1rem;
   }
-  
+
   .clear-btn,
   .filter-toggle {
     width: 3rem;
@@ -968,81 +968,81 @@ const handleKeyDown = (e: KeyboardEvent) => {
     right: 0.25rem;
     font-size: 1.1rem;
   }
-  
+
   .filter-toggle {
     right: 3.5rem;
   }
-  
+
   .search-history,
   .search-suggestions {
     max-height: 250px;
     border-radius: 8px;
     margin-top: 0.25rem;
   }
-  
+
   .history-item,
   .suggestion-item {
     padding: 0.875rem;
     min-height: 44px;
   }
-  
+
   .history-header {
     padding: 0.625rem 0.875rem;
     font-size: 0.8rem;
   }
-  
+
   .clear-history {
     padding: 0.375rem 0.75rem;
     font-size: 0.7rem;
   }
-  
+
   .filter-panel {
     padding: 1rem;
     border-radius: 8px;
     margin-top: 0.25rem;
   }
-  
+
   .filter-section {
     margin-bottom: 1rem;
   }
-  
+
   .filter-section h3 {
     font-size: 0.9rem;
     margin-bottom: 0.5rem;
   }
-  
+
   .filter-option {
     padding: 0.625rem;
     font-size: 0.85rem;
   }
-  
+
   .filter-option input[type="checkbox"] {
     width: 22px;
     height: 22px;
   }
-  
+
   .sort-select {
     padding: 0.75rem 0.875rem;
     font-size: 0.85rem;
     background-size: 0.875rem;
     padding-right: 2.25rem;
   }
-  
+
   .quick-filters {
     gap: 0.375rem;
     margin-bottom: 0.625rem;
   }
-  
+
   .quick-filter-label {
     font-size: 0.8rem;
   }
-  
+
   .quick-filter-tag {
     padding: 0.375rem 0.75rem;
     font-size: 0.75rem;
     min-height: 32px;
   }
-  
+
   .search-stats {
     padding: 0.5rem;
     font-size: 0.8rem;
@@ -1053,65 +1053,65 @@ const handleKeyDown = (e: KeyboardEvent) => {
   .search-filter {
     margin-bottom: 0.75rem;
   }
-  
+
   .search-input-wrapper {
     border-radius: 16px;
   }
-  
+
   .search-icon {
     left: 0.625rem;
   }
-  
+
   .search-input-wrapper input {
     padding: 0.875rem 0.875rem 0.875rem 2.5rem;
     font-size: 0.9rem;
   }
-  
+
   .clear-btn,
   .filter-toggle {
     width: 2.75rem;
     height: 2.75rem;
     font-size: 1rem;
   }
-  
+
   .filter-toggle {
     right: 3.25rem;
   }
-  
+
   .search-history,
   .search-suggestions {
     max-height: 200px;
   }
-  
+
   .history-item,
   .suggestion-item {
     padding: 0.75rem;
     gap: 0.5rem;
   }
-  
+
   .history-text,
   .suggestion-text {
     font-size: 0.85rem;
   }
-  
+
   .remove-history {
     width: 1.75rem;
     height: 1.75rem;
   }
-  
+
   .filter-panel {
     padding: 0.75rem;
   }
-  
+
   .filter-section h3 {
     font-size: 0.85rem;
   }
-  
+
   .filter-option {
     font-size: 0.8rem;
     gap: 0.5rem;
   }
-  
+
   .quick-filter-tag {
     padding: 0.25rem 0.625rem;
     font-size: 0.7rem;
