@@ -1,7 +1,7 @@
 ---
 name: new_task
 title: new_task 委派规范
-description: "定义 new_task 工具的消息格式规范，包含任务定义、执行边界和输出要求"
+description: "定义 new_task 工具的消息格式规范，包含任务定义、执行边界和响应要求"
 category: rule
 tags: [任务委派, 消息格式, 规范]
 ---
@@ -39,17 +39,35 @@ tags: [任务委派, 消息格式, 规范]
         disallowed_patterns?: [string]  # 禁止修改的模式
       acceptance:
         criteria?: [string]  # 验收标准
-    output:
-      # 输出规范部分
+    response:
+      # 响应格式部分
       format:
-        code_standards?: object  # 代码标准
-        documentation?: object  # 文档要求
-      validation:
-        automated_tests?: [string]  # 自动测试要求
-        test_coverage?: string  # 测试覆盖率
-      deliverables:
-        files?: [object]  # 文件交付物
-        documentation?: [object]  # 文档交付物
+        structure:
+          required_sections:
+            - "task_status"
+            - "completion_time"
+            - "context_info"
+          template: |
+            ```yaml
+            task_status: string
+            completion_time: string
+            context_info:
+              metadata:
+                task_id: string
+                category: string
+              execution_summary:
+                start_time: string
+                end_time: string
+                duration: string
+            results:
+              deliverables: object
+              next_steps?: [string]
+              lessons_learned?: [string]
+            ```
+      content_requirements:
+        - "必须使用标准 yaml 格式"
+        - "保持缩进一致"
+        - "所有字段必须有清晰的描述"
   </message>
   <todos>
     ...  # 任务清单
@@ -92,17 +110,35 @@ task:
     disallowed_patterns?: [string] # 禁止修改的模式
   acceptance:
     criteria?: [string] # 验收标准
-output:
-  # 输出规范部分
+response:
+  # 响应格式部分
   format:
-    code_standards?: object # 代码标准
-    documentation?: object # 文档要求
-  validation:
-    automated_tests?: [string] # 自动测试要求
-    test_coverage?: string # 测试覆盖率
-  deliverables:
-    files?: [object] # 文件交付物
-    documentation?: [object] # 文档交付物
+    structure:
+      required_sections:
+        - "task_status"
+        - "completion_time"
+        - "context_info"
+      template: |
+        ```yaml
+        task_status: string
+        completion_time: string
+        context_info:
+          metadata:
+            task_id: string
+            category: string
+          execution_summary:
+            start_time: string
+            end_time: string
+            duration: string
+        results:
+          deliverables: object
+          next_steps?: [string]
+          lessons_learned?: [string]
+        ```
+    content_requirements:
+      - "必须使用标准 yaml 格式"
+      - "保持缩进一致"
+      - "所有字段必须有清晰的描述"
 ```
 
 ---
@@ -264,76 +300,38 @@ task:
           tasks: [string]        # 关联任务
 ```
 
-#### 3. 输出规范部分 (output)
+#### 3. 响应格式部分 (response)
 
 ```yaml
-output:
-  # 格式要求
+response:
+  # 响应格式部分
   format:
-    structure?: object            # 输出结构要求
-      sections?: [string]         # 必须包含的章节
-      template?: string           # 输出模板
-    # 内容要求
-    content_requirements?: [string]  # 内容要求
-    style_guide?: string         # 风格指南
-    # 文档要求
-    documentation?: object       # 文档要求
-      api_docs?: boolean          # 是否需要API文档
-      user_guide?: boolean        # 是否需要用户指南
-      examples?: boolean          # 是否需要示例
-    # 代码要求
-    code_standards?: object       # 代码标准
-      linting?: boolean           # 是否需要代码检查
-      formatting?: boolean        # 是否需要格式化
-      comments?: boolean          # 是否需要注释
-  # 验证规则
-  validation:
-    # 自动验证
-    automated_tests?: [string]   # 自动测试要求
-    test_coverage?: string        # 测试覆盖率要求
-    # 手动验证
-    manual_checks?: [string]      # 手动检查项
-    review_criteria?: [string]   # 审查标准
-    # 验证环境
-    test_environment?: object     # 测试环境要求
-      os?: string                # 操作系统
-      dependencies?: [string]     # 依赖项
-      configuration?: object     # 配置要求
-  # 交付物清单
-  deliverables:
-    files?: [object]              # 文件交付物
-      - path: string             # 文件路径
-        type: string             # 文件类型
-        description?: string     # 文件描述
-        required: boolean        # 是否必需
-    # 功能交付物
-    features?: [string]          # 功能列表
-    endpoints?: [object]         # API端点
-      - method: string           # HTTP方法
-        path: string             # 路径
-        description: string       # 描述
-    # 文档交付物
-    documentation?: [object]      # 文档列表
-      - title: string            # 文档标题
-        format: string           # 格式
-        location: string         # 位置
-    # 测试交付物
-    tests?: [object]             # 测试交付物
-      - type: string            # 测试类型
-        coverage?: string        # 覆盖范围
-        framework: string        # 测试框架
-    # 其他交付物
-    artifacts?: [object]         # 其他产物
-      - name: string            # 产物名称
-        type: string            # 类型
-        location: string        # 位置
-  # 报告要求
-  reporting:
-    progress_updates?: [string]   # 进度更新要求
-    final_report?: object        # 最终报告要求
-      sections?: [string]        # 报告章节
-      metrics?: [string]         # 需要报告的指标
-      format?: string            # 报告格式
+    structure:
+      required_sections:
+        - "task_status"
+        - "completion_time"
+        - "context_info"
+      template: |
+        ```yaml
+        task_status: string
+        completion_time: string
+        context_info:
+          metadata:
+            task_id: string
+            category: string
+          execution_summary:
+            start_time: string
+            end_time: string
+            duration: string
+        results:
+          deliverables: object
+          next_steps?: [string]
+          lessons_learned?: [string]
+        ```
+    content_requirements:
+      - "必须使用标准 yaml 格式"
+      - "保持缩进一致"
+      - "所有字段必须有清晰的描述"
 ```
 
 ---
@@ -626,22 +624,34 @@ task:
       - "邮件发送成功"
       - "令牌验证通过"
       - "密码更新成功"
-output:
+response:
   format:
-    code_standards:
-      linting: true
-      comments: true
-  validation:
-    automated_tests:
-      - "单元测试覆盖所有功能"
-      - "集成测试验证邮件发送"
-    test_coverage: "95%"
-  deliverables:
-    files:
-      - path: "src/services/user_service.py"
-        required: true
-      - path: "tests/test_user_service.py"
-        required: true
+    structure:
+      required_sections:
+        - "task_status"
+        - "completion_time"
+        - "context_info"
+      template: |
+        ```yaml
+        task_status: string
+        completion_time: string
+        context_info:
+          metadata:
+            task_id: string
+            category: string
+          execution_summary:
+            start_time: string
+            end_time: string
+            duration: string
+        results:
+          deliverables: object
+          next_steps?: [string]
+          lessons_learned?: [string]
+        ```
+    content_requirements:
+      - "必须使用标准 yaml 格式"
+      - "保持缩进一致"
+      - "所有字段必须有清晰的描述"
 ```
 
 #### 中级示例 - 架构重构
@@ -765,13 +775,32 @@ task:
         - "架构图"
         - "服务依赖图"
         - "部署图"
-output:
+response:
   format:
-    documentation:
-      api_docs: true
-      user_guide: true
     structure:
-      sections:
-        - "架构设计文档"
-        - "API规范"
+      required_sections:
+        - "task_status"
+        - "completion_time"
+        - "context_info"
+      template: |
+        ```yaml
+        task_status: string
+        completion_time: string
+        context_info:
+          metadata:
+            task_id: string
+            category: string
+          execution_summary:
+            start_time: string
+            end_time: string
+            duration: string
+        results:
+          deliverables: object
+          next_steps?: [string]
+          lessons_learned?: [string]
+        ```
+    content_requirements:
+      - "必须使用标准 yaml 格式"
+      - "保持缩进一致"
+      - "所有字段必须有清晰的描述"
 ```
