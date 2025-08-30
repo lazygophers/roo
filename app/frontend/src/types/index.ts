@@ -5,6 +5,14 @@ export interface Model {
     category?: string
     tags?: string[]
     _path: string
+    metadata?: {
+        name?: string
+        title?: string
+        description?: string
+        category?: string
+        priority?: string
+        tags?: string[]
+    }
 }
 
 export interface Rule {
