@@ -53,6 +53,89 @@ python_executables:
 - 总体超时：`--max-time 10`
 - 标准格式：`curl --connect-timeout 5 --max-time 10 <URL>`
 
+### grep 代码搜索规范
+
+**核心原则**：
+
+- grep 是 Linux/Unix 系统中最强大的文本搜索工具之一
+- 使用 grep 可以快速在代码库中查找特定的代码模式、函数名、变量等
+- 掌握 grep 的高级用法可以大幅提升代码搜索效率
+
+**基础用法**：
+
+```bash
+# 在当前目录及子目录中搜索
+grep -r "search_pattern" .
+
+# 递归搜索，但忽略二进制文件
+grep -rI "search_pattern" .
+
+# 搜索时显示行号
+grep -rn "search_pattern" .
+
+# 显示匹配的上下文（前后各 2 行）
+grep -rnC 2 "search_pattern" .
+```
+
+**常用选项组合**：
+
+| 选项 | 说明 | 示例 |
+|------|------|------|
+| `-i` | 忽略大小写 | `grep -ri "function" .` |
+| `-w` | 匹配整个单词 | `grep -rw "import" .` |
+| `-l` | 只显示文件名 | `grep -rl "TODO" .` |
+| `-L` | 只显示不匹配的文件名 | `grep -rL "FIXME" .` |
+| `-n` | 显示行号 | `grep -rn "class User" .` |
+| `-C` | 显示上下文 | `grep -rnC 3 "def main" .` |
+| `--include` | 只搜索特定文件 | `grep -rn "import" --include="*.py" .` |
+| `--exclude` | 排除特定文件 | `grep -rn "debug" --exclude="*.log" .` |
+| `--exclude-dir` | 排除特定目录 | `grep -rn "test" --exclude-dir=vendor .` |
+
+**高级用法示例**：
+
+```bash
+# 搜索特定文件类型中的模式
+grep -rn "TODO\|FIXME" --include="*.py" --include="*.js" .
+
+# 使用正则表达式搜索函数定义
+grep -rn "^\s*def \w+" --include="*.py" .
+
+# 搜索包含特定单词但不包含另一个单词的行
+grep -rn "import.*pytest" --include="*.py" . | grep -v "test_"
+
+# 搜索多个模式（OR 关系）
+grep -rnE "(class|def) \w+.*:" --include="*.py" .
+
+# 使用管道组合多个 grep 命令
+grep -rn "async def" --include="*.py" . | grep -v "test_" | head -20
+
+# 搜索并统计出现次数
+grep -r "print(" --include="*.py" . | wc -l
+
+# 在特定目录中搜索
+grep -rn "API_KEY" src/ config/
+
+# 搜索制表符或空格开头的注释
+grep -rn "^[\t ]*#" --include="*.py" .
+```
+
+**性能优化建议**：
+
+1. **使用 `--include` 限制搜索范围**：只搜索相关文件类型
+2. **排除不必要的目录**：如 `node_modules`、`.git`、`vendor` 等
+3. **使用 `head` 或 `tail` 限制输出**：避免输出过多结果
+4. **组合使用其他工具**：
+   - 使用 `xargs` 处理大量文件
+   - 使用 `find` + `grep` 进行更精确的搜索
+
+```bash
+# 结合 find 使用，性能更好
+find . -name "*.py" -type f -exec grep -l "import.*pandas" {} \;
+
+# 使用 xargs 处理大量文件
+find . -name "*.js" -type f -print0 | xargs -0 grep -l "React"
+```
+
 ### Makefile 规范
 
 **核心原则**：
