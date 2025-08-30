@@ -125,9 +125,8 @@
                         class="rule-card"
                         :class="{
                           selected: isRuleSelected(model.slug, name),
-                          disabled: model.slug === BRAIN_MODEL_SLUG
                         }"
-                        @click.stop="model.slug !== BRAIN_MODEL_SLUG && toggleModelRule(model.slug, name, rule)"
+                        @click.stop="toggleModelRule(model.slug, name, rule)"
                       >
                         <div class="rule-card-header">
                           <div class="rule-checkbox">
@@ -135,7 +134,6 @@
                               type="checkbox"
                               :checked="isRuleSelected(model.slug, name)"
                               @change.stop="toggleModelRule(model.slug, name, rule)"
-                              :disabled="model.slug === BRAIN_MODEL_SLUG"
                               class="custom-checkbox"
                             />
                           </div>
