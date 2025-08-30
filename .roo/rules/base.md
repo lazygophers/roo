@@ -84,20 +84,136 @@ build:
 	@echo "Building project..."
 ```
 
+### 测试访问说明
+
+**前端测试**：
+- 执行 `make build` 构建项目
+- 访问 http://localhost:14001 进行前端测试
+
+**后端测试**：
+- 直接访问 http://localhost:14001/api 进行后端API测试
+
 ## 🏗️ 技术栈
 
 ```yaml
 # 核心技术栈
 languages:
-  - python    # 后端语言
-  - vue       # 前端框架
-  - react     # 前端框架
+  - python      # 后端语言
+  - typescript  # 前端语言（优先）
+  - javascript  # 前端语言（兼容）
+  - vue         # 前端框架
 
 frameworks:
-  backend: "fastapi"    # 后端框架
-  frontend: "vuepy"     # 前端框架
-  frontend_react: "react"  # 前端框架
-  database: "tinydb"    # 数据库
+  backend: "fastapi"           # 后端框架
+  frontend: "vue"              # Vue 前端框架
+  build_tools: "vite/webpack"  # 构建工具
+  database: "tinydb"           # 数据库
+```
+
+### TypeScript 优先原则
+
+**核心要求**：
+- **所有新项目必须使用 TypeScript**
+- **现有 JS 项目逐步迁移至 TS**
+- **类型定义覆盖率达到 95%+**
+- **严格模式启用：`strict: true`**
+
+**迁移策略**：
+1. 先添加 `@types` 依赖
+2. 文件扩展名改为 `.ts`/`.tsx`（Vue）或 `.vue`
+3. 逐步添加类型注解
+4. 启用严格模式检查
+
+**类型规范**：
+- 使用接口定义数据结构
+- 优先使用联合类型而非 `any`
+- 工具类型合理使用 `Partial`、`Pick`、`Omit`
+- 泛型约束清晰明确
+- Vue 组件使用 `defineComponent` 或 Composition API
+
+## 🎯 模式选择指导
+
+### 开发任务模式选择
+
+根据任务类型选择合适的执行模式，确保专业化分工和高效执行。
+
+#### 后端开发任务
+
+**优先模式**: `code-python`
+
+**适用任务类型**:
+- Python 后端 API 开发
+- 数据库操作和模型定义
+- 业务逻辑实现
+- 中间件和工具开发
+- 自动化脚本编写
+
+**模式特点**:
+- 专精 Python 生态系统
+- 熟悉 FastAPI、Django、Flask 等框架
+- 擅长数据库操作（SQL、NoSQL）
+- 支持异步编程和性能优化
+
+#### 前端开发任务
+
+**优先模式**: `code-vue`
+
+**适用任务类型**:
+- Vue 组件开发
+- 前端页面构建
+- 状态管理（Vuex/Pinia）
+- 路由配置
+- 前端工程化配置
+
+**模式特点**:
+- 深度理解 Vue 3 生态系统
+- 熟练使用 Composition API
+- 掌握 Vite 构建工具
+- 支持 TypeScript 集成
+- 擅长前端性能优化
+
+### 模式选择决策流程
+
+1. **识别任务性质**
+   - 后端任务 → `code-python`
+   - 前端任务 → `code-vue`
+   - 架构设计 → `architect`
+   - 文档编写 → `doc-writer`
+   - 问题调试 → `debug`
+
+2. **考虑技术栈**
+   - Python 相关 → 优先 `code-python`
+   - Vue/TypeScript → 优先 `code-vue`
+   - 多语言混合 → `orchestrator` 协调
+
+3. **评估复杂度**
+   - 简单任务 → 直接对应模式
+   - 复杂任务 → `orchestrator` 分解
+
+### 模式协作示例
+
+#### 全栈开发场景
+
+```
+用户需求 → orchestrator
+    ↓ 任务分解
+后端 API → code-python
+前端界面 → code-vue
+数据库设计 → architect
+    ↓ 结果整合
+完整系统交付
+```
+
+#### 技术迁移场景
+
+```
+迁移任务 → orchestrator
+    ↓ 评估和规划
+架构分析 → architect
+代码重构 → code-python/code-vue
+测试验证 → debug
+    ↓ 交付
+迁移完成
 ```
 
 ## 📋 开发规范
@@ -108,6 +224,36 @@ frameworks:
 - **代码质量**: 严格遵循代码规范
 - **架构设计**: 合理的分层分包
 - **开发方式**: 渐进式开发
+
+### 工程化要求
+
+**代码规范**：
+- 使用 ESLint/Prettier 统一代码风格
+- 遵循 Airbnb/Standard 规范
+- 强制代码检查通过才能提交
+- 使用 Husky 管理 Git hooks
+
+**构建工具配置**：
+- **Vite**（推荐）：现代、快速、开箱即用，对 Vue 有原生支持
+- **Webpack**：功能强大、生态完善
+- 必须配置：
+  - 代码分割（Code Splitting）
+  - 懒加载（Lazy Loading）
+  - Tree Shaking
+  - Source Map
+- Vue 项目推荐使用 Vite 以获得最佳开发体验
+
+**开发环境**：
+- 热模块替换（HMR）
+- 开发服务器代理配置
+- 环境变量管理（.env 文件）
+- 跨域处理（CORS）
+
+**构建优化**：
+- 代码压缩混淆
+- 静态资源 CDN 配置
+- 缓存策略配置
+- 性能预算（Performance Budget）
 
 ### CSS 样式分离要求
 
@@ -120,8 +266,8 @@ frameworks:
 
 1. **模块化样式**
    - 每个组件必须有独立的样式文件
-   - 样式文件命名：`ComponentName.module.css`（React）或 `ComponentName.scss`（Vue）
-   - 使用 CSS Modules 或 scoped 样式避免全局污染
+   - 样式文件命名：`ComponentName.module.css`（Vue）
+   - 使用 CSS Modules 或 Scoped CSS 避免全局污染
 
 2. **样式文件结构**
    ```
@@ -135,10 +281,10 @@ frameworks:
    │       └── Card.module.css
    └── components/
        ├── Button/
-       │   ├── Button.jsx
+       │   ├── Button.vue
        │   └── Button.module.css
        └── Card/
-           ├── Card.jsx
+           ├── Card.vue
            └── Card.module.css
    ```
 
@@ -164,10 +310,70 @@ frameworks:
 
 ### 开发流程
 
-1. 实现最小化功能（MVP）
-2. 编写完整的测试用例
-3. 逐步扩展功能特性
-4. 持续优化和重构
+#### 渐进式开发流程
+
+**核心理念**：
+- **快速验证**：先实现核心功能，快速获得反馈
+- **迭代优化**：基于反馈持续改进，避免过度设计
+- **质量保证**：每个阶段都确保代码质量和测试覆盖
+
+**开发阶段**：
+
+1. **第一阶段：MVP（最小可行产品）**
+   - 实现核心业务逻辑
+   - 基础用户界面
+   - 基本功能测试
+   - 部署验证
+
+2. **第二阶段：功能完善**
+   - 扩展功能特性
+   - 优化用户体验
+   - 完善错误处理
+   - 集成测试覆盖
+
+3. **第三阶段：性能优化**
+   - 代码重构优化
+   - 性能瓶颈解决
+   - 缓存策略实施
+   - 负载测试验证
+
+4. **第四阶段：生产就绪**
+   - 安全加固
+   - 监控告警
+   - 文档完善
+   - 上线部署
+
+**各阶段要求**：
+
+- **MVP 阶段**：
+  - 功能：仅包含核心功能，去除所有非必需特性
+  - 质量：基础测试覆盖，主要流程可验证
+  - 时间：控制在 1-2 周内完成
+  - 目标：快速验证产品价值
+
+- **功能完善阶段**：
+  - 功能：实现 80% 的规划功能
+  - 质量：单元测试覆盖率 ≥ 80%
+  - 时间：根据项目规模，2-4 周
+  - 目标：获得用户真实使用反馈
+
+- **性能优化阶段**：
+  - 功能：全部功能完成
+  - 质量：性能指标达标，自动化测试完善
+  - 时间：1-2 周
+  - 目标：系统稳定可靠
+
+- **生产就绪阶段**：
+  - 功能：功能冻结，仅修复问题
+  - 质量：生产环境验证通过
+  - 时间：1 周
+  - 目标：安全稳定上线
+
+**迭代原则**：
+- 每个迭代周期不超过 2 周
+- 每次迭代必须有可交付的成果
+- 保持与用户的持续沟通
+- 及时调整开发优先级
 
 ## 🔒 决策授权
 
