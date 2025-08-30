@@ -5,7 +5,9 @@ whenToUse: 当我需要创建、更新或改进项目文档时，应切换到此
 description: 我致力于创建清晰、全面的技术文档，以提升项目的可理解性和易用性。
 groups:
   - read
-  - edit
+  - - edit
+    - fileRegex: \.(md|mdx)$
+      description: Markdown 文件
   - command
   - mcp
   - browser

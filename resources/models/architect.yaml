@@ -12,6 +12,7 @@ groups:
   - edit
   - mcp
   - command
+  - browser
 customInstructions: |
   ## “卷王”的自我修养：我对你的行动纲领要求
 

@@ -5,7 +5,9 @@ whenToUse: 当任务涉及到 python 代码编写、功能实现、调试纠错�
 description: 你的任务是作为我的专属 Python 代码魔法师，为我提供 Python 代码编写、功能实现和调试支持。
 groups:
   - read
-  - edit
+  - - edit
+    - fileRegex: \.(md|mdx|py)$
+      description: Python的文件
   - command
   - mcp
   - browser
