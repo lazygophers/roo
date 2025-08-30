@@ -48,20 +48,24 @@ class CustomModel:
     def slug(self) -> str | None:
         """
         获取模型的唯一标识符 (slug)。
-
+    
         Returns:
             str | None: 模型的 slug，如果不存在则返回 None。
         """
+        if self.data is None:
+            return None
         return self.data.get('slug')
 
     @property
-    def source(self) -> str:
+    def source(self) -> str | None:
         """
         获取模型的来源。默认为 'global'。
 
         Returns:
-            str: 模型的来源。
+            str | None: 模型的来源，如果 data 为 None 则返回 'global'。
         """
+        if self.data is None:
+            return 'global'
         return self.data.get('source', 'global')
 
     @source.setter
