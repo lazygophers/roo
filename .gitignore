@@ -1,5 +1,7 @@
 .idea/
 .vscode/
+!.vscode/launch.json
+
 .DS_Store
 .memory/
 mcp/cache/
