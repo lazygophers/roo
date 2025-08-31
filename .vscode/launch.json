@@ -1,0 +1,42 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "FastAPI Backend",
+      "type": "python",
+      "request": "launch",
+      "module": "uvicorn",
+      "args": [
+        "app.main:app",
+        "--host",
+        "0.0.0.0",
+        "--port",
+        "14001",
+        "--reload"
+      ],
+      "jinja": true,
+      "justMyCode": true,
+      "python": "${workspaceFolder}/.venv/bin/python",
+      "cwd": "${workspaceFolder}",
+      "env": {
+        "PYTHONPATH": "${workspaceFolder}"
+      },
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen"
+    },
+  ],
+  "compounds": [
+    {
+      "name": "Full Stack Debug",
+      "configurations": [
+        "FastAPI Backend",
+        "Vue Frontend (Chrome Debug)"
+      ],
+      "stopAll": true,
+      "presentation": {
+        "hidden": false,
+        "group": "full-stack"
+      }
+    }
+  ]
+}

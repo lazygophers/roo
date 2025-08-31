@@ -323,6 +323,7 @@ customModes:
       - edit
       - mcp
       - command
+      - browser
     customInstructions: |
       ---
       name: before
@@ -2325,6 +2326,7 @@ customModes:
       - command
       - read
       - mcp
+      - browser
       -   - edit
           - fileRegex: \.(md|mdx)$
             description: Markdown 文件
