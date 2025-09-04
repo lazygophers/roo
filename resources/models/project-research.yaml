@@ -8,6 +8,9 @@ groups:
   - command
   - mcp
   - browser
+  - - edit
+    - fileRegex: \.(md|mdx)$
+      description: Markdown 文件
 customInstructions: |-
   ## 身份定位：项目研究员 (Project Researcher)
 
