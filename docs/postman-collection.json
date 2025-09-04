@@ -1,0 +1,430 @@
+{
+  "info": {
+    "name": "FastAPI 应用程序接口测试集合",
+    "description": "从 Markdown 文档提取的 Postman Collection",
+    "version": "1.0.0",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Hello APIs",
+      "item": [
+        {
+          "name": "基础问候",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/hello",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "hello"
+              ]
+            },
+            "description": "返回简单的问候消息"
+          },
+          "response": []
+        },
+        {
+          "name": "个性化问候",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/hello/Alice",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "hello",
+                "Alice"
+              ]
+            },
+            "description": "根据提供的名称返回个性化问候"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Models APIs",
+      "item": [
+        {
+          "name": "获取所有模型",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/models",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "models"
+              ]
+            },
+            "description": "返回系统中所有可用模型的列表"
+          },
+          "response": []
+        },
+        {
+          "name": "获取特定模型信息",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/models/gpt-4",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "models",
+                "gpt-4"
+              ]
+            },
+            "description": "返回指定模型的详细信息"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Hooks APIs",
+      "item": [
+        {
+          "name": "获取所有钩子",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/hooks",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "hooks"
+              ]
+            },
+            "description": "返回系统中所有可用的钩子"
+          },
+          "response": []
+        },
+        {
+          "name": "获取特定钩子信息",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/hooks/before",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "hooks",
+                "before"
+              ]
+            },
+            "description": "返回指定钩子的详细信息"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Rules APIs",
+      "item": [
+        {
+          "name": "获取所有规则",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/rules",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "rules"
+              ]
+            },
+            "description": "返回系统中所有规则的列表"
+          },
+          "response": []
+        },
+        {
+          "name": "获取特定规则信息",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/rules/authentication",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "rules",
+                "authentication"
+              ]
+            },
+            "description": "返回指定规则的详细信息"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Commands APIs",
+      "item": [
+        {
+          "name": "获取所有命令",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/commands",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "commands"
+              ]
+            },
+            "description": "返回系统中所有可用命令的列表"
+          },
+          "response": []
+        },
+        {
+          "name": "获取特定命令信息",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/commands/start",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "commands",
+                "start"
+              ]
+            },
+            "description": "返回指定命令的详细信息"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Roles APIs",
+      "item": [
+        {
+          "name": "获取所有角色",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/roles",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "roles"
+              ]
+            },
+            "description": "返回系统中所有角色的列表"
+          },
+          "response": []
+        },
+        {
+          "name": "获取特定角色信息",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/roles/admin",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "roles",
+                "admin"
+              ]
+            },
+            "description": "返回指定角色的详细信息"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Configurations APIs",
+      "item": [
+        {
+          "name": "获取所有配置",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/configurations",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "configurations"
+              ]
+            },
+            "description": "返回系统中所有配置项的列表"
+          },
+          "response": []
+        },
+        {
+          "name": "获取特定配置信息",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/configurations/database",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "configurations",
+                "database"
+              ]
+            },
+            "description": "返回指定配置的详细信息"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Import/Export APIs",
+      "item": [
+        {
+          "name": "导入数据",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"data\": {\n    \"key\": \"value\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8000/import",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "import"
+              ]
+            },
+            "description": "导入数据到系统中"
+          },
+          "response": []
+        },
+        {
+          "name": "导出数据",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/export",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "export"
+              ]
+            },
+            "description": "从系统导出数据"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Command Execution APIs",
+      "item": [
+        {
+          "name": "执行命令",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"command\": \"ls -la\",\n  \"parameters\": {\n    \"path\": \"/tmp\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8000/execute",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "execute"
+              ]
+            },
+            "description": "在系统中执行指定的命令"
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
