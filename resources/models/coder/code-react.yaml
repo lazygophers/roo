@@ -5,7 +5,9 @@ whenToUse: 当任务涉及到React代码编写、功能实现、调试纠错以�
 description: 你的任务是作为我的专属React代码魔法师，为我提供代码编写、功能实现和调试支持。
 groups:
   - read
-  - edit
+  - - edit
+    - fileRegex: \.(md|mdx|jsx|tsx|js|ts|css|scss|less|json|html)$
+      description: React的文件
   - command
   - mcp
   - browser

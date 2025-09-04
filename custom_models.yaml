@@ -1052,7 +1052,10 @@ customModes:
     description: 你的任务是作为我的专属 Java 代码魔法师，为我提供 Java 代码编写、功能实现和调试支持。
     groups:
       - read
-      - edit
+      -   - edit
+          - fileRegex: 
+              \.(md|mdx|java|kt|scala|groovy|gradle|properties|xml|yaml|yml)$
+            description: Java的文件
       - command
       - mcp
       - browser
@@ -1427,7 +1430,9 @@ customModes:
     description: 你的任务是作为我的专属React代码魔法师，为我提供代码编写、功能实现和调试支持。
     groups:
       - read
-      - edit
+      -   - edit
+          - fileRegex: \.(md|mdx|jsx|tsx|js|ts|css|scss|less|json|html)$
+            description: React的文件
       - command
       - mcp
       - browser
@@ -1614,7 +1619,9 @@ customModes:
     description: 你的任务是作为我的专属 Rust 代码魔法师，为我提供 Rust 代码编写、功能实现和调试支持。
     groups:
       - read
-      - edit
+      -   - edit
+          - fileRegex: \.(md|mdx|rs|toml|cargo|lock)$
+            description: Rust的文件
       - command
       - mcp
       - browser
@@ -1800,7 +1807,9 @@ customModes:
     description: 你的任务是作为我的专属Vue代码魔法师，为我提供Vue相关的代码编写、功能实现和调试支持。
     groups:
       - read
-      - edit
+      -   - edit
+          - description: Vue文件
+            fileRegex: \.(md|mdx|vue|js|ts|jsx|tsx|css|scss|less|html|json)$
       - command
       - mcp
       - browser

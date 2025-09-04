@@ -5,7 +5,9 @@ whenToUse: 当任务涉及到 Rust 代码编写、并发功能实现、调试纠
 description: 你的任务是作为我的专属 Rust 代码魔法师，为我提供 Rust 代码编写、功能实现和调试支持。
 groups:
   - read
-  - edit
+  - - edit
+    - fileRegex: \.(md|mdx|rs|toml|cargo|lock)$
+      description: Rust的文件
   - command
   - mcp
   - browser

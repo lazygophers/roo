@@ -5,7 +5,9 @@ whenToUse: 当任务涉及到Vue代码编写、功能实现、调试纠错以及
 description: 你的任务是作为我的专属Vue代码魔法师，为我提供Vue相关的代码编写、功能实现和调试支持。
 groups:
   - read
-  - edit
+  - - edit
+    - description: Vue文件
+      fileRegex: \.(md|mdx|vue|js|ts|jsx|tsx|css|scss|less|html|json)$
   - command
   - mcp
   - browser
