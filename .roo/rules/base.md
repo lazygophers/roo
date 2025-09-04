@@ -95,28 +95,29 @@ grep -rnC 2 "search_pattern" .
 
 ```bash
 # 搜索特定文件类型中的模式
-grep -rn "TODO\|FIXME" --include="*.py" --include="*.js" .
+grep -rn "TODO\|FIXME" --include="*.py" --include="*.jsx" .
 
 # 使用正则表达式搜索函数定义
-grep -rn "^\s*def \w+" --include="*.py" .
+grep -rn "^\s*function \w+" --include="*.jsx" .
+grep -rn "^\s*const \w+.*=.*=>" --include="*.jsx" .
 
 # 搜索包含特定单词但不包含另一个单词的行
-grep -rn "import.*pytest" --include="*.py" . | grep -v "test_"
+grep -rn "import.*react" --include="*.jsx" . | grep -v "test_"
 
 # 搜索多个模式（OR 关系）
-grep -rnE "(class|def) \w+.*:" --include="*.py" .
+grep -rnE "(function|const) \w+.*:" --include="*.jsx" .
 
 # 使用管道组合多个 grep 命令
-grep -rn "async def" --include="*.py" . | grep -v "test_" | head -20
+grep -rn "useState.*=>" --include="*.jsx" . | grep -v "test_" | head -20
 
 # 搜索并统计出现次数
-grep -r "print(" --include="*.py" . | wc -l
+grep -r "useState(" --include="*.jsx" . | wc -l
 
 # 在特定目录中搜索
 grep -rn "API_KEY" src/ config/
 
 # 搜索制表符或空格开头的注释
-grep -rn "^[\t ]*#" --include="*.py" .
+grep -rn "^[\t ]*#" --include="*.jsx" .
 ```
 
 **性能优化建议**：
@@ -178,10 +179,18 @@ build:
 
 - 执行 `make build` 构建项目
 - 访问 http://localhost:14001 进行前端测试
+- **热重载支持**：前端服务支持自动热重载，代码变更后无需重新运行服务，可直接在浏览器中验证效果
 
 **后端测试**：
 
 - 直接访问 http://localhost:14001/api 进行后端 API 测试
+- **热重载支持**：后端服务支持自动热重载，代码变更后无需重新运行服务，API 修改会立即生效
+
+**开发体验优化**：
+
+- 前后端服务均配置了文件监听机制，支持开发时的实时热重载
+- 出现代码变更后，系统会自动重新加载相关模块，保持服务运行状态
+- 开发者可以专注于代码编写，无需手动重启服务，提高开发效率
 
 ## 🏗️ 技术栈
 
@@ -191,11 +200,12 @@ languages:
   - python # 后端语言
   - typescript # 前端语言（优先）
   - javascript # 前端语言（兼容）
-  - vue # 前端框架
+  - react # 前端框架
 
 frameworks:
   backend: "fastapi" # 后端框架
-  frontend: "vue" # Vue 前端框架
+  frontend: "react" # React 前端框架
+  ui_library: "antd" # Ant Design UI 组件库
   build_tools: "vite/webpack" # 构建工具
   database: "tinydb" # 数据库
 ```
@@ -208,11 +218,12 @@ frameworks:
 - **现有 JS 项目逐步迁移至 TS**
 - **类型定义覆盖率达到 95%+**
 - **严格模式启用：`strict: true`**
+- **禁止使用 `any` 类型**（特殊情况需注释说明）
 
 **迁移策略**：
 
 1. 先添加 `@types` 依赖
-2. 文件扩展名改为 `.ts`/`.tsx`（Vue）或 `.vue`
+2. 文件扩展名改为 `.ts`/`.tsx`
 3. 逐步添加类型注解
 4. 启用严格模式检查
 
@@ -220,9 +231,58 @@ frameworks:
 
 - 使用接口定义数据结构
 - 优先使用联合类型而非 `any`
-- 工具类型合理使用 `Partial`、`Pick`、`Omit`
+- 工具类型合理使用 `Partial`、`Pick`、`Omit`、`Record`
 - 泛型约束清晰明确
-- Vue 组件使用 `defineComponent` 或 Composition API
+- React 组件使用 `React.FC` 或函数组件语法
+
+**高级类型使用**：
+
+```typescript
+// 推荐的类型定义方式
+interface User {
+  id: string;
+  name: string;
+  email?: string; // 可选属性
+}
+
+type Status = 'pending' | 'in_progress' | 'completed';
+
+// 使用泛型增强复用性
+interface ApiResponse<T> {
+  data: T;
+  success: boolean;
+  error?: string;
+}
+
+// 使用工具类型
+type UserPreview = Pick<User, 'id' | 'name'>;
+type PartialUser = Partial<User>;
+```
+
+**配置文件要求**：
+
+```jsonc
+// tsconfig.json 必须包含
+{
+  "compilerOptions": {
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react-jsx"
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules"]
+}
+```
 
 ## 🎯 模式选择指导
 
@@ -251,21 +311,21 @@ frameworks:
 
 #### 前端开发任务
 
-**优先模式**: `code-vue`
+**优先模式**: `code-react`
 
 **适用任务类型**:
 
-- Vue 组件开发
+- React 组件开发
 - 前端页面构建
-- 状态管理（Vuex/Pinia）
-- 路由配置
+- 状态管理（Redux/Context API）
+- 路由配置（React Router）
 - 前端工程化配置
 
 **模式特点**:
 
-- 深度理解 Vue 3 生态系统
-- 熟练使用 Composition API
-- 掌握 Vite 构建工具
+- 深度理解 React 生态系统
+- 熟练使用 Hooks API
+- 掌握 Vite/Webpack 构建工具
 - 支持 TypeScript 集成
 - 擅长前端性能优化
 
@@ -274,7 +334,7 @@ frameworks:
 1. **识别任务性质**
 
    - 后端任务 → `code-python`
-   - 前端任务 → `code-vue`
+   - 前端任务 → `code-react`
    - 架构设计 → `architect`
    - 文档编写 → `doc-writer`
    - 问题调试 → `debug`
@@ -282,7 +342,7 @@ frameworks:
 2. **考虑技术栈**
 
    - Python 相关 → 优先 `code-python`
-   - Vue/TypeScript → 优先 `code-vue`
+   - React/TypeScript → 优先 `code-react`
    - 多语言混合 → `orchestrator` 协调
 
 3. **评估复杂度**
@@ -297,7 +357,7 @@ frameworks:
 用户需求 → orchestrator
     ↓ 任务分解
 后端 API → code-python
-前端界面 → code-vue
+前端界面 → code-react
 数据库设计 → architect
     ↓ 结果整合
 完整系统交付
@@ -309,7 +369,7 @@ frameworks:
 迁移任务 → orchestrator
     ↓ 评估和规划
 架构分析 → architect
-代码重构 → code-python/code-vue
+代码重构 → code-python/code-react
 测试验证 → debug
     ↓ 交付
 迁移完成
@@ -335,14 +395,14 @@ frameworks:
 
 **构建工具配置**：
 
-- **Vite**（推荐）：现代、快速、开箱即用，对 Vue 有原生支持
+- **Vite**（推荐）：现代、快速、开箱即用，对 React 有原生支持
 - **Webpack**：功能强大、生态完善
 - 必须配置：
   - 代码分割（Code Splitting）
   - 懒加载（Lazy Loading）
   - Tree Shaking
   - Source Map
-- Vue 项目推荐使用 Vite 以获得最佳开发体验
+- React 项目推荐使用 Vite 以获得最佳开发体验
 
 **开发环境**：
 
@@ -363,15 +423,17 @@ frameworks:
 **核心原则**：
 
 - 严格遵循样式与结构分离的原则
-- 禁止在组件文件中使用内联样式
-- 禁止使用 `!important` 覆盖样式优先级
+- **禁止在组件文件中使用内联样式**（包括 `style` 属性和 `style` 对象）
+- **禁止使用 `!important` 覆盖样式优先级**
+- **每个组件必须使用单独的样式文件**，禁止在组件文件中嵌入任何样式代码
 
 **样式组织规范**：
 
 1. **模块化样式**
 
-   - 使用 CSS Modules 或 Scoped CSS 避免全局污染
-   - 支持在 Vue 单文件组件中使用 `<style>` 标签
+   - 使用 CSS Modules 或 CSS-in-JS 避免全局污染
+   - 支持在 React 组件中使用 CSS Modules 或 styled-components
+   - **样式文件必须与组件文件放在同一目录下**
 
 2. **样式文件结构**
 
@@ -381,14 +443,22 @@ frameworks:
    │   ├── variables.css      # CSS 变量定义
    │   ├── mixins.css         # 混合器定义
    │   ├── global.css         # 全局样式
-   │   └── components/        # 组件样式目录（可选）
-   │       ├── Button.module.css
-   │       └── Card.module.css
+   │   └── themes/            # 主题相关样式
+   │       ├── light.css       # 亮色主题
+   │       └── dark.css        # 暗色主题
    └── components/
        ├── Button/
-       │   ├── Button.vue
-       └── Card/
-           ├── Card.vue（包含 <style> 标签）
+       │   ├── Button.jsx
+       │   ├── Button.module.css
+       │   └── Button.test.js
+       ├── Card/
+       │   ├── Card.jsx
+       │   ├── Card.module.css
+       │   └── Card.styled.js (可选)
+       └── Layout/
+           ├── Layout.jsx
+           ├── Layout.module.css
+           └── Layout.context.js (主题上下文)
    ```
 
 3. **CSS 命名规范**
@@ -396,23 +466,193 @@ frameworks:
    - 使用 BEM（Block Element Modifier）命名规范
    - 类名使用小写字母，单词间用连字符 `-` 连接
    - 避免使用标签选择器和 ID 选择器
+   - CSS Modules 类名必须使用 `moduleName_className` 格式
 
 4. **响应式设计**
 
    - 必须使用相对单位（rem、em、%、vw、vh）
    - 使用 CSS Grid 或 Flexbox 进行布局
    - 媒体查询必须使用移动优先（mobile-first）策略
+   - 断点必须使用预定义的变量（如 `--breakpoint-md`、`--breakpoint-lg`）
 
 5. **主题支持**
    - 所有颜色、字体、间距等必须使用 CSS 变量
    - 支持亮色/暗色主题切换
    - 主题变量统一在 `variables.css` 中定义
+   - 使用 CSS 自定义属性（CSS Variables）而非 Sass/Less 变量
 
 **样式检查**：
 
 - 使用 Stylelint 进行代码检查
 - 配合 Prettier 进行格式化
 - 在 CI/CD 流程中加入样式检查环节
+- **必须配置 stylelint-config-recommended 和 stylelint-config-prettier**
+
+**性能要求**：
+
+- CSS 文件大小不得超过 50KB（压缩后）
+- 每个组件的样式文件必须独立，避免合并
+- 使用 `@import` 时必须指定媒体查询条件
+- 禁止使用 `@import` 导入非 CSS 文件
+
+**开发规范**：
+
+- 所有样式变更必须经过代码审查
+- 禁止在生产环境使用内联样式
+- 样式文件必须与组件文件同步更新
+- 使用 CSS 预处理器时必须配置 source maps
+
+**React 组件样式使用示例**：
+
+```jsx
+// ❌ 错误示例：内联样式（禁止）
+const BadComponent = () => {
+  return (
+    <div style={{
+      backgroundColor: '#f0f0f0',
+      padding: '20px',
+      borderRadius: '8px'
+    }}>
+      <h3 style={{ color: 'red', fontSize: '18px' }}>错误示范</h3>
+    </div>
+  );
+};
+
+// ✅ 正确示例：使用 CSS Modules
+import styles from './GoodComponent.module.css';
+
+const GoodComponent = () => {
+  return (
+    <div className={styles.container}>
+      <h3 className={styles.title}>正确示范</h3>
+      <button className={styles.button}>点击按钮</button>
+    </div>
+  );
+};
+
+// ✅ 正确示例：使用 styled-components
+import styled from 'styled-components';
+
+const StyledContainer = styled.div`
+  background-color: var(--color-background);
+  padding: var(--spacing-md);
+  border-radius: var(--border-radius-md);
+  
+  @media (min-width: 768px) {
+    padding: var(--spacing-lg);
+  }
+`;
+
+const StyledTitle = styled.h3`
+  color: var(--color-primary);
+  font-size: var(--font-size-lg);
+  margin-bottom: var(--spacing-sm);
+`;
+
+const StyledComponent = () => {
+  return (
+    <StyledContainer>
+      <StyledTitle>正确示范</StyledTitle>
+      <button className="btn btn-primary">点击按钮</button>
+    </StyledContainer>
+  );
+};
+
+// ✅ 正确示例：使用 CSS-in-JS with emotion
+/** @jsx jsx */
+import { jsx, css } from '@emotion/react';
+
+const containerStyle = css`
+  background-color: var(--color-background);
+  padding: var(--spacing-md);
+  border-radius: var(--border-radius-md);
+  
+  &:hover {
+    box-shadow: var(--shadow-md);
+  }
+`;
+
+const EmotionComponent = () => {
+  return (
+    <div css={containerStyle}>
+      <h3 css={css`
+        color: var(--color-primary);
+        font-size: var(--font-size-lg);
+      `>
+        正确示范
+      </h3>
+    </div>
+  );
+};
+```
+
+**CSS 变量定义示例**：
+
+```css
+/* src/styles/variables.css */
+:root {
+  /* 颜色系统 */
+  --color-primary: #1890ff;
+  --color-secondary: #52c41a;
+  --color-danger: #ff4d4f;
+  --color-warning: #faad14;
+  --color-background: #ffffff;
+  --color-surface: #f5f5f5;
+  --color-text: #262626;
+  --color-text-secondary: #8c8c8c;
+  
+  /* 间距系统 */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  
+  /* 字体系统 */
+  --font-size-xs: 12px;
+  --font-size-sm: 14px;
+  --font-size-md: 16px;
+  --font-size-lg: 18px;
+  --font-size-xl: 20px;
+  --font-size-xxl: 24px;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-bold: 600;
+  
+  /* 边框和圆角 */
+  --border-radius-sm: 4px;
+  --border-radius-md: 8px;
+  --border-radius-lg: 12px;
+  --border-width: 1px;
+  --border-color: #d9d9d9;
+  
+  /* 阴影 */
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.15);
+  --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.2);
+  
+  /* 断点 */
+  --breakpoint-sm: 576px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 992px;
+  --breakpoint-xl: 1200px;
+  
+  /* 动画 */
+  --transition-fast: 0.2s ease;
+  --transition-normal: 0.3s ease;
+  --transition-slow: 0.5s ease;
+}
+
+/* 暗色主题 */
+[data-theme="dark"] {
+  --color-primary: #40a9ff;
+  --color-background: #1f1f1f;
+  --color-surface: #2d2d2d;
+  --color-text: #ffffff;
+  --color-text-secondary: #bfbfbf;
+  --border-color: #434343;
+}
+```
 
 ### 开发流程
 
