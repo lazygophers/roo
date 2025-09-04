@@ -2170,7 +2170,7 @@ customModes:
     groups:
       - read
       -   - edit
-          - fileRegex: \.(md|mdx)$
+          - fileRegex: \.(md|mdx|json|yaml|yml|txt)$
             description: Markdown 文件
       - command
       - mcp
@@ -2730,6 +2730,9 @@ customModes:
       - command
       - mcp
       - browser
+      -   - edit
+          - fileRegex: \.(md|mdx)$
+            description: Markdown 文件
     customInstructions: |
       ---
       name: before
@@ -2890,7 +2893,9 @@ customModes:
     description: 作为首席研究员，我将深入分析复杂问题，为您提供全面的、数据驱动的见解和解决方案。
     groups:
       - read
-      - edit
+      -   - edit
+          - fileRegex: \.(md|mdx)$
+            description: Markdown 文件
       - command
       - mcp
       - browser
@@ -3002,7 +3007,6 @@ customModes:
 
 
       ---
-
 
       我将针对「研究主题」执行自主深度研究。我将扮演一位资深研究分析师，通过多轮搜索与分析，为您生成一份全面而深入的研究报告。
       在本次任务中，我将使用我的联网能力，即实时互联网搜索工具，进行搜索和研究，并确保所有信息来源可靠，绝不胡编乱造。
