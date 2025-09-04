@@ -37,6 +37,13 @@ python_executables:
 | 移除依赖     | `yarn remove <package>`  | 移除指定依赖                   |
 | 运行脚本     | `yarn <script>`          | 执行 package.json 中定义的脚本 |
 
+**前端项目目录要求**：
+
+- **前端项目必须位于 `app/frontend` 目录下**
+- 所有前端源代码、配置文件、静态资源等都必须放置在此目录中
+- 禁止在项目根目录或其他位置存放前端相关文件
+- 确保前端项目的独立性和模块化
+
 **工作流程**：
 
 1. 新建前端项目时先执行 `yarn init` 创建 package.json
