@@ -107,6 +107,7 @@ orchestrator → project-research → architect → code → giter
 4. **信息呈现**: 使用流程图、清单、表格等可视化方式
 5. **模式专业化**: 严格专业分工，超出能力的任务必须委派
 6. **上下文精简**: 仅传递任务相关上下文，避免过载
+7. **任务分配要求**: 所有任务分配时必须使用 `sequentialthinkingglobal` 工具进行深度思考和规划
 
 ### 优化策略
 
