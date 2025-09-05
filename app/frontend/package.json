@@ -7,17 +7,18 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "test": "vitest",
-    "test:coverage": "vitest run --coverage",
+    "test": "vitest --config ./vitest.config.ts",
+    "test:coverage": "vitest run --coverage --config ./vitest.config.ts",
     "preview": "vite preview"
   },
   "dependencies": {
     "@ant-design/charts": "^2.6.4",
     "@ant-design/pro-components": "^2.8.10",
     "ahooks": "^3.9.5",
-    "antd": "^5.27.2",
+    "antd": "^5.27.3",
     "react": "^19.1.1",
-    "react-dom": "^19.1.1"
+    "react-dom": "^19.1.1",
+    "react-router-dom": "^7.8.2"
   },
   "devDependencies": {
     "@eslint/js": "^9.33.0",

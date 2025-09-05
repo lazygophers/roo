@@ -123,25 +123,30 @@ export async function fetchApi<T>(
           path: string,
           method: string = "POST",
           body?: any,
-          headers: Record<string, string> = { "Content-Type": "application/json" }
+          initialHeaders: Record<string, string> = { "Content-Type": "application/json" }
 ): Promise<T> {
-  const url = `${API_BASE_URL}${path}`;
-  const options: RequestInit = {
-    method,
-    headers,
-  };
+ const url = `${API_BASE_URL}${path}`;
+ 
+ // Use a Headers object to safely manage headers
+ const headers = new Headers(initialHeaders);
 
-  if (body !== undefined) {
-    // Handle FormData for file uploads specifically
-    if (body instanceof FormData) {
-      options.body = body;
-      // When using FormData, fetch automatically sets Content-Type to multipart/form-data
-      // and includes the boundary. Do not manually set it to application/json.
-      delete options.headers!['Content-Type'];
-    } else {
-      options.body = JSON.stringify(body);
-    }
-  }
+ const options: RequestInit = {
+   method,
+   headers: headers, // Assign the Headers object
+ };
+
+ if (body !== undefined) {
+   if (body instanceof FormData) {
+     options.body = body;
+     // When using FormData, fetch automatically sets Content-Type to multipart/form-data
+     // and includes the boundary. Do not manually set it.
+     if (headers.has('Content-Type')) { // Safely check and delete Content-Type if it exists
+       headers.delete('Content-Type');
+     }
+   } else {
+     options.body = JSON.stringify(body);
+   }
+ }
 
   try {
     const response = await fetch(url, options);
@@ -154,10 +159,12 @@ export async function fetchApi<T>(
     // Handle StreamingResponse and file downloads
     if (response.headers.get("content-type")?.includes("application/x-yaml") ||
         (response.headers.get("content-type")?.includes("application/json") && response.headers.get("content-disposition")?.includes("attachment"))) {
+      console.log('DEBUG: fetchApi is about to return Blob for content-type:', response.headers.get("content-type"), 'and content-disposition:', response.headers.get("content-disposition"));
       return response.blob() as Promise<T>; // Return Blob for file downloads
     }
     
     // For other responses, try to parse JSON
+    console.log('DEBUG: fetchApi is about to return JSON for content-type:', response.headers.get("content-type"));
     return (await response.json()) as T;
 
   } catch (error: any) {

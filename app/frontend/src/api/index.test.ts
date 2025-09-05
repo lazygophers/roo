@@ -9,6 +9,7 @@ beforeEach(() => {
   global.fetch = mockFetch;
 });
 
+
 describe('fetchApi', () => {
   it('should successfully fetch data and parse JSON', async () => {
     const mockData = { message: 'Hello from mock server' };
@@ -70,35 +71,46 @@ describe('fetchApi', () => {
 
   it('should correctly handle file download response (application/x-yaml)', async () => {
     const mockBlob = new Blob(['yaml content'], { type: 'application/x-yaml' });
+    Object.defineProperty(mockBlob, 'text', {
+      value: () => Promise.resolve('yaml content'),
+      writable: true,
+      configurable: true,
+    });
     mockFetch.mockResolvedValueOnce({
       ok: true,
       blob: () => Promise.resolve(mockBlob),
+      text: () => Promise.resolve('yaml content'),
       headers: new Headers({ 'Content-Type': 'application/x-yaml' }),
     });
 
-    const result = await fetchApi('/export', 'POST', { id: '123' });
-    expect(result).toBeInstanceOf(Blob);
-    expect(result.type).toBe('application/x-yaml');
-    const textContent = await (result as Blob).text();
-    expect(textContent).toBe('yaml content');
-  });
+    const result = await fetchApi<Blob>('/export', 'POST', { id: '123' });
+        expect(result).toBeInstanceOf(Blob);
+        expect(result.type).toBe('application/x-yaml');
+        const textContent = await result.text();
+        expect(textContent).toBe('yaml content');
+      });
 
   it('should correctly handle file download response (application/json with content-disposition)', async () => {
     const mockBlob = new Blob(['{"key": "value"}'], { type: 'application/json' });
+    Object.defineProperty(mockBlob, 'text', {
+      value: () => Promise.resolve('{"key": "value"}'),
+      writable: true,
+      configurable: true,
+    });
     mockFetch.mockResolvedValueOnce({
       ok: true,
       blob: () => Promise.resolve(mockBlob),
+      text: () => Promise.resolve('{"key": "value"}'), // Add this line
       headers: new Headers({ 'Content-Type': 'application/json', 'Content-Disposition': 'attachment; filename="data.json"' }),
     });
 
-    const result = await fetchApi('/download', 'POST', { id: '456' });
+    const result = await fetchApi<Blob>('/download', 'POST', { id: '456' });
     expect(result).toBeInstanceOf(Blob);
     expect(result.type).toBe('application/json');
-    const textContent = await (result as Blob).text();
+    const textContent = await result.text();
     expect(textContent).toBe('{"key": "value"}');
   });
 });
-
 describe('api.hello', () => {
   it('should call fetchApi with correct parameters for hello endpoint', async () => {
     const mockResponse = { message: 'Hello from mock server' };
