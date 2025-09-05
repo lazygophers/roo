@@ -8,40 +8,35 @@ tags: [任务委派, 消息格式, 规范]
 
 # new_task 委派规范
 
-## 工具参数说明
+## 工具参数
 
-`new_task` 工具接受以下参数：
-
-````xml
+```xml
 <new_task>
-  <mode>模式 slug</mode>  <!-- 必填：目标模式的 slug，如 "code"、"architect" 等 -->
+  <mode>模式 slug</mode>
   <message>
     metadata:
-      task_id?: string  # 唯一任务ID，格式: TASK-YYYY-NNN
-      task_id_list?: [string]  # 父任务ID链
-      category: string  # 必填: feature | bugfix | refactor | docs | research
-      tags?: [string]  # 标签列表
-      assignee?: string  # 指定的执行模式
+      task_id?: string
+      task_id_list?: [string]
+      category: string
+      tags?: [string]
+      assignee?: string
     task:
-      description: string  # 必填: 一句话描述任务目标
+      description: string
       context:
-        reason: string  # 必填: 执行此任务的背景原因
-        relevant_files?: [string]  # 相关文件路径
-        user_persona?: string  # 用户角色
+        reason: string
+        relevant_files?: [string]
+        user_persona?: string
       requirements:
-        functional?: [string]  # 功能需求
-        non_functional?: [string]  # 非功能需求
+        functional?: [string]
+        non_functional?: [string]
       boundaries:
-        allowed_files?: [string]  # 允许修改的文件
-        disallowed_patterns?: [string]  # 禁止修改的模式
+        allowed_files?: [string]
+        disallowed_patterns?: [string]
       acceptance:
-        criteria?: [string]  # 验收标准
+        criteria?: [string]
     response:
       format:
-        required_sections:
-          - "task_status"
-          - "completion_time"
-          - "context_info"
+        required_sections: ["task_status", "completion_time", "context_info"]
         template: |
           ```yaml
           task_status: string
@@ -64,68 +59,14 @@ tags: [任务委派, 消息格式, 规范]
         - "保持缩进一致"
         - "所有字段必须有清晰的描述"
   </message>
-  <todos>
-    ...  # 任务清单
-  </todos>
+  <todos>...</todos>
 </new_task>
-````
+```
 
-**参数说明**：
-
-- `mode`：必填，指定目标模式 slug（如 `code`、`architect`、`debug`）
-- `message`：必填，包含任务定义和响应格式要求
-- `todos`：必填，推荐子任务清单
-
-## 标准 YAML 格式
-
-````yaml
-metadata:
-  task_id?: string # 格式: TASK-YYYY-NNN
-  category: string # feature | bugfix | refactor | docs | research
-  tags?: [string]
-  assignee?: string
-task:
-  description: string # 必填: 一句话描述任务目标
-  context:
-    reason: string # 必填: 执行背景原因
-    relevant_files?: [string]
-    user_persona?: string
-  requirements:
-    functional?: [string]
-    non_functional?: [string]
-  boundaries:
-    allowed_files?: [string]
-    disallowed_patterns?: [string]
-  acceptance:
-    criteria?: [string]
-response:
-  format:
-    required_sections:
-      - "task_status"
-      - "completion_time"
-      - "context_info"
-    template: |
-      ```yaml
-      task_status: string
-      completion_time: string
-      context_info:
-        metadata:
-          task_id: string
-          category: string
-        execution_summary:
-          start_time: string
-          end_time: string
-          duration: string
-      results:
-        deliverables: object
-        next_steps?: [string]
-        lessons_learned?: [string]
-      ```
-    content_requirements:
-      - "必须使用标准 yaml 格式"
-      - "保持缩进一致"
-      - "所有字段必须有清晰的描述"
-````
+**必填参数**：
+- `mode`: 目标模式 slug
+- `message`: 任务定义和响应格式
+- `todos`: 子任务清单
 
 ## 模式选择指南
 

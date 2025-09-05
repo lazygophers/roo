@@ -78,7 +78,6 @@ tags: [任务管理, 模式协作, 工作流程]
 #### 典型场景
 
 **新功能开发**:
-
 ```
 orchestrator → architect → code → debug → doc-writer
      ↓           ↓        ↓       ↓          ↓
@@ -86,7 +85,6 @@ orchestrator → architect → code → debug → doc-writer
 ```
 
 **系统重构**:
-
 ```
 orchestrator → project-research → architect → code → giter
      ↓                ↓              ↓        ↓        ↓
