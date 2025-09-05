@@ -1,7 +1,20 @@
-- 当前端需要校验代码问题时，可以运行 `yarn build`
-- resources 目录下的所有文件以及 .roo 目录下的所有文件均为 ai 的配置文件（主要为提示词），当变更时，尽可能的保证使用更低的 token，同时确认变更的文件已有的内容，如果存在相似的，可以通过合并等方式减少 tokens 的消耗
-
 # 项目基础配置
+
+## Token 优化策略
+
+**配置文件管理原则**：
+
+- `resources/` 和 `.roo/` 目录下的所有文件均为 AI 配置文件（主要为提示词）
+- 变更时优先保证更低 token 消耗
+- 确认变更文件的现有内容，相似内容通过合并减少 token 消耗
+- 保持配置结构清晰，避免冗余重复
+
+**优化执行准则**：
+
+- 合并相似配置项，消除重复内容
+- 优先使用简洁表达，避免冗长描述
+- 保持配置功能完整性，优化信息密度
+- 动态调整配置结构，确保最高效的 token 利用
 
 ## 🛠️ 环境配置
 
@@ -97,49 +110,13 @@ frameworks:
 - 泛型约束清晰明确
 - React 组件使用 `React.FC` 或函数组件语法
 
-**类型示例**：
+**类型示例要点**：
 
-```typescript
-interface User {
-  id: string;
-  name: string;
-  email?: string;
-}
-
-type Status = "pending" | "in_progress" | "completed";
-
-interface ApiResponse<T> {
-  data: T;
-  success: boolean;
-  error?: string;
-}
-
-type UserPreview = Pick<User, "id" | "name">;
-```
-
-**tsconfig.json 配置**：
-
-```jsonc
-{
-  "compilerOptions": {
-    "strict": true,
-    "noImplicitAny": true,
-    "strictNullChecks": true,
-    "strictFunctionTypes": true,
-    "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true,
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "noEmit": true,
-    "jsx": "react-jsx"
-  },
-  "include": ["src/**/*"],
-  "exclude": ["node_modules"]
-}
-```
+- **基础接口**：定义包含必需和可选属性的数据结构
+- **联合类型**：使用字面量类型限制值的范围
+- **泛型接口**：创建可复用的响应类型模板
+- **工具类型**：使用 `Pick` 提取接口的特定属性
+- **配置要点**：启用严格模式、禁用隐式 any、配置 JSX 转换
 
 ## 🎯 模式选择指导
 
@@ -359,57 +336,18 @@ type UserPreview = Pick<User, "id" | "name">;
 - 样式文件必须与组件文件同步更新
 - 使用 CSS 预处理器时必须配置 source maps
 
-**React 组件样式使用示例**：
+**React 组件样式使用要点**：
 
-```jsx
-// ❌ 错误示例：内联样式（禁止）
-const BadComponent = () => {
-  return (
-    <div style={{ backgroundColor: "#f0f0f0", padding: "20px" }}>
-      <h3 style={{ color: "red" }}>错误示范</h3>
-    </div>
-  );
-};
+- **禁止内联样式**：不在 JSX 中使用 `style` 属性或对象
+- **推荐 CSS Modules**：通过 `import styles` 导入并使用 `className`
+- **文件组织**：样式文件与组件文件同目录，命名规范一致
 
-// ✅ 正确示例：使用 CSS Modules
-import styles from "./Component.module.css";
+**CSS 变量定义要点**：
 
-const GoodComponent = () => {
-  return (
-    <div className={styles.container}>
-      <h3 className={styles.title}>正确示范</h3>
-    </div>
-  );
-};
-```
-
-**CSS 变量定义示例**：
-
-```css
-/* src/styles/variables.css */
-:root {
-  /* 颜色系统 */
-  --color-primary: #1890ff;
-  --color-background: #ffffff;
-  --color-text: #262626;
-
-  /* 间距系统 */
-  --spacing-sm: 8px;
-  --spacing-md: 16px;
-  --spacing-lg: 24px;
-
-  /* 字体系统 */
-  --font-size-md: 16px;
-  --font-weight-normal: 400;
-}
-
-/* 暗色主题 */
-[data-theme="dark"] {
-  --color-primary: #40a9ff;
-  --color-background: #1f1f1f;
-  --color-text: #ffffff;
-}
-```
+- **颜色系统**：主色、背景色、文本色等基础色彩变量
+- **间距系统**：使用 `--spacing-sm/md/lg` 等标准化间距
+- **字体系统**：定义字体大小、字重等排版变量
+- **主题切换**：通过 `[data-theme="dark"]` 属性支持暗色模式
 
 ### 开发流程
 
