@@ -1,4 +1,5 @@
 - 当前端需要校验代码问题时，可以运行 `yarn build`
+- resources 目录下的所有文件以及 .roo 目录下的所有文件均为 ai 的配置文件（主要为提示词），当变更时，尽可能的保证使用更低的 token，同时确认变更的文件已有的内容，如果存在相似的，可以通过合并等方式减少 tokens 的消耗
 
 # 项目基础配置
 
@@ -29,11 +30,11 @@ python_executables:
 - 前端项目必须使用 Yarn，禁止使用 npm
 - 依赖版本必须锁定在 `yarn.lock` 文件中
 
-| 操作 | 命令 | 功能说明 |
-|------|------|----------|
-| 安装依赖 | `yarn install` | 根据 package.json 安装依赖 |
-| 添加依赖 | `yarn add <package>` | 添加生产环境依赖 |
-| 运行脚本 | `yarn <script>` | 执行脚本 |
+| 操作     | 命令                 | 功能说明                   |
+| -------- | -------------------- | -------------------------- |
+| 安装依赖 | `yarn install`       | 根据 package.json 安装依赖 |
+| 添加依赖 | `yarn add <package>` | 添加生产环境依赖           |
+| 运行脚本 | `yarn <script>`      | 执行脚本                   |
 
 **前端项目目录**：必须位于 `app/frontend` 目录下。
 
@@ -41,13 +42,14 @@ python_executables:
 
 ### 开发工具规范
 
-| 工具 | 配置要求 | 示例 |
-|------|----------|------|
-| curl | 超时配置 | `curl --connect-timeout 5 --max-time 10 <URL>` |
-| grep | 高效搜索 | `grep -rn "pattern" --include="*.py" .` |
-| Makefile | 必需目标 | `dev`、`test`、`fmt`、`install`、`build` |
+| 工具     | 配置要求 | 示例                                           |
+| -------- | -------- | ---------------------------------------------- |
+| curl     | 超时配置 | `curl --connect-timeout 5 --max-time 10 <URL>` |
+| grep     | 高效搜索 | `grep -rn "pattern" --include="*.py" .`        |
+| Makefile | 必需目标 | `dev`、`test`、`fmt`、`install`、`build`       |
 
 **测试访问**：
+
 - 前端：http://localhost:14001
 - 后端：http://localhost:14001/api
 - 支持热重载，无需重启服务
@@ -74,55 +76,50 @@ frameworks:
 
 **核心要求**：
 
-- **所有新项目必须使用 TypeScript**
-- **现有 JS 项目逐步迁移至 TS**
-- **类型定义覆盖率达到 95%+**
-- **严格模式启用：`strict: true`**
-- **禁止使用 `any` 类型**（特殊情况需注释说明）
+- 新项目必须使用 TypeScript
+- 现有 JS 项目逐步迁移至 TS
+- 类型定义覆盖率 ≥ 95%
+- 启用严格模式：`strict: true`
+- 禁止使用 `any` 类型（特殊情况需注释说明）
 
 **迁移策略**：
 
-1. 先添加 `@types` 依赖
+1. 添加 `@types` 依赖
 2. 文件扩展名改为 `.ts`/`.tsx`
 3. 逐步添加类型注解
 4. 启用严格模式检查
 
 **类型规范**：
 
-- 使用接口定义数据结构
-- 优先使用联合类型而非 `any`
-- 工具类型合理使用 `Partial`、`Pick`、`Omit`、`Record`
+- 接口定义数据结构
+- 优先联合类型而非 `any`
+- 工具类型使用 `Partial`、`Pick`、`Omit`、`Record`
 - 泛型约束清晰明确
 - React 组件使用 `React.FC` 或函数组件语法
 
-**高级类型使用**：
+**类型示例**：
 
 ```typescript
-// 推荐的类型定义方式
 interface User {
   id: string;
   name: string;
-  email?: string; // 可选属性
+  email?: string;
 }
 
 type Status = "pending" | "in_progress" | "completed";
 
-// 使用泛型增强复用性
 interface ApiResponse<T> {
   data: T;
   success: boolean;
   error?: string;
 }
 
-// 使用工具类型
 type UserPreview = Pick<User, "id" | "name">;
-type PartialUser = Partial<User>;
 ```
 
-**配置文件要求**：
+**tsconfig.json 配置**：
 
 ```jsonc
-// tsconfig.json 必须包含
 {
   "compilerOptions": {
     "strict": true,
@@ -253,16 +250,16 @@ type PartialUser = Partial<User>;
 - 强制代码检查通过才能提交
 - 使用 Husky 管理 Git hooks
 
-**构建工具配置**：
+**构建工具**：
 
-- **Vite**（推荐）：现代、快速、开箱即用，对 React 有原生支持
+- **Vite**（推荐）：现代、快速、开箱即用，React 原生支持
 - **Webpack**：功能强大、生态完善
-- 必须配置：
+- 必需配置：
   - 代码分割（Code Splitting）
   - 懒加载（Lazy Loading）
   - Tree Shaking
   - Source Map
-- React 项目推荐使用 Vite 以获得最佳开发体验
+- React 项目推荐 Vite 以获得最佳开发体验
 
 **开发环境**：
 
@@ -368,14 +365,14 @@ type PartialUser = Partial<User>;
 // ❌ 错误示例：内联样式（禁止）
 const BadComponent = () => {
   return (
-    <div style={{ backgroundColor: '#f0f0f0', padding: '20px' }}>
-      <h3 style={{ color: 'red' }}>错误示范</h3>
+    <div style={{ backgroundColor: "#f0f0f0", padding: "20px" }}>
+      <h3 style={{ color: "red" }}>错误示范</h3>
     </div>
   );
 };
 
 // ✅ 正确示例：使用 CSS Modules
-import styles from './Component.module.css';
+import styles from "./Component.module.css";
 
 const GoodComponent = () => {
   return (
@@ -395,12 +392,12 @@ const GoodComponent = () => {
   --color-primary: #1890ff;
   --color-background: #ffffff;
   --color-text: #262626;
-  
+
   /* 间距系统 */
   --spacing-sm: 8px;
   --spacing-md: 16px;
   --spacing-lg: 24px;
-  
+
   /* 字体系统 */
   --font-size-md: 16px;
   --font-weight-normal: 400;
@@ -578,12 +575,12 @@ tests/                        # 测试文件目录
 
 ### 提示词层次结构
 
-| 层级 | 路径 | 职责 |
-|------|------|------|
-| 全局前置规则 | `hooks/before.md` | 核心原则、行为准则、专业分工 |
-| 项目基础规则 | `rules/base.md` | 项目配置、技术栈、执行原则 |
-| 模式特异性规则 | `rules-<slug>/` | 模式行为规范、工具限制 |
-| 通用规则 | `rules/` | 跨模式规范、工具标准 |
+| 层级           | 路径              | 职责                         |
+| -------------- | ----------------- | ---------------------------- |
+| 全局前置规则   | `hooks/before.md` | 核心原则、行为准则、专业分工 |
+| 项目基础规则   | `rules/base.md`   | 项目配置、技术栈、执行原则   |
+| 模式特异性规则 | `rules-<slug>/`   | 模式行为规范、工具限制       |
+| 通用规则       | `rules/`          | 跨模式规范、工具标准         |
 
 ### 设计原则
 
@@ -598,6 +595,22 @@ tests/                        # 测试文件目录
 - **规则注入**：Shell 动态生成规则
 - **插件机制**：第三方提示词插件
 
+### Token 优化策略
+
+**配置文件管理原则**：
+
+- `resources/` 和 `.roo/` 目录下的所有文件均为 AI 配置文件（主要为提示词）
+- 变更时优先保证更低 token 消耗
+- 确认变更文件的现有内容，相似内容通过合并减少 token 消耗
+- 保持配置结构清晰，避免冗余重复
+
+**优化执行准则**：
+
+- 合并相似配置项，消除重复内容
+- 优先使用简洁表达，避免冗长描述
+- 保持配置功能完整性，优化信息密度
+- 动态调整配置结构，确保最高效的 token 利用
+
 ### 接口变更自动更新文档规范
 
 **核心理念**：
@@ -608,23 +621,23 @@ tests/                        # 测试文件目录
 
 **检测机制**：
 
-| 层级 | 功能 | 支持文件类型 |
-|------|------|-------------|
-| 代码分析 | AST解析、接口定义扫描 | Python: `*.py`, TS: `*.ts` |
-| 文件监听 | 实时变更监控 | API/Router/Model文件 |
-| 变更分析 | 增删改检测、破坏性变更标记 | 所有接口相关文件 |
+| 层级     | 功能                       | 支持文件类型               |
+| -------- | -------------------------- | -------------------------- |
+| 代码分析 | AST 解析、接口定义扫描     | Python: `*.py`, TS: `*.ts` |
+| 文件监听 | 实时变更监控               | API/Router/Model 文件      |
+| 变更分析 | 增删改检测、破坏性变更标记 | 所有接口相关文件           |
 
 **实现工具**：
 
-| 技术栈 | 推荐工具 | 配置示例 |
-|--------|----------|----------|
-| Python | FastAPI OpenAPI | `from fastapi.openapi.utils import get_openapi` |
-| TypeScript | TypeDoc | TSDoc + 类型定义生成 |
-| 通用 | Git Hooks | Pre-commit 检测API变更 |
+| 技术栈     | 推荐工具        | 配置示例                                        |
+| ---------- | --------------- | ----------------------------------------------- |
+| Python     | FastAPI OpenAPI | `from fastapi.openapi.utils import get_openapi` |
+| TypeScript | TypeDoc         | TSDoc + 类型定义生成                            |
+| 通用       | Git Hooks       | Pre-commit 检测 API 变更                        |
 
 **最佳实践**：
 
-- **注释规范**：使用标准格式，包含Args/Returns/Raises
-- **版本控制**：PR审核，破坏性变更需major版本更新
-- **质量保证**：CI/CD检查、文档同步验证
+- **注释规范**：使用标准格式，包含 Args/Returns/Raises
+- **版本控制**：PR 审核，破坏性变更需 major 版本更新
+- **质量保证**：CI/CD 检查、文档同步验证
 - **监控告警**：自动检测不同步，生成使用报告
