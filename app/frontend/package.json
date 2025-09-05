@@ -10,7 +10,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@ant-design/charts": "^2.6.4",
     "@ant-design/pro-components": "^2.8.10",
+    "ahooks": "^3.9.5",
     "antd": "^5.27.2",
     "react": "^19.1.1",
     "react-dom": "^19.1.1"
