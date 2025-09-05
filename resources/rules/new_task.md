@@ -39,25 +39,38 @@ tags: [任务委派, 消息格式, 规范]
         required_sections: ["task_status", "completion_time", "context_info"]
         template: |
           ```yaml
-          task_status: string
-          completion_time: string
+          # attempt_completion 工具入参格式
+          # 此模板作为 attempt_completion 工具 result 参数的标准格式
+          
+          task_status: string              # 任务状态：completed/failed/partial
+          completion_time: string          # 完成时间：ISO 8601 格式
           context_info:
             metadata:
-              task_id: string
-              category: string
+              task_id: string              # 任务唯一标识符
+              task_id_list?: [string]      # 关联任务ID列表（如有）
+              category: string              # 任务分类
+              tags?: [string]               # 任务标签
+              assignee?: string             # 执行者模式
             execution_summary:
-              start_time: string
-              end_time: string
-              duration: string
-          results:
-            deliverables: object
-            next_steps?: [string]
-            lessons_learned?: [string]
+              start_time: string            # 开始时间：ISO 8601 格式
+              end_time: string              # 结束时间：ISO 8601 格式
+              duration: string              # 执行耗时（如："2h 30m"）
+              mode_used: string             # 实际使用的执行模式
+            results:
+              deliverables: object         # 交付物详情（文件路径、功能说明等）
+              changes_made?: [string]       # 具体变更内容
+              issues_resolved?: [string]    # 已解决的问题
+              performance_metrics?: object  # 性能指标（如适用）
+              next_steps?: [string]         # 后续建议或待办事项
+              lessons_learned?: [string]    # 经验总结
           ```
       content_requirements:
-        - "必须使用标准 yaml 格式"
-        - "保持缩进一致"
-        - "所有字段必须有清晰的描述"
+        - "必须使用标准 YAML 格式，确保格式一致性"
+        - "保持 2 空格缩进，避免格式错误"
+        - "所有字段必须包含清晰的类型说明和用途描述"
+        - "时间字段必须使用 ISO 8601 格式 (YYYY-MM-DDTHH:MM:SSZ)"
+        - "任务状态必须使用预定义枚举值 (completed/failed/partial)"
+        - "可选字段使用 '?:' 标记，必填字段明确说明"
   </message>
   <todos>...</todos>
 </new_task>
