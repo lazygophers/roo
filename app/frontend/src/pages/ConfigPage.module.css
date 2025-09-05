@@ -1,0 +1,494 @@
+/* ConfigPage 配置管理页面样式 */
+
+.container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f6f9fc 0%, #ffffff 50%, #f0f4f8 100%);
+  padding: var(--spacing-lg) var(--spacing-md);
+
+  /* 响应式设计 */
+  @media (min-width: 768px) {
+    padding: var(--spacing-xl) var(--spacing-lg);
+  }
+
+  @media (min-width: 1200px) {
+    padding: var(--spacing-xl) var(--spacing-xxl);
+  }
+}
+
+/* 深色主题 */
+[data-theme='dark'] .container {
+  background: linear-gradient(135deg, #1f1f23 0%, #141414 50%, #1a1a1d 100%);
+}
+
+/* 加载状态 */
+.loadingContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  gap: var(--spacing-md);
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+.loadingText {
+  font-size: var(--font-size-lg);
+  color: var(--color-text-secondary);
+  margin-top: var(--spacing-md);
+}
+
+/* 页面头部 */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: var(--spacing-xl);
+  gap: var(--spacing-md);
+
+  /* 响应式布局 */
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: var(--spacing-lg);
+  }
+}
+
+.titleSection {
+  flex: 1;
+  min-width: 0; /* 防止内容溢出 */
+}
+
+.title {
+  margin: 0 !important;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  color: var(--color-text);
+  font-weight: 600;
+
+  /* 响应式字体 */
+  font-size: clamp(1.5rem, 4vw, 2rem);
+}
+
+.titleIcon {
+  color: var(--color-primary);
+  font-size: 1.2em;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+.subtitle {
+  margin: var(--spacing-sm) 0 0 0 !important;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-md);
+  line-height: 1.6;
+  max-width: 600px;
+}
+
+.actions {
+  flex-shrink: 0;
+
+  /* 移动端全宽显示 */
+  @media (max-width: 768px) {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* 统计信息卡片 */
+.statsContainer {
+  margin-bottom: var(--spacing-lg);
+}
+
+.statsCard {
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--color-border);
+  transition: all var(--transition-base);
+}
+
+.statsCard:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+[data-theme='dark'] .statsCard {
+  background: var(--color-bg-elevated);
+  border-color: var(--color-border-secondary);
+}
+
+/* 警告提示 */
+.alert {
+  margin-bottom: var(--spacing-lg);
+  border-radius: var(--border-radius-md);
+  animation: slideInDown 0.5s ease-out;
+}
+
+@keyframes slideInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 模型列表卡片 */
+.modelsCard {
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-container);
+  overflow: hidden;
+  transition: all var(--transition-base);
+}
+
+.modelsCard:hover {
+  box-shadow: var(--shadow-md);
+}
+
+[data-theme='dark'] .modelsCard {
+  background: var(--color-bg-elevated);
+  border-color: var(--color-border-secondary);
+}
+
+/* 模型列表项 */
+.modelItem {
+  padding: var(--spacing-lg) !important;
+  border-bottom: 1px solid var(--color-border-light);
+  transition: all var(--transition-base);
+  position: relative;
+  overflow: hidden;
+}
+
+.modelItem::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 4px;
+  background: transparent;
+  transition: all var(--transition-base);
+}
+
+.modelItem:hover {
+  background: var(--color-bg-hover);
+  transform: translateX(4px);
+}
+
+.modelItem:hover::before {
+  background: var(--color-primary);
+}
+
+.modelItem:last-child {
+  border-bottom: none;
+}
+
+[data-theme='dark'] .modelItem {
+  border-bottom-color: var(--color-border-secondary);
+}
+
+[data-theme='dark'] .modelItem:hover {
+  background: var(--color-bg-hover-dark);
+}
+
+/* 模型标题区域 */
+.modelTitle {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  flex-wrap: wrap;
+  margin-bottom: var(--spacing-xs);
+}
+
+.version {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-tertiary);
+  background: var(--color-bg-container);
+  padding: 2px 6px;
+  border-radius: var(--border-radius-sm);
+  border: 1px solid var(--color-border-light);
+}
+
+[data-theme='dark'] .version {
+  background: var(--color-bg-elevated);
+  border-color: var(--color-border-secondary);
+}
+
+/* 模型描述区域 */
+.modelDescription {
+  line-height: 1.6;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-xs);
+  margin-top: var(--spacing-sm);
+}
+
+.dependencies {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacing-xs);
+  margin-top: var(--spacing-sm);
+  font-size: var(--font-size-sm);
+}
+
+/* 配置编辑文本框 */
+.configTextArea {
+  font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+  font-size: var(--font-size-sm);
+  line-height: 1.5;
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-md);
+  transition: all var(--transition-base);
+}
+
+.configTextArea:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px var(--color-primary-bg);
+}
+
+[data-theme='dark'] .configTextArea {
+  background: var(--color-bg-elevated);
+  border-color: var(--color-border-secondary);
+  color: var(--color-text);
+}
+
+/* 动画效果 */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modelsCard {
+  animation: slideInUp 0.6s ease-out;
+}
+
+.modelItem {
+  animation: fadeIn 0.5s ease-out forwards;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .container {
+    padding: var(--spacing-md);
+  }
+
+  .header {
+    text-align: center;
+  }
+
+  .actions {
+    width: 100%;
+  }
+
+  .actions .ant-space {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .modelItem {
+    padding: var(--spacing-md) !important;
+  }
+
+  .modelTitle {
+    justify-content: center;
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .title {
+    font-size: var(--font-size-xl);
+  }
+
+  .subtitle {
+    font-size: var(--font-size-sm);
+  }
+
+  .actions .ant-btn {
+    font-size: var(--font-size-sm);
+    padding: 4px 8px;
+    height: auto;
+  }
+
+  .modelTitle {
+    flex-direction: column;
+    gap: var(--spacing-xs);
+    text-align: center;
+  }
+
+  .dependencies,
+  .tags {
+    justify-content: center;
+  }
+}
+
+/* 打印样式 */
+@media print {
+  .container {
+    background: white;
+    padding: 0;
+  }
+
+  .actions {
+    display: none;
+  }
+
+  .modelsCard {
+    box-shadow: none;
+    border: 1px solid #ddd;
+  }
+
+  .modelItem:hover {
+    background: transparent;
+    transform: none;
+  }
+
+  .modelItem::before {
+    display: none;
+  }
+}
+
+/* 无障碍访问增强 */
+@media (prefers-reduced-motion: reduce) {
+  .container,
+  .statsCard,
+  .modelsCard,
+  .modelItem,
+  .titleIcon {
+    animation: none;
+    transition: none;
+  }
+
+  .modelItem:hover {
+    transform: none;
+  }
+
+  .statsCard:hover {
+    transform: none;
+  }
+}
+
+@media (prefers-contrast: high) {
+  .container {
+    background: white;
+  }
+
+  .statsCard,
+  .modelsCard {
+    border: 2px solid #000;
+  }
+
+  .modelItem {
+    border-bottom: 2px solid #000;
+  }
+
+  [data-theme='dark'] .container {
+    background: #000;
+  }
+
+  [data-theme='dark'] .statsCard,
+  [data-theme='dark'] .modelsCard {
+    border: 2px solid #fff;
+  }
+
+  [data-theme='dark'] .modelItem {
+    border-bottom: 2px solid #fff;
+  }
+}
+
+/* CSS 变量定义（如果需要覆盖全局变量） */
+.container {
+  --config-primary-color: #1890ff;
+  --config-success-color: #52c41a;
+  --config-warning-color: #fa8c16;
+  --config-error-color: #ff4d4f;
+  --config-info-color: #13c2c2;
+}
+
+[data-theme='dark'] .container {
+  --config-primary-color: #40a9ff;
+  --config-success-color: #73d13d;
+  --config-warning-color: #ffa940;
+  --config-error-color: #ff7875;
+  --config-info-color: #36cfc9;
+}
+
+/* 状态指示器 */
+.statusIndicator {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: var(--spacing-xs);
+}
+
+.statusIndicator.enabled {
+  background-color: var(--config-success-color);
+  box-shadow: 0 0 8px var(--config-success-color);
+}
+
+.statusIndicator.disabled {
+  background-color: var(--color-text-quaternary);
+  box-shadow: none;
+}
+
+/* 加载骨架屏效果 */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--color-bg-container) 25%,
+    var(--color-bg-hover) 50%,
+    var(--color-bg-container) 75%
+  );
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* 性能优化：GPU 加速 */
+.container,
+.statsCard,
+.modelsCard,
+.modelItem {
+  will-change: transform, opacity;
+  transform: translateZ(0);
+}
