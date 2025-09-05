@@ -10,7 +10,7 @@ tags: [任务委派, 消息格式, 规范]
 
 ## 工具参数
 
-```xml
+````xml
 <new_task>
   <mode>模式 slug</mode>
   <message>
@@ -61,9 +61,10 @@ tags: [任务委派, 消息格式, 规范]
   </message>
   <todos>...</todos>
 </new_task>
-```
+````
 
 **必填参数**：
+
 - `mode`: 目标模式 slug
 - `message`: 任务定义和响应格式
 - `todos`: 子任务清单
@@ -100,112 +101,3 @@ tags: [任务委派, 消息格式, 规范]
 2. **任务分解** → `orchestrator`：创建子任务清单，确定依赖关系，分配执行模式
 3. **专业执行** → 各专业模式：按领域执行，必要时模式间协作
 4. **结果汇总** → `orchestrator`：收集结果，验证完成度，准备交付
-
-### 典型协作场景
-
-**新功能开发**：
-
-```
-orchestrator → architect → code → debug → doc-writer
-```
-
-**系统重构**：
-
-```
-orchestrator → project-research → architect → code → giter
-```
-
-**问题排查**：
-
-```
-orchestrator → debug → code → ask → doc-writer
-```
-
-## 示例
-
-### 基础示例 - 功能开发
-
-```yaml
-metadata:
-  task_id: "TASK-2025-001"
-  category: "feature"
-  tags: ["api", "user-management"]
-task:
-  description: "为用户服务添加密码重置功能"
-  context:
-    reason: "用户反馈无法重置忘记的密码"
-    relevant_files:
-      - "src/services/user_service.py"
-      - "tests/test_user_service.py"
-  requirements:
-    functional:
-      - "发送密码重置邮件"
-      - "验证重置令牌"
-      - "更新用户密码"
-    non_functional:
-      - "令牌有效期1小时"
-      - "邮件发送5分钟内"
-  boundaries:
-    allowed_files:
-      - "src/services/user_service.py"
-      - "tests/test_user_service.py"
-  acceptance:
-    criteria:
-      - "邮件发送成功"
-      - "令牌验证通过"
-      - "密码更新成功"
-response:
-  format:
-    required_sections:
-      - "task_status"
-      - "completion_time"
-      - "context_info"
-    content_requirements:
-      - "必须使用标准 yaml 格式"
-      - "保持缩进一致"
-```
-
-### 高级示例 - 架构重构
-
-```yaml
-metadata:
-  task_id: "TASK-2025-002"
-  category: "refactor"
-  tags: ["architecture", "microservices"]
-  assignee: "architect"
-task:
-  description: "将单体应用拆分为微服务架构"
-  context:
-    reason: "应用规模增长，单体架构难以维护"
-    relevant_files:
-      - "src/main.py"
-      - "src/models/"
-      - "src/services/"
-  requirements:
-    functional:
-      - "识别服务边界"
-      - "设计服务间通信"
-      - "实现服务发现"
-    non_functional:
-      - "服务独立部署"
-      - "故障隔离"
-      - "水平扩展能力"
-  boundaries:
-    disallowed_patterns:
-      - "直接数据库共享"
-      - "紧耦合服务调用"
-  acceptance:
-    criteria:
-      - "服务响应时间<100ms"
-      - "系统可用性>99.9%"
-      - "部署时间<5分钟"
-response:
-  format:
-    required_sections:
-      - "task_status"
-      - "completion_time"
-      - "context_info"
-    content_requirements:
-      - "必须使用标准 yaml 格式"
-      - "保持缩进一致"
-```
