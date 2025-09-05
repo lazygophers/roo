@@ -1,3 +1,5 @@
+- 当前端需要校验代码问题时，可以运行 `yarn build`
+
 # 项目基础配置
 
 ## 🛠️ 环境配置
@@ -86,17 +88,17 @@ grep -rnC 2 "search_pattern" .
 
 **常用选项组合**：
 
-| 选项 | 说明 | 示例 |
-|------|------|------|
-| `-i` | 忽略大小写 | `grep -ri "function" .` |
-| `-w` | 匹配整个单词 | `grep -rw "import" .` |
-| `-l` | 只显示文件名 | `grep -rl "TODO" .` |
-| `-L` | 只显示不匹配的文件名 | `grep -rL "FIXME" .` |
-| `-n` | 显示行号 | `grep -rn "class User" .` |
-| `-C` | 显示上下文 | `grep -rnC 3 "def main" .` |
-| `--include` | 只搜索特定文件 | `grep -rn "import" --include="*.py" .` |
-| `--exclude` | 排除特定文件 | `grep -rn "debug" --exclude="*.log" .` |
-| `--exclude-dir` | 排除特定目录 | `grep -rn "test" --exclude-dir=vendor .` |
+| 选项            | 说明                 | 示例                                     |
+| --------------- | -------------------- | ---------------------------------------- |
+| `-i`            | 忽略大小写           | `grep -ri "function" .`                  |
+| `-w`            | 匹配整个单词         | `grep -rw "import" .`                    |
+| `-l`            | 只显示文件名         | `grep -rl "TODO" .`                      |
+| `-L`            | 只显示不匹配的文件名 | `grep -rL "FIXME" .`                     |
+| `-n`            | 显示行号             | `grep -rn "class User" .`                |
+| `-C`            | 显示上下文           | `grep -rnC 3 "def main" .`               |
+| `--include`     | 只搜索特定文件       | `grep -rn "import" --include="*.py" .`   |
+| `--exclude`     | 排除特定文件         | `grep -rn "debug" --exclude="*.log" .`   |
+| `--exclude-dir` | 排除特定目录         | `grep -rn "test" --exclude-dir=vendor .` |
 
 **高级用法示例**：
 
@@ -252,7 +254,7 @@ interface User {
   email?: string; // 可选属性
 }
 
-type Status = 'pending' | 'in_progress' | 'completed';
+type Status = "pending" | "in_progress" | "completed";
 
 // 使用泛型增强复用性
 interface ApiResponse<T> {
@@ -262,7 +264,7 @@ interface ApiResponse<T> {
 }
 
 // 使用工具类型
-type UserPreview = Pick<User, 'id' | 'name'>;
+type UserPreview = Pick<User, "id" | "name">;
 type PartialUser = Partial<User>;
 ```
 
@@ -544,7 +546,7 @@ const StyledContainer = styled.div`
   background-color: var(--color-background);
   padding: var(--spacing-md);
   border-radius: var(--border-radius-md);
-  
+
   @media (min-width: 768px) {
     padding: var(--spacing-lg);
   }
@@ -573,7 +575,7 @@ const containerStyle = css`
   background-color: var(--color-background);
   padding: var(--spacing-md);
   border-radius: var(--border-radius-md);
-  
+
   &:hover {
     box-shadow: var(--shadow-md);
   }
@@ -607,14 +609,14 @@ const EmotionComponent = () => {
   --color-surface: #f5f5f5;
   --color-text: #262626;
   --color-text-secondary: #8c8c8c;
-  
+
   /* 间距系统 */
   --spacing-xs: 4px;
   --spacing-sm: 8px;
   --spacing-md: 16px;
   --spacing-lg: 24px;
   --spacing-xl: 32px;
-  
+
   /* 字体系统 */
   --font-size-xs: 12px;
   --font-size-sm: 14px;
@@ -625,25 +627,25 @@ const EmotionComponent = () => {
   --font-weight-normal: 400;
   --font-weight-medium: 500;
   --font-weight-bold: 600;
-  
+
   /* 边框和圆角 */
   --border-radius-sm: 4px;
   --border-radius-md: 8px;
   --border-radius-lg: 12px;
   --border-width: 1px;
   --border-color: #d9d9d9;
-  
+
   /* 阴影 */
   --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
   --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.15);
   --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.2);
-  
+
   /* 断点 */
   --breakpoint-sm: 576px;
   --breakpoint-md: 768px;
   --breakpoint-lg: 992px;
   --breakpoint-xl: 1200px;
-  
+
   /* 动画 */
   --transition-fast: 0.2s ease;
   --transition-normal: 0.3s ease;
@@ -936,7 +938,6 @@ tests/                        # 测试文件目录
    - 提供标准化的插件接口
    - 建立插件市场和评分系统
 
-
 ### 接口变更自动更新文档规范
 
 **核心理念**：
@@ -948,12 +949,14 @@ tests/                        # 测试文件目录
 **接口变更检测机制**：
 
 1. **代码分析层**
+
    - 使用 AST 解析器扫描代码中的接口定义
    - 监控函数签名、参数、返回值的变化
    - 检测数据模型（Pydantic 模型、TypeScript 接口）的变更
    - 识别路由端点的增删改
 
 2. **文件监听层**
+
    - 实时监听 API 相关文件变更
    - 支持的文件类型：
      - Python: `*.py`, `*api*.py`, `*router*.py`
@@ -971,15 +974,17 @@ tests/                        # 测试文件目录
 **文档自动更新流程**：
 
 1. **变更触发**
+
    ```bash
    # 开发者提交代码变更
    git commit -m "feat(api): add user management endpoints"
-   
+
    # 或者在开发服务器上保存文件
    # 文件系统监听器自动触发
    ```
 
 2. **文档生成**
+
    - 自动从代码中提取最新的接口信息
    - 生成/更新以下文档：
      - OpenAPI/Swagger 规范
@@ -988,6 +993,7 @@ tests/                        # 测试文件目录
      - 集成测试用例
 
 3. **变更对比**
+
    - 生成变更前后对比报告
    - 高亮显示：
      - 新增的接口和参数
@@ -1002,10 +1008,11 @@ tests/                        # 测试文件目录
 **实现工具要求**：
 
 1. **Python 项目**
+
    ```python
    # 使用 pydantic 和 fastapi 的 OpenAPI 生成
    from fastapi.openapi.utils import get_openapi
-   
+
    # 或使用第三方工具
    # - sphinxcontrib-openapi
    # - apispec
@@ -1013,6 +1020,7 @@ tests/                        # 测试文件目录
    ```
 
 2. **TypeScript 项目**
+
    ```typescript
    // 使用 TSDoc 和类型定义生成
    // 工具选择：
@@ -1027,14 +1035,15 @@ tests/                        # 测试文件目录
    #!/bin/bash
    # 检测 API 文件变更
    if git diff --cached --name-only | grep -E "(api|router|model)"; then
-       npm run docs:generate
-       git add docs/
+   npm run docs:generate
+   git add docs/
    fi
    ```
 
 **最佳实践**：
 
 1. **注释规范**
+
    ```python
    # 使用标准注释格式
    def create_user(
@@ -1043,14 +1052,14 @@ tests/                        # 测试文件目录
    ) -> User:
        """
        创建新用户
-       
+
        Args:
            username: 必需，长度 3-20 字符
            email: 必需，有效的邮箱格式
-           
+
        Returns:
            User: 创建的用户对象，包含 ID 和创建时间
-           
+
        Raises:
            400: 用户名或邮箱格式错误
            409: 用户名或邮箱已存在
@@ -1058,6 +1067,7 @@ tests/                        # 测试文件目录
    ```
 
 2. **版本控制**
+
    - 所有文档变更必须通过 PR 审核
    - 破坏性变更需要 major 版本号更新
    - 保留历史版本的文档，支持 API 版本切换
@@ -1073,11 +1083,13 @@ tests/                        # 测试文件目录
 **监控与告警**：
 
 1. **文档同步状态**
+
    - 在项目 README 中显示文档最后更新时间
    - 定期检查代码与文档的一致性
    - 发现不同步时自动创建修复任务
 
 2. **使用统计**
+
    - 记录接口调用频率，识别常用接口
    - 监控废弃接口的使用情况
    - 生成 API 使用报告，指导优化方向
@@ -1088,7 +1100,7 @@ tests/                        # 测试文件目录
    name: API Documentation Check
    on:
      push:
-       paths: ['src/api/**', 'src/models/**']
+       paths: ["src/api/**", "src/models/**"]
    jobs:
      check-docs:
        runs-on: ubuntu-latest
@@ -1104,4 +1116,4 @@ tests/                        # 测试文件目录
                echo "❌ 发现文档变更，请提交更新"
                exit 1
              fi
-     ```
+   ```
