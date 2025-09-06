@@ -1,133 +1,86 @@
 ---
 name: python-guide
 title: Python编程规范指南
-description: "Python编程规范技术文档，优先使用uv作为环境管理工具，包含编码规范、类型注解、pydantic模型、函数规范和测试指南"
+description: "Python编程规范和最佳实践，包含编码规范、类型注解、pydantic模型、函数规范和测试指南"
 category: language-guide
 language: python
 priority: high
 tags: [Python, 编程规范, uv, pydantic, 类型注解]
 sections:
-  - "编码规范：命名规范、代码格式"
-  - "类型注解规范：基础类型、pydantic模型"
-  - "函数参数与返回值规范：参数规范、返回值规范"
-  - "pydantic最佳实践：模型定义、数据验证"
-  - "注释规范：文档字符串、注释内容原则"
-  - "异常处理规范：异常处理、自定义异常"
-  - "测试规范：命名规范、断言库、表驱动测试"
+  - "编码规范"
+  - "类型注解规范"
+  - "函数参数与返回值规范"
+  - "pydantic最佳实践"
+  - "注释规范"
+  - "异常处理规范"
+  - "测试规范"
 tools:
   - "包管理：uv"
   - "类型验证：pydantic"
   - "测试框架：pytest"
 ---
 
-# Python 编程规范技术文档
+# Python 编程规范
 
-> 优先使用 `uv` 作为环境管理和包管理工具
+**优先使用 `uv` 进行环境管理和包管理**
 
 ## 编码规范
 
-### 命名规范
+**命名规范**：
 
-| 元素类型  | 命名风格      | 示例                              |
+| 类型      | 命名风格      | 示例                              |
 | --------- | ------------- | --------------------------------- |
 | 变量/函数 | 蛇形命名法    | `user_name`, `calculate_sum`      |
 | 类/异常   | 帕斯卡命名法  | `UserModel`, `ValidationError`    |
 | 常量      | 全大写+下划线 | `MAX_ATTEMPTS`, `DEFAULT_TIMEOUT` |
 | 模块/包   | 简短小写      | `utils`, `datamodel`              |
 
-### 代码格式
+**代码格式**：
 
-- **缩进**：使用 Tab
-- **空行**：函数/类定义间用 2 个空行分隔，类方法间用 1 个空行分隔
-- **括号**：避免冗余括号，仅在必要时使用
+- 缩进：Tab
+- 空行：函数/类间 2 空行，类方法间 1 空行
+- 括号：避免冗余，必要时使用
 
 ## 类型注解规范
 
-### 基础类型注解
+**类型注解**：
 
-函数参数和返回值必须明确标注类型：
+- 函数参数和返回值必须明确标注类型
+- 使用 `pydantic.Field` 添加描述和约束
 
-```python
-from typing import List, Dict
-from pydantic import Field
-
-
-async def process_data(
-		items: List[Dict[str, str]] = Field(description="要处理的数据列表"),
-		max_retries: int = Field(description="最大重试次数", default=3),
-) -> Dict[str, int]:
-	"""处理数据并返回统计结果"""
-	pass
-```
-
-### pydantic 模型
-
-使用 pydantic 定义复杂数据结构：
+**pydantic 模型**：
 
 ```python
 from pydantic import BaseModel, EmailStr, Field
 
-
 class User(BaseModel):
-	name: str = Field(description="姓名", min_length=2)
-	email: EmailStr = Field(description="邮箱")
-	age: int = Field(description="年龄", ge=0, le=150)
+    name: str = Field(description="姓名", min_length=2)
+    email: EmailStr = Field(description="邮箱")
+    age: int = Field(description="年龄", ge=0, le=150)
 ```
 
-## 函数参数与返回值规范
+**函数参数规范**：
 
-### 参数规范
+- 类型注解 + Field 描述 + 约束条件
+- docstring 详细说明返回值格式
 
-所有函数参数必须包含：
-
-- 类型注解
-- 使用 Field 的 description 说明
-- 必要时添加约束条件（如默认值、范围限制）
+**示例**：
 
 ```python
-from pydantic import Field
-
-
 async def search_api(
-		query: str = Field(description="搜索关键词"),
-		page_size: int = Field(description="每页结果数", default=10, ge=1, le=100,
-		include_details: bool = Field(description="是否包含详细信息", default=False,
+    query: str = Field(description="搜索关键词"),
+    page_size: int = Field(description="每页结果数", default=10, ge=1, le=100),
+    include_details: bool = Field(description="是否包含详细信息", default=False),
 ) -> list[dict[str, object]]:
-	"""调用API进行搜索"""
-	pass
-```
-
-### 返回值规范
-
-- 使用类型注解明确返回值结构
-- 在 docstring 中详细说明返回值格式
-
-```python
-from pydantic import Field
-
-
-async def get_user_profile(
-		user_id: str = Field(description="用户ID")
-	) -> dict[str, set[str, int, list[str]]]:
-	"""获取用户个人资料
-
-	Returns:
-		Dict with the following keys:
-		{
-			"id": 用户ID,
-			"name": 用户姓名,
-			"age": 用户年龄,
-			"roles": 用户角色列表
-		}
-	"""
-	pass
+    """调用API进行搜索"""
+    pass
 ```
 
 ## pydantic 最佳实践
 
 ### 模型定义
 
-````python
+```python
 from pydantic import BaseModel, Field, field_validator
 from typing import List, Optional
 
@@ -144,7 +97,8 @@ def check_tag_length(cls, value):
 	for tag in value:
 		if len(tag) > 20:
 			raise ValueError("标签长度不能超过20个字符")
-	return value```
+	return value
+```
 
 ### 数据验证
 
@@ -155,7 +109,7 @@ try:
 	product = Product(id="P001", name="手机", price=999.99, tags=["电子", "通讯"])
 except ValidationError as e:
 	print(e.json())
-````
+```
 
 ## 注释规范
 

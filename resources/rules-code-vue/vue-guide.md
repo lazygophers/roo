@@ -376,11 +376,25 @@ props: {
 为了实现局部作用域，Vue 会为组件的元素添加一个唯一的 `data` 属性（如 `data-v-f3f3eg9`）。然后，样式选择器会被修改，以确保它们只作用于带有这个特定属性的元素。相比类选择器（如 `.btn-close[data-v-f3f3eg9]`），大量的元素属性选择器（如 `button[data-v-f3f3eg9]`）会慢得多。
 
 ```vue
-&lt;!-- 不推荐 --&gt; &lt;template&gt; &lt;button&gt;×&lt;/button&gt;
-&lt;/template&gt; &lt;style scoped&gt; button { background-color: red; }
-&lt;/style&gt; &lt;!-- 推荐 --&gt; &lt;template&gt; &lt;button class="btn
-btn-close"&gt;×&lt;/button&gt; &lt;/template&gt; &lt;style scoped&gt; .btn-close
-{ background-color: red; } &lt;/style&gt;
+<!-- 不推荐 -->
+<template>
+  <button>×</button>
+</template>
+<style scoped>
+button {
+  background-color: red;
+}
+</style>
+
+<!-- 推荐 -->
+<template>
+  <button class="btn btn-close">×</button>
+</template>
+<style scoped>
+.btn-close {
+  background-color: red;
+}
+</style>
 ```
 
 ### D.3 避免隐式的父子组件通信

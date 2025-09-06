@@ -1,14 +1,14 @@
 ---
 name: markdown
 title: Markdown文档编写规范
-description: "AI系统通用的Markdown格式与风格指南，涵盖基本规范、内容元素、项目约定等完整规范"
+description: "AI系统通用的Markdown格式与风格指南，涵盖基本规范、内容元素和项目约定"
 category: documentation
 priority: high
 tags: [Markdown, 文档规范, 格式指南, 最佳实践]
 sections:
-  - "基本规范：标题、代码块、列表、链接"
-  - "内容元素：表格、图表（Mermaid）"
-  - "项目约定：文件标准、编码、换行"
+  - "基本规范"
+  - "内容元素"
+  - "项目约定"
 standards:
   - "编码：UTF-8"
   - "换行：LF（Unix风格）"
