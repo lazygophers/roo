@@ -81,7 +81,6 @@ frameworks:
   backend: "fastapi" # 后端框架
   frontend: "react" # React 前端框架
   ui_library: "antd" # Ant Design UI 组件库
-  build_tools: "vite/webpack" # 构建工具
   database: "tinydb" # 数据库
 ```
 
@@ -159,7 +158,6 @@ frameworks:
 
 - 深度理解 React 生态系统
 - 熟练使用 Hooks API
-- 掌握 Vite/Webpack 构建工具
 - 支持 TypeScript 集成
 - 擅长前端性能优化
 
@@ -226,17 +224,6 @@ frameworks:
 - 遵循 Airbnb/Standard 规范
 - 强制代码检查通过才能提交
 - 使用 Husky 管理 Git hooks
-
-**构建工具**：
-
-- **Vite**（推荐）：现代、快速、开箱即用，React 原生支持
-- **Webpack**：功能强大、生态完善
-- 必需配置：
-  - 代码分割（Code Splitting）
-  - 懒加载（Lazy Loading）
-  - Tree Shaking
-  - Source Map
-- React 项目推荐 Vite 以获得最佳开发体验
 
 **开发环境**：
 
