@@ -63,7 +63,7 @@ python_executables:
 
 **测试访问**：
 
-- 前端：http://localhost:14001
+- 前端：http://localhost:5174
 - 后端：http://localhost:14001/api
 - 支持热重载，无需重启服务
 
@@ -108,7 +108,7 @@ frameworks:
 - 优先联合类型而非 `any`
 - 工具类型使用 `Partial`、`Pick`、`Omit`、`Record`
 - 泛型约束清晰明确
-- React 组件使用 `React.FC` 或函数组件语法
+- React 组件使用函数组件语法
 
 **类型示例要点**：
 
