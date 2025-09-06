@@ -62,6 +62,7 @@ tags: [任务委派, 消息格式, 规范]
               lessons_learned?: [string]
           ```
       content_requirements:
+        - "作为 attempt_completion 工具的 result 字段标准"
         - "标准 YAML 格式，2 空格缩进"
         - "时间字段 ISO 8601 格式"
         - "任务状态枚举值: completed/failed/partial"
