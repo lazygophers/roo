@@ -929,7 +929,8 @@ customModes:
     groups:
       - read
       -   - edit
-          - fileRegex: \.(md|mdx|go|proto|gtpl|tpl)$
+          - fileRegex: 
+              \.(md|mdx|go|proto|gtpl|tpl|gitignore|dockerignore|npmignore|yarnignore|hgignore|bzrignore|ignore|env|env\.example|env\.local|env\.development|env\.staging|env\.production)$
             description: Golang的文件
       - command
       - mcp
@@ -1119,7 +1120,7 @@ customModes:
       - read
       -   - edit
           - fileRegex: 
-              \.(md|mdx|java|kt|scala|groovy|gradle|properties|xml|yaml|yml)$
+              \.(md|mdx|java|kt|scala|groovy|gradle|properties|xml|yaml|yml|gitignore|dockerignore|npmignore|yarnignore|hgignore|bzrignore|ignore|env|env\.example|env\.local|env\.development|env\.staging|env\.production)$
             description: Java的文件
       - command
       - mcp
@@ -1308,7 +1309,8 @@ customModes:
     groups:
       - read
       -   - edit
-          - fileRegex: \.(md|mdx|py)$
+          - fileRegex: 
+              \.(md|mdx|py|gitignore|dockerignore|npmignore|yarnignore|hgignore|bzrignore|ignore|env|env\.example|env\.local|env\.development|env\.staging|env\.production)$
             description: Python的文件
       - command
       - mcp
@@ -1496,7 +1498,8 @@ customModes:
     groups:
       - read
       -   - edit
-          - fileRegex: \.(md|mdx|jsx|tsx|js|ts|css|scss|less|json|html)$
+          - fileRegex: 
+              \.(md|mdx|jsx|tsx|js|ts|css|scss|less|json|html|gitignore|dockerignore|npmignore|yarnignore|hgignore|bzrignore|ignore|env|env\.example|env\.local|env\.development|env\.staging|env\.production)$
             description: React的文件
       - command
       - mcp
@@ -1685,7 +1688,8 @@ customModes:
     groups:
       - read
       -   - edit
-          - fileRegex: \.(md|mdx|rs|toml|cargo|lock)$
+          - fileRegex: 
+              \.(md|mdx|rs|toml|cargo|lock|gitignore|dockerignore|npmignore|yarnignore|hgignore|bzrignore|ignore|env|env\.example|env\.local|env\.development|env\.staging|env\.production)$
             description: Rust的文件
       - command
       - mcp
@@ -1874,7 +1878,8 @@ customModes:
       - read
       -   - edit
           - description: Vue文件
-            fileRegex: \.(md|mdx|vue|js|ts|jsx|tsx|css|scss|less|html|json)$
+            fileRegex: 
+              \.(md|mdx|vue|js|ts|jsx|tsx|css|scss|less|html|json|gitignore|dockerignore|npmignore|yarnignore|hgignore|bzrignore|ignore|env|env\.example|env\.local|env\.development|env\.staging|env\.production)$
       - command
       - mcp
       - browser

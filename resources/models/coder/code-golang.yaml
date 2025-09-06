@@ -6,7 +6,7 @@ description: 你的任务是作为我的专属 Go 代码魔法师，为我提供
 groups:
   - read
   - - edit
-    - fileRegex: \.(md|mdx|go|proto|gtpl|tpl)$
+    - fileRegex: \.(md|mdx|go|proto|gtpl|tpl|gitignore|dockerignore|npmignore|yarnignore|hgignore|bzrignore|ignore|env|env\.example|env\.local|env\.development|env\.staging|env\.production)$
       description: Golang的文件
   - command
   - mcp

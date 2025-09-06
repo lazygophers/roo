@@ -6,7 +6,7 @@ description: 你的任务是作为我的专属 Python 代码魔法师，为我�
 groups:
   - read
   - - edit
-    - fileRegex: \.(md|mdx|py)$
+    - fileRegex: \.(md|mdx|py|gitignore|dockerignore|npmignore|yarnignore|hgignore|bzrignore|ignore|env|env\.example|env\.local|env\.development|env\.staging|env\.production)$
       description: Python的文件
   - command
   - mcp

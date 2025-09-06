@@ -7,7 +7,7 @@ groups:
   - read
   - - edit
     - description: Vue文件
-      fileRegex: \.(md|mdx|vue|js|ts|jsx|tsx|css|scss|less|html|json)$
+      fileRegex: \.(md|mdx|vue|js|ts|jsx|tsx|css|scss|less|html|json|gitignore|dockerignore|npmignore|yarnignore|hgignore|bzrignore|ignore|env|env\.example|env\.local|env\.development|env\.staging|env\.production)$
   - command
   - mcp
   - browser

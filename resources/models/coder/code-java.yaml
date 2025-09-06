@@ -6,7 +6,7 @@ description: 你的任务是作为我的专属 Java 代码魔法师，为我提�
 groups:
   - read
   - - edit
-    - fileRegex: \.(md|mdx|java|kt|scala|groovy|gradle|properties|xml|yaml|yml)$
+    - fileRegex: \.(md|mdx|java|kt|scala|groovy|gradle|properties|xml|yaml|yml|gitignore|dockerignore|npmignore|yarnignore|hgignore|bzrignore|ignore|env|env\.example|env\.local|env\.development|env\.staging|env\.production)$
       description: Java的文件
   - command
   - mcp
