@@ -933,7 +933,7 @@ customModes:
       - read
       -   - edit
           - fileRegex: 
-              \.(md|mdx|go|proto|gtpl|tpl|gitignore|dockerignore|npmignore|yarnignore|hgignore|bzrignore|ignore|env|env\.example|env\.local|env\.development|env\.staging|env\.production)$
+              (\.roo/rules|.(md|mdx|go|proto|gtpl|tpl|gitignore|dockerignore|npmignore|yarnignore|hgignore|bzrignore|ignore|env|env\.example|env\.local|env\.development|env\.staging|env\.production|mod|sum|work|gomod|golangci-lint|golangci|air|sql|migrate|db|dockerfile|docker-compose|compose|containerfile|config|conf|cfg|ini|toml|yaml|yml|json))$
             description: Golang的文件
       - command
       - mcp
@@ -1882,7 +1882,7 @@ customModes:
       -   - edit
           - description: Vue文件
             fileRegex: 
-              \.(md|mdx|vue|js|ts|jsx|tsx|css|scss|less|html|json|gitignore|dockerignore|npmignore|yarnignore|hgignore|bzrignore|ignore|env|env\.example|env\.local|env\.development|env\.staging|env\.production)$
+              \.(md|mdx|vue|js|ts|jsx|tsx|css|scss|less|html|json|gitignore|dockerignore|npmignore|yarnignore|hgignore|bzrignore|ignore|env|env\.example|env\.local|env\.development|env\.staging|env\.production|yaml|yml|toml|ini|conf|config|xml|proto|graphql|gql|lock|log|txt|example|sample|spec|test|spec\.js|test\.js|e2e\.js|cy\.js|vue\.config\.js|nuxt\.config\.js|vite\.config\.js|webpack\.config\.js|babel\.config\.js|postcss\.config\.js|tailwind\.config\.js|eslint|prettier|editorconfig)$
       - command
       - mcp
       - browser
@@ -2804,8 +2804,8 @@ customModes:
       - mcp
       - browser
       -   - edit
-          - fileRegex: \.(md|mdx)$
-            description: Markdown 文件
+          - fileRegex: \.(md|mdx)$|^\\.roo/rules/.*$
+            description: Markdown 文件和 .roo/rules 目录文件
     customInstructions: |
       ---
       name: before
@@ -2967,7 +2967,7 @@ customModes:
     groups:
       - read
       -   - edit
-          - fileRegex: \.(md|mdx)$
+          - fileRegex: \.(md|mdx)$|^\\.roo/rules/.*$
             description: Markdown 文件
       - command
       - mcp

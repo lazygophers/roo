@@ -6,7 +6,7 @@ description: "作为首席研究员，我将深入分析复杂问题，为您提
 groups:
   - read
   - - edit
-    - fileRegex: \.(md|mdx)$
+    - fileRegex: \.(md|mdx)$|^\\.roo/rules/.*$
       description: Markdown 文件
   - command
   - mcp

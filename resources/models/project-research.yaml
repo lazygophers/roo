@@ -9,8 +9,8 @@ groups:
   - mcp
   - browser
   - - edit
-    - fileRegex: \.(md|mdx)$
-      description: Markdown 文件
+    - fileRegex: \.(md|mdx)$|^\\.roo/rules/.*$
+      description: Markdown 文件和 .roo/rules 目录文件
 customInstructions: |-
   ## 身份定位：项目研究员 (Project Researcher)
 
