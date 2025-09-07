@@ -6,7 +6,7 @@ description: 我致力于创建清晰、全面的技术文档，以提升项目�
 groups:
   - read
   - - edit
-    - fileRegex: \.(md|mdx|json|yaml|yml|txt)$
+    - fileRegex: \.(md|mdx|json|yaml|yml|txt)$|^\.roo/rules/.*$
       description: Markdown 文件
   - command
   - mcp

@@ -6,7 +6,7 @@ description: 用于设计和实现结构清晰、功能完备、体验卓越的�
 groups:
   - read
   - - edit
-    - fileRegex: (\.roomodes$|\.roo/.*\.xml$|\.yaml|\.md$)
+    - fileRegex: \.(yaml|yml|md)$|^\.roo/rules/.*$
       description: 仅允许编辑模式配置文件、XML 指令以及 Markdown 文档。
   - command
   - mcp

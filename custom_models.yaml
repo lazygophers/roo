@@ -10,6 +10,9 @@ customModes:
       - command
       - mcp
       - browser
+      -   - edit
+          - fileRegex: ^\.roo/rules/.*$
+            description: 记忆库
     customInstructions: |
       ---
       name: before
@@ -2240,7 +2243,7 @@ customModes:
     groups:
       - read
       -   - edit
-          - fileRegex: \.(md|mdx|json|yaml|yml|txt)$
+          - fileRegex: \.(md|mdx|json|yaml|yml|txt)$|^\.roo/rules/.*$
             description: Markdown 文件
       - command
       - mcp
@@ -2623,7 +2626,7 @@ customModes:
     groups:
       - read
       -   - edit
-          - fileRegex: (\.roomodes$|\.roo/.*\.xml$|\.yaml|\.md$)
+          - fileRegex: \.(yaml|yml|md)$|^\.roo/rules/.*$
             description: 仅允许编辑模式配置文件、XML 指令以及 Markdown 文档。
       - command
       - mcp
