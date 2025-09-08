@@ -9,7 +9,7 @@ groups:
   - mcp
   - browser
   - - edit
-    - fileRegex: ^\.roo/rules/.*$
+    - fileRegex: ^\.roo/rules/memory-.*$
       description: 记忆库
 customInstructions: |-
   # 🧠 Brain 工作流程指南
