@@ -1,12 +1,11 @@
 ---
 name: task
-title: 任务 ID 生成规范
-description: "定义任务 ID 的格式规范、管理要求和使用指南"
+title: 任务管理
 category: rule
 tags: [任务ID, 规范, 管理]
 ---
 
-# 任务 ID 生成规范
+# 任务管理
 
 ## ID 格式规范
 
