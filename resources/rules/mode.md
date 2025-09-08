@@ -232,8 +232,9 @@ orchestrator → researcher → code-python → doc-writer
    - 编程开发 → 进入下一步
 
 3. **选择编程语言**：主要使用什么技术栈？
+   - Golang → `code-golang`
    - Python → `code-python`
-   - React/TypeScript → `code-react`
+   - React → `code-react`
    - Java → `code-java`
    - Rust → `code-rust`
    - Vue → `code-vue`
