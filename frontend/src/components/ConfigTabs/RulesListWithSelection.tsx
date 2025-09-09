@@ -11,7 +11,8 @@ import {
   Checkbox,
   Button,
   Row,
-  Col
+  Col,
+  theme
 } from 'antd';
 import { 
   BookOutlined, 
@@ -37,6 +38,7 @@ const RulesListWithSelection: React.FC<RulesListProps> = ({
   onSelectAll,
   onClearSelection
 }) => {
+  const { token } = theme.useToken();
   const [rules, setRules] = useState<FileMetadata[]>([]);
   const [loading, setLoading] = useState(true);
   const [directories, setDirectories] = useState<any[]>([]);
@@ -200,8 +202,15 @@ const RulesListWithSelection: React.FC<RulesListProps> = ({
                   style={{ 
                     width: '100%', 
                     cursor: 'pointer',
-                    border: isItemSelected ? '2px solid #1890ff' : '1px solid #d9d9d9',
-                    backgroundColor: isItemSelected ? '#f6ffed' : '#fff'
+                    border: isItemSelected 
+                      ? `2px solid ${token.colorPrimary}` 
+                      : `1px solid ${token.colorBorder}`,
+                    backgroundColor: isItemSelected 
+                      ? token.colorBgContainer 
+                      : token.colorBgContainer,
+                    boxShadow: isItemSelected 
+                      ? `0 0 0 2px ${token.colorPrimary}20` 
+                      : 'none'
                   }}
                   styles={{ body: { padding: '12px 16px' } }}
                 >
@@ -214,7 +223,7 @@ const RulesListWithSelection: React.FC<RulesListProps> = ({
                     </div>
                     <div style={{ flex: 1 }}>
                       <List.Item.Meta
-                        avatar={<BookOutlined style={{ fontSize: 16, color: '#722ed1' }} />}
+                        avatar={<BookOutlined style={{ fontSize: 16, color: token.colorPrimary }} />}
                         title={
                           <Space>
                             <span style={{ fontWeight: 'bold' }}>
@@ -242,7 +251,7 @@ const RulesListWithSelection: React.FC<RulesListProps> = ({
                             {rule.description && (
                               <Paragraph 
                                 ellipsis={{ rows: 2, expandable: false }}
-                                style={{ marginBottom: 8, fontSize: 13, color: '#666' }}
+                                style={{ marginBottom: 8, fontSize: 13, color: token.colorTextSecondary }}
                               >
                                 {rule.description}
                               </Paragraph>
@@ -291,7 +300,7 @@ const RulesListWithSelection: React.FC<RulesListProps> = ({
 
                             {/* 文件信息 */}
                             <div style={{ marginTop: 8 }}>
-                              <Space size="large" style={{ fontSize: 11, color: '#999' }}>
+                              <Space size="large" style={{ fontSize: 11, color: token.colorTextTertiary }}>
                                 <Space>
                                   <FolderOutlined />
                                   <Text type="secondary">
