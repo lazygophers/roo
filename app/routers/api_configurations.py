@@ -12,7 +12,7 @@ from app.core.database_service import get_database_service
 router = APIRouter()
 
 @router.post(
-    "/configurations/save",
+    "/config/save",
     response_model=ConfigurationResponse,
     summary="保存配置",
     description="保存用户选择的配置信息，支持覆盖保存"
@@ -75,7 +75,7 @@ async def save_configuration(request: SaveConfigurationRequest) -> Configuration
 
 
 @router.post(
-    "/configurations/list",
+    "/config/list",
     response_model=ConfigurationListResponse,
     summary="获取配置列表",
     description="获取所有已保存的配置信息"
@@ -110,7 +110,7 @@ async def get_configurations() -> ConfigurationListResponse:
 
 
 @router.delete(
-    "/configurations/{config_name}",
+    "/config/{config_name}",
     response_model=ConfigurationResponse,
     summary="删除配置",
     description="删除指定名称的配置"
@@ -148,7 +148,7 @@ async def delete_configuration(config_name: str) -> ConfigurationResponse:
 
 
 @router.get(
-    "/configurations/{config_name}",
+    "/config/{config_name}",
     response_model=ConfigurationResponse,
     summary="获取单个配置",
     description="根据名称获取指定配置的详细信息"

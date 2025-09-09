@@ -137,25 +137,25 @@ export const apiClient = {
     modelRules: Record<string, any[]>;
     overwrite?: boolean;
   }) => {
-    const response = await api.post('/configurations/save', configData);
+    const response = await api.post('/config/save', configData);
     return response.data;
   },
 
   // 获取配置列表
   getConfigurations: async () => {
-    const response = await api.post('/configurations/list');
+    const response = await api.post('/config/list');
     return response.data;
   },
 
   // 获取单个配置
   getConfiguration: async (name: string) => {
-    const response = await api.get(`/configurations/${name}`);
+    const response = await api.get(`/config/${name}`);
     return response.data;
   },
 
   // 删除配置
   deleteConfiguration: async (name: string) => {
-    const response = await api.delete(`/configurations/${name}`);
+    const response = await api.delete(`/config/${name}`);
     return response.data;
   }
 };

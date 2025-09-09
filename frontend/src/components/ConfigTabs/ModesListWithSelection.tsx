@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   List, 
   Card, 
@@ -59,10 +59,34 @@ const ModesListWithSelection: React.FC<ModesListProps> = ({
   const [modelRules, setModelRules] = useState<Record<string, FileMetadata[]>>({});
   const [loadingRules, setLoadingRules] = useState<Record<string, boolean>>({});
   const [expandedModels, setExpandedModels] = useState<Set<string>>(new Set());
+  const modelRulesRef = useRef<Record<string, FileMetadata[]>>({});
 
   useEffect(() => {
     loadModels();
   }, []);
+
+  // 同步 modelRules 到 ref
+  useEffect(() => {
+    modelRulesRef.current = modelRules;
+  }, [modelRules]);
+
+  // 初始化时设置 orchestrator 模式默认展开
+  useEffect(() => {
+    if (models.length > 0) {
+      const orchestratorModel = models.find(model => model.slug === 'orchestrator');
+      if (orchestratorModel) {
+        setExpandedModels(prev => {
+          const newSet = new Set(prev);
+          newSet.add('orchestrator');
+          return newSet;
+        });
+        // 如果 orchestrator 还未加载规则，则加载
+        if (!modelRules['orchestrator'] && !loadingRules['orchestrator']) {
+          forceExpandModel('orchestrator');
+        }
+      }
+    }
+  }, [models]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // 当模型加载完成后，自动选择 orchestrator 模型
   useEffect(() => {
@@ -76,8 +100,7 @@ const ModesListWithSelection: React.FC<ModesListProps> = ({
           data: orchestratorModel
         };
         onToggleSelection(orchestratorItem);
-        // 自动展开并加载关联规则
-        handleModelExpand(orchestratorModel.slug);
+        // orchestrator 已在上面的 useEffect 中设置为展开状态，这里不需要再次调用 handleModelExpand
       }
     }
   }, [models]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -288,28 +311,98 @@ const ModesListWithSelection: React.FC<ModesListProps> = ({
     return bindings.includes(rulePath);
   };
 
-  // 模式slug到规则slug的映射关系
-  const getModelRuleSlug = (modelSlug: string): string | null => {
-    // 模式和对应的规则目录映射
-    const modelRuleMapping: Record<string, string> = {
-      'architect': 'rules-code-architect', // 对应 rules-code-architect 目录
-      'orchestrator': 'rules-orchestrator', // 对应 rules-orchestrator 目录
-      'ask': 'rules-ask', // 对应 rules-ask 目录
-      'code-python': 'rules-code-python',
-      'code-golang': 'rules-code-golang', 
-      'code-java': 'rules-code-java',
-      'code-react': 'rules-code-react',
-      'code-rust': 'rules-code-rust',
-      'code-vue': 'rules-code-vue',
-      'debug': 'rules-debug',
-      'doc-writer': 'rules-doc-writer',
-      'memory': 'rules-memory',
-      'project-research': 'rules-project-research'
-    };
+  // 模式slug到规则slug的映射关系 - 根据slug层级查找规则目录
+  const getModelRuleSlug = (modelSlug: string): string[] => {
+    // 将 slug 按 '-' 分割，生成层级结构的规则目录名称
+    const parts = modelSlug.split('-');
+    const ruleSlugs: string[] = [];
     
-    return modelRuleMapping[modelSlug] || null;
+    // 添加基础的 rules 目录
+    ruleSlugs.push('rules');
+    
+    // 逐级构建规则目录名称
+    let currentPath = 'rules';
+    for (const part of parts) {
+      if (part) { // 忽略空字符串
+        currentPath += `-${part}`;
+        ruleSlugs.push(currentPath);
+      }
+    }
+    
+    return ruleSlugs;
   };
 
+  // 加载模型规则的独立函数
+  const loadModelRules = async (modelSlug: string) => {
+    const ruleSlugs = getModelRuleSlug(modelSlug);
+    
+    if (ruleSlugs.length === 0) {
+      setModelRules(prev => ({ ...prev, [modelSlug]: [] }));
+      return;
+    }
+    
+    setLoadingRules(prev => ({ ...prev, [modelSlug]: true }));
+    
+    try {
+      const allRules: FileMetadata[] = [];
+      const ruleSlugResults: string[] = [];
+      
+      for (const ruleSlug of ruleSlugs) {
+        try {
+          const response = await apiClient.getRulesBySlug(ruleSlug);
+          if (response.data && response.data.length > 0) {
+            allRules.push(...response.data);
+            ruleSlugResults.push(ruleSlug);
+          }
+        } catch (error: any) {
+          console.debug(`Rule directory ${ruleSlug} not found for model ${modelSlug}, continuing...`);
+        }
+      }
+      
+      const uniqueRules = allRules.filter((rule, index, self) => 
+        index === self.findIndex(r => r.file_path === rule.file_path)
+      );
+      
+      setModelRules(prev => ({ ...prev, [modelSlug]: uniqueRules }));
+      
+      if (onUpdateModelRules) {
+        onUpdateModelRules(modelSlug, uniqueRules);
+      }
+      
+      if (ruleSlugResults.length > 0) {
+        console.log(`Loaded rules for model ${modelSlug} from directories: ${ruleSlugResults.join(', ')}`);
+      }
+    } catch (error: any) {
+      console.warn(`Failed to load rules for model ${modelSlug}:`, error);
+      const emptyRules: FileMetadata[] = [];
+      setModelRules(prev => ({ ...prev, [modelSlug]: emptyRules }));
+      
+      if (onUpdateModelRules) {
+        onUpdateModelRules(modelSlug, emptyRules);
+      }
+    } finally {
+      setLoadingRules(prev => ({ ...prev, [modelSlug]: false }));
+    }
+  };
+
+  // 强制展开模型（不包含 toggle 逻辑）
+  const forceExpandModel = async (modelSlug: string) => {
+    console.log(`Force expanding model: ${modelSlug}`);
+    const newExpandedModels = new Set(expandedModels);
+    newExpandedModels.add(modelSlug);
+    setExpandedModels(newExpandedModels);
+    console.log(`Expanded models after force expand:`, Array.from(newExpandedModels));
+    
+    // 如果还没有加载过这个模式的规则，则加载
+    if (!modelRules[modelSlug] && !loadingRules[modelSlug]) {
+      console.log(`Loading rules for model: ${modelSlug}`);
+      await loadModelRules(modelSlug);
+    } else {
+      console.log(`Rules already loaded for model: ${modelSlug}`);
+    }
+  };
+
+  // 切换模型展开状态（用于用户点击）
   const handleModelExpand = async (modelSlug: string) => {
     const newExpandedModels = new Set(expandedModels);
     
@@ -324,55 +417,57 @@ const ModesListWithSelection: React.FC<ModesListProps> = ({
     
     // 如果还没有加载过这个模式的规则，则加载
     if (!modelRules[modelSlug] && !loadingRules[modelSlug]) {
-      const ruleSlug = getModelRuleSlug(modelSlug);
-      
-      if (!ruleSlug) {
-        // 没有对应的规则目录
-        setModelRules(prev => ({ ...prev, [modelSlug]: [] }));
-        return;
-      }
-      
-      setLoadingRules(prev => ({ ...prev, [modelSlug]: true }));
-      
-      try {
-        // 使用现有的 getRulesBySlug API 获取对应规则目录的内容
-        const response = await apiClient.getRulesBySlug(ruleSlug);
-        const rules = response.data;
-        setModelRules(prev => ({ ...prev, [modelSlug]: rules }));
-        
-        // 通知父组件更新模式规则详细信息
-        if (onUpdateModelRules) {
-          onUpdateModelRules(modelSlug, rules);
-        }
-      } catch (error: any) {
-        console.warn(`Failed to load rules for model ${modelSlug} (rule slug: ${ruleSlug}):`, error);
-        const emptyRules: FileMetadata[] = [];
-        setModelRules(prev => ({ ...prev, [modelSlug]: emptyRules }));
-        
-        // 通知父组件空规则列表
-        if (onUpdateModelRules) {
-          onUpdateModelRules(modelSlug, emptyRules);
-        }
-        
-        if (error.response?.status === 404) {
-          message.info(`模式 "${modelSlug}" 对应的规则目录 "${ruleSlug}" 不存在`);
-        } else {
-          message.error(`加载模式 "${modelSlug}" 的关联规则失败`);
-        }
-      } finally {
-        setLoadingRules(prev => ({ ...prev, [modelSlug]: false }));
-      }
+      await loadModelRules(modelSlug);
     }
   };
 
-  const handleSelectAllVisible = () => {
+  const handleSelectAllVisible = async () => {
+    console.log('handleSelectAllVisible called');
     const visibleItems: SelectedItem[] = filteredModels.map(model => ({
       id: model.slug,
       type: 'model',
       name: model.name,
       data: model
     }));
+    console.log('Visible items:', visibleItems.map(item => item.id));
     onSelectAll(visibleItems);
+    
+    // 获取需要新展开的模型
+    const modelsToExpand = filteredModels.filter(model => 
+      !selectedItems.some(item => item.id === model.slug && item.type === 'model')
+    );
+    console.log('Models to expand:', modelsToExpand.map(model => model.slug));
+    console.log('Current expanded models:', Array.from(expandedModels));
+    
+    if (modelsToExpand.length > 0) {
+      message.info(`正在展开并加载 ${modelsToExpand.length} 个模型的关联规则...`);
+      
+      // 使用 Promise.all 并行处理所有模型的展开
+      const expandPromises = modelsToExpand.map(async (model) => {
+        console.log(`Processing model for expand: ${model.slug}`);
+        // 强制展开模型并加载规则
+        await forceExpandModel(model.slug);
+        
+        // 等待一段时间确保规则加载完成后再选择规则
+        return new Promise<void>((resolve) => {
+          setTimeout(() => {
+            const associatedRules = modelRulesRef.current[model.slug] || [];
+            console.log(`Auto-selecting ${associatedRules.length} rules for model: ${model.slug}`);
+            console.log(`Rules for ${model.slug}:`, associatedRules.map(r => r.name || r.file_path));
+            associatedRules.forEach(rule => {
+              if (!isRuleSelectedForModel(rule.file_path, model.slug)) {
+                onModelRuleBinding(model.slug, rule.file_path, true);
+              }
+            });
+            resolve();
+          }, 300);
+        });
+      });
+      
+      // 等待所有模型展开完成
+      await Promise.all(expandPromises);
+      console.log('All models expanded and rules selected');
+    }
   };
 
   const selectedModelCount = selectedItems.filter(item => item.type === 'model').length;

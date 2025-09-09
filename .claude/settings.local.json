@@ -10,7 +10,10 @@
       "Bash(curl:*)",
       "Bash(ALL_PROXY=\"\" curl -s http://localhost:8001/api/database/status)",
       "Bash(pkill:*)",
-      "Bash(lsof:*)"
+      "Bash(lsof:*)",
+      "mcp__ide__getDiagnostics",
+      "Bash(ALL_PROXY=\"\" curl -s http://localhost:8000/openapi.json)",
+      "Bash(python:*)"
     ],
     "deny": [],
     "ask": []
