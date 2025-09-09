@@ -14,6 +14,8 @@ const ThemeToggle: React.FC = () => {
   // 创建主题预览小圆点
   const ThemePreview: React.FC<{ name: ThemeName }> = ({ name }) => {
     const themeConfig = themeRegistry[name];
+    if (!themeConfig) return null;
+    
     return (
       <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
         <div style={{
@@ -29,26 +31,31 @@ const ThemeToggle: React.FC = () => {
 
   // 分组主题
   const themeGroups = {
-    基础主题: ['light', 'dark', 'compactDark'],
-    蓝色系列: ['blue', 'blueDark'],
-    绿色系列: ['green', 'greenDark'], 
-    紫色系列: ['purple', 'purpleDark'],
+    雾霭系列: ['morningMist', 'nightRain'],
+    桃花系列: ['peachBlossom', 'plumRain'],
+    溪水系列: ['streamFlow', 'deepSeaMoon'],
+    竹林系列: ['bambooForest', 'greenMountain'],
   };
 
   const menuItems: MenuProps['items'] = Object.entries(themeGroups).map(([groupName, themes]) => ({
     key: groupName,
     label: groupName,
     type: 'group',
-    children: themes.map((name) => ({
-      key: name,
-      label: (
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', minWidth: 160 }}>
-          <span>{themeRegistry[name as ThemeName].description}</span>
-          <ThemePreview name={name as ThemeName} />
-        </div>
-      ),
-      onClick: () => setThemeType(name as ThemeName),
-    })),
+    children: themes.map((name) => {
+      const themeConfig = themeRegistry[name as ThemeName];
+      if (!themeConfig) return null;
+      
+      return {
+        key: name,
+        label: (
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', minWidth: 160 }}>
+            <span>{themeConfig.description}</span>
+            <ThemePreview name={name as ThemeName} />
+          </div>
+        ),
+        onClick: () => setThemeType(name as ThemeName),
+      };
+    }).filter(Boolean),
   }));
 
   return (
@@ -67,7 +74,7 @@ const ThemeToggle: React.FC = () => {
         }}
       >
         <Space>
-          {currentTheme.description}
+          {currentTheme?.description || '主题'}
           <DownOutlined style={{ fontSize: 10 }} />
         </Space>
       </Button>

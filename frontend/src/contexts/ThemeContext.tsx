@@ -16,10 +16,12 @@ interface ThemeProviderProps {
 export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   const [themeType, setThemeTypeState] = useState<ThemeName>(() => {
     const saved = localStorage.getItem('theme-type');
-    return (saved as ThemeName) || 'dark'; // 默认深色模式
+    const defaultTheme = (saved as ThemeName) || 'nightRain'; // 默认夜雨如诗深色模式
+    // 确保主题存在，否则使用第一个可用主题
+    return themeRegistry[defaultTheme] ? defaultTheme : Object.keys(themeRegistry)[0] as ThemeName;
   });
 
-  const currentTheme = themeRegistry[themeType];
+  const currentTheme = themeRegistry[themeType] || themeRegistry[Object.keys(themeRegistry)[0] as ThemeName];
 
   // 更新主题类型
   const setThemeType = (newTheme: ThemeName) => {
@@ -28,8 +30,8 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   };
 
   // 根据主题判断是否为深色模式
-  const isDark = themeType === 'dark' || themeType === 'compactDark' || 
-                 themeType === 'blueDark' || themeType === 'greenDark' || themeType === 'purpleDark';
+  const isDark = themeType === 'nightRain' || themeType === 'plumRain' || 
+                 themeType === 'deepSeaMoon' || themeType === 'greenMountain';
 
   // 更新body类名以支持全局样式
   useEffect(() => {
