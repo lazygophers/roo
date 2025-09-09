@@ -68,6 +68,25 @@ const ConfigManagementWithSelection: React.FC = () => {
     // 这里可以实现具体的导出逻辑
   };
 
+  // 加载配置并应用到当前选择
+  const handleLoadConfiguration = (config: any) => {
+    // 清除当前选择
+    setSelectedItems([]);
+    setModelRuleBindings([]);
+    setModelRules({});
+    
+    // 应用配置数据
+    if (config.selectedItems) {
+      setSelectedItems(config.selectedItems);
+    }
+    if (config.modelRuleBindings) {
+      setModelRuleBindings(config.modelRuleBindings);
+    }
+    if (config.modelRules) {
+      setModelRules(config.modelRules);
+    }
+  };
+
   // 处理模式-规则绑定关系
   const handleModelRuleBinding = (modelId: string, ruleId: string, selected: boolean) => {
     setModelRuleBindings(prev => {
@@ -178,6 +197,7 @@ const ConfigManagementWithSelection: React.FC = () => {
         onExport={handleExport}
         modelRuleBindings={modelRuleBindings}
         modelRules={modelRules}
+        onLoadConfiguration={handleLoadConfiguration}
       />
 
       <Row gutter={16} style={{ height: 'calc(100% - 80px)' }}>
