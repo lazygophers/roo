@@ -66,6 +66,24 @@ const ModesListWithSelection: React.FC<ModesListProps> = ({
     loadModels();
   }, []);
 
+  // 当模型加载完成后，自动选择 orchestrator 模型
+  useEffect(() => {
+    if (models.length > 0) {
+      const orchestratorModel = models.find(model => model.slug === 'orchestrator');
+      if (orchestratorModel && !isSelected('orchestrator')) {
+        const orchestratorItem: SelectedItem = {
+          id: orchestratorModel.slug,
+          type: 'model',
+          name: orchestratorModel.name,
+          data: orchestratorModel
+        };
+        onToggleSelection(orchestratorItem);
+        // 自动展开并加载关联规则
+        handleModelExpand(orchestratorModel.slug);
+      }
+    }
+  }, [models]); // eslint-disable-line react-hooks/exhaustive-deps
+
   useEffect(() => {
     filterModels();
   }, [models, searchText, categoryFilter]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -104,6 +122,19 @@ const ModesListWithSelection: React.FC<ModesListProps> = ({
       );
     }
 
+    // 排序：参考 merge.py 的排序逻辑
+    // 'orchestrator' 类型的模型优先级最高，其他的按 slug 字母顺序排列
+    filtered.sort((a, b) => {
+      if (a.slug === "orchestrator" && b.slug !== "orchestrator") {
+        return -1; // a 排在前面
+      }
+      if (b.slug === "orchestrator" && a.slug !== "orchestrator") {
+        return 1; // b 排在前面
+      }
+      // 两者都是或都不是 orchestrator，按 slug 字母顺序排序
+      return a.slug.localeCompare(b.slug);
+    });
+
     setFilteredModels(filtered);
   };
 
@@ -123,7 +154,17 @@ const ModesListWithSelection: React.FC<ModesListProps> = ({
     return selectedItems.some(item => item.id === modelSlug && item.type === 'model');
   };
 
+  // 检查是否为必选模型（不可取消）
+  const isRequiredModel = (modelSlug: string) => {
+    return modelSlug === 'orchestrator';
+  };
+
   const handleToggleSelection = (model: ModelInfo) => {
+    // 如果是必选模型且已经选中，阻止取消选择
+    if (isRequiredModel(model.slug) && isSelected(model.slug)) {
+      return;
+    }
+    
     const selectedItem: SelectedItem = {
       id: model.slug,
       type: 'model',
@@ -341,6 +382,7 @@ const ModesListWithSelection: React.FC<ModesListProps> = ({
                     <div style={{ marginRight: 12, marginTop: 4 }}>
                       <Checkbox 
                         checked={isItemSelected}
+                        disabled={isRequiredModel(model.slug) && isItemSelected}
                         onChange={() => handleToggleSelection(model)}
                       />
                     </div>
@@ -353,6 +395,11 @@ const ModesListWithSelection: React.FC<ModesListProps> = ({
                             <Tag color={getGroupColor(model.groups)}>
                               {model.groups.includes('core') ? 'Core' : 'Coder'}
                             </Tag>
+                            {isRequiredModel(model.slug) && (
+                              <Tag color="volcano">
+                                必选
+                              </Tag>
+                            )}
                             {isItemSelected && (
                               <Tag color="success" icon={<CheckOutlined />}>
                                 已选择
@@ -376,7 +423,10 @@ const ModesListWithSelection: React.FC<ModesListProps> = ({
                                 type="secondary" 
                                 style={{ fontSize: 11, marginLeft: 8 }}
                               >
-                                点击选择/取消
+                                {isRequiredModel(model.slug) 
+                                  ? (isItemSelected ? '必选模型（已选择）' : '点击选择（必选）')
+                                  : '点击选择/取消'
+                                }
                               </Text>
                             </div>
                           </div>

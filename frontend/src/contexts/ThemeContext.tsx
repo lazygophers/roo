@@ -16,7 +16,7 @@ interface ThemeProviderProps {
 export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   const [themeType, setThemeTypeState] = useState<ThemeName>(() => {
     const saved = localStorage.getItem('theme-type');
-    const defaultTheme = (saved as ThemeName) || 'nightRain'; // 默认夜雨如诗深色模式
+    const defaultTheme = (saved as ThemeName) || 'deepSeaMoon'; // 默认深海月色深色模式
     // 确保主题存在，否则使用第一个可用主题
     return themeRegistry[defaultTheme] ? defaultTheme : Object.keys(themeRegistry)[0] as ThemeName;
   });

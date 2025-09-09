@@ -24,7 +24,14 @@ const ConfigManagementWithSelection: React.FC = () => {
       selectedItem => selectedItem.id === item.id && selectedItem.type === item.type
     );
     
+    // 检查是否为必选模型
+    const isRequiredModel = item.type === 'model' && item.id === 'orchestrator';
+    
     if (existingIndex >= 0) {
+      // 如果是必选模型，不允许移除
+      if (isRequiredModel) {
+        return;
+      }
       // 已选择，移除
       setSelectedItems(selectedItems.filter((_, index) => index !== existingIndex));
     } else {
@@ -48,7 +55,11 @@ const ConfigManagementWithSelection: React.FC = () => {
   };
 
   const handleClearSelection = () => {
-    setSelectedItems([]);
+    // 清空选择时保留必选模型
+    const requiredItems = selectedItems.filter(item => 
+      item.type === 'model' && item.id === 'orchestrator'
+    );
+    setSelectedItems(requiredItems);
   };
 
   const handleExport = () => {
