@@ -630,7 +630,7 @@ const ModesListWithSelection: React.FC<ModesListProps> = ({
                           该模式没有关联规则
                         </Text>
                       ) : (
-                        <div style={{ maxHeight: '200px', overflowY: 'auto' }}>
+                        <div>
                           {associatedRules.map((rule) => {
                             const ruleSelected = isRuleSelectedForModel(rule.file_path, model.slug);
                             return (
