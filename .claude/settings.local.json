@@ -4,7 +4,13 @@
       "Bash(find:*)",
       "Bash(yarn tsc:*)",
       "Bash(npm start)",
-      "Bash(npm run build:*)"
+      "Bash(npm run build:*)",
+      "Bash(uv sync:*)",
+      "Bash(uv run:*)",
+      "Bash(curl:*)",
+      "Bash(ALL_PROXY=\"\" curl -s http://localhost:8001/api/database/status)",
+      "Bash(pkill:*)",
+      "Bash(lsof:*)"
     ],
     "deny": [],
     "ask": []
