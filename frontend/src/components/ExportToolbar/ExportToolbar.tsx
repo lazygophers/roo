@@ -12,7 +12,8 @@ import {
   Modal,
   Form,
   Input,
-  Checkbox
+  Checkbox,
+  theme
 } from 'antd';
 import { 
   DownloadOutlined, 
@@ -42,6 +43,7 @@ const ExportToolbar: React.FC<ExportToolbarProps> = ({
   modelRuleBindings,
   modelRules
 }) => {
+  const { token } = theme.useToken();
   const [saveModalVisible, setSaveModalVisible] = useState(false);
   const [saveLoading, setSaveLoading] = useState(false);
   const [form] = Form.useForm();
@@ -184,7 +186,7 @@ const ExportToolbar: React.FC<ExportToolbarProps> = ({
 
       {/* 选中项详情（当有选择时显示） */}
       {totalCount > 0 && (
-        <div style={{ marginTop: 12, paddingTop: 12, borderTop: '1px solid #f0f0f0' }}>
+        <div style={{ marginTop: 12, paddingTop: 12, borderTop: `1px solid ${token.colorBorderSecondary}` }}>
           <Text type="secondary" style={{ fontSize: 12 }}>
             选中的项目将被导出为配置文件，包含所有相关的元数据信息
           </Text>
@@ -265,8 +267,9 @@ const ExportToolbar: React.FC<ExportToolbarProps> = ({
           <div style={{ 
             marginTop: 16, 
             padding: 12, 
-            backgroundColor: '#f5f5f5', 
-            borderRadius: 6 
+            backgroundColor: token.colorFillAlter, 
+            borderRadius: 6,
+            border: `1px solid ${token.colorBorderSecondary}`
           }}>
             <Text type="secondary" style={{ fontSize: 12 }}>
               <strong>将要保存的内容：</strong>

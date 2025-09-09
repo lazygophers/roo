@@ -82,6 +82,20 @@ const ModesListWithSelection: React.FC<ModesListProps> = ({
     }
   }, [models]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // 当 orchestrator 模式的规则加载完成后，自动选择所有规则
+  useEffect(() => {
+    const orchestratorRules = modelRules['orchestrator'];
+    if (orchestratorRules && orchestratorRules.length > 0 && isSelected('orchestrator')) {
+      // 检查是否已有规则绑定，如果没有则自动选择所有规则
+      const currentBindings = getModelRuleBindings('orchestrator');
+      if (currentBindings.length === 0) {
+        orchestratorRules.forEach(rule => {
+          onModelRuleBinding('orchestrator', rule.file_path, true);
+        });
+      }
+    }
+  }, [modelRules, selectedItems]); // eslint-disable-line react-hooks/exhaustive-deps
+
   useEffect(() => {
     filterModels();
   }, [models, searchText, categoryFilter]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -177,12 +191,30 @@ const ModesListWithSelection: React.FC<ModesListProps> = ({
     if (!currentlySelected) {
       // 从未选中变为选中，自动展开并加载关联规则
       handleModelExpand(model.slug);
+      
+      // 自动选择该模式下的所有规则
+      setTimeout(() => {
+        const associatedRules = modelRules[model.slug] || [];
+        associatedRules.forEach(rule => {
+          if (!isRuleSelectedForModel(rule.file_path, model.slug)) {
+            onModelRuleBinding(model.slug, rule.file_path, true);
+          }
+        });
+      }, 100); // 延迟执行确保模式选择状态已更新
     } else {
-      // 从选中变为未选中，自动收起
+      // 从选中变为未选中，自动收起，并取消选择所有关联规则
       setExpandedModels(prev => {
         const newSet = new Set(prev);
         newSet.delete(model.slug);
         return newSet;
+      });
+      
+      // 取消选择该模式下的所有规则
+      const associatedRules = modelRules[model.slug] || [];
+      associatedRules.forEach(rule => {
+        if (isRuleSelectedForModel(rule.file_path, model.slug)) {
+          onModelRuleBinding(model.slug, rule.file_path, false);
+        }
       });
     }
   };
