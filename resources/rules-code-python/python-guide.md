@@ -1,186 +1,74 @@
 ---
 name: python-guide
 title: Python编程规范指南
-description: "Python编程规范和最佳实践，包含编码规范、类型注解、pydantic模型、函数规范和测试指南"
+description: "Python开发规范和最佳实践"
 category: language-guide
 language: python
 priority: high
-tags: [Python, 编程规范, uv, pydantic, 类型注解]
-sections:
-  - "编码规范"
-  - "类型注解规范"
-  - "函数参数与返回值规范"
-  - "pydantic最佳实践"
-  - "注释规范"
-  - "异常处理规范"
-  - "测试规范"
-tools:
-  - "包管理：uv"
-  - "类型验证：pydantic"
-  - "测试框架：pytest"
+tags: [Python, uv, pydantic, 类型注解]
 ---
 
 # Python 编程规范
 
-**优先使用 `uv` 进行环境管理和包管理**
+## 🔧 工具栈
+- **包管理**: `uv` (优先使用)
+- **类型验证**: `pydantic` 
+- **测试**: `pytest`
 
-## 编码规范
+## 📝 命名规范
+| 类型 | 规范 | 示例 |
+|------|------|------|
+| 变量/函数 | 蛇形 | `user_name`, `get_data` |
+| 类/异常 | 帕斯卡 | `UserModel`, `ApiError` |
+| 常量 | 大写+下划线 | `MAX_SIZE`, `API_URL` |
 
-**命名规范**：
-
-| 类型      | 命名风格      | 示例                              |
-| --------- | ------------- | --------------------------------- |
-| 变量/函数 | 蛇形命名法    | `user_name`, `calculate_sum`      |
-| 类/异常   | 帕斯卡命名法  | `UserModel`, `ValidationError`    |
-| 常量      | 全大写+下划线 | `MAX_ATTEMPTS`, `DEFAULT_TIMEOUT` |
-| 模块/包   | 简短小写      | `utils`, `datamodel`              |
-
-**代码格式**：
-
-- 缩进：Tab
-- 空行：函数/类间 2 空行，类方法间 1 空行
-- 括号：避免冗余，必要时使用
-
-## 类型注解规范
-
-**类型注解**：
-
-- 函数参数和返回值必须明确标注类型
-- 使用 `pydantic.Field` 添加描述和约束
-
-**pydantic 模型**：
+## 🏷️ 类型注解要求
+- **必须**: 函数参数和返回值明确注解
+- **Field描述**: 使用`pydantic.Field`添加描述和约束
 
 ```python
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, Field
 
 class User(BaseModel):
     name: str = Field(description="姓名", min_length=2)
-    email: EmailStr = Field(description="邮箱")
     age: int = Field(description="年龄", ge=0, le=150)
-```
 
-**函数参数规范**：
-
-- 类型注解 + Field 描述 + 约束条件
-- docstring 详细说明返回值格式
-
-**示例**：
-
-```python
 async def search_api(
     query: str = Field(description="搜索关键词"),
-    page_size: int = Field(description="每页结果数", default=10, ge=1, le=100),
-    include_details: bool = Field(description="是否包含详细信息", default=False),
-) -> list[dict[str, object]]:
-    """调用API进行搜索"""
+    limit: int = Field(description="结果限制", default=10, ge=1, le=100)
+) -> list[dict]:
+    """API搜索接口"""
     pass
 ```
 
-## pydantic 最佳实践
-
-### 模型定义
-
-```python
-from pydantic import BaseModel, Field, field_validator
-from typing import List, Optional
-
-
-class Product(BaseModel):
-	id: str = Field(description="产品ID")
-	name: str = Field(description="产品名称", min_length=2)
-	price: float = Field(description="产品价格", gt=0)
-	tags: Optional[List[str]] = Field(description="产品标签", default=[])
-
-
-@field_validator("tags")
-def check_tag_length(cls, value):
-	for tag in value:
-		if len(tag) > 20:
-			raise ValueError("标签长度不能超过20个字符")
-	return value
-```
-
-### 数据验证
-
-```python
-from pydantic import ValidationError
-
-try:
-	product = Product(id="P001", name="手机", price=999.99, tags=["电子", "通讯"])
-except ValidationError as e:
-	print(e.json())
-```
-
-## 注释规范
-
-### 文档字符串（Docstrings）
-
-使用 Google 风格的 docstring：
-
-```python
-from typing import List
-
-from pydantic import Field
-
-async def calculate_statistics(
-		data: List[float] = Field(description="要计算的数据集"),
-		method: str = Field(description="计算方法", default="mean", enum=["mean", "median", "std"]),
-) -> float:
-	"""计算数据集的统计量
-
-	Args:
-		data: 包含数值的列表
-		method: 计算方法，可选值为'mean'(均值)、'median'(中位数)、'std'(标准差)
-
-	Returns:
-		计算得到的统计值
-
-	Raises:
-		ValueError: 当数据集为空或方法无效时
-	"""
-	if not data:
-		raise ValueError("数据集不能为空")
-# 计算逻辑...
-```
-
-## 异常处理规范
-
-- **避免空 except 块**：
-
-```python
-try:
-	result = api_call()
-except APIError as e:
-	print(f"API调用失败: {e}")
-	raise
-```
-
-- **自定义异常**：
-  class InvalidParameterError(Exception):
-  """参数无效异常"""
-
-## 测试规范
-
-- 使用`pytest`框架编写单元测试
-- 测试文件命名：`test_<module>.py`
+## 🧪 测试规范
+- **框架**: pytest
+- **文件命名**: `test_*.py`
 
 ```python
 import pytest
 from pydantic import ValidationError
 
-def test_product_validation():
-	product = Product(id="P001", name="电脑", price=4999.0)
-	assert product.name == "电脑"
-	assert product.price > 0
-
-def test_invalid_product():
-	with pytest.raises(ValidationError):
-		Product(id="P002", name="A", price=-100)
+def test_user_validation():
+    user = User(name="张三", age=25)
+    assert user.name == "张三"
+    
+def test_invalid_user():
+    with pytest.raises(ValidationError):
+        User(name="A", age=-1)
 ```
 
-## 代码审查指南
+## ⚠️ 异常处理
+```python
+try:
+    result = api_call()
+except ApiError as e:
+    logger.error(f"API失败: {e}")
+    raise
+```
 
-- 检查所有函数参数是否有明确的类型和描述
-- 验证 pydantic 模型是否包含必要的约束条件
-- 确保 docstring 完整且准确
-- 检查依赖管理是否规范
+## ✅ 代码检查要点
+- 函数参数有类型注解和Field描述
+- pydantic模型包含约束条件  
+- 使用uv管理依赖
+- 编写对应测试

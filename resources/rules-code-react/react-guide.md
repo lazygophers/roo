@@ -1,88 +1,87 @@
 ---
 name: react-guide
-title: React风格指南
-description: "React风格指南，基于Airbnb黄金标准，涵盖命名规范、文件结构、Props使用、State与Hooks等最佳实践"
+title: React开发规范指南
+description: "React开发规范和最佳实践"
 category: language-guide
 language: react
 priority: high
-tags: [React, JSX, 风格指南, 最佳实践, Airbnb]
-sections:
-  - "命名规范"
-  - "文件结构"
-  - "Props使用"
-  - "State与Hooks"
-references:
-  - "Airbnb React/JSX Style Guide"
-note: "基于Airbnb黄金标准，Google无官方React风格指南"
+tags: [React, TypeScript, JSX]
 ---
 
-# React 风格指南
+# React 开发规范
 
-本指南旨在总结业界公认的 React 最佳实践与风格指南。虽然 Google 没有发布官方的 React 风格指南，但 Airbnb 的 React/JSX 风格指南已成为社区广泛采纳的黄金标准。
+## 🔧 技术栈
+- **框架**: React 18+, Next.js
+- **语言**: TypeScript
+- **状态**: Redux Toolkit, Zustand
+- **样式**: Tailwind CSS, styled-components
 
-[TOC]
+## 📝 命名规范
+| 类型 | 规范 | 示例 |
+|------|------|------|
+| 组件文件 | PascalCase + .tsx | `UserCard.tsx` |
+| 组件名 | PascalCase | `UserCard` |
+| Props接口 | PascalCase + Props | `UserCardProps` |
+| Hooks | use + camelCase | `useUserData` |
 
-## 1. 命名规范 (Naming Conventions)
+## 📁 文件结构
+```
+/components
+└── /UserCard
+    ├── UserCard.tsx
+    ├── UserCard.module.css
+    └── UserCard.test.tsx
+```
 
-| 类别         | 规则                                                                   | 示例                                                                                             |
-| ------------ | ---------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
-| **文件**     | 使用帕斯卡命名法 (`PascalCase`) 和 `.jsx` (或 `.tsx`) 扩展名。         | `MyComponent.jsx`                                                                                |
-| **组件**     | 组件名称应与文件名一致，并使用 `PascalCase`。                          | `function MyComponent() { ... }`                                                                 |
-| **引用**     | React 组件引用使用 `PascalCase`，其实例使用 `camelCase`。              | `const myComponentInstance = <MyComponent />;`                                                   |
-| **高阶组件** | HOC 名称应由 `hocName(WrappedComponent)` 组合而成。                    | `const withSubscription = (WrappedComponent) => { ... }`                                         |
-| **Props**    | 避免使用 DOM 元素的原生属性名（如 `style`, `className`）用于其他目的。 | **Good**: `<MyComponent representationStyle={...} />`<br/>**Bad**: `<MyComponent style={...} />` |
+## 🏷️ TypeScript接口定义
+```tsx
+interface UserCardProps {
+    user: User;
+    onEdit?: () => void;
+    isLoading?: boolean;
+    className?: string;
+}
 
----
+const UserCard: React.FC<UserCardProps> = ({ 
+    user, 
+    onEdit, 
+    isLoading = false,
+    className 
+}) => {
+    return <div className={className}>...</div>;
+};
+```
 
-## 2. 文件结构 (File Structure)
+## 🔄 Hooks使用
+```tsx
+// 自定义Hook
+const useUserData = (userId: string) => {
+    const [user, setUser] = useState<User | null>(null);
+    const [loading, setLoading] = useState(true);
+    
+    useEffect(() => {
+        fetchUser(userId).then(setUser).finally(() => setLoading(false));
+    }, [userId]);
+    
+    return { user, loading };
+};
+```
 
-- **单一组件原则**: 每个文件只导出一个 React 组件。
-  > 这使得组件更易于查找、阅读和测试。
-- **目录组织**: 将组件、其样式文件和测试文件放在同一个目录中。
-  ```
-  /components
-  └── /MyComponent
-      ├── MyComponent.jsx
-      ├── MyComponent.module.css
-      └── MyComponent.test.js
-  ```
+## 🧪 测试规范
+```tsx
+import { render, screen } from '@testing-library/react';
+import UserCard from './UserCard';
 
----
+test('renders user name', () => {
+    const user = { name: '张三', email: 'zhang@example.com' };
+    render(<UserCard user={user} />);
+    expect(screen.getByText('张三')).toBeInTheDocument();
+});
+```
 
-## 3. Props 使用规范
-
-- **布尔属性简写**: 值为 `true` 时省略值
-  ```jsx
-  // Bad
-  <MyComponent isVisible={true} />
-  // Good
-  <MyComponent isVisible />
-  ```
-
-- **默认 Props**: 使用 ES6 默认参数
-  ```jsx
-  function MyComponent({ name = 'Guest' }) {
-    return <div>Hello, {name}</div>;
-  }
-  ```
-
-- **Props 展开**: 展开放在最后以保证可读性
-  ```jsx
-  // Bad
-  <MyComponent {...props} name="override" />
-  // Good
-  <MyComponent name="override" {...props} />
-  ```
-
----
-
-## 4. State 与 Hooks 使用规范
-
-- **优先使用函数组件与 Hooks**: 除非需要类组件特有的生命周期方法（现代 React 中已很少见），否则应始终使用函数组件和 Hooks。
-- **`useState`**: 用于管理简单的组件内部状态。
-
-  ```jsx
-  import React, { useState } from 'react';
-
-  function Counter
-  ```
+## ✅ 核心要求
+- 使用TypeScript定义Props接口
+- 组件命名与文件名一致
+- 每个文件只导出一个组件
+- 自定义Hook以use开头
+- 编写对应测试文件
