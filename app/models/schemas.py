@@ -100,3 +100,53 @@ class CommandsResponse(BaseModel):
     message: str
     data: List[FileMetadata]
     total: int
+
+
+class SelectedItem(BaseModel):
+    """选中项数据结构"""
+    id: str
+    type: str  # 'model', 'command', 'rule'
+    name: str
+    data: Dict[str, Any]
+
+
+class ModelRuleBinding(BaseModel):
+    """模型-规则绑定关系数据结构"""
+    modelId: str
+    selectedRuleIds: List[str]
+
+
+class ConfigurationData(BaseModel):
+    """配置数据结构"""
+    name: str
+    description: Optional[str] = None
+    selectedItems: List[SelectedItem]
+    modelRuleBindings: List[ModelRuleBinding]
+    modelRules: Dict[str, List[Dict[str, Any]]]
+    created_at: Optional[str] = None
+    updated_at: Optional[str] = None
+
+
+class SaveConfigurationRequest(BaseModel):
+    """保存配置请求数据结构"""
+    name: str
+    description: Optional[str] = None
+    selectedItems: List[SelectedItem]
+    modelRuleBindings: List[ModelRuleBinding]
+    modelRules: Dict[str, List[Dict[str, Any]]]
+    overwrite: bool = False
+
+
+class ConfigurationResponse(BaseModel):
+    """配置响应数据结构"""
+    success: bool
+    message: str
+    data: Optional[ConfigurationData] = None
+
+
+class ConfigurationListResponse(BaseModel):
+    """配置列表响应数据结构"""
+    success: bool
+    message: str
+    data: List[ConfigurationData]
+    total: int

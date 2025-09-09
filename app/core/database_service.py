@@ -365,6 +365,50 @@ class DatabaseService:
         
         return status
     
+    def add_cached_data(self, table_name: str, data: Dict[str, Any]) -> bool:
+        """添加缓存数据到指定表"""
+        try:
+            table = self.db.table(table_name)
+            table.insert(data)
+            logger.info(f"Data added to table '{table_name}': {data.get('name', 'unnamed')}")
+            return True
+        except Exception as e:
+            logger.error(f"Failed to add data to table '{table_name}': {e}")
+            return False
+    
+    def update_cached_data(self, table_name: str, key: str, data: Dict[str, Any]) -> bool:
+        """更新缓存数据"""
+        try:
+            table = self.db.table(table_name)
+            Query_obj = Query()
+            table.update(data, Query_obj.name == key)
+            logger.info(f"Data updated in table '{table_name}': {key}")
+            return True
+        except Exception as e:
+            logger.error(f"Failed to update data in table '{table_name}': {e}")
+            return False
+    
+    def remove_cached_data(self, table_name: str, key: str) -> bool:
+        """删除缓存数据"""
+        try:
+            table = self.db.table(table_name)
+            Query_obj = Query()
+            table.remove(Query_obj.name == key)
+            logger.info(f"Data removed from table '{table_name}': {key}")
+            return True
+        except Exception as e:
+            logger.error(f"Failed to remove data from table '{table_name}': {e}")
+            return False
+    
+    def get_cached_data_by_table(self, table_name: str) -> List[Dict[str, Any]]:
+        """获取指定表的所有数据"""
+        try:
+            table = self.db.table(table_name)
+            return table.all()
+        except Exception as e:
+            logger.error(f"Failed to get data from table '{table_name}': {e}")
+            return []
+    
     def close(self):
         """关闭数据库连接"""
         self.stop_watching()

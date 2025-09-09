@@ -176,6 +176,8 @@ const ConfigManagementWithSelection: React.FC = () => {
         selectedItems={selectedItems}
         onClearSelection={handleClearSelectionWithBindings}
         onExport={handleExport}
+        modelRuleBindings={modelRuleBindings}
+        modelRules={modelRules}
       />
 
       <Row gutter={16} style={{ height: 'calc(100% - 80px)' }}>

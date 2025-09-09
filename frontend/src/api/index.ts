@@ -126,6 +126,37 @@ export const apiClient = {
   getAllHooks: async () => {
     const response = await api.post('/hooks');
     return response.data;
+  },
+
+  // 保存配置
+  saveConfiguration: async (configData: {
+    name: string;
+    description?: string;
+    selectedItems: any[];
+    modelRuleBindings: any[];
+    modelRules: Record<string, any[]>;
+    overwrite?: boolean;
+  }) => {
+    const response = await api.post('/configurations/save', configData);
+    return response.data;
+  },
+
+  // 获取配置列表
+  getConfigurations: async () => {
+    const response = await api.post('/configurations/list');
+    return response.data;
+  },
+
+  // 获取单个配置
+  getConfiguration: async (name: string) => {
+    const response = await api.get(`/configurations/${name}`);
+    return response.data;
+  },
+
+  // 删除配置
+  deleteConfiguration: async (name: string) => {
+    const response = await api.delete(`/configurations/${name}`);
+    return response.data;
   }
 };
 

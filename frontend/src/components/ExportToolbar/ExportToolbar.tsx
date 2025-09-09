@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { 
   Card, 
   Button, 
@@ -8,16 +8,22 @@ import {
   Divider, 
   Row, 
   Col, 
-  message 
+  message,
+  Modal,
+  Form,
+  Input,
+  Checkbox
 } from 'antd';
 import { 
   DownloadOutlined, 
   ClearOutlined, 
   CodeOutlined,
   FileTextOutlined,
-  BookOutlined
+  BookOutlined,
+  SaveOutlined
 } from '@ant-design/icons';
-import { SelectedItem } from '../../types/selection';
+import { SelectedItem, ModelRuleBinding } from '../../types/selection';
+import { apiClient, FileMetadata } from '../../api';
 
 const { Text } = Typography;
 
@@ -25,13 +31,20 @@ interface ExportToolbarProps {
   selectedItems: SelectedItem[];
   onClearSelection: () => void;
   onExport: () => void;
+  modelRuleBindings: ModelRuleBinding[];
+  modelRules: Record<string, FileMetadata[]>;
 }
 
 const ExportToolbar: React.FC<ExportToolbarProps> = ({
   selectedItems,
   onClearSelection,
-  onExport
+  onExport,
+  modelRuleBindings,
+  modelRules
 }) => {
+  const [saveModalVisible, setSaveModalVisible] = useState(false);
+  const [saveLoading, setSaveLoading] = useState(false);
+  const [form] = Form.useForm();
   const modelCount = selectedItems.filter(item => item.type === 'model').length;
   const commandCount = selectedItems.filter(item => item.type === 'command').length;
   const ruleCount = selectedItems.filter(item => item.type === 'rule').length;
@@ -46,6 +59,53 @@ const ExportToolbar: React.FC<ExportToolbarProps> = ({
     // 这里暂不实现具体的导出逻辑，只显示提示
     message.info(`准备导出 ${totalCount} 个项目（模拟功能）`);
     onExport();
+  };
+
+  const handleSaveConfiguration = () => {
+    if (totalCount === 0) {
+      message.warning('请先选择要保存的项目');
+      return;
+    }
+    setSaveModalVisible(true);
+  };
+
+  const handleSaveModalCancel = () => {
+    setSaveModalVisible(false);
+    form.resetFields();
+  };
+
+  const handleSaveModalOk = async () => {
+    try {
+      const values = await form.validateFields();
+      setSaveLoading(true);
+
+      const configData = {
+        name: values.name,
+        description: values.description || '',
+        selectedItems: selectedItems,
+        modelRuleBindings: modelRuleBindings,
+        modelRules: modelRules,
+        overwrite: values.overwrite || false
+      };
+
+      const result = await apiClient.saveConfiguration(configData);
+      
+      if (result.success) {
+        message.success(result.message);
+        setSaveModalVisible(false);
+        form.resetFields();
+      } else {
+        message.error(result.message || '保存配置失败');
+      }
+    } catch (error: any) {
+      if (error.response?.status === 409) {
+        message.error('配置名称已存在，请启用覆盖选项或使用其他名称');
+      } else {
+        message.error('保存配置失败: ' + (error.message || '未知错误'));
+      }
+    } finally {
+      setSaveLoading(false);
+    }
   };
 
   return (
@@ -102,6 +162,15 @@ const ExportToolbar: React.FC<ExportToolbarProps> = ({
             
             <Button
               size="small"
+              icon={<SaveOutlined />}
+              onClick={handleSaveConfiguration}
+              disabled={totalCount === 0}
+            >
+              保存配置
+            </Button>
+            
+            <Button
+              size="small"
               type="primary"
               icon={<DownloadOutlined />}
               onClick={handleExport}
@@ -147,6 +216,88 @@ const ExportToolbar: React.FC<ExportToolbarProps> = ({
           </div>
         </div>
       )}
+
+      {/* 保存配置对话框 */}
+      <Modal
+        title="保存配置"
+        open={saveModalVisible}
+        onOk={handleSaveModalOk}
+        onCancel={handleSaveModalCancel}
+        confirmLoading={saveLoading}
+        width={500}
+      >
+        <Form
+          form={form}
+          layout="vertical"
+          initialValues={{ overwrite: false }}
+        >
+          <Form.Item
+            name="name"
+            label="配置名称"
+            rules={[
+              { required: true, message: '请输入配置名称' },
+              { min: 2, message: '配置名称至少2个字符' },
+              { max: 50, message: '配置名称不能超过50个字符' }
+            ]}
+          >
+            <Input placeholder="请输入配置名称，例如：我的开发配置" />
+          </Form.Item>
+
+          <Form.Item
+            name="description"
+            label="配置描述"
+          >
+            <Input.TextArea 
+              placeholder="请输入配置描述（可选）" 
+              rows={3}
+              showCount
+              maxLength={200}
+            />
+          </Form.Item>
+
+          <Form.Item
+            name="overwrite"
+            valuePropName="checked"
+          >
+            <Checkbox>如果配置名称已存在，允许覆盖</Checkbox>
+          </Form.Item>
+
+          <div style={{ 
+            marginTop: 16, 
+            padding: 12, 
+            backgroundColor: '#f5f5f5', 
+            borderRadius: 6 
+          }}>
+            <Text type="secondary" style={{ fontSize: 12 }}>
+              <strong>将要保存的内容：</strong>
+            </Text>
+            <div style={{ marginTop: 4 }}>
+              <Space wrap size="small">
+                {modelCount > 0 && (
+                  <Tag color="green">
+                    {modelCount} 个模型
+                  </Tag>
+                )}
+                {commandCount > 0 && (
+                  <Tag color="blue">
+                    {commandCount} 个指令
+                  </Tag>
+                )}
+                {ruleCount > 0 && (
+                  <Tag color="purple">
+                    {ruleCount} 个规则
+                  </Tag>
+                )}
+                {modelRuleBindings.length > 0 && (
+                  <Tag color="orange">
+                    {modelRuleBindings.length} 个模型-规则绑定
+                  </Tag>
+                )}
+              </Space>
+            </div>
+          </div>
+        </Form>
+      </Modal>
     </Card>
   );
 };
