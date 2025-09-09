@@ -92,3 +92,11 @@ class ModelBySlugRequest(BaseModel):
 class RulesRequest(BaseModel):
     """Rules API POST 请求数据结构"""
     slug: str
+
+
+class CommandsResponse(BaseModel):
+    """Commands API 响应数据结构"""
+    success: bool
+    message: str
+    data: List[FileMetadata]
+    total: int
