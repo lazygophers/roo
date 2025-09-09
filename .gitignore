@@ -10,3 +10,5 @@ update.sh
 app/frontend/node_modules/
 data/
 logs/
+.claude
+.gitignore

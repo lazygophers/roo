@@ -4,7 +4,7 @@ from app.core.hooks_service import HooksService
 
 router = APIRouter()
 
-@router.get(
+@router.post(
     "/hooks/before",
     response_model=HookResponse,
     summary="获取 Before Hook",
@@ -31,7 +31,7 @@ async def get_before_hook() -> HookResponse:
         )
 
 
-@router.get(
+@router.post(
     "/hooks/after",
     response_model=HookResponse,
     summary="获取 After Hook",
@@ -58,7 +58,7 @@ async def get_after_hook() -> HookResponse:
         )
 
 
-@router.get(
+@router.post(
     "/hooks",
     summary="获取所有 Hooks 信息",
     description="获取 before.md 和 after.md 两个文件的信息"

@@ -1,21 +1,17 @@
 from typing import List, Optional
-from fastapi import APIRouter, HTTPException, Query
-from app.models.schemas import ModelsResponse, ErrorResponse, ModelInfo
+from fastapi import APIRouter, HTTPException
+from app.models.schemas import ModelsResponse, ErrorResponse, ModelInfo, ModelsRequest, ModelBySlugRequest
 from app.core.yaml_service import YAMLService
 
 router = APIRouter()
 
-@router.get(
+@router.post(
     "/models", 
     response_model=ModelsResponse,
     summary="获取所有模型信息",
     description="获取 resources/models 目录及其子目录下的所有 YAML 文件信息，排除 customInstructions 字段"
 )
-async def get_models(
-    slug: Optional[str] = Query(None, description="按 slug 过滤模型"),
-    category: Optional[str] = Query(None, description="按分类过滤模型 (coder/core)"),
-    search: Optional[str] = Query(None, description="在 name 和 description 中搜索关键词")
-) -> ModelsResponse:
+async def get_models(request: ModelsRequest = ModelsRequest()) -> ModelsResponse:
     """获取所有模型信息"""
     try:
         # 加载所有模型数据
@@ -25,19 +21,19 @@ async def get_models(
         filtered_models = models
         
         # 按 slug 过滤
-        if slug:
-            filtered_models = [m for m in filtered_models if m.slug == slug]
+        if request.slug:
+            filtered_models = [m for m in filtered_models if m.slug == request.slug]
         
         # 按分类过滤 (基于文件路径)
-        if category:
-            if category == "coder":
+        if request.category:
+            if request.category == "coder":
                 filtered_models = [m for m in filtered_models if "/coder/" in m.file_path]
-            elif category == "core":
+            elif request.category == "core":
                 filtered_models = [m for m in filtered_models if "/coder/" not in m.file_path]
         
         # 按关键词搜索
-        if search:
-            search_lower = search.lower()
+        if request.search:
+            search_lower = request.search.lower()
             filtered_models = [
                 m for m in filtered_models 
                 if search_lower in m.name.lower() or search_lower in m.description.lower()
@@ -57,25 +53,25 @@ async def get_models(
         )
 
 
-@router.get(
-    "/models/{slug}",
+@router.post(
+    "/models/by-slug",
     response_model=ModelInfo,
     summary="获取单个模型信息",
     description="根据 slug 获取指定模型的详细信息"
 )
-async def get_model_by_slug(slug: str) -> ModelInfo:
+async def get_model_by_slug(request: ModelBySlugRequest) -> ModelInfo:
     """根据 slug 获取单个模型信息"""
     try:
         models = YAMLService.load_all_models()
         
         # 查找匹配的模型
         for model in models:
-            if model.slug == slug:
+            if model.slug == request.slug:
                 return model
         
         raise HTTPException(
             status_code=404,
-            detail=f"Model with slug '{slug}' not found"
+            detail=f"Model with slug '{request.slug}' not found"
         )
         
     except HTTPException:
@@ -87,7 +83,7 @@ async def get_model_by_slug(slug: str) -> ModelInfo:
         )
 
 
-@router.get(
+@router.post(
     "/models/categories/list",
     summary="获取所有模型分类",
     description="获取可用的模型分类列表"

@@ -74,3 +74,21 @@ class RulesResponse(BaseModel):
     found_directories: List[str]
     data: List[FileMetadata]
     total: int
+
+
+# POST 请求数据模型
+class ModelsRequest(BaseModel):
+    """Models API POST 请求数据结构"""
+    slug: Optional[str] = None
+    category: Optional[str] = None
+    search: Optional[str] = None
+
+
+class ModelBySlugRequest(BaseModel):
+    """根据 slug 获取单个模型的请求数据结构"""
+    slug: str
+
+
+class RulesRequest(BaseModel):
+    """Rules API POST 请求数据结构"""
+    slug: str
