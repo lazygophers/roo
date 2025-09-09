@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Row, Col, Tabs, TabsProps } from 'antd';
+import { Row, Col, Tabs, TabsProps, theme } from 'antd';
 import { CodeOutlined, FileTextOutlined, BookOutlined } from '@ant-design/icons';
 import ModesListWithSelection from '../components/ConfigTabs/ModesListWithSelection';
 import CommandsListWithSelection from '../components/ConfigTabs/CommandsListWithSelection';
@@ -10,6 +10,7 @@ import { SelectedItem, ModelRuleBinding } from '../types/selection';
 import { FileMetadata } from '../api';
 
 const ConfigManagementWithSelection: React.FC = () => {
+  const { token } = theme.useToken();
   const [selectedItems, setSelectedItems] = useState<SelectedItem[]>([]);
   const [modelRuleBindings, setModelRuleBindings] = useState<ModelRuleBinding[]>([]);
   const [modelRules, setModelRules] = useState<Record<string, FileMetadata[]>>({});
@@ -171,9 +172,9 @@ const ConfigManagementWithSelection: React.FC = () => {
         <Col span={10} style={{ height: '100%' }}>
           <div style={{ 
             height: '100%', 
-            border: '1px solid #d9d9d9', 
+            border: `1px solid ${token.colorBorder}`, 
             borderRadius: '8px',
-            backgroundColor: '#fff'
+            backgroundColor: token.colorBgContainer
           }}>
             <Tabs
               defaultActiveKey="models"

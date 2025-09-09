@@ -1,7 +1,8 @@
 import React from 'react';
-import { Layout, Menu, theme } from 'antd';
+import { Layout, Menu, theme, Space } from 'antd';
 import { HomeOutlined, SettingOutlined } from '@ant-design/icons';
 import { useNavigate, useLocation } from 'react-router-dom';
+import ThemeToggle from '../Theme/ThemeToggle';
 
 const { Header, Content, Sider } = Layout;
 
@@ -69,9 +70,14 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
             padding: '0 24px', 
             fontSize: '18px', 
             fontWeight: 'bold',
-            color: '#1890ff'
+            color: '#1890ff',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            height: '100%'
           }}>
-            Roo Models 配置管理系统
+            <span>Roo Models 配置管理系统</span>
+            <ThemeToggle />
           </div>
         </Header>
         <Content style={{ margin: '24px 16px 0', overflow: 'initial' }}>

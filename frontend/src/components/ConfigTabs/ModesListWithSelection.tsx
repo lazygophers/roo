@@ -14,7 +14,8 @@ import {
   Checkbox,
   Button,
   Collapse,
-  Divider
+  Divider,
+  theme
 } from 'antd';
 import { 
   CodeOutlined, 
@@ -53,6 +54,7 @@ const ModesListWithSelection: React.FC<ModesListProps> = ({
   getModelRuleBindings,
   onUpdateModelRules
 }) => {
+  const { token } = theme.useToken();
   const [models, setModels] = useState<ModelInfo[]>([]);
   const [filteredModels, setFilteredModels] = useState<ModelInfo[]>([]);
   const [loading, setLoading] = useState(true);
@@ -321,8 +323,15 @@ const ModesListWithSelection: React.FC<ModesListProps> = ({
                   size="small"
                   style={{ 
                     width: '100%',
-                    border: isItemSelected ? '2px solid #1890ff' : '1px solid #d9d9d9',
-                    backgroundColor: isItemSelected ? '#f6ffed' : '#fff'
+                    border: isItemSelected 
+                      ? `2px solid ${token.colorPrimary}` 
+                      : `1px solid ${token.colorBorder}`,
+                    backgroundColor: isItemSelected 
+                      ? token.colorBgContainer 
+                      : token.colorBgContainer,
+                    boxShadow: isItemSelected 
+                      ? `0 0 0 2px ${token.colorPrimary}20` 
+                      : 'none'
                   }}
                   styles={{ body: { padding: '12px 16px' } }}
                 >
@@ -425,9 +434,13 @@ const ModesListWithSelection: React.FC<ModesListProps> = ({
                                 key={rule.file_path}
                                 style={{
                                   padding: '6px 8px',
-                                  border: ruleSelected ? '1px solid #1890ff' : '1px solid #f0f0f0',
+                                  border: ruleSelected 
+                                    ? `1px solid ${token.colorPrimary}` 
+                                    : `1px solid ${token.colorBorderSecondary}`,
                                   borderRadius: '4px',
-                                  backgroundColor: ruleSelected ? '#f6ffed' : '#fafafa',
+                                  backgroundColor: ruleSelected 
+                                    ? token.colorFillSecondary
+                                    : token.colorFillTertiary,
                                   marginBottom: '4px',
                                   cursor: 'pointer',
                                   display: 'flex',

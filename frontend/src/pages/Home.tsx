@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Statistic, Row, Col, Typography, List, Tag, Space, message } from 'antd';
+import { Card, Statistic, Row, Col, Typography, List, Tag, Space, message, theme } from 'antd';
 import { 
   CodeOutlined, 
   FileTextOutlined, 
@@ -11,6 +11,7 @@ import { apiClient, ModelInfo } from '../api';
 const { Title, Paragraph } = Typography;
 
 const Home: React.FC = () => {
+  const { token } = theme.useToken();
   const [stats, setStats] = useState({
     totalModels: 0,
     coderModels: 0,
@@ -177,10 +178,10 @@ const Home: React.FC = () => {
           >
             <div style={{ textAlign: 'center' }}>
               <div style={{ marginBottom: 16 }}>
-                <Title level={4} style={{ margin: 0, color: '#1890ff' }}>
+                <Title level={4} style={{ margin: 0, color: token.colorPrimary }}>
                   {stats.totalModels}
                 </Title>
-                <div style={{ color: '#666', fontSize: 14 }}>总配置项</div>
+                <div style={{ color: token.colorTextSecondary, fontSize: 14 }}>总配置项</div>
               </div>
               
               <Row gutter={16}>
@@ -189,7 +190,7 @@ const Home: React.FC = () => {
                     <div style={{ fontSize: 20, fontWeight: 'bold', color: '#52c41a' }}>
                       {stats.commands}
                     </div>
-                    <div style={{ fontSize: 12, color: '#999' }}>指令</div>
+                    <div style={{ fontSize: 12, color: token.colorTextTertiary }}>指令</div>
                   </div>
                 </Col>
                 <Col span={12}>
@@ -197,7 +198,7 @@ const Home: React.FC = () => {
                     <div style={{ fontSize: 20, fontWeight: 'bold', color: '#fa8c16' }}>
                       {stats.rules}
                     </div>
-                    <div style={{ fontSize: 12, color: '#999' }}>规则目录</div>
+                    <div style={{ fontSize: 12, color: token.colorTextTertiary }}>规则目录</div>
                   </div>
                 </Col>
               </Row>
@@ -205,10 +206,11 @@ const Home: React.FC = () => {
               <div style={{ 
                 marginTop: 16, 
                 padding: 12, 
-                backgroundColor: '#f0f2f5', 
-                borderRadius: 6 
+                backgroundColor: token.colorFillSecondary, 
+                borderRadius: 6,
+                border: `1px solid ${token.colorBorderSecondary}`
               }}>
-                <div style={{ fontSize: 12, color: '#666' }}>
+                <div style={{ fontSize: 12, color: token.colorTextSecondary }}>
                   系统运行正常 ✅
                 </div>
               </div>

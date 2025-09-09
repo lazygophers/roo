@@ -1,8 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "WebFetch(domain:*)",
-      "Bash(*)"
+      "Bash(find:*)",
+      "Bash(yarn tsc:*)"
     ],
     "deny": [],
     "ask": []

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, Typography, Tag, Space, Empty, List, Divider, Row, Col } from 'antd';
+import { Card, Typography, Tag, Space, Empty, List, Divider, Row, Col, theme } from 'antd';
 import { 
   CodeOutlined, 
   FileTextOutlined, 
@@ -22,6 +22,7 @@ const SelectionPreviewPanel: React.FC<SelectionPreviewPanelProps> = ({
   modelRuleBindings,
   modelRules = {}
 }) => {
+  const { token } = theme.useToken();
   // 多选预览显示
     const modelCount = selectedItems.filter(item => item.type === 'model').length;
     const commandCount = selectedItems.filter(item => item.type === 'command').length;
@@ -171,7 +172,7 @@ const SelectionPreviewPanel: React.FC<SelectionPreviewPanelProps> = ({
                     
                     {/* 关联规则显示 */}
                     {associatedRules.length > 0 && (
-                      <div style={{ marginTop: 16, paddingTop: 12, borderTop: '1px solid #f0f0f0' }}>
+                      <div style={{ marginTop: 16, paddingTop: 12, borderTop: `1px solid ${token.colorBorderSecondary}` }}>
                         <div style={{ marginBottom: 12 }}>
                           <Space>
                             <BookOutlined style={{ color: '#722ed1' }} />
@@ -188,8 +189,8 @@ const SelectionPreviewPanel: React.FC<SelectionPreviewPanelProps> = ({
                               <div key={ruleId} style={{ 
                                 marginBottom: 12,
                                 padding: '8px 12px',
-                                backgroundColor: '#f6ffed',
-                                border: '1px solid #b7eb8f',
+                                backgroundColor: token.colorFillSecondary,
+                                border: `1px solid ${token.colorBorderSecondary}`,
                                 borderRadius: '4px'
                               }}>
                                 <div style={{ marginBottom: 6 }}>
@@ -354,14 +355,14 @@ const SelectionPreviewPanel: React.FC<SelectionPreviewPanelProps> = ({
         <div style={{ 
           marginTop: 20, 
           padding: '12px 16px', 
-          backgroundColor: '#f6ffed', 
+          backgroundColor: token.colorFillSecondary, 
           borderRadius: 6,
-          border: '1px solid #b7eb8f'
+          border: `1px solid ${token.colorBorderSecondary}`
         }}>
-          <Title level={5} style={{ color: '#389e0d', margin: 0, marginBottom: 8 }}>
+          <Title level={5} style={{ color: token.colorSuccess, margin: 0, marginBottom: 8 }}>
             导出预览
           </Title>
-          <Text style={{ fontSize: 12, color: '#666' }}>
+          <Text style={{ fontSize: 12, color: token.colorTextSecondary }}>
             选中的 {totalCount} 个项目将被导出为配置文件，包含所有详细信息和元数据
           </Text>
         </div>
