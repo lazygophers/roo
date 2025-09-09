@@ -1,7 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "WebFetch(domain:docs.roocode.com)"
+      "WebFetch(domain:*)",
+      "Bash(*)"
     ],
     "deny": [],
     "ask": []
