@@ -47,7 +47,7 @@ const ModesListWithSelection: React.FC<ModesListProps> = ({
   onToggleSelection,
   onSelectAll,
   onClearSelection,
-  modelRuleBindings,
+  // modelRuleBindings, // 目前未使用，保留以供将来扩展
   onModelRuleBinding,
   getModelRuleBindings,
   onUpdateModelRules
@@ -182,6 +182,64 @@ const ModesListWithSelection: React.FC<ModesListProps> = ({
   const handleRuleToggleSelection = (rule: FileMetadata, modelSlug: string) => {
     const currentlySelected = isRuleSelectedForModel(rule.file_path, modelSlug);
     onModelRuleBinding(modelSlug, rule.file_path, !currentlySelected);
+  };
+
+  // 批量操作函数
+  const handleRulesBatchOperation = (modelSlug: string, operation: 'selectAll' | 'deselectAll' | 'invert' | 'clear') => {
+    const associatedRules = modelRules[modelSlug] || [];
+    
+    switch (operation) {
+      case 'selectAll':
+        // 全选：选择所有关联规则
+        associatedRules.forEach(rule => {
+          if (!isRuleSelectedForModel(rule.file_path, modelSlug)) {
+            onModelRuleBinding(modelSlug, rule.file_path, true);
+          }
+        });
+        break;
+        
+      case 'deselectAll':
+        // 取消全选：取消选择所有关联规则
+        associatedRules.forEach(rule => {
+          if (isRuleSelectedForModel(rule.file_path, modelSlug)) {
+            onModelRuleBinding(modelSlug, rule.file_path, false);
+          }
+        });
+        break;
+        
+      case 'invert':
+        // 反选：切换所有关联规则的选择状态
+        associatedRules.forEach(rule => {
+          const currentlySelected = isRuleSelectedForModel(rule.file_path, modelSlug);
+          onModelRuleBinding(modelSlug, rule.file_path, !currentlySelected);
+        });
+        break;
+        
+      case 'clear':
+        // 清空：等同于取消全选
+        associatedRules.forEach(rule => {
+          if (isRuleSelectedForModel(rule.file_path, modelSlug)) {
+            onModelRuleBinding(modelSlug, rule.file_path, false);
+          }
+        });
+        break;
+    }
+  };
+
+  // 获取模式的规则选择统计信息
+  const getRuleSelectionStats = (modelSlug: string) => {
+    const associatedRules = modelRules[modelSlug] || [];
+    const selectedCount = associatedRules.filter(rule => 
+      isRuleSelectedForModel(rule.file_path, modelSlug)
+    ).length;
+    
+    return {
+      total: associatedRules.length,
+      selected: selectedCount,
+      isAllSelected: selectedCount === associatedRules.length && associatedRules.length > 0,
+      isNoneSelected: selectedCount === 0,
+      hasPartialSelection: selectedCount > 0 && selectedCount < associatedRules.length
+    };
   };
   
   // 检查规则是否被特定模式选择
@@ -453,13 +511,111 @@ const ModesListWithSelection: React.FC<ModesListProps> = ({
                   {isExpanded && (
                     <div style={{ marginTop: 12, paddingTop: 12, borderTop: '1px solid #f0f0f0' }}>
                       <div style={{ marginBottom: 8 }}>
-                        <Space>
-                          <BookOutlined style={{ color: '#722ed1' }} />
-                          <Text strong style={{ fontSize: 13 }}>关联规则</Text>
-                          {associatedRules.length > 0 && (
-                            <Tag color="blue">{associatedRules.length} 个</Tag>
-                          )}
-                        </Space>
+                        <Row justify="space-between" align="middle">
+                          <Col>
+                            <Space>
+                              <BookOutlined style={{ color: '#722ed1' }} />
+                              <Text strong style={{ fontSize: 13 }}>关联规则</Text>
+                              {associatedRules.length > 0 && (
+                                <Tag color="blue">{associatedRules.length} 个</Tag>
+                              )}
+                              {(() => {
+                                const stats = getRuleSelectionStats(model.slug);
+                                if (stats.total > 0) {
+                                  return (
+                                    <Tag color={stats.selected > 0 ? "green" : "default"} style={{ fontSize: 10 }}>
+                                      已选择 {stats.selected}/{stats.total}
+                                    </Tag>
+                                  );
+                                }
+                                return null;
+                              })()}
+                            </Space>
+                          </Col>
+                          <Col>
+                            {associatedRules.length > 0 && (
+                              <Space size={4}>
+                                <Button
+                                  type="link"
+                                  size="small"
+                                  style={{ 
+                                    fontSize: 11, 
+                                    padding: '0 6px', 
+                                    height: 20,
+                                    color: (() => {
+                                      const stats = getRuleSelectionStats(model.slug);
+                                      return stats.isAllSelected ? '#d9d9d9' : '#1890ff';
+                                    })()
+                                  }}
+                                  onClick={() => handleRulesBatchOperation(model.slug, 'selectAll')}
+                                  disabled={(() => {
+                                    const stats = getRuleSelectionStats(model.slug);
+                                    return stats.isAllSelected;
+                                  })()}
+                                >
+                                  全选
+                                </Button>
+                                <span style={{ color: '#d9d9d9', fontSize: 10 }}>|</span>
+                                <Button
+                                  type="link"
+                                  size="small"
+                                  style={{ 
+                                    fontSize: 11, 
+                                    padding: '0 6px', 
+                                    height: 20,
+                                    color: (() => {
+                                      const stats = getRuleSelectionStats(model.slug);
+                                      return stats.isNoneSelected ? '#d9d9d9' : '#f5222d';
+                                    })()
+                                  }}
+                                  onClick={() => handleRulesBatchOperation(model.slug, 'deselectAll')}
+                                  disabled={(() => {
+                                    const stats = getRuleSelectionStats(model.slug);
+                                    return stats.isNoneSelected;
+                                  })()}
+                                >
+                                  取消全选
+                                </Button>
+                                <span style={{ color: '#d9d9d9', fontSize: 10 }}>|</span>
+                                <Button
+                                  type="link"
+                                  size="small"
+                                  style={{ 
+                                    fontSize: 11, 
+                                    padding: '0 6px', 
+                                    height: 20,
+                                    color: '#722ed1'
+                                  }}
+                                  onClick={() => handleRulesBatchOperation(model.slug, 'invert')}
+                                  disabled={associatedRules.length === 0}
+                                >
+                                  反选
+                                </Button>
+                                <span style={{ color: '#d9d9d9', fontSize: 10 }}>|</span>
+                                <Button
+                                  type="link"
+                                  size="small"
+                                  style={{ 
+                                    fontSize: 11, 
+                                    padding: '0 6px', 
+                                    height: 20,
+                                    color: (() => {
+                                      const stats = getRuleSelectionStats(model.slug);
+                                      return stats.isNoneSelected ? '#d9d9d9' : '#fa8c16';
+                                    })()
+                                  }}
+                                  onClick={() => handleRulesBatchOperation(model.slug, 'clear')}
+                                  disabled={(() => {
+                                    const stats = getRuleSelectionStats(model.slug);
+                                    return stats.isNoneSelected;
+                                  })()}
+                                >
+                                  清空
+                                </Button>
+                              </Space>
+                            )}
+                          </Col>
+                        </Row>
                       </div>
                       
                       {isLoadingModelRules ? (
@@ -475,7 +631,7 @@ const ModesListWithSelection: React.FC<ModesListProps> = ({
                         </Text>
                       ) : (
                         <div style={{ maxHeight: '200px', overflowY: 'auto' }}>
-                          {associatedRules.map((rule, index) => {
+                          {associatedRules.map((rule) => {
                             const ruleSelected = isRuleSelectedForModel(rule.file_path, model.slug);
                             return (
                               <div
