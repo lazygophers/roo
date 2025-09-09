@@ -20,9 +20,7 @@ import {
   SearchOutlined, 
   SettingOutlined,
   CheckOutlined,
-  BookOutlined,
-  DownOutlined,
-  RightOutlined
+  BookOutlined
 } from '@ant-design/icons';
 import { apiClient, ModelInfo, FileMetadata } from '../../api';
 import { SelectedItem, ModelRuleBinding } from '../../types/selection';
@@ -165,6 +163,8 @@ const ModesListWithSelection: React.FC<ModesListProps> = ({
       return;
     }
     
+    const currentlySelected = isSelected(model.slug);
+    
     const selectedItem: SelectedItem = {
       id: model.slug,
       type: 'model',
@@ -173,9 +173,17 @@ const ModesListWithSelection: React.FC<ModesListProps> = ({
     };
     onToggleSelection(selectedItem);
     
-    // 当选择模式时，自动展开并加载关联规则
-    if (!isSelected(model.slug)) {
+    // 根据选中状态自动展开或收起关联规则
+    if (!currentlySelected) {
+      // 从未选中变为选中，自动展开并加载关联规则
       handleModelExpand(model.slug);
+    } else {
+      // 从选中变为未选中，自动收起
+      setExpandedModels(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(model.slug);
+        return newSet;
+      });
     }
   };
 
@@ -410,7 +418,8 @@ const ModesListWithSelection: React.FC<ModesListProps> = ({
           dataSource={filteredModels}
           renderItem={(model) => {
             const isItemSelected = isSelected(model.slug);
-            const isExpanded = expandedModels.has(model.slug);
+            // 只有选中的模式才展开关联规则
+            const isExpanded = isItemSelected && expandedModels.has(model.slug);
             const associatedRules = modelRules[model.slug] || [];
             const isLoadingModelRules = loadingRules[model.slug] || false;
             
@@ -486,28 +495,19 @@ const ModesListWithSelection: React.FC<ModesListProps> = ({
                                   : '点击选择/取消'
                                 }
                               </Text>
+                              {isItemSelected && associatedRules.length > 0 && (
+                                <Tag color="purple" style={{ fontSize: 10, marginLeft: 8 }}>
+                                  {associatedRules.length} 个关联规则
+                                </Tag>
+                              )}
                             </div>
                           </div>
                         }
                       />
                     </div>
-                    <div style={{ marginLeft: 8 }}>
-                      <Button
-                        type="text"
-                        size="small"
-                        icon={isExpanded ? <DownOutlined /> : <RightOutlined />}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleModelExpand(model.slug);
-                        }}
-                        style={{ fontSize: 12 }}
-                      >
-                        关联规则
-                      </Button>
-                    </div>
                   </div>
 
-                  {/* 关联规则区域 */}
+                  {/* 关联规则区域 - 选中后自动展开 */}
                   {isExpanded && (
                     <div style={{ marginTop: 12, paddingTop: 12, borderTop: '1px solid #f0f0f0' }}>
                       <div style={{ marginBottom: 8 }}>
