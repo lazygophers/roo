@@ -2,7 +2,9 @@
   "permissions": {
     "allow": [
       "Bash(find:*)",
-      "Bash(yarn tsc:*)"
+      "Bash(yarn tsc:*)",
+      "Bash(npm start)",
+      "Bash(npm run build:*)"
     ],
     "deny": [],
     "ask": []

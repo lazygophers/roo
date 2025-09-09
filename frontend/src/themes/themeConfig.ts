@@ -140,10 +140,10 @@ export const lightTheme: ExtendedThemeConfig = {
   },
 };
 
-// 蓝色主题
+// 蓝色明亮主题
 export const blueTheme: ExtendedThemeConfig = {
-  name: 'Blue',
-  description: '蓝色主题',
+  name: 'Blue Light',
+  description: '蓝色明亮主题',
   preview: {
     primary: '#2f54eb',
     background: '#f0f5ff',
@@ -177,10 +177,72 @@ export const blueTheme: ExtendedThemeConfig = {
   },
 };
 
-// 绿色主题
+// 蓝色深色主题
+export const blueDarkTheme: ExtendedThemeConfig = {
+  name: 'Blue Dark',
+  description: '蓝色深色主题',
+  preview: {
+    primary: '#597ef7',
+    background: '#111b58',
+    surface: '#1a2980',
+  },
+  algorithm: theme.darkAlgorithm,
+  token: {
+    colorPrimary: '#597ef7',
+    colorInfo: '#597ef7',
+    colorSuccess: '#52c41a',
+    colorWarning: '#faad14',
+    colorError: '#f5222d',
+    colorBgContainer: '#1a2980',
+    colorBgElevated: '#2f4091',
+    colorBgLayout: '#111b58',
+    colorBgSpotlight: '#3851c4',
+    colorBorder: '#434ea6',
+    colorBorderSecondary: '#2f4091',
+    colorFill: '#1a2980',
+    colorFillSecondary: '#2f4091',
+    colorFillTertiary: '#434ea6',
+    colorText: '#ffffffd9',
+    colorTextSecondary: '#ffffff73',
+    colorTextTertiary: '#ffffff40',
+    borderRadius: 8,
+    borderRadiusLG: 12,
+    borderRadiusSM: 4,
+  },
+  components: {
+    Layout: {
+      bodyBg: '#111b58',
+      headerBg: '#1a2980',
+      siderBg: '#111b58',
+    },
+    Menu: {
+      darkItemBg: '#111b58',
+      darkItemSelectedBg: '#597ef7',
+      darkItemHoverBg: '#2f4091',
+    },
+    Card: {
+      colorBgContainer: '#1a2980',
+      colorBorderSecondary: '#434ea6',
+    },
+    Input: {
+      colorBgContainer: '#1a2980',
+      colorBorder: '#434ea6',
+    },
+    Select: {
+      colorBgContainer: '#1a2980',
+      colorBorder: '#434ea6',
+    },
+    Button: {
+      colorBgContainer: '#1a2980',
+      colorBorder: '#434ea6',
+    },
+  },
+};
+
+// 绿色明亮主题
 export const greenTheme: ExtendedThemeConfig = {
-  name: 'Green',
-  description: '绿色主题',
+  name: 'Green Light',
+  description: '绿色明亮主题',
   preview: {
     primary: '#52c41a',
     background: '#f6ffed',
@@ -214,10 +276,72 @@ export const greenTheme: ExtendedThemeConfig = {
   },
 };
 
-// 紫色主题
+// 绿色深色主题
+export const greenDarkTheme: ExtendedThemeConfig = {
+  name: 'Green Dark',
+  description: '绿色深色主题',
+  preview: {
+    primary: '#73d13d',
+    background: '#162312',
+    surface: '#274916',
+  },
+  algorithm: theme.darkAlgorithm,
+  token: {
+    colorPrimary: '#73d13d',
+    colorInfo: '#73d13d',
+    colorSuccess: '#73d13d',
+    colorWarning: '#faad14',
+    colorError: '#f5222d',
+    colorBgContainer: '#274916',
+    colorBgElevated: '#3f6622',
+    colorBgLayout: '#162312',
+    colorBgSpotlight: '#52c41a',
+    colorBorder: '#52844a',
+    colorBorderSecondary: '#3f6622',
+    colorFill: '#274916',
+    colorFillSecondary: '#3f6622',
+    colorFillTertiary: '#52844a',
+    colorText: '#ffffffd9',
+    colorTextSecondary: '#ffffff73',
+    colorTextTertiary: '#ffffff40',
+    borderRadius: 8,
+    borderRadiusLG: 12,
+    borderRadiusSM: 4,
+  },
+  components: {
+    Layout: {
+      bodyBg: '#162312',
+      headerBg: '#274916',
+      siderBg: '#162312',
+    },
+    Menu: {
+      darkItemBg: '#162312',
+      darkItemSelectedBg: '#73d13d',
+      darkItemHoverBg: '#3f6622',
+    },
+    Card: {
+      colorBgContainer: '#274916',
+      colorBorderSecondary: '#52844a',
+    },
+    Input: {
+      colorBgContainer: '#274916',
+      colorBorder: '#52844a',
+    },
+    Select: {
+      colorBgContainer: '#274916',
+      colorBorder: '#52844a',
+    },
+    Button: {
+      colorBgContainer: '#274916',
+      colorBorder: '#52844a',
+    },
+  },
+};
+
+// 紫色明亮主题
 export const purpleTheme: ExtendedThemeConfig = {
-  name: 'Purple',
-  description: '紫色主题',
+  name: 'Purple Light',
+  description: '紫色明亮主题',
   preview: {
     primary: '#722ed1',
     background: '#f9f0ff',
@@ -247,6 +371,68 @@ export const purpleTheme: ExtendedThemeConfig = {
     Menu: {
       itemSelectedBg: '#efdbff',
       itemHoverBg: '#f9f0ff',
+    },
+  },
+};
+
+// 紫色深色主题
+export const purpleDarkTheme: ExtendedThemeConfig = {
+  name: 'Purple Dark',
+  description: '紫色深色主题',
+  preview: {
+    primary: '#b37feb',
+    background: '#22075e',
+    surface: '#391085',
+  },
+  algorithm: theme.darkAlgorithm,
+  token: {
+    colorPrimary: '#b37feb',
+    colorInfo: '#b37feb',
+    colorSuccess: '#52c41a',
+    colorWarning: '#faad14',
+    colorError: '#f5222d',
+    colorBgContainer: '#391085',
+    colorBgElevated: '#531dab',
+    colorBgLayout: '#22075e',
+    colorBgSpotlight: '#722ed1',
+    colorBorder: '#723dc4',
+    colorBorderSecondary: '#531dab',
+    colorFill: '#391085',
+    colorFillSecondary: '#531dab',
+    colorFillTertiary: '#723dc4',
+    colorText: '#ffffffd9',
+    colorTextSecondary: '#ffffff73',
+    colorTextTertiary: '#ffffff40',
+    borderRadius: 8,
+    borderRadiusLG: 12,
+    borderRadiusSM: 4,
+  },
+  components: {
+    Layout: {
+      bodyBg: '#22075e',
+      headerBg: '#391085',
+      siderBg: '#22075e',
+    },
+    Menu: {
+      darkItemBg: '#22075e',
+      darkItemSelectedBg: '#b37feb',
+      darkItemHoverBg: '#531dab',
+    },
+    Card: {
+      colorBgContainer: '#391085',
+      colorBorderSecondary: '#723dc4',
+    },
+    Input: {
+      colorBgContainer: '#391085',
+      colorBorder: '#723dc4',
+    },
+    Select: {
+      colorBgContainer: '#391085',
+      colorBorder: '#723dc4',
+    },
+    Button: {
+      colorBgContainer: '#391085',
+      colorBorder: '#723dc4',
     },
   },
 };
@@ -288,8 +474,11 @@ export const themeRegistry = {
   dark: darkTheme,
   light: lightTheme,
   blue: blueTheme,
+  blueDark: blueDarkTheme,
   green: greenTheme,
+  greenDark: greenDarkTheme,
   purple: purpleTheme,
+  purpleDark: purpleDarkTheme,
   compactDark: compactDarkTheme,
 };
 

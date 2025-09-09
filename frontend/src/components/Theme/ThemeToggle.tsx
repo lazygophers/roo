@@ -1,122 +1,74 @@
 import React from 'react';
-import { Button, Dropdown, Space, theme, Divider } from 'antd';
+import { Button, Dropdown, Space, theme, MenuProps } from 'antd';
 import { 
-  BulbOutlined, 
-  BulbFilled, 
-  DesktopOutlined,
-  SunOutlined,
-  MoonOutlined,
-  BgColorsOutlined
+  BgColorsOutlined,
+  DownOutlined
 } from '@ant-design/icons';
-import { useTheme, ThemeType } from '../../contexts/ThemeContext';
-import { ThemeName } from '../../themes/themeConfig';
+import { useTheme } from '../../contexts/ThemeContext';
+import { ThemeName, themeRegistry } from '../../themes/themeConfig';
 
 const ThemeToggle: React.FC = () => {
-  const { themeType, themeName, isDark, availableThemes, setThemeType, setThemeName, toggleTheme } = useTheme();
+  const { themeType, setThemeType, currentTheme } = useTheme();
   const { token } = theme.useToken();
-
-  const getThemeIcon = (theme?: ThemeName) => {
-    const currentTheme = theme || themeName;
-    
-    if (currentTheme === 'dark' || currentTheme === 'compactDark') {
-      return <MoonOutlined />;
-    } else if (currentTheme === 'light') {
-      return <SunOutlined />;
-    } else if (currentTheme === 'blue') {
-      return <BgColorsOutlined style={{ color: '#2f54eb' }} />;
-    } else if (currentTheme === 'green') {
-      return <BgColorsOutlined style={{ color: '#52c41a' }} />;
-    } else if (currentTheme === 'purple') {
-      return <BgColorsOutlined style={{ color: '#722ed1' }} />;
-    }
-    
-    return <BgColorsOutlined />;
-  };
-
-  const getThemeLabel = () => {
-    const theme = availableThemes[themeName];
-    return theme ? theme.description : '主题';
-  };
 
   // 创建主题预览小圆点
   const ThemePreview: React.FC<{ name: ThemeName }> = ({ name }) => {
-    const theme = availableThemes[name];
+    const themeConfig = themeRegistry[name];
     return (
       <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
         <div style={{
           width: 12,
           height: 12,
           borderRadius: 6,
-          background: `linear-gradient(45deg, ${theme.preview.primary}, ${theme.preview.surface})`,
-          border: `1px solid ${theme.preview.primary}`,
-          marginRight: 4
+          background: `linear-gradient(45deg, ${themeConfig.preview.primary}, ${themeConfig.preview.surface})`,
+          border: '1px solid #d9d9d9'
         }} />
-        <span>{theme.description}</span>
       </div>
     );
   };
 
-  const basicThemeItems = [
-    {
-      key: 'light',
-      icon: <SunOutlined />,
-      label: '浅色模式',
-      onClick: () => setThemeType('light'),
-    },
-    {
-      key: 'dark',
-      icon: <MoonOutlined />,
-      label: '深色模式',  
-      onClick: () => setThemeType('dark'),
-    },
-    {
-      key: 'auto',
-      icon: <DesktopOutlined />,
-      label: '跟随系统',
-      onClick: () => setThemeType('auto'),
-    },
-  ];
+  // 分组主题
+  const themeGroups = {
+    基础主题: ['light', 'dark', 'compactDark'],
+    蓝色系列: ['blue', 'blueDark'],
+    绿色系列: ['green', 'greenDark'], 
+    紫色系列: ['purple', 'purpleDark'],
+  };
 
-  const customThemeItems = Object.entries(availableThemes).map(([key, theme]) => ({
-    key,
-    icon: getThemeIcon(key as ThemeName),
-    label: <ThemePreview name={key as ThemeName} />,
-    onClick: () => setThemeName(key as ThemeName),
+  const menuItems: MenuProps['items'] = Object.entries(themeGroups).map(([groupName, themes]) => ({
+    key: groupName,
+    label: groupName,
+    type: 'group',
+    children: themes.map((name) => ({
+      key: name,
+      label: (
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', minWidth: 160 }}>
+          <span>{themeRegistry[name as ThemeName].description}</span>
+          <ThemePreview name={name as ThemeName} />
+        </div>
+      ),
+      onClick: () => setThemeType(name as ThemeName),
+    })),
   }));
 
-  const menuItems = [
-    ...basicThemeItems,
-    { type: 'divider' as const },
-    {
-      key: 'custom-themes',
-      label: '自定义主题',
-      type: 'group' as const,
-      children: customThemeItems,
-    },
-  ];
-
   return (
-    <Dropdown
-      menu={{ items: menuItems, selectedKeys: [themeName] }}
-      placement="bottomRight"
-      arrow
+    <Dropdown 
+      menu={{ items: menuItems, selectedKeys: [themeType] }}
       trigger={['click']}
+      placement="bottomRight"
     >
-      <Button
-        type="text"
-        size="small"
-        style={{
-          color: token.colorText,
-          display: 'flex',
+      <Button 
+        type="text" 
+        icon={<BgColorsOutlined />}
+        style={{ 
+          display: 'flex', 
           alignItems: 'center',
-          gap: '4px',
-          padding: '4px 8px',
-          height: 'auto',
+          color: token.colorText
         }}
       >
-        <Space size={4}>
-          {getThemeIcon()}
-          <span style={{ fontSize: '12px' }}>{getThemeLabel()}</span>
+        <Space>
+          {currentTheme.description}
+          <DownOutlined style={{ fontSize: 10 }} />
         </Space>
       </Button>
     </Dropdown>
