@@ -25,7 +25,10 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test",
+    "test": "react-scripts test --watchAll=false --coverage --ci",
+    "test:watch": "react-scripts test",
+    "test:coverage": "react-scripts test --watchAll=false --coverage",
+    "test:ci": "react-scripts test --watchAll=false --coverage --ci --silent",
     "eject": "react-scripts eject",
     "dev": "react-scripts start"
   },

@@ -23,9 +23,13 @@ help:
 	@echo "  frontend-build   构建前端静态文件"
 	@echo ""
 	@echo "🧪 测试命令:"
-	@echo "  test             运行所有测试"
+	@echo "  test             运行所有测试（前端+后端）"
+	@echo "  test-fast        运行快速测试（跳过慢速测试）"
+	@echo "  test-full        运行完整测试套件（包含集成测试）"
 	@echo "  test-backend     运行后端测试"
 	@echo "  test-frontend    运行前端测试"
+	@echo "  test-coverage    生成测试覆盖率报告"
+	@echo "  test-watch       启动测试监听模式"
 	@echo ""
 	@echo "🚀 部署命令:"
 	@echo "  deploy           部署到生产环境"
@@ -86,15 +90,61 @@ frontend-build-yarn:
 	cd frontend && yarn build
 
 # ========== 测试 ==========
-test: test-backend
+test: test-backend test-frontend
+	@echo "🎉 所有测试完成！"
 
 test-backend:
 	@echo "🧪 运行后端测试..."
-	uv run pytest tests/ -v
+	uv run pytest tests/ -v --cov=app --cov-report=html --cov-report=term-missing
+
+test-backend-unit:
+	@echo "🧪 运行后端单元测试..."
+	uv run pytest tests/test_*.py -v -m "not integration and not slow"
+
+test-backend-integration:
+	@echo "🧪 运行后端集成测试..."
+	uv run pytest tests/test_integration*.py -v -m integration
 
 test-frontend:
 	@echo "🧪 运行前端测试..."
-	cd frontend && npm test -- --coverage --ci --watchAll=false
+	cd frontend && npm run test:ci
+
+test-frontend-watch:
+	@echo "🧪 运行前端测试 (监听模式)..."
+	cd frontend && npm run test:watch
+
+test-frontend-coverage:
+	@echo "🧪 运行前端测试 (覆盖率报告)..."
+	cd frontend && npm run test:coverage
+
+# 快速测试 (跳过慢速测试)
+test-fast:
+	@echo "⚡ 运行快速测试..."
+	uv run pytest tests/ -v -m "not slow" --tb=short
+	cd frontend && npm run test:ci
+
+# 完整测试套件 (包含集成和慢速测试)
+test-full:
+	@echo "🚀 运行完整测试套件..."
+	@echo "📊 后端测试 (包含集成测试)..."
+	uv run pytest tests/ -v --cov=app --cov-report=html --cov-report=term-missing --cov-fail-under=80
+	@echo "📊 前端测试 (包含覆盖率)..."
+	cd frontend && npm run test:coverage
+	@echo "🎉 完整测试套件完成！"
+
+# 测试覆盖率报告
+test-coverage:
+	@echo "📊 生成测试覆盖率报告..."
+	uv run pytest tests/ --cov=app --cov-report=html --cov-report=term-missing --cov-report=xml
+	cd frontend && npm run test:coverage
+	@echo "📈 覆盖率报告已生成："
+	@echo "  - 后端: htmlcov/index.html"
+	@echo "  - 前端: frontend/coverage/lcov-report/index.html"
+
+# 监听模式测试
+test-watch:
+	@echo "👀 启动测试监听模式..."
+	uv run pytest tests/ -v --tb=short -f
 
 # ========== 部署 ==========
 deploy: build

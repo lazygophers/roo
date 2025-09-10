@@ -25,7 +25,8 @@
       "WebFetch(domain:docs.roocode.com)",
       "WebFetch(domain:github.com)",
       "WebFetch(domain:raw.githubusercontent.com)",
-      "Bash(make:*)"
+      "Bash(make:*)",
+      "Bash(export:*)"
     ],
     "deny": [],
     "ask": []
