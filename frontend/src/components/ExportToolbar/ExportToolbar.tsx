@@ -29,7 +29,9 @@ import {
   SettingOutlined,
   DeleteOutlined,
   RocketOutlined,
-  UserOutlined
+  UserOutlined,
+  RestOutlined,
+  FolderOutlined
 } from '@ant-design/icons';
 import { SelectedItem, ModelRuleBinding } from '../../types/selection';
 import { apiClient, FileMetadata, DeployTarget, DeployRequest } from '../../api';
@@ -75,6 +77,7 @@ const ExportToolbar: React.FC<ExportToolbarProps> = ({
   const [selectedDeployTargets, setSelectedDeployTargets] = useState<string[]>([]);
   const [configurationsLoading, setConfigurationsLoading] = useState(false);
   const [selectedConfigName, setSelectedConfigName] = useState<string | null>(null);
+  const [cleanupLoading, setCleanupLoading] = useState(false);
   const [form] = Form.useForm();
   const [deployForm] = Form.useForm();
   const modelCount = selectedItems.filter(item => item.type === 'model').length;
@@ -293,6 +296,62 @@ const ExportToolbar: React.FC<ExportToolbarProps> = ({
   const handleConfigManage = () => {
     setConfigManageModalVisible(true);
     loadConfigurations();
+  };
+
+  // 清空模型配置
+  const handleCleanupModels = async () => {
+    try {
+      setCleanupLoading(true);
+      
+      const result = await apiClient.cleanupConfigurations({
+        cleanup_type: 'models',
+        deploy_targets: selectedDeployTargets
+      });
+
+      if (result.success) {
+        message.success(`清空成功！已清理 ${result.cleaned_items.length} 个模型配置文件`);
+        if (result.errors.length > 0) {
+          result.errors.forEach(error => {
+            message.error(error);
+          });
+        }
+      } else {
+        message.error(`清空失败: ${result.message}`);
+      }
+
+    } catch (error: any) {
+      message.error('清空失败: ' + (error.response?.data?.detail || error.message));
+    } finally {
+      setCleanupLoading(false);
+    }
+  };
+
+  // 清空目录（包括模型配置和命令文件）
+  const handleCleanupDirectories = async () => {
+    try {
+      setCleanupLoading(true);
+      
+      const result = await apiClient.cleanupConfigurations({
+        cleanup_type: 'directories',
+        deploy_targets: selectedDeployTargets
+      });
+
+      if (result.success) {
+        message.success(`清空成功！已清理 ${result.cleaned_items.length} 个文件和目录`);
+        if (result.errors.length > 0) {
+          result.errors.forEach(error => {
+            message.error(error);
+          });
+        }
+      } else {
+        message.error(`清空失败: ${result.message}`);
+      }
+
+    } catch (error: any) {
+      message.error('清空失败: ' + (error.response?.data?.detail || error.message));
+    } finally {
+      setCleanupLoading(false);
+    }
   };
 
   return (
@@ -687,12 +746,56 @@ const ExportToolbar: React.FC<ExportToolbarProps> = ({
           </Space>
         }
         open={deployModalVisible}
-        onOk={handleDeployConfirm}
         onCancel={() => setDeployModalVisible(false)}
         confirmLoading={deployLoading}
-        okText="确认部署"
-        cancelText="取消"
         width={600}
+        footer={[
+          <Popconfirm
+            key="cleanup-models"
+            title="清空模型配置"
+            description="确定要清空选中目标的模型配置文件吗？"
+            onConfirm={handleCleanupModels}
+            okText="确定"
+            cancelText="取消"
+            disabled={cleanupLoading}
+          >
+            <Button
+              icon={<RestOutlined />}
+              loading={cleanupLoading}
+              danger
+            >
+              清空模型
+            </Button>
+          </Popconfirm>,
+          <Popconfirm
+            key="cleanup-directories"
+            title="清空所有配置"
+            description="确定要清空选中目标的配置文件和命令目录吗？此操作不可撤销。"
+            onConfirm={handleCleanupDirectories}
+            okText="确定"
+            cancelText="取消"
+            disabled={cleanupLoading}
+          >
+            <Button
+              icon={<FolderOutlined />}
+              loading={cleanupLoading}
+              danger
+            >
+              清空目录
+            </Button>
+          </Popconfirm>,
+          <Button key="cancel" onClick={() => setDeployModalVisible(false)}>
+            取消
+          </Button>,
+          <Button
+            key="deploy"
+            type="primary"
+            loading={deployLoading}
+            onClick={handleDeployConfirm}
+          >
+            确认部署
+          </Button>
+        ]}
       >
         <div style={{ marginBottom: 16 }}>
           <Text type="secondary">

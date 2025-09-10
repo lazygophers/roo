@@ -115,6 +115,18 @@ export interface DeployResponse {
   errors: string[];
 }
 
+export interface CleanupRequest {
+  cleanup_type: 'models' | 'directories';
+  deploy_targets: string[];
+}
+
+export interface CleanupResponse {
+  success: boolean;
+  message: string;
+  cleaned_items: string[];
+  errors: string[];
+}
+
 // API 方法
 export const apiClient = {
   // 获取所有模型
@@ -221,6 +233,12 @@ export const apiClient = {
   // 部署配置
   deployCustomModes: async (request: DeployRequest) => {
     const response = await api.post<DeployResponse>('/deploy/deploy', request);
+    return response.data;
+  },
+
+  // 清空配置
+  cleanupConfigurations: async (request: CleanupRequest) => {
+    const response = await api.post<CleanupResponse>('/deploy/cleanup', request);
     return response.data;
   }
 };

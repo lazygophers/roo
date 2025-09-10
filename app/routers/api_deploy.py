@@ -46,6 +46,18 @@ class DeployResponse(BaseModel):
     deployed_files: List[str] = []
     errors: List[str] = []
 
+class CleanupRequest(BaseModel):
+    """清空请求数据结构"""
+    cleanup_type: str  # "models" 或 "directories"
+    deploy_targets: List[str]  # 部署目标列表：roo, roo-nightly, kilo等
+
+class CleanupResponse(BaseModel):
+    """清空响应数据结构"""
+    success: bool
+    message: str
+    cleaned_items: List[str] = []
+    errors: List[str] = []
+
 import platform
 
 def get_platform_specific_path(extension_id: str) -> str:
@@ -396,5 +408,95 @@ async def deploy_custom_modes(request: DeployRequest):
             success=False,
             message=f"Deployment failed: {str(e)}",
             deployed_files=deployed_files,
+            errors=errors + [str(e)]
+        )
+
+@router.post(
+    "/cleanup",
+    response_model=CleanupResponse,
+    summary="清空配置",
+    description="清空指定目标的模型配置文件或目录"
+)
+async def cleanup_configurations(request: CleanupRequest):
+    """清空配置文件或目录"""
+    cleaned_items = []
+    errors = []
+    
+    try:
+        for target_key in request.deploy_targets:
+            if target_key not in DEPLOY_TARGETS:
+                errors.append(f"Unknown deploy target: {target_key}")
+                continue
+                
+            target_config = DEPLOY_TARGETS[target_key]
+            
+            if request.cleanup_type == "models":
+                # 清空模型配置文件
+                target_path = os.path.expanduser(target_config["path"])
+                try:
+                    if os.path.exists(target_path):
+                        os.remove(target_path)
+                        cleaned_items.append(target_path)
+                        logger.info(f"Successfully removed model config from {target_config['name']}: {target_path}")
+                    else:
+                        logger.info(f"Model config file not found at {target_path}")
+                except Exception as e:
+                    error_msg = f"Failed to remove model config from {target_config['name']}: {str(e)}"
+                    errors.append(error_msg)
+                    logger.error(error_msg)
+                    
+            elif request.cleanup_type == "directories":
+                # 清空整个目录结构
+                if target_key in COMMAND_DEPLOY_PATHS:
+                    # 清空命令目录
+                    command_dir = os.path.expanduser(COMMAND_DEPLOY_PATHS[target_key])
+                    try:
+                        if os.path.exists(command_dir):
+                            for file in os.listdir(command_dir):
+                                file_path = os.path.join(command_dir, file)
+                                if os.path.isfile(file_path):
+                                    os.remove(file_path)
+                                    cleaned_items.append(file_path)
+                            logger.info(f"Successfully cleaned command directory for {target_config['name']}: {command_dir}")
+                        else:
+                            logger.info(f"Command directory not found at {command_dir}")
+                    except Exception as e:
+                        error_msg = f"Failed to clean command directory for {target_config['name']}: {str(e)}"
+                        errors.append(error_msg)
+                        logger.error(error_msg)
+                
+                # 同时清空模型配置文件
+                target_path = os.path.expanduser(target_config["path"])
+                try:
+                    if os.path.exists(target_path):
+                        os.remove(target_path)
+                        cleaned_items.append(target_path)
+                        logger.info(f"Successfully removed model config from {target_config['name']}: {target_path}")
+                except Exception as e:
+                    error_msg = f"Failed to remove model config from {target_config['name']}: {str(e)}"
+                    errors.append(error_msg)
+                    logger.error(error_msg)
+                    
+            else:
+                errors.append(f"Unknown cleanup type: {request.cleanup_type}")
+        
+        success = len(cleaned_items) > 0 or len(errors) == 0
+        message = f"Cleanup completed. Cleaned {len(cleaned_items)} items."
+        if errors:
+            message += f" {len(errors)} errors occurred."
+            
+        return CleanupResponse(
+            success=success,
+            message=message,
+            cleaned_items=cleaned_items,
+            errors=errors
+        )
+        
+    except Exception as e:
+        logger.error(f"Error during cleanup: {e}")
+        return CleanupResponse(
+            success=False,
+            message=f"Cleanup failed: {str(e)}",
+            cleaned_items=cleaned_items,
             errors=errors + [str(e)]
         )
