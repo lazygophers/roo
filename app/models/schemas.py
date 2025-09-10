@@ -150,3 +150,33 @@ class ConfigurationListResponse(BaseModel):
     message: str
     data: List[ConfigurationData]
     total: int
+
+
+class GetConfigurationRequest(BaseModel):
+    """获取单个配置请求数据结构"""
+    name: str
+
+
+class DeleteConfigurationRequest(BaseModel):
+    """删除配置请求数据结构"""
+    name: str
+
+
+class RoleInfo(BaseModel):
+    """角色信息数据结构"""
+    name: str
+    title: str
+    description: str
+    category: str
+    traits: List[str]
+    features: List[str]
+    restrictions: Optional[List[str]] = None
+    file_path: str
+
+
+class RoleResponse(BaseModel):
+    """角色 API 响应数据结构"""
+    success: bool
+    message: str
+    data: List[RoleInfo]
+    total: int

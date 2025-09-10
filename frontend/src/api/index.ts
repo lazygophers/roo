@@ -74,6 +74,24 @@ export interface HookResponse {
   data: HookInfo;
 }
 
+export interface RoleInfo {
+  name: string;
+  title: string;
+  description: string;
+  category: string;
+  traits: string[];
+  features: string[];
+  restrictions?: string[];
+  file_path: string;
+}
+
+export interface RoleResponse {
+  success: boolean;
+  message: string;
+  data: RoleInfo[];
+  total: number;
+}
+
 // API 方法
 export const apiClient = {
   // 获取所有模型
@@ -149,13 +167,19 @@ export const apiClient = {
 
   // 获取单个配置
   getConfiguration: async (name: string) => {
-    const response = await api.get(`/config/${name}`);
+    const response = await api.post('/config/get', { name });
     return response.data;
   },
 
   // 删除配置
   deleteConfiguration: async (name: string) => {
-    const response = await api.delete(`/config/${name}`);
+    const response = await api.post('/config/delete', { name });
+    return response.data;
+  },
+
+  // 获取角色列表
+  getRoles: async () => {
+    const response = await api.post<RoleResponse>('/roles/list', {});
     return response.data;
   }
 };

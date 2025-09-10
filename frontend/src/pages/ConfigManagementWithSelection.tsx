@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
 import { Row, Col, Tabs, TabsProps, theme } from 'antd';
-import { CodeOutlined, FileTextOutlined, BookOutlined } from '@ant-design/icons';
+import { CodeOutlined, FileTextOutlined, BookOutlined, UserOutlined } from '@ant-design/icons';
 import ModesListWithSelection from '../components/ConfigTabs/ModesListWithSelection';
 import CommandsListWithSelection from '../components/ConfigTabs/CommandsListWithSelection';
 import RulesListWithSelection from '../components/ConfigTabs/RulesListWithSelection';
+import RolesListWithSelection from '../components/ConfigTabs/RolesListWithSelection';
 import SelectionPreviewPanel from '../components/Preview/SelectionPreviewPanel';
 import ExportToolbar from '../components/ExportToolbar/ExportToolbar';
 import { SelectedItem, ModelRuleBinding } from '../types/selection';
 import { FileMetadata } from '../api';
+import './ConfigManagement.css';
 
 const ConfigManagementWithSelection: React.FC = () => {
   const { token } = theme.useToken();
@@ -35,8 +37,14 @@ const ConfigManagementWithSelection: React.FC = () => {
       // 已选择，移除
       setSelectedItems(selectedItems.filter((_, index) => index !== existingIndex));
     } else {
-      // 未选择，添加
-      setSelectedItems([...selectedItems, item]);
+      // 角色是单选，需要先移除其他角色
+      if (item.type === 'role') {
+        const nonRoleItems = selectedItems.filter(selectedItem => selectedItem.type !== 'role');
+        setSelectedItems([...nonRoleItems, item]);
+      } else {
+        // 其他类型正常添加
+        setSelectedItems([...selectedItems, item]);
+      }
     }
   };
 
@@ -186,10 +194,32 @@ const ConfigManagementWithSelection: React.FC = () => {
         />
       ),
     },
+    {
+      key: 'roles',
+      label: (
+        <span>
+          <UserOutlined />
+          角色选择
+        </span>
+      ),
+      children: (
+        <RolesListWithSelection 
+          selectedItems={selectedItems}
+          onToggleSelection={handleToggleSelection}
+          onSelectAll={handleSelectAll}
+          onClearSelection={handleClearSelection}
+        />
+      ),
+    },
   ];
 
   return (
-    <div style={{ height: '100%' }}>
+    <div className="config-management-page" style={{ height: '100%' }}>
+      {/* 页面标题 */}
+      <h2 style={{ margin: '0 0 16px 0', fontSize: '20px', fontWeight: 'normal' }}>
+        配置管理
+      </h2>
+      
       {/* 导出工具栏 */}
       <ExportToolbar
         selectedItems={selectedItems}
@@ -206,7 +236,7 @@ const ConfigManagementWithSelection: React.FC = () => {
           <div style={{ 
             height: '100%', 
             border: `1px solid ${token.colorBorder}`, 
-            borderRadius: '8px',
+            borderRadius: '4px',
             backgroundColor: token.colorBgContainer
           }}>
             <Tabs
@@ -216,10 +246,6 @@ const ConfigManagementWithSelection: React.FC = () => {
               style={{
                 height: '100%',
                 padding: '0 16px',
-              }}
-              tabBarStyle={{
-                paddingTop: '16px',
-                marginBottom: '16px'
               }}
             />
           </div>

@@ -12,6 +12,7 @@ import {
   Modal,
   Form,
   Input,
+  AutoComplete,
   Checkbox,
   theme,
   Select,
@@ -377,7 +378,35 @@ const ExportToolbar: React.FC<ExportToolbarProps> = ({
               { max: 50, message: '配置名称不能超过50个字符' }
             ]}
           >
-            <Input placeholder="请输入配置名称，例如：我的开发配置" />
+            <AutoComplete
+              placeholder="请输入配置名称，例如：我的开发配置"
+              options={configurations.map(config => ({
+                value: config.name,
+                label: (
+                  <div>
+                    <div>{config.name}</div>
+                    {config.description && (
+                      <div style={{ fontSize: 12, color: '#999' }}>
+                        {config.description}
+                      </div>
+                    )}
+                  </div>
+                )
+              }))}
+              filterOption={(inputValue, option) =>
+                option?.value?.toLowerCase().includes(inputValue.toLowerCase()) || false
+              }
+              onSelect={(value) => {
+                const config = configurations.find(c => c.name === value);
+                if (config) {
+                  form.setFieldsValue({
+                    name: config.name,
+                    description: config.description,
+                    overwrite: true
+                  });
+                }
+              }}
+            />
           </Form.Item>
 
           <Form.Item

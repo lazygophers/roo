@@ -1,0 +1,31 @@
+/* 简洁的导航样式 */
+.nav-logo {
+  transition: background-color 0.2s;
+}
+
+.nav-logo:hover {
+  background-color: rgba(0, 0, 0, 0.04);
+}
+
+/* 菜单项基础样式 */
+.ant-menu-item {
+  margin: 4px 8px;
+  border-radius: 4px;
+}
+
+.ant-menu-item-selected {
+  background-color: rgba(24, 144, 255, 0.1) !important;
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+  .nav-logo {
+    font-size: 14px !important;
+    margin: 12px !important;
+  }
+  
+  .ant-menu-item {
+    margin: 2px 6px;
+    font-size: 13px;
+  }
+}

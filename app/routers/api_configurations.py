@@ -5,7 +5,9 @@ from app.models.schemas import (
     SaveConfigurationRequest, 
     ConfigurationResponse, 
     ConfigurationListResponse,
-    ConfigurationData
+    ConfigurationData,
+    GetConfigurationRequest,
+    DeleteConfigurationRequest
 )
 from app.core.database_service import get_database_service
 
@@ -109,33 +111,33 @@ async def get_configurations() -> ConfigurationListResponse:
         )
 
 
-@router.delete(
-    "/config/{config_name}",
+@router.post(
+    "/config/delete",
     response_model=ConfigurationResponse,
     summary="删除配置",
     description="删除指定名称的配置"
 )
-async def delete_configuration(config_name: str) -> ConfigurationResponse:
+async def delete_configuration(request: DeleteConfigurationRequest) -> ConfigurationResponse:
     """删除配置"""
     try:
         db_service = get_database_service()
         
         # 检查配置是否存在
-        existing_configs = db_service.get_cached_data("configurations")
-        config_exists = any(config.get('name') == config_name for config in existing_configs)
+        existing_configs = db_service.get_cached_data_by_table("configurations")
+        config_exists = any(config.get('name') == request.name for config in existing_configs)
         
         if not config_exists:
             raise HTTPException(
                 status_code=404,
-                detail=f"配置 '{config_name}' 不存在"
+                detail=f"配置 '{request.name}' 不存在"
             )
         
         # 删除配置
-        db_service.remove_cached_data("configurations", config_name)
+        db_service.remove_cached_data("configurations", request.name)
         
         return ConfigurationResponse(
             success=True,
-            message=f"配置 '{config_name}' 已成功删除"
+            message=f"配置 '{request.name}' 已成功删除"
         )
         
     except HTTPException:
@@ -147,13 +149,13 @@ async def delete_configuration(config_name: str) -> ConfigurationResponse:
         )
 
 
-@router.get(
-    "/config/{config_name}",
+@router.post(
+    "/config/get",
     response_model=ConfigurationResponse,
     summary="获取单个配置",
     description="根据名称获取指定配置的详细信息"
 )
-async def get_configuration(config_name: str) -> ConfigurationResponse:
+async def get_configuration(request: GetConfigurationRequest) -> ConfigurationResponse:
     """获取单个配置信息"""
     try:
         db_service = get_database_service()
@@ -162,19 +164,19 @@ async def get_configuration(config_name: str) -> ConfigurationResponse:
         # 查找指定配置
         target_config = None
         for config_data in cached_configs:
-            if config_data.get('name') == config_name:
+            if config_data.get('name') == request.name:
                 target_config = config_data
                 break
         
         if not target_config:
             raise HTTPException(
                 status_code=404,
-                detail=f"配置 '{config_name}' 不存在"
+                detail=f"配置 '{request.name}' 不存在"
             )
         
         return ConfigurationResponse(
             success=True,
-            message=f"成功获取配置 '{config_name}'",
+            message=f"成功获取配置 '{request.name}'",
             data=ConfigurationData(**target_config)
         )
         

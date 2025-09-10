@@ -13,7 +13,8 @@
       "Bash(lsof:*)",
       "mcp__ide__getDiagnostics",
       "Bash(ALL_PROXY=\"\" curl -s http://localhost:8000/openapi.json)",
-      "Bash(python:*)"
+      "Bash(python:*)",
+      "Bash(git add:*)"
     ],
     "deny": [],
     "ask": []

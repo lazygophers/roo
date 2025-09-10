@@ -605,7 +605,7 @@ const ModesListWithSelection: React.FC<ModesListProps> = ({
                           <div>
                             <Paragraph 
                               ellipsis={{ rows: 2, expandable: false }}
-                              style={{ marginBottom: 8, fontSize: 13, color: '#666' }}
+                              style={{ marginBottom: 8, fontSize: 13, color: token.colorTextSecondary }}
                             >
                               {model.description}
                             </Paragraph>
@@ -636,12 +636,12 @@ const ModesListWithSelection: React.FC<ModesListProps> = ({
 
                   {/* 关联规则区域 - 选中后自动展开 */}
                   {isExpanded && (
-                    <div style={{ marginTop: 12, paddingTop: 12, borderTop: '1px solid #f0f0f0' }}>
+                    <div style={{ marginTop: 12, paddingTop: 12, borderTop: `1px solid ${token.colorBorderSecondary}` }}>
                       <div style={{ marginBottom: 8 }}>
                         <Row justify="space-between" align="middle">
                           <Col>
                             <Space>
-                              <BookOutlined style={{ color: '#722ed1' }} />
+                              <BookOutlined style={{ color: token.colorPrimary }} />
                               <Text strong style={{ fontSize: 13 }}>关联规则</Text>
                               {associatedRules.length > 0 && (
                                 <Tag color="blue">{associatedRules.length} 个</Tag>
@@ -671,7 +671,7 @@ const ModesListWithSelection: React.FC<ModesListProps> = ({
                                     height: 20,
                                     color: (() => {
                                       const stats = getRuleSelectionStats(model.slug);
-                                      return stats.isAllSelected ? '#d9d9d9' : '#1890ff';
+                                      return stats.isAllSelected ? token.colorTextDisabled : token.colorPrimary;
                                     })()
                                   }}
                                   onClick={() => handleRulesBatchOperation(model.slug, 'selectAll')}
@@ -682,7 +682,7 @@ const ModesListWithSelection: React.FC<ModesListProps> = ({
                                 >
                                   全选
                                 </Button>
-                                <span style={{ color: '#d9d9d9', fontSize: 10 }}>|</span>
+                                <span style={{ color: token.colorBorderSecondary, fontSize: 10 }}>|</span>
                                 <Button
                                   type="link"
                                   size="small"
@@ -692,7 +692,7 @@ const ModesListWithSelection: React.FC<ModesListProps> = ({
                                     height: 20,
                                     color: (() => {
                                       const stats = getRuleSelectionStats(model.slug);
-                                      return stats.isNoneSelected ? '#d9d9d9' : '#f5222d';
+                                      return stats.isNoneSelected ? token.colorTextDisabled : token.colorError;
                                     })()
                                   }}
                                   onClick={() => handleRulesBatchOperation(model.slug, 'deselectAll')}
@@ -703,7 +703,7 @@ const ModesListWithSelection: React.FC<ModesListProps> = ({
                                 >
                                   取消全选
                                 </Button>
-                                <span style={{ color: '#d9d9d9', fontSize: 10 }}>|</span>
+                                <span style={{ color: token.colorBorderSecondary, fontSize: 10 }}>|</span>
                                 <Button
                                   type="link"
                                   size="small"
@@ -711,14 +711,14 @@ const ModesListWithSelection: React.FC<ModesListProps> = ({
                                     fontSize: 11, 
                                     padding: '0 6px', 
                                     height: 20,
-                                    color: '#722ed1'
+                                    color: token.colorPrimary
                                   }}
                                   onClick={() => handleRulesBatchOperation(model.slug, 'invert')}
                                   disabled={associatedRules.length === 0}
                                 >
                                   反选
                                 </Button>
-                                <span style={{ color: '#d9d9d9', fontSize: 10 }}>|</span>
+                                <span style={{ color: token.colorBorderSecondary, fontSize: 10 }}>|</span>
                                 <Button
                                   type="link"
                                   size="small"
@@ -728,7 +728,7 @@ const ModesListWithSelection: React.FC<ModesListProps> = ({
                                     height: 20,
                                     color: (() => {
                                       const stats = getRuleSelectionStats(model.slug);
-                                      return stats.isNoneSelected ? '#d9d9d9' : '#fa8c16';
+                                      return stats.isNoneSelected ? token.colorTextDisabled : token.colorWarning;
                                     })()
                                   }}
                                   onClick={() => handleRulesBatchOperation(model.slug, 'clear')}

@@ -5,6 +5,7 @@ from .api_rules import router as rules_router
 from .api_commands import router as commands_router
 from .api_database import router as database_router
 from .api_configurations import router as configurations_router
+from .api_roles import router as roles_router
 
 # 创建主路由
 api_router = APIRouter()
@@ -16,3 +17,4 @@ api_router.include_router(rules_router, tags=["rules"])
 api_router.include_router(commands_router, tags=["commands"])
 api_router.include_router(database_router, tags=["database"])
 api_router.include_router(configurations_router, tags=["configurations"])
+api_router.include_router(roles_router, tags=["roles"])

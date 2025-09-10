@@ -1,0 +1,54 @@
+/* 简洁的配置管理页面样式 */
+.config-management-page {
+  min-height: 100vh;
+  background: #ffffff;
+}
+
+/* 卡片基础样式 */
+.config-management-page .ant-card {
+  border: 1px solid #f0f0f0;
+  border-radius: 4px;
+  box-shadow: none;
+}
+
+.config-management-page .ant-card:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.09);
+}
+
+/* Tabs 样式 */
+.config-management-page .ant-tabs-tab {
+  padding: 8px 16px;
+}
+
+/* 列表项样式 */
+.config-management-page .ant-list-item {
+  padding: 12px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.config-management-page .ant-list-item:hover {
+  background: #fafafa;
+}
+
+/* 按钮样式 */
+.config-management-page .ant-btn {
+  border-radius: 4px;
+}
+
+/* 暗色主题适配 */
+.dark-theme .config-management-page {
+  background: #141414;
+}
+
+.dark-theme .config-management-page .ant-card {
+  background: #1f1f1f;
+  border-color: #303030;
+}
+
+.dark-theme .config-management-page .ant-list-item {
+  border-color: #303030;
+}
+
+.dark-theme .config-management-page .ant-list-item:hover {
+  background: #262626;
+}

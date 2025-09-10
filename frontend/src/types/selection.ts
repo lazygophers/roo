@@ -1,6 +1,6 @@
 export interface SelectedItem {
   id: string;
-  type: 'model' | 'command' | 'rule';
+  type: 'model' | 'command' | 'rule' | 'role';
   name: string;
   data: any;
 }
