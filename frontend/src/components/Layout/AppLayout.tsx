@@ -13,7 +13,7 @@ interface AppLayoutProps {
 
 const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   const {
-    token: { colorBgContainer },
+    token: { colorBgContainer, colorBorderSecondary },
   } = theme.useToken();
   
   const navigate = useNavigate();
@@ -52,7 +52,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
             fontWeight: 'bold',
             fontSize: '16px',
             cursor: 'pointer',
-            borderBottom: '1px solid #f0f0f0'
+            borderBottom: `1px solid ${colorBorderSecondary}`
           }}
           onClick={() => navigate('/')}
         >
@@ -73,7 +73,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
         <Header style={{ 
           padding: 0, 
           background: colorBgContainer,
-          borderBottom: '1px solid #f0f0f0'
+          borderBottom: `1px solid ${colorBorderSecondary}`
         }}>
           <div style={{ 
             padding: '0 24px', 

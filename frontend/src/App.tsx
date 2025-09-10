@@ -7,6 +7,7 @@ import AppLayout from './components/Layout/AppLayout';
 import Home from './pages/Home';
 import ConfigManagementWithSelection from './pages/ConfigManagementWithSelection';
 import './App.css';
+import './styles/theme.css';
 
 const AppContent: React.FC = () => {
   const { currentTheme } = useTheme();

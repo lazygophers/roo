@@ -1,31 +1,74 @@
-/* 简洁的导航样式 */
+/* 简洁的导航样式 - 使用主题系统 */
 .nav-logo {
-  transition: background-color 0.2s;
+  transition: all 0.2s ease;
+  border-radius: 6px;
+  margin: 16px 8px !important;
 }
 
 .nav-logo:hover {
-  background-color: rgba(0, 0, 0, 0.04);
+  background-color: rgba(24, 144, 255, 0.06);
+  transform: scale(1.02);
 }
 
 /* 菜单项基础样式 */
 .ant-menu-item {
-  margin: 4px 8px;
-  border-radius: 4px;
+  margin: 6px 8px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.ant-menu-item:hover {
+  transform: translateX(2px);
 }
 
 .ant-menu-item-selected {
-  background-color: rgba(24, 144, 255, 0.1) !important;
+  background-color: rgba(24, 144, 255, 0.08) !important;
+  border: 1px solid rgba(24, 144, 255, 0.2);
+}
+
+/* 侧边栏样式 */
+.ant-layout-sider {
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.06);
+}
+
+/* Header样式优化 */
+.ant-layout-header {
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
 }
 
 /* 响应式调整 */
 @media (max-width: 768px) {
   .nav-logo {
     font-size: 14px !important;
-    margin: 12px !important;
+    margin: 12px 6px !important;
   }
   
   .ant-menu-item {
-    margin: 2px 6px;
+    margin: 4px 6px;
     font-size: 13px;
   }
+  
+  .ant-layout-sider {
+    box-shadow: none;
+  }
+}
+
+/* 暗色主题优化 */
+[data-theme='dark'] .nav-logo:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme='dark'] .ant-menu-item-selected {
+  background-color: rgba(24, 144, 255, 0.15) !important;
+  border: 1px solid rgba(24, 144, 255, 0.3);
+}
+
+[data-theme='dark'] .ant-layout-sider {
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme='dark'] .ant-layout-header {
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }

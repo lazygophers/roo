@@ -359,7 +359,7 @@ const ExportToolbar: React.FC<ExportToolbarProps> = ({
                   <div>
                     <strong>{config.name}</strong>
                     {config.description && (
-                      <div style={{ fontSize: 12, color: '#999' }}>
+                      <div style={{ fontSize: 12, color: token.colorTextTertiary }}>
                         {config.description}
                       </div>
                     )}
@@ -386,7 +386,7 @@ const ExportToolbar: React.FC<ExportToolbarProps> = ({
                   <div>
                     <div>{config.name}</div>
                     {config.description && (
-                      <div style={{ fontSize: 12, color: '#999' }}>
+                      <div style={{ fontSize: 12, color: token.colorTextTertiary }}>
                         {config.description}
                       </div>
                     )}

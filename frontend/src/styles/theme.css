@@ -1,0 +1,155 @@
+/* 全局主题协调性样式 */
+
+/* 统一边框圆角 */
+.ant-card,
+.ant-btn,
+.ant-input,
+.ant-select-selector,
+.ant-tabs-tab,
+.ant-list-item {
+  border-radius: 6px !important;
+}
+
+/* 统一过渡动画 */
+.ant-card,
+.ant-btn,
+.ant-list-item,
+.ant-tabs-tab,
+.nav-logo,
+.ant-menu-item {
+  transition: all 0.2s ease !important;
+}
+
+/* 卡片悬停效果 */
+.ant-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+}
+
+/* 按钮悬停效果 */
+.ant-btn:hover {
+  transform: translateY(-1px);
+}
+
+/* 统一间距 */
+.ant-space-item {
+  display: flex;
+  align-items: center;
+}
+
+/* 标签样式统一 */
+.ant-tag {
+  border-radius: 4px;
+  font-size: 11px;
+  line-height: 1.4;
+  margin: 2px;
+}
+
+/* 列表项优化 */
+.ant-list-item {
+  border-radius: 6px;
+  margin-bottom: 8px;
+  padding: 12px;
+}
+
+.ant-list-item:hover {
+  background: rgba(24, 144, 255, 0.02);
+}
+
+/* Tabs优化 */
+.ant-tabs-tab {
+  margin-right: 4px;
+  border-radius: 6px 6px 0 0;
+}
+
+.ant-tabs-tab:hover {
+  background: rgba(24, 144, 255, 0.04);
+}
+
+/* 表单元素统一 */
+.ant-input,
+.ant-select-selector,
+.ant-input-number,
+.ant-picker {
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.ant-input:focus,
+.ant-select-focused .ant-select-selector,
+.ant-input-number:focus,
+.ant-picker:focus {
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.1);
+}
+
+/* 模态框优化 */
+.ant-modal-content {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.ant-modal-header {
+  border-radius: 8px 8px 0 0;
+}
+
+/* 响应式优化 */
+@media (max-width: 768px) {
+  .ant-card {
+    margin-bottom: 16px;
+  }
+  
+  .ant-btn {
+    font-size: 12px;
+    padding: 4px 8px;
+    height: auto;
+  }
+  
+  .ant-tag {
+    font-size: 10px;
+  }
+}
+
+/* 暗色主题特定优化 */
+[data-theme='dark'] .ant-card:hover {
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.05) !important;
+}
+
+[data-theme='dark'] .ant-list-item:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+[data-theme='dark'] .ant-tabs-tab:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+[data-theme='dark'] .ant-input:focus,
+[data-theme='dark'] .ant-select-focused .ant-select-selector {
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+}
+
+/* 滚动条美化 */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+[data-theme='dark'] ::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme='dark'] ::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
