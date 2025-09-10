@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Card, Row, Col, Typography, List, Tag, Space, message, Progress, Badge, theme } from 'antd';
+import { Card, Row, Col, Typography, List, Tag, Space, message, Progress, Badge } from 'antd';
 import { 
   CodeOutlined, 
   RocketOutlined,
@@ -132,77 +132,10 @@ const ParticleBackground: React.FC = () => {
   );
 };
 
-// 数据可视化卡片组件
-const AnimatedStatCard: React.FC<{
-  title: string;
-  value: number;
-  icon: React.ReactNode;
-  color: string;
-  delay: number;
-  loading: boolean;
-}> = ({ title, value, icon, color, delay, loading }) => {
-  const [animatedValue, setAnimatedValue] = useState(0);
-  const [visible, setVisible] = useState(false);
-
-  useEffect(() => {
-    const timer = setTimeout(() => setVisible(true), delay);
-    return () => clearTimeout(timer);
-  }, [delay]);
-
-  useEffect(() => {
-    if (!loading && visible && value > 0) {
-      let current = 0;
-      const increment = Math.max(1, Math.floor(value / 30));
-      const timer = setInterval(() => {
-        current += increment;
-        if (current >= value) {
-          current = value;
-          clearInterval(timer);
-        }
-        setAnimatedValue(current);
-      }, 50);
-      return () => clearInterval(timer);
-    }
-  }, [value, loading, visible]);
-
-  return (
-    <Card 
-      className={`stat-card ${visible ? 'visible' : ''}`}
-      loading={loading}
-      hoverable
-      style={{
-        background: `linear-gradient(135deg, ${color}15, ${color}05)`,
-        border: `1px solid ${color}30`,
-        boxShadow: `0 4px 12px ${color}20`
-      }}
-    >
-      <div className="stat-content">
-        <div className="stat-icon" style={{ color }}>
-          {icon}
-        </div>
-        <div className="stat-info">
-          <div className="stat-value" style={{ color }}>
-            {animatedValue}
-          </div>
-          <div className="stat-title">{title}</div>
-        </div>
-      </div>
-      <div className="stat-progress">
-        <Progress 
-          percent={loading ? 0 : 100} 
-          showInfo={false} 
-          strokeColor={color}
-          trailColor={`${color}20`}
-        />
-      </div>
-    </Card>
-  );
-};
 
 // 主页组件
 const Home: React.FC = () => {
-  const { token } = theme.useToken();
-  const { currentTheme, themeType } = useTheme();
+  const { themeType } = useTheme();
   const [stats, setStats] = useState({
     totalModels: 0,
     coderModels: 0,

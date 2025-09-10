@@ -320,11 +320,15 @@ const ModesListWithSelection: React.FC<ModesListProps> = ({
     // 添加基础的 rules 目录
     ruleSlugs.push('rules');
     
-    // 逐级构建规则目录名称
-    let currentPath = 'rules';
+    // 逐级构建规则目录名称，不添加 rules- 前缀
+    let currentPath = '';
     for (const part of parts) {
       if (part) { // 忽略空字符串
-        currentPath += `-${part}`;
+        if (currentPath === '') {
+          currentPath = part;
+        } else {
+          currentPath += `-${part}`;
+        }
         ruleSlugs.push(currentPath);
       }
     }
@@ -682,6 +686,21 @@ const ModesListWithSelection: React.FC<ModesListProps> = ({
                                 </Tag>
                               )}
                             </div>
+                            
+                            {/* 文件信息 */}
+                            <div style={{ marginTop: 6, fontSize: 11, color: token.colorTextTertiary }}>
+                              <Space split={<span style={{ color: token.colorTextTertiary }}>|</span>} size={8}>
+                                <Text type="secondary" style={{ fontSize: 10 }}>
+                                  📁 {model.file_path?.replace(/^.*\/resources\//, '') || 'N/A'}
+                                </Text>
+                                <Text type="secondary" style={{ fontSize: 10 }}>
+                                  📏 {model.file_size ? `${(model.file_size / 1024).toFixed(1)}KB` : 'N/A'}
+                                </Text>
+                                <Text type="secondary" style={{ fontSize: 10 }}>
+                                  📅 {model.last_modified ? new Date(model.last_modified * 1000).toLocaleString() : 'N/A'}
+                                </Text>
+                              </Space>
+                            </div>
                           </div>
                         }
                       />
@@ -854,6 +873,21 @@ const ModesListWithSelection: React.FC<ModesListProps> = ({
                                       {rule.description.substring(0, 50)}{rule.description.length > 50 ? '...' : ''}
                                     </Text>
                                   )}
+                                  
+                                  {/* 规则文件信息 */}
+                                  <div style={{ marginTop: 4, fontSize: 10, color: token.colorTextTertiary }}>
+                                    <Space split={<span>|</span>} size={4}>
+                                      <Text type="secondary" style={{ fontSize: 9 }}>
+                                        📁 {rule.file_path?.replace(/^.*\/resources\//, '') || 'N/A'}
+                                      </Text>
+                                      <Text type="secondary" style={{ fontSize: 9 }}>
+                                        📏 {rule.file_size ? `${(rule.file_size / 1024).toFixed(1)}KB` : 'N/A'}
+                                      </Text>
+                                      <Text type="secondary" style={{ fontSize: 9 }}>
+                                        📅 {rule.last_modified ? new Date(rule.last_modified).toLocaleDateString() : 'N/A'}
+                                      </Text>
+                                    </Space>
+                                  </div>
                                 </div>
                               </div>
                             );

@@ -78,8 +78,8 @@ const RulesListWithSelection: React.FC<RulesListProps> = ({
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   };
 
-  const formatDate = (dateString: string): string => {
-    return new Date(dateString).toLocaleString('zh-CN');
+  const formatDate = (timestamp: number): string => {
+    return new Date(timestamp * 1000).toLocaleString('zh-CN');
   };
 
   const getFileExtension = (filePath: string): string => {
@@ -321,7 +321,7 @@ const RulesListWithSelection: React.FC<RulesListProps> = ({
                                 type="secondary" 
                                 style={{ fontSize: 10 }}
                               >
-                                {rule.file_path.split('/').pop()}
+                                📁 {rule.file_path?.replace(/^.*\/resources\//, '') || 'N/A'}
                               </Text>
                               <Text 
                                 type="secondary" 

@@ -17,6 +17,8 @@ export interface ModelInfo {
   description: string;
   groups: any[];
   file_path: string;
+  file_size?: number;
+  last_modified?: number;
 }
 
 export interface ModelsResponse {
@@ -39,7 +41,7 @@ export interface FileMetadata {
   file_path: string;
   source_directory: string;
   file_size: number;
-  last_modified: string;
+  last_modified: number;
 }
 
 export interface CommandsResponse {

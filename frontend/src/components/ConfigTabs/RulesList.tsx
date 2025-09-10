@@ -65,8 +65,8 @@ const RulesList: React.FC<RulesListProps> = ({ onSelectRule }) => {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   };
 
-  const formatDate = (dateString: string): string => {
-    return new Date(dateString).toLocaleString('zh-CN');
+  const formatDate = (timestamp: number): string => {
+    return new Date(timestamp * 1000).toLocaleString('zh-CN');
   };
 
   const getFileExtension = (filePath: string): string => {
