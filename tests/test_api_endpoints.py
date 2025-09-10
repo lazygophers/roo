@@ -87,8 +87,8 @@ class TestAPIEndpoints:
         response = client.post("/api/models/by-slug", json={"slug": "definitely-nonexistent-model-12345"})
         assert response.status_code == 404
         data = response.json()
-        assert data["success"] is False
-        assert "not found" in data["message"].lower()
+        assert "detail" in data
+        assert "not found" in data["detail"].lower()
 
     def test_models_categories_endpoint(self, client, mock_database_service):
         """Test models categories endpoint"""
@@ -190,19 +190,17 @@ class TestAPIEndpoints:
         response = client.post("/api/models/by-slug", json={})
         assert response.status_code == 422
 
-    @patch('app.core.database_service.get_database_service')
+    @patch('app.routers.api_models.get_database_service')
     def test_database_service_error(self, mock_get_service, client):
         """Test API behavior when database service fails"""
         # Mock service to raise an exception
         mock_service = Mock()
-        mock_service.get_models.side_effect = Exception("Database error")
+        mock_service.get_cached_data.side_effect = Exception("Database error")
         mock_get_service.return_value = mock_service
         
         response = client.post("/api/models", json={})
-        # Should handle error gracefully - may return 200 with empty data or 500
-        assert response.status_code in [200, 500]
-        
-        if response.status_code == 200:
-            data = response.json()
-            assert data["success"] is True
-            assert data["data"] == []
+        # Should return 500 when database service fails
+        assert response.status_code == 500
+        data = response.json()
+        assert "detail" in data
+        assert "database error" in data["detail"].lower()

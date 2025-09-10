@@ -128,6 +128,15 @@ app.add_middleware(
 # 注册路由
 app.include_router(api_router, prefix=API_PREFIX)
 
+# 健康检查端点 - 必须在静态文件挂载之前定义
+@app.get("/health")
+async def health_check():
+    return {"status": "healthy"}
+
+@app.get("/api/health")
+async def api_health_check():
+    return {"status": "healthy"}
+
 # 静态文件配置
 FRONTEND_BUILD_DIR = PROJECT_ROOT / "frontend" / "build"
 FRONTEND_STATIC_DIR = FRONTEND_BUILD_DIR / "static"
@@ -153,11 +162,3 @@ else:
             "build_command": "cd frontend && npm run build",
             "docs": "/docs"
         }
-
-@app.get("/health")
-async def health_check():
-    return {"status": "healthy"}
-
-@app.get("/api/health")
-async def api_health_check():
-    return {"status": "healthy"}

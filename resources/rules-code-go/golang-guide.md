@@ -23,21 +23,33 @@ references:
 # Go 编程规范指南
 
 ## 🔧 技术栈
-- Go 1.21+, Gin, GORM, Redis
-- 工具: gofmt, golint, go vet
-- 推荐包: testify, zap, viper
+
+- Go 1.25+, Gofiber, GORM, Redis，MySQL, PostgreSQL, MongoDB，SQLite，etcd
+
+## 包引用问题
+
+- **日志包**：优先推荐 `github.com/lazygophers/log`
+- **工具包**：优先使用 `github.com/lazygophers/utils`
+  - `json` 包：`github.com/lazygophers/utils/json`
+  - `string` 扩展：`github.com/lazygophers/utils/stringx`
+  - `time` 扩展：`github.com/lazygophers/utils/xtime`
+  - `bufio` 扩展：`github.com/lazygophers/utils/bufiox`
+  - `rand` 扩展：`github.com/lazygophers/utils/randx`
+  - `类型` 扩展：`github.com/lazygophers/utils/anyx`
+  - 语法糖：`github.com/lazygophers/utils/candy`
+- **原子操作**：优先使用 `go.uber.org/atomic`
 
 ## 📝 命名规范
 
-| 元素 | 命名法 | 示例 |
-|------|--------|------|
-| 包名 | `lowercase` | `http`, `json` |
-| 导出类型 | `UpperCamelCase` | `HTTPClient`, `User` |
-| 未导出类型 | `lowerCamelCase` | `httpClient`, `userRepo` |
-| 常量 | `SCREAMING_SNAKE_CASE` | `MAX_RETRY_COUNT` |
-| 变量 | 简短/描述性 | `i`, `maxRetries`, `userID` |
-| 接口 | `-er`后缀 | `Reader`, `Writer`, `Handler` |
-| 函数/方法 | `UpperCamelCase/lowerCamelCase` | `GetUser()`, `processData()` |
+| 元素       | 命名法                          | 示例                          |
+| ---------- | ------------------------------- | ----------------------------- |
+| 包名       | `lowercase`                     | `http`, `json`                |
+| 导出类型   | `UpperCamelCase`                | `HTTPClient`, `User`          |
+| 未导出类型 | `lowerCamelCase`                | `httpClient`, `userRepo`      |
+| 常量       | `SCREAMING_SNAKE_CASE`          | `MAX_RETRY_COUNT`             |
+| 变量       | 简短/描述性                     | `i`, `maxRetries`, `userID`   |
+| 接口       | `-er`后缀                       | `Reader`, `Writer`, `Handler` |
+| 函数/方法  | `UpperCamelCase/lowerCamelCase` | `GetUser()`, `processData()`  |
 
 ## 🏷️ 类型/接口定义
 
@@ -80,18 +92,18 @@ func TestUserRepository_GetByID(t *testing.T) {
         {"valid user", 1, &User{ID: 1, Name: "John"}, false},
         {"user not found", 999, nil, true},
     }
-    
+
     for _, tt := range tests {
         tt := tt
         t.Run(tt.name, func(t *testing.T) {
             t.Parallel()
             got, err := repo.GetByID(context.Background(), tt.userID)
-            
+
             if tt.wantErr {
                 assert.Error(t, err)
                 return
             }
-            
+
             require.NoError(t, err)
             assert.Equal(t, tt.want, got)
         })
@@ -100,11 +112,12 @@ func TestUserRepository_GetByID(t *testing.T) {
 ```
 
 ## ✅ 核心要求
-- 必须使用`gofmt -s`格式化，Tab缩进
-- Context作为函数第一参数，命名为`ctx`
+
+- 必须使用`gofmt -s`格式化，Tab 缩进
+- Context 作为函数第一参数，命名为`ctx`
 - 错误处理：使用`errors.Is/As`，不忽略错误
-- 并发：优先使用Channel，谨慎使用Mutex
+- 并发：优先使用 Channel，谨慎使用 Mutex
 - 尽早返回，减少嵌套深度
 - 使用`var`声明零值，`&T{}`创建指针
-- 测试覆盖率≥90%，使用表驱动测试
-- 公开API必须有注释，使用中文
+- 测试覆盖率 ≥90%，使用表驱动测试
+- 公开 API 必须有注释，使用中文

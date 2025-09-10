@@ -26,7 +26,9 @@
       "WebFetch(domain:github.com)",
       "WebFetch(domain:raw.githubusercontent.com)",
       "Bash(make:*)",
-      "Bash(export:*)"
+      "Bash(export:*)",
+      "Bash(npm test:*)",
+      "Bash(npm install)"
     ],
     "deny": [],
     "ask": []
