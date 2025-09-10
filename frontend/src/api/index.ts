@@ -92,6 +92,29 @@ export interface RoleResponse {
   total: number;
 }
 
+export interface DeployTarget {
+  name: string;
+  path: string;
+  enabled: boolean;
+  description: string;
+}
+
+export interface DeployRequest {
+  selected_models: string[];
+  selected_commands: string[];
+  selected_rules: string[];
+  model_rule_bindings: any[];
+  selected_role?: string;
+  deploy_targets: string[];
+}
+
+export interface DeployResponse {
+  success: boolean;
+  message: string;
+  deployed_files: string[];
+  errors: string[];
+}
+
 // API 方法
 export const apiClient = {
   // 获取所有模型
@@ -180,6 +203,24 @@ export const apiClient = {
   // 获取角色列表
   getRoles: async () => {
     const response = await api.post<RoleResponse>('/roles/list', {});
+    return response.data;
+  },
+
+  // 获取部署目标
+  getDeployTargets: async () => {
+    const response = await api.get<Record<string, DeployTarget>>('/deploy/targets');
+    return response.data;
+  },
+
+  // 生成custom_modes.yaml
+  generateCustomModes: async (request: DeployRequest) => {
+    const response = await api.post('/deploy/generate', request);
+    return response.data;
+  },
+
+  // 部署配置
+  deployCustomModes: async (request: DeployRequest) => {
+    const response = await api.post<DeployResponse>('/deploy/deploy', request);
     return response.data;
   }
 };

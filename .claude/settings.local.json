@@ -14,7 +14,8 @@
       "mcp__ide__getDiagnostics",
       "Bash(ALL_PROXY=\"\" curl -s http://localhost:8000/openapi.json)",
       "Bash(python:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Read(//Users/luoxin/Library/Application Support/Code/User/globalStorage/rooveterinaryinc.roo-cline/settings/**)"
     ],
     "deny": [],
     "ask": []

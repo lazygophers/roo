@@ -27,10 +27,12 @@ import {
   BookOutlined,
   SaveOutlined,
   SettingOutlined,
-  DeleteOutlined
+  DeleteOutlined,
+  RocketOutlined,
+  UserOutlined
 } from '@ant-design/icons';
 import { SelectedItem, ModelRuleBinding } from '../../types/selection';
-import { apiClient, FileMetadata } from '../../api';
+import { apiClient, FileMetadata, DeployTarget, DeployRequest } from '../../api';
 
 const { Text } = Typography;
 const { Option } = Select;
@@ -65,11 +67,16 @@ const ExportToolbar: React.FC<ExportToolbarProps> = ({
   const { token } = theme.useToken();
   const [saveModalVisible, setSaveModalVisible] = useState(false);
   const [configManageModalVisible, setConfigManageModalVisible] = useState(false);
+  const [deployModalVisible, setDeployModalVisible] = useState(false);
   const [saveLoading, setSaveLoading] = useState(false);
+  const [deployLoading, setDeployLoading] = useState(false);
   const [configurations, setConfigurations] = useState<ConfigurationData[]>([]);
+  const [deployTargets, setDeployTargets] = useState<Record<string, DeployTarget>>({});
+  const [selectedDeployTargets, setSelectedDeployTargets] = useState<string[]>([]);
   const [configurationsLoading, setConfigurationsLoading] = useState(false);
   const [selectedConfigName, setSelectedConfigName] = useState<string | null>(null);
   const [form] = Form.useForm();
+  const [deployForm] = Form.useForm();
   const modelCount = selectedItems.filter(item => item.type === 'model').length;
   const commandCount = selectedItems.filter(item => item.type === 'command').length;
   const ruleCount = selectedItems.filter(item => item.type === 'rule').length;
@@ -90,9 +97,32 @@ const ExportToolbar: React.FC<ExportToolbarProps> = ({
     }
   };
 
-  // 组件加载时获取配置列表
+  // 检测操作系统
+  const getOperatingSystem = () => {
+    const platform = navigator.platform.toLowerCase();
+    if (platform.includes('mac')) return 'macOS';
+    if (platform.includes('win')) return 'Windows';
+    if (platform.includes('linux')) return 'Linux';
+    return 'Unknown';
+  };
+
+  // 加载部署目标
+  const loadDeployTargets = async () => {
+    try {
+      const result = await apiClient.getDeployTargets();
+      setDeployTargets(result);
+      // 默认选择所有目标
+      const defaultTargets = Object.keys(result);
+      setSelectedDeployTargets(defaultTargets);
+    } catch (error) {
+      message.error('获取部署目标失败');
+    }
+  };
+
+  // 组件加载时获取配置列表和部署目标
   useEffect(() => {
     loadConfigurations();
+    loadDeployTargets();
   }, []);
 
   const handleExport = () => {
@@ -104,6 +134,58 @@ const ExportToolbar: React.FC<ExportToolbarProps> = ({
     // 这里暂不实现具体的导出逻辑，只显示提示
     message.info(`准备导出 ${totalCount} 个项目（模拟功能）`);
     onExport();
+  };
+
+  const handleDeploy = () => {
+    if (totalCount === 0) {
+      message.warning('请先选择要部署的项目');
+      return;
+    }
+    setDeployModalVisible(true);
+  };
+
+  const handleDeployConfirm = async () => {
+    try {
+      setDeployLoading(true);
+      
+      // 构建部署请求
+      const roleItem = selectedItems.find(item => item.type === 'role');
+      
+      const deployRequest: DeployRequest = {
+        selected_models: selectedItems
+          .filter(item => item.type === 'model')
+          .map(item => item.id),
+        selected_commands: selectedItems
+          .filter(item => item.type === 'command')
+          .map(item => item.id),
+        selected_rules: selectedItems
+          .filter(item => item.type === 'rule')
+          .map(item => item.id),
+        model_rule_bindings: modelRuleBindings,
+        selected_role: roleItem?.id,
+        deploy_targets: selectedDeployTargets
+      };
+
+      const result = await apiClient.deployCustomModes(deployRequest);
+      
+      if (result.success) {
+        message.success(`部署成功！已部署到 ${result.deployed_files.length} 个目标位置`);
+        if (result.errors.length > 0) {
+          result.errors.forEach(error => {
+            message.error(error);
+          });
+        }
+      } else {
+        message.error(`部署失败: ${result.message}`);
+      }
+      
+      setDeployModalVisible(false);
+      
+    } catch (error: any) {
+      message.error('部署失败: ' + (error.response?.data?.detail || error.message));
+    } finally {
+      setDeployLoading(false);
+    }
   };
 
   const handleSaveConfiguration = () => {
@@ -272,6 +354,17 @@ const ExportToolbar: React.FC<ExportToolbarProps> = ({
               disabled={totalCount === 0}
             >
               保存配置
+            </Button>
+            
+            <Button
+              size="small"
+              icon={<RocketOutlined />}
+              onClick={handleDeploy}
+              disabled={totalCount === 0}
+              type="primary"
+              style={{ background: '#722ed1' }}
+            >
+              部署配置
             </Button>
             
             <Button
@@ -583,6 +676,111 @@ const ExportToolbar: React.FC<ExportToolbarProps> = ({
             ))}
           </div>
         )}
+      </Modal>
+
+      {/* 部署模态框 */}
+      <Modal
+        title={
+          <Space>
+            <RocketOutlined style={{ color: '#722ed1' }} />
+            部署配置到VS Code扩展
+          </Space>
+        }
+        open={deployModalVisible}
+        onOk={handleDeployConfirm}
+        onCancel={() => setDeployModalVisible(false)}
+        confirmLoading={deployLoading}
+        okText="确认部署"
+        cancelText="取消"
+        width={600}
+      >
+        <div style={{ marginBottom: 16 }}>
+          <Text type="secondary">
+            将当前选择的配置生成为custom_modes.yaml并部署到指定的VS Code扩展目录
+          </Text>
+          <div style={{ marginTop: 8 }}>
+            <Tag color="blue">当前操作系统: {getOperatingSystem()}</Tag>
+            <Text type="secondary" style={{ fontSize: 12, marginLeft: 8 }}>
+              路径将根据您的操作系统自动调整
+            </Text>
+          </div>
+        </div>
+
+        {/* 当前选择概览 */}
+        <Card size="small" style={{ marginBottom: 16 }}>
+          <div style={{ marginBottom: 8 }}>
+            <Text strong>当前选择概览：</Text>
+          </div>
+          <Space wrap>
+            {modelCount > 0 && (
+              <Tag color="green" icon={<CodeOutlined />}>
+                {modelCount} 个模型
+              </Tag>
+            )}
+            {commandCount > 0 && (
+              <Tag color="blue" icon={<FileTextOutlined />}>
+                {commandCount} 个指令
+              </Tag>
+            )}
+            {ruleCount > 0 && (
+              <Tag color="purple" icon={<BookOutlined />}>
+                {ruleCount} 个规则
+              </Tag>
+            )}
+            {selectedItems.filter(item => item.type === 'role').length > 0 && (
+              <Tag color="orange" icon={<UserOutlined />}>
+                {selectedItems.filter(item => item.type === 'role').length} 个角色
+              </Tag>
+            )}
+          </Space>
+        </Card>
+
+        {/* 部署目标选择 */}
+        <Form form={deployForm} layout="vertical">
+          <Form.Item 
+            label="选择部署目标" 
+            name="deploy_targets"
+            rules={[{ required: true, message: '请选择至少一个部署目标' }]}
+          >
+            <Checkbox.Group 
+              value={selectedDeployTargets}
+              onChange={setSelectedDeployTargets}
+              style={{ width: '100%' }}
+            >
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                {Object.entries(deployTargets).map(([key, target]) => (
+                  <div key={key} style={{ 
+                    padding: 8, 
+                    border: `1px solid ${token.colorBorderSecondary}`,
+                    borderRadius: 4,
+                    backgroundColor: selectedDeployTargets.includes(key) 
+                      ? token.colorFillSecondary 
+                      : 'transparent'
+                  }}>
+                    <Checkbox value={key} style={{ width: '100%' }}>
+                      <div>
+                        <div style={{ fontWeight: 500 }}>{target.name}</div>
+                        <div style={{ fontSize: 11, color: token.colorTextTertiary, marginTop: 2 }}>
+                          {target.description}
+                        </div>
+                        <div style={{ fontSize: 10, color: token.colorTextTertiary, marginTop: 2 }}>
+                          路径: {target.path}
+                        </div>
+                      </div>
+                    </Checkbox>
+                  </div>
+                ))}
+              </div>
+            </Checkbox.Group>
+          </Form.Item>
+        </Form>
+
+        <div style={{ marginTop: 16, padding: 8, backgroundColor: token.colorFillTertiary, borderRadius: 4 }}>
+          <Text style={{ fontSize: 12, color: token.colorTextSecondary }}>
+            💡 提示：部署将会自动拼接before/after钩子、选中的规则到模型的customInstructions中，
+            然后生成custom_modes.yaml文件并复制到选定的VS Code扩展目录。
+          </Text>
+        </div>
       </Modal>
     </Card>
   );
