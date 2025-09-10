@@ -105,6 +105,13 @@ COMMAND_DEPLOY_PATHS = {
     "kilo": "~/.kilocode/commands"
 }
 
+# 规则文件部署目标映射（用于角色文件）
+RULES_DEPLOY_PATHS = {
+    "roo": "~/.roo/rules",
+    "roo-nightly": "~/.roo/rules",
+    "kilo": "~/.kilocode/rules"
+}
+
 def load_yaml_file(file_path: str) -> Dict[str, Any]:
     """加载YAML文件"""
     try:
@@ -381,13 +388,37 @@ async def deploy_custom_modes(request: DeployRequest):
                             error_msg = f"Command file not found: {command_path}"
                             errors.append(error_msg)
                             logger.warning(error_msg)
+
+                # 6. 部署选中的角色文件
+                if request.selected_role and target_key in RULES_DEPLOY_PATHS:
+                    rules_target_dir = os.path.expanduser(RULES_DEPLOY_PATHS[target_key])
+                    os.makedirs(rules_target_dir, exist_ok=True)
+                    
+                    # 构建角色文件路径
+                    role_file_path = f"resources/roles/{request.selected_role}.md"
+                    
+                    if os.path.exists(role_file_path):
+                        role_target_path = os.path.join(rules_target_dir, "role.md")
+                        
+                        try:
+                            shutil.copy2(role_file_path, role_target_path)
+                            deployed_files.append(role_target_path)
+                            logger.info(f"Successfully deployed role to {target_config['name']}: {role_target_path}")
+                        except Exception as e:
+                            error_msg = f"Failed to deploy role {request.selected_role} to {target_config['name']}: {str(e)}"
+                            errors.append(error_msg)
+                            logger.error(error_msg)
+                    else:
+                        error_msg = f"Role file not found: {role_file_path}"
+                        errors.append(error_msg)
+                        logger.warning(error_msg)
                 
             except Exception as e:
                 error_msg = f"Failed to deploy to {target_config['name']}: {str(e)}"
                 errors.append(error_msg)
                 logger.error(error_msg)
         
-        # 6. 清理临时文件（可选，保留用于调试）
+        # 7. 清理临时文件（可选，保留用于调试）
         # temp_yaml_file.unlink(missing_ok=True)
         
         success = len(deployed_files) > 0
@@ -462,6 +493,22 @@ async def cleanup_configurations(request: CleanupRequest):
                             logger.info(f"Command directory not found at {command_dir}")
                     except Exception as e:
                         error_msg = f"Failed to clean command directory for {target_config['name']}: {str(e)}"
+                        errors.append(error_msg)
+                        logger.error(error_msg)
+                
+                # 清空规则目录中的角色文件
+                if target_key in RULES_DEPLOY_PATHS:
+                    rules_dir = os.path.expanduser(RULES_DEPLOY_PATHS[target_key])
+                    role_file_path = os.path.join(rules_dir, "role.md")
+                    try:
+                        if os.path.exists(role_file_path):
+                            os.remove(role_file_path)
+                            cleaned_items.append(role_file_path)
+                            logger.info(f"Successfully cleaned role file for {target_config['name']}: {role_file_path}")
+                        else:
+                            logger.info(f"Role file not found at {role_file_path}")
+                    except Exception as e:
+                        error_msg = f"Failed to clean role file for {target_config['name']}: {str(e)}"
                         errors.append(error_msg)
                         logger.error(error_msg)
                 

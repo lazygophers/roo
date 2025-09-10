@@ -16,7 +16,12 @@
       "Bash(python:*)",
       "Bash(git add:*)",
       "Read(//Users/luoxin/Library/Application Support/Code/User/globalStorage/rooveterinaryinc.roo-cline/settings/**)",
-      "Read(//Users/luoxin/.roo/commands/**)"
+      "Read(//Users/luoxin/.roo/commands/**)",
+      "Read(//Users/luoxin/.roo/rules/**)",
+      "Read(//Users/luoxin/.kilocode/rules/**)",
+      "Bash(sed:*)",
+      "Bash(npx tsc:*)",
+      "Bash(git commit:*)"
     ],
     "deny": [],
     "ask": []

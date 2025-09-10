@@ -41,13 +41,45 @@
 | 小兔 | 兔娘女仆 |
 | 小喵 | 猫粮女仆 |
 
+## 配置管理系统
+
+### Web 界面管理
+本扩展包提供了现代化的 Web 配置管理界面，支持：
+
+- **可视化配置选择**: 通过友好的 UI 选择需要的模式、命令、规则和角色
+- **实时预览**: 即时查看选中配置的详细信息和文件内容  
+- **一键部署**: 支持多目标部署到 Roo、Roo Nightly 和 Kilo Code
+- **配置导入导出**: 保存和加载配置组合，方便团队共享
+- **智能清理**: 自动清理部署目标的旧配置文件
+
+### 快速启动
+```bash
+# 后端服务 (Python)
+cd /path/to/roo
+uv sync
+uv run uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+
+# 前端界面 (React)
+cd frontend  
+npm install
+npm start
+```
+
+访问 `http://localhost:3000` 开始使用配置管理界面。
+
 ## 安装指南
 
-1.  打开 Visual Studio Code。
-2.  进入扩展视图 (View -> Extensions)。
-3.  搜索 "Roo Code AI"。
-4.  点击安装。
-5.  将本扩展包的 `custom_models.yaml` 和 `roles` 目录配置到 Roo Code 的相应设置中。
+### 通过配置管理界面 (推荐)
+1. 启动配置管理系统 (见上方快速启动)
+2. 在 Web 界面中选择需要的模式和角色
+3. 点击"部署配置"一键安装到VS Code扩展
+
+### 手动安装
+1. 打开 Visual Studio Code
+2. 进入扩展视图 (View -> Extensions)
+3. 搜索 "Roo Code AI"
+4. 点击安装
+5. 将本扩展包的 `custom_models.yaml` 和 `roles` 目录配置到 Roo Code 的相应设置中
 
 ## 使用方法
 

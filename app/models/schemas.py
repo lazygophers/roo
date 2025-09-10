@@ -11,6 +11,8 @@ class ModelInfo(BaseModel):
     description: str
     groups: List[Any]
     file_path: str
+    file_size: Optional[int] = None
+    last_modified: Optional[int] = None
 
 
 class ModelsResponse(BaseModel):
@@ -62,7 +64,7 @@ class FileMetadata(BaseModel):
     file_path: str
     source_directory: str
     file_size: int
-    last_modified: str
+    last_modified: int
 
 
 class RulesResponse(BaseModel):

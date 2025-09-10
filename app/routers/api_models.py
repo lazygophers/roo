@@ -31,7 +31,9 @@ async def get_models(request: ModelsRequest = ModelsRequest()) -> ModelsResponse
                     whenToUse=content.get('whenToUse', ''),
                     description=content.get('description', ''),
                     groups=content.get('groups', []),
-                    file_path=file_data.get('file_path', '')
+                    file_path=file_data.get('file_path', ''),
+                    file_size=file_data.get('file_size'),
+                    last_modified=file_data.get('last_modified')
                 )
                 models.append(model_info)
         
@@ -98,7 +100,9 @@ async def get_model_by_slug(request: ModelBySlugRequest) -> ModelInfo:
                     whenToUse=content.get('whenToUse', ''),
                     description=content.get('description', ''),
                     groups=content.get('groups', []),
-                    file_path=file_data.get('file_path', '')
+                    file_path=file_data.get('file_path', ''),
+                    file_size=file_data.get('file_size'),
+                    last_modified=file_data.get('last_modified')
                 )
         
         raise HTTPException(

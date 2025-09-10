@@ -108,12 +108,14 @@ class DatabaseService:
                         # 计算文件哈希
                         file_hash = self._get_file_hash(file_path)
                         
+                        file_stats = file_path.stat()
                         file_data = {
                             'file_path': str(file_path.relative_to(PROJECT_ROOT)),
                             'absolute_path': str(file_path),
                             'file_name': file_path.name,
                             'file_hash': file_hash,
-                            'last_modified': file_path.stat().st_mtime,
+                            'file_size': file_stats.st_size,
+                            'last_modified': int(file_stats.st_mtime),
                             'scan_time': datetime.now().isoformat(),
                             'content': content,
                             'config_name': config_name
@@ -154,8 +156,11 @@ class DatabaseService:
             if file_path in existing_files:
                 # 检查文件是否有变化
                 existing_record = existing_files[file_path]
-                if existing_record['file_hash'] != file_data['file_hash']:
-                    # 文件已修改，更新记录
+                if (existing_record['file_hash'] != file_data['file_hash'] or 
+                    'file_size' not in existing_record or existing_record.get('file_size') is None or
+                    isinstance(existing_record.get('last_modified'), str) or
+                    isinstance(existing_record.get('last_modified'), float)):
+                    # 文件已修改或缺少文件大小信息，更新记录
                     table.update(file_data, Query_obj.file_path == file_path)
                     stats['updated'] += 1
                 else:
