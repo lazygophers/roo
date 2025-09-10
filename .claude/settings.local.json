@@ -21,7 +21,10 @@
       "Read(//Users/luoxin/.kilocode/rules/**)",
       "Bash(sed:*)",
       "Bash(npx tsc:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "WebFetch(domain:docs.roocode.com)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:raw.githubusercontent.com)"
     ],
     "deny": [],
     "ask": []

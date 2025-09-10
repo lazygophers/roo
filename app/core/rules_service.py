@@ -59,7 +59,7 @@ class RulesService:
             # 获取文件统计信息
             file_stat = file_path.stat()
             file_size = file_stat.st_size
-            last_modified = datetime.fromtimestamp(file_stat.st_mtime).isoformat()
+            last_modified = int(file_stat.st_mtime)
             
             # 读取文件内容
             with open(file_path, 'r', encoding='utf-8') as f:
