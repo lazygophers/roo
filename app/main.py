@@ -20,6 +20,57 @@ async def lifespan(app: FastAPI):
     try:
         db_service = init_database_service()
         logger.info("Database service initialized successfully")
+        
+        # 打印启动信息和访问地址
+        import socket
+        import sys
+        
+        try:
+            hostname = socket.gethostname()
+            local_ip = socket.gethostbyname(hostname)
+        except Exception:
+            local_ip = "127.0.0.1"
+        
+        startup_message = f"""
+{"="*60}
+🚀 LazyAI Studio 启动成功！
+📋 LazyGophers 出品 - 让 AI 替你思考，让工具替你工作！
+{"="*60}
+
+📍 访问地址:
+   🏠 本地访问:    http://localhost:8000
+   🌐 局域网访问:  http://{local_ip}:8000
+   📱 移动设备:    http://{local_ip}:8000
+
+🔗 功能入口:
+   📊 配置管理:    http://localhost:8000/
+   📖 API 文档:    http://localhost:8000/docs
+   💚 健康检查:    http://localhost:8000/api/health"""
+
+        # 检查前端构建状态
+        frontend_build = PROJECT_ROOT / "frontend" / "build"
+        if frontend_build.exists():
+            startup_message += "\n   ✅ 前端状态:    已构建 (集成模式)"
+        else:
+            startup_message += "\n   ⚠️  前端状态:    未构建 (API 模式)"
+            startup_message += "\n   💡 构建提示:    运行 'make build' 构建前端"
+        
+        startup_message += f"""
+
+🎯 快速开始:
+   📚 查看帮助:    make help
+   🏗️ 构建前端:    make build
+   🧪 运行测试:    make test
+   🧹 清理文件:    make clean
+
+{"="*60}
+🎉 Ready! 开始你的 AI 懒人之旅吧！
+{"="*60}
+"""
+        
+        print(startup_message, flush=True)
+        sys.stdout.flush()
+        
     except Exception as e:
         logger.error(f"Failed to initialize database service: {e}")
         raise
@@ -28,12 +79,20 @@ async def lifespan(app: FastAPI):
     
     # 关闭时清理资源
     logger.info("Shutting down application...")
+    shutdown_message = """
+👋 LazyAI Studio 正在关闭...
+📋 LazyGophers - 感谢使用我们的懒人工具！
+"""
+    print(shutdown_message, flush=True)
+    
     try:
         db_service = get_database_service()
         db_service.close()
         logger.info("Database service closed successfully")
+        print("✅ 服务已安全关闭\n", flush=True)
     except Exception as e:
         logger.error(f"Error during shutdown: {e}")
+        print(f"⚠️ 关闭过程中出现错误: {e}\n", flush=True)
 
 # 创建 FastAPI 应用
 app = FastAPI(
