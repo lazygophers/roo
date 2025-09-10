@@ -4,23 +4,34 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Roo Code AI Extension Package - A comprehensive system for enhancing AI coding experience through custom modes and roles. The project consists of a mode management system that processes YAML-based AI model definitions and integrates them with VS Code extensions.
+**LazyAI Studio** - LazyGophers 组织出品的 AI 智能工作室。这是一个专为懒人开发者设计的综合性 AI 开发解决方案，通过智能模式、个性角色和便捷命令，让复杂的开发工作变得简单高效。
+
+项目核心是一个强大的配置管理系统，能够处理基于 YAML 的 AI 模式定义，并与 VS Code 扩展无缝集成，为开发者提供完整的 AI 辅助开发体验。
 
 ## Commands
 
 ### Development & Testing
 ```bash
-# Install dependencies (uses UV package manager)
-uv sync
+# Install all dependencies
+make install
 
-# Run tests (once tests/ directory is created)
-uv run pytest tests/ -v
+# Start development server (with integrated frontend)
+make backend-dev
+
+# Start production server
+make run
+
+# Build frontend for production
+make build
+
+# Run tests
+make test
 
 # Generate custom_models.yaml from resources/models/*.yaml
 uv run python merge.py
 
-# Deploy to VS Code extensions (macOS)
-./update.sh
+# Clean build files
+make clean
 ```
 
 ## Architecture

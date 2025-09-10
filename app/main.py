@@ -1,8 +1,10 @@
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
 from contextlib import asynccontextmanager
-from app.core.config import API_PREFIX, DEBUG, LOG_LEVEL
+from pathlib import Path
+from app.core.config import API_PREFIX, DEBUG, LOG_LEVEL, PROJECT_ROOT
 from app.core.logging import setup_logging, log_error
 from app.core.database_service import init_database_service, get_database_service
 from app.routers import api_router
@@ -35,8 +37,8 @@ async def lifespan(app: FastAPI):
 
 # 创建 FastAPI 应用
 app = FastAPI(
-    title="Roo Models API",
-    description="API for accessing Roo model configurations with auto file scanning",
+    title="LazyAI Studio API",
+    description="LazyGophers 出品 - 懒人的 AI 智能工作室 API，提供模式、角色、命令和规则的智能管理",
     version="1.0.0",
     debug=DEBUG,
     lifespan=lifespan
@@ -67,9 +69,31 @@ app.add_middleware(
 # 注册路由
 app.include_router(api_router, prefix=API_PREFIX)
 
-@app.get("/")
-async def root():
-    return {"message": "Roo Models API is running", "docs": "/docs"}
+# 静态文件配置
+FRONTEND_BUILD_DIR = PROJECT_ROOT / "frontend" / "build"
+FRONTEND_STATIC_DIR = FRONTEND_BUILD_DIR / "static"
+
+# 挂载前端静态资源
+if FRONTEND_BUILD_DIR.exists():
+    # 挂载静态文件目录
+    if FRONTEND_STATIC_DIR.exists():
+        app.mount("/static", StaticFiles(directory=str(FRONTEND_STATIC_DIR)), name="static")
+    
+    # 挂载前端应用
+    app.mount("/", StaticFiles(directory=str(FRONTEND_BUILD_DIR), html=True), name="frontend")
+else:
+    # 如果前端构建目录不存在，显示开发模式的 API 信息
+    @app.get("/")
+    async def root():
+        return {
+            "message": "LazyAI Studio API is running", 
+            "organization": "LazyGophers",
+            "motto": "让 AI 替你思考，让工具替你工作，让你做个聪明的懒人！",
+            "mode": "development",
+            "frontend_status": "not_built",
+            "build_command": "cd frontend && npm run build",
+            "docs": "/docs"
+        }
 
 @app.get("/health")
 async def health_check():

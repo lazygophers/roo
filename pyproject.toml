@@ -1,7 +1,7 @@
 [project]
-name = "roo"
-version = "0.1.0"
-description = "Add your description here"
+name = "lazyai-studio"
+version = "1.0.0"
+description = "LazyAI Studio - 懒人的 AI 智能工作室，为开发者提供专业的 AI 模式、角色和命令管理系统"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [

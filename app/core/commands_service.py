@@ -43,7 +43,7 @@ class CommandsService:
                         file_path=str(file_path),
                         source_directory=str(CommandsService.COMMANDS_DIR),
                         file_size=stat.st_size,
-                        last_modified=datetime.fromtimestamp(stat.st_mtime).isoformat()
+                        last_modified=int(stat.st_mtime)
                     )
                     
                     metadata_list.append(metadata)

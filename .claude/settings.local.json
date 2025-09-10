@@ -24,7 +24,8 @@
       "Bash(git commit:*)",
       "WebFetch(domain:docs.roocode.com)",
       "WebFetch(domain:github.com)",
-      "WebFetch(domain:raw.githubusercontent.com)"
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(make:*)"
     ],
     "deny": [],
     "ask": []

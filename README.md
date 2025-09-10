@@ -1,10 +1,36 @@
-# Roo Code AI 扩展包
+# LazyAI Studio
 
-[![项目状态: 活跃](https://img.shields.io/badge/status-active-success.svg)](https://github.com/lazygophers/roo)
+[![项目状态: 活跃](https://img.shields.io/badge/status-active-success.svg)](https://github.com/lazygophers/lazyai-studio)
+[![组织: LazyGophers](https://img.shields.io/badge/org-LazyGophers-blue.svg)](https://github.com/lazygophers)
+[![许可证: MIT](https://img.shields.io/badge/license-MIT-green.svg)](https://choosealicense.com/licenses/mit/)
+
+> 🚀 **LazyGophers 出品** - 让 AI 开发更智能，让开发者更懒人！
 
 ## 简介
 
-欢迎使用 Roo Code AI 扩展包！本扩展旨在通过一系列专业的 **自定义模式 (Modes)** 和生动的 **自定义角色 (Roles)**，极大地增强和个性化您的 AI 编码体验。无论您是需要顶层架构设计、精准的代码实现、系统的项目研究，还是希望与富有特色的 AI 角色互动，本扩展都能为您提供强大的支持。
+欢迎使用 **LazyAI Studio**！这是 LazyGophers 组织为懒人开发者精心打造的 AI 智能工作室。
+
+我们的理念是：**让 AI 替你思考，让工具替你工作，让你做个聪明的懒人！** 🛋️
+
+本项目通过一系列专业的 **智能模式 (Modes)**、**个性角色 (Roles)** 和 **便捷命令 (Commands)**，为您提供完整的 AI 开发解决方案。从顶层架构设计到精确代码实现，从项目研究到文档编写，LazyAI Studio 让复杂的开发工作变得简单而高效。
+
+## 🐹 关于 LazyGophers
+
+**LazyGophers** 是一个致力于为开发者提供智能开发工具的开源组织。我们相信：
+
+- 🧠 **智能优于蛮力** - 用 AI 解决重复性工作
+- 🛠️ **工具优于手工** - 让自动化处理琐碎任务  
+- 😎 **高效优于忙碌** - 专注核心创造而非基础劳动
+- 🎯 **简单优于复杂** - 复杂的问题需要简单的解决方案
+
+我们的使命是让每个开发者都能成为"聪明的懒人" - 通过智能工具提升效率，将时间投入到真正重要的创新工作中。
+
+### 组织项目
+
+- 🏗️ **LazyAI Studio** - AI 智能工作室 (本项目)
+- 🔧 **LazyDevOps** - 自动化运维工具链 (规划中)
+- 📱 **LazyMobile** - 移动开发加速器 (规划中)
+- 🌐 **LazyCloud** - 云服务管理平台 (规划中)
 
 ## 核心功能
 
@@ -52,20 +78,75 @@
 - **配置导入导出**: 保存和加载配置组合，方便团队共享
 - **智能清理**: 自动清理部署目标的旧配置文件
 
-### 快速启动
-```bash
-# 后端服务 (Python)
-cd /path/to/roo
-uv sync
-uv run uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+### 🚀 快速启动
 
-# 前端界面 (React)
-cd frontend  
-npm install
-npm start
+#### 一键启动 (推荐)
+```bash
+# 安装依赖、构建前端、启动服务器
+make install && make run
+```
+访问 `http://localhost:8000` 开始使用！
+
+#### 开发模式
+```bash
+# 前端开发 (热重载)
+make frontend-dev   # 访问 http://localhost:3000
+
+# 后端开发 (集成前端)
+make backend-dev    # 访问 http://localhost:8000
 ```
 
-访问 `http://localhost:3000` 开始使用配置管理界面。
+#### 手动启动
+```bash
+# 1. 安装依赖
+make install
+
+# 2. 构建前端
+make build
+
+# 3. 启动服务器
+make run
+```
+
+### 📋 可用命令
+
+LazyAI Studio 提供了完整的 Makefile 命令集，让开发更加懒人化：
+
+```bash
+# 📦 安装依赖
+make install           # 安装所有依赖（前端+后端）
+make backend-install   # 仅安装后端依赖
+make frontend-install  # 仅安装前端依赖
+
+# 🚀 启动服务
+make run              # 构建并启动生产服务器
+make dev              # 启动开发环境
+make backend-dev      # 启动后端开发服务器
+make frontend-dev     # 启动前端开发服务器
+
+# 🏗️ 构建项目
+make build            # 构建前端生产版本
+make frontend-build   # 构建前端静态文件
+
+# 🧪 运行测试
+make test             # 运行所有测试
+make test-backend     # 运行后端测试
+make test-frontend    # 运行前端测试
+make test-integration # 运行集成测试
+
+# 🚀 部署项目
+make deploy           # 部署到生产环境
+
+# 🧹 清理文件
+make clean            # 清理所有构建文件
+make clean-frontend   # 清理前端构建文件
+make clean-backend    # 清理后端缓存
+
+# 🔍 其他工具
+make check            # 检查系统环境
+make info             # 显示项目信息
+make help             # 显示帮助信息
+```
 
 ## 安装指南
 
@@ -87,15 +168,29 @@ npm start
 2.  通过 Roo Code 的命令面板或侧边栏激活您需要的模式。
 3.  在与 AI 交互时，可以指定使用特定的角色，体验个性化的互动。
 
-## 贡献指南
+## 🤝 加入 LazyGophers
 
-我们欢迎社区的任何贡献！无论是 Bug 修复、功能建议还是模式/角色的创新，都可以通过以下方式参与：
+欢迎所有认同"聪明的懒人"理念的开发者加入我们！
 
-1.  **Fork** 本仓库。
-2.  创建您的特性分支 (`git checkout -b feature/AmazingFeature`)。
-3.  提交您的更改 (`git commit -m 'feat(scope): Add some AmazingFeature'`)。
-4.  推送到分支 (`git push origin feature/AmazingFeature`)。
-5.  开启一个 **Pull Request**。
+### 贡献方式
+- 🐛 **发现 Bug** - 帮助我们发现和修复问题，让工具更可靠
+- ✨ **提升功能** - 添加让开发者更懒的新特性
+- 🎭 **设计角色** - 创造有趣的 AI 角色，让编程更有温度
+- 🧠 **优化模式** - 改进现有模式，提升 AI 辅助效果
+- 📖 **完善文档** - 让更多懒人能够快速上手
+
+### 贡献流程
+1. **Fork** 本仓库
+2. 创建您的懒人分支 (`git checkout -b feature/SuperLazyFeature`)
+3. 提交更改 (`git commit -m 'feat: 添加超级懒人功能'`)
+4. 推送到分支 (`git push origin feature/SuperLazyFeature`)
+5. 开启 **Pull Request** 并描述您的懒人创新
+
+### 行为准则
+- 🎯 **效率至上** - 代码要解决实际问题，提升开发效率
+- 🧠 **AI 优先** - 优先考虑 AI 和自动化解决方案  
+- 😊 **友善交流** - 保持开放和友善的社区氛围
+- 📚 **持续学习** - 分享经验，共同成长为更智能的懒人
 
 ## 许可证
 
