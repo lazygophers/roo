@@ -421,16 +421,17 @@ const ModesListWithSelection: React.FC<ModesListProps> = ({
     }
   };
 
-  const handleSelectAllVisible = async () => {
-    console.log('handleSelectAllVisible called');
-    const visibleItems: SelectedItem[] = filteredModels.map(model => ({
+  // 全选所有模式
+  const handleSelectAll = async () => {
+    console.log('handleSelectAll called');
+    const allItems: SelectedItem[] = models.map(model => ({
       id: model.slug,
       type: 'model',
       name: model.name,
       data: model
     }));
-    console.log('Visible items:', visibleItems.map(item => item.id));
-    onSelectAll(visibleItems);
+    console.log('All items:', allItems.map(item => item.id));
+    onSelectAll(allItems);
     
     // 获取需要新展开的模型
     const modelsToExpand = filteredModels.filter(model => 
@@ -467,6 +468,47 @@ const ModesListWithSelection: React.FC<ModesListProps> = ({
       // 等待所有模型展开完成
       await Promise.all(expandPromises);
       console.log('All models expanded and rules selected');
+    }
+  };
+
+  // 反选所有模式
+  const handleReverseSelection = async () => {
+    console.log('handleReverseSelection called');
+    const currentSelectedIds = selectedItems
+      .filter(item => item.type === 'model')
+      .map(item => item.id);
+    
+    const reversedItems: SelectedItem[] = models
+      .filter(model => !currentSelectedIds.includes(model.slug))
+      .map(model => ({
+        id: model.slug,
+        type: 'model',
+        name: model.name,
+        data: model
+      }));
+    
+    // 清空当前选择，然后选择反选的项目
+    onClearSelection();
+    setTimeout(() => {
+      onSelectAll(reversedItems);
+    }, 100);
+  };
+
+  // 取消全选（仅取消选中状态，保留必选项）
+  const handleUnselectAll = () => {
+    const requiredModels = ['orchestrator']; // 必选模式列表
+    const requiredItems = selectedItems.filter(item => 
+      item.type === 'model' && requiredModels.includes(item.id)
+    );
+    
+    // 清空所有选择
+    onClearSelection();
+    
+    // 重新添加必选项
+    if (requiredItems.length > 0) {
+      setTimeout(() => {
+        requiredItems.forEach(item => onToggleSelection(item));
+      }, 100);
     }
   };
 
@@ -520,19 +562,31 @@ const ModesListWithSelection: React.FC<ModesListProps> = ({
             <Space>
               <Button 
                 size="small"
-                
-                onClick={handleSelectAllVisible}
-                disabled={filteredModels.length === 0}
+                onClick={handleSelectAll}
+                disabled={models.length === 0}
               >
-                全选当前页
+                全选
               </Button>
               <Button 
                 size="small"
-                
+                onClick={handleReverseSelection}
+                disabled={models.length === 0}
+              >
+                反选
+              </Button>
+              <Button 
+                size="small"
+                onClick={handleUnselectAll}
+                disabled={selectedModelCount === 0}
+              >
+                取消全选
+              </Button>
+              <Button 
+                size="small"
                 onClick={onClearSelection}
                 disabled={selectedModelCount === 0}
               >
-                清空选择
+                清空
               </Button>
             </Space>
           </Col>

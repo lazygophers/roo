@@ -86,6 +86,13 @@ def get_deploy_targets():
 # 使用函数获取部署目标
 DEPLOY_TARGETS = get_deploy_targets()
 
+# 命令文件部署目标映射
+COMMAND_DEPLOY_PATHS = {
+    "roo": "~/.roo/commands",
+    "roo-nightly": "~/.roo/commands", 
+    "kilo": "~/.kilocode/commands"
+}
+
 def load_yaml_file(file_path: str) -> Dict[str, Any]:
     """加载YAML文件"""
     try:
@@ -165,9 +172,9 @@ def generate_custom_modes_yaml(
                     model_file = yaml_file
                     break
             
-            # 如果还没找到，搜索所有yaml文件寻找匹配的slug
+            # 如果还没找到，递归搜索所有yaml文件寻找匹配的slug
             if not model_file:
-                for yaml_file in models_dir.glob("*.yaml"):
+                for yaml_file in models_dir.rglob("*.yaml"):
                     try:
                         temp_data = load_yaml_file(str(yaml_file))
                         if temp_data.get('slug') == model_slug:
@@ -334,18 +341,41 @@ async def deploy_custom_modes(request: DeployRequest):
                 # 确保目标目录存在
                 os.makedirs(os.path.dirname(target_path), exist_ok=True)
                 
-                # 复制文件
+                # 复制自定义模式YAML文件
                 shutil.copy2(str(temp_yaml_file), target_path)
                 deployed_files.append(target_path)
                 
-                logger.info(f"Successfully deployed to {target_config['name']}: {target_path}")
+                logger.info(f"Successfully deployed custom modes to {target_config['name']}: {target_path}")
+                
+                # 5. 部署选中的命令文件
+                if request.selected_commands and target_key in COMMAND_DEPLOY_PATHS:
+                    command_target_dir = os.path.expanduser(COMMAND_DEPLOY_PATHS[target_key])
+                    os.makedirs(command_target_dir, exist_ok=True)
+                    
+                    for command_path in request.selected_commands:
+                        if os.path.exists(command_path):
+                            command_filename = os.path.basename(command_path)
+                            command_target_path = os.path.join(command_target_dir, command_filename)
+                            
+                            try:
+                                shutil.copy2(command_path, command_target_path)
+                                deployed_files.append(command_target_path)
+                                logger.info(f"Successfully deployed command to {target_config['name']}: {command_target_path}")
+                            except Exception as e:
+                                error_msg = f"Failed to deploy command {command_filename} to {target_config['name']}: {str(e)}"
+                                errors.append(error_msg)
+                                logger.error(error_msg)
+                        else:
+                            error_msg = f"Command file not found: {command_path}"
+                            errors.append(error_msg)
+                            logger.warning(error_msg)
                 
             except Exception as e:
                 error_msg = f"Failed to deploy to {target_config['name']}: {str(e)}"
                 errors.append(error_msg)
                 logger.error(error_msg)
         
-        # 5. 清理临时文件（可选，保留用于调试）
+        # 6. 清理临时文件（可选，保留用于调试）
         # temp_yaml_file.unlink(missing_ok=True)
         
         success = len(deployed_files) > 0

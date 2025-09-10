@@ -15,7 +15,8 @@
       "Bash(ALL_PROXY=\"\" curl -s http://localhost:8000/openapi.json)",
       "Bash(python:*)",
       "Bash(git add:*)",
-      "Read(//Users/luoxin/Library/Application Support/Code/User/globalStorage/rooveterinaryinc.roo-cline/settings/**)"
+      "Read(//Users/luoxin/Library/Application Support/Code/User/globalStorage/rooveterinaryinc.roo-cline/settings/**)",
+      "Read(//Users/luoxin/.roo/commands/**)"
     ],
     "deny": [],
     "ask": []

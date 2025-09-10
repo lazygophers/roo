@@ -55,12 +55,6 @@ const RolesListWithSelection: React.FC<RolesListWithSelectionProps> = ({
     data: role
   });
 
-  // 全选角色
-  const handleSelectAllRoles = () => {
-    const allRoleItems = roles.map(convertRoleToSelectedItem);
-    onSelectAll(allRoleItems);
-  };
-
   // 清空角色选择
   const handleClearRoleSelection = () => {
     // 只移除角色类型的选择，保留其他类型
@@ -95,13 +89,6 @@ const RolesListWithSelection: React.FC<RolesListWithSelectionProps> = ({
             角色列表 ({selectedRoleCount}/{roles.length})
           </span>
           <Space>
-            <Button 
-              size="small" 
-              onClick={handleSelectAllRoles}
-              disabled={selectedRoleCount === roles.length}
-            >
-              全选
-            </Button>
             <Button 
               size="small" 
               onClick={handleClearRoleSelection}
