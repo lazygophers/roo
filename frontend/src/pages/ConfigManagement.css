@@ -1,0 +1,44 @@
+/* 简洁的配置管理页面样式 - 使用主题系统 */
+.config-management-page {
+  min-height: 100vh;
+}
+
+/* 统一卡片样式 - 让Antd主题系统接管 */
+.config-management-page .ant-card {
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.config-management-page .ant-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* 统一按钮样式 */
+.config-management-page .ant-btn {
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+/* 列表项样式优化 */
+.config-management-page .ant-list-item {
+  transition: all 0.2s ease;
+}
+
+/* Tabs样式优化 */
+.config-management-page .ant-tabs-tab {
+  border-radius: 6px 6px 0 0;
+  transition: all 0.2s ease;
+  margin-right: 4px;
+}
+
+.config-management-page .ant-tabs-tab:hover {
+  background: rgba(24, 144, 255, 0.04);
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .config-management-page .ant-col {
+    margin-bottom: 16px;
+  }
+}

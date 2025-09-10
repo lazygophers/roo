@@ -1,0 +1,51 @@
+# 任务上下文信息
+task_id: "任务ID"
+context:
+  # 任务相关的临时变量
+  variables:
+    # 示例变量
+    api_endpoint: "https://api.example.com"
+    current_user: "username"
+    session_token: "token_value"
+
+  # 中间状态
+  state:
+    step: "current_step"
+    progress: "percentage"
+    status: "processing|completed|failed"
+
+  # 临时配置
+  config:
+    timeout: 30
+    retries: 3
+    debug_mode: false
+
+  # 缓存数据
+  cache:
+    key: "cache_key"
+    value: "cached_value"
+    expires_at: "2025-01-01T00:00:00Z"
+
+  # 依赖信息
+  dependencies:
+    files: ["file1.py", "file2.py"]
+    services: ["service1", "service2"]
+    packages: ["package1", "package2"]
+
+  # 环境信息
+  environment:
+    python_version: "3.9.0"
+    os: "darwin"
+    workspace: "/path/to/workspace"
+
+  # 调试信息
+  debug:
+    last_error: "error_message"
+    stack_trace: "stack_trace"
+    logs: ["log1", "log2"]
+
+  # 会话信息
+  session:
+    start_time: "2025-01-01T00:00:00Z"
+    last_update: "2025-01-01T00:00:00Z"
+    actions: ["action1", "action2"]

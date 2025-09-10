@@ -1,0 +1,106 @@
+/* 全局样式 */
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+#root {
+  height: 100%;
+}
+
+/* 浅色主题 */
+.light-theme {
+  background-color: #f0f2f5;
+  color: #000000d9;
+}
+
+.light-theme .ant-layout {
+  background-color: #f0f2f5;
+}
+
+/* 深色主题 */
+.dark-theme {
+  background-color: #000000;
+  color: #ffffffd9;
+}
+
+.dark-theme .ant-layout {
+  background-color: #000000;
+}
+
+/* 主题切换动画 */
+.theme-transition {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 自定义滚动条 */
+.light-theme ::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.light-theme ::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.light-theme ::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+.light-theme ::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+.dark-theme ::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.dark-theme ::-webkit-scrollbar-track {
+  background: #2f2f2f;
+  border-radius: 4px;
+}
+
+.dark-theme ::-webkit-scrollbar-thumb {
+  background: #555;
+  border-radius: 4px;
+}
+
+.dark-theme ::-webkit-scrollbar-thumb:hover {
+  background: #777;
+}
+
+/* 卡片和组件的额外样式 */
+.theme-card {
+  transition: all 0.3s ease;
+}
+
+.light-theme .theme-card {
+  background-color: #ffffff;
+  border: 1px solid #d9d9d9;
+}
+
+.dark-theme .theme-card {
+  background-color: #141414;
+  border: 1px solid #434343;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .ant-layout-header {
+    padding: 0 12px !important;
+  }
+  
+  .ant-layout-header > div {
+    font-size: 16px !important;
+  }
+}

@@ -1,0 +1,23 @@
+[project]
+name = "lazyai-studio"
+version = "1.0.0"
+description = "LazyAI Studio - 懒人的 AI 智能工作室，为开发者提供专业的 AI 模式、角色和命令管理系统"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.116.1",
+    "flask>=3.1.2",
+    "python-multipart>=0.0.20",
+    "pyyaml>=6.0.2",
+    "requests>=2.32.5",
+    "rich>=14.1.0",
+    "ruamel-yaml>=0.18.15",
+    "tinydb>=4.8.2",
+    "uvicorn>=0.35.0",
+    "pytest>=8.3.3",
+    "pytest-asyncio>=0.24.0",
+    "httpx>=0.27.2",
+    "pytz>=2025.2",
+    "pytest-cov>=6.2.1",
+    "watchdog>=3.0.0",
+]
