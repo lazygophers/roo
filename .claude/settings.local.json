@@ -33,7 +33,15 @@
       "Bash(ALL_PROXY=\"\" curl -s http://localhost:8001/api/system/monitor)",
       "Bash(ALL_PROXY=\"\" curl -s http://localhost:8000/api/models)",
       "Bash(ALL_PROXY=\"\" curl -s -X POST http://localhost:8000/api/models -H \"Content-Type: application/json\" -d '{}')",
-      "Bash(ALL_PROXY=\"\" curl -s -X POST http://localhost:8000/api/rules/by-slug -H \"Content-Type: application/json\" -d '{\"\"slug\"\": \"\"orchestrator\"\"}')"
+      "Bash(ALL_PROXY=\"\" curl -s -X POST http://localhost:8000/api/rules/by-slug -H \"Content-Type: application/json\" -d '{\"\"slug\"\": \"\"orchestrator\"\"}')",
+      "Bash(git push:*)",
+      "Bash(gh api:*)",
+      "Bash(npm audit:*)",
+      "Bash(yarn audit)",
+      "Bash(npm view:*)",
+      "Bash(yarn install)",
+      "Bash(yarn install:*)",
+      "Bash(yarn import:*)"
     ],
     "deny": [],
     "ask": []
