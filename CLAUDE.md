@@ -6,86 +6,155 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **LazyAI Studio** - LazyGophers 组织出品的 AI 智能工作室。这是一个专为懒人开发者设计的综合性 AI 开发解决方案，通过智能模式、个性角色和便捷命令，让复杂的开发工作变得简单高效。
 
-项目核心是一个强大的配置管理系统，能够处理基于 YAML 的 AI 模式定义，并与 VS Code 扩展无缝集成，为开发者提供完整的 AI 辅助开发体验。
+项目包含完整的前后端应用：后端基于 FastAPI 提供 REST API，前端使用 React + TypeScript + Ant Design 构建现代化管理界面，为开发者提供直观的 AI 模式配置和管理体验。
 
 ## Commands
 
 ### Development & Testing
 ```bash
-# Install all dependencies
+# Install all dependencies (frontend + backend)
 make install
 
-# Start development server (with integrated frontend)
-make backend-dev
+# Development servers
+make dev                   # Start full-stack dev environment
+make backend-dev          # Start backend only (port 8000)
+make backend-dev-optimized # Start high-performance backend (ultra cache)
+make frontend-dev         # Start frontend only (port 3000)
 
-# Start production server
-make run
+# Production
+make run                  # Build and start production server
+make build               # Build frontend for production
 
-# Build frontend for production
-make build
+# Testing
+make test                # Run all tests (frontend + backend)
+make test-backend        # Run Python backend tests only
+make test-frontend       # Run React frontend tests only
+make test-coverage       # Generate coverage reports
+make test-watch          # Run tests in watch mode
 
-# Run tests
-make test
+# Performance
+make benchmark           # Run performance comparison tests
+make benchmark-optimized # Test ultra-performance version
 
-# Generate custom_models.yaml from resources/models/*.yaml
-uv run python merge.py
+# Maintenance
+make clean              # Clean all build files
+make clean-frontend     # Clean frontend build only
+```
 
-# Clean build files
-make clean
+### Single Test Examples
+```bash
+# Backend single test
+uv run pytest tests/test_api_endpoints.py::test_health_check -v
+
+# Frontend single test
+cd frontend && npm test -- --testNamePattern="App renders"
+
+# Integration test
+uv run pytest tests/test_integration_comprehensive.py -v
 ```
 
 ## Architecture
 
-### Core Components
+### Full-Stack Architecture
 
-1. **Mode Processing System** (`merge.py`)
-   - Reads model definitions from `resources/models/*.yaml`
-   - Injects hooks from `resources/hooks/before.md` and `resources/hooks/after.md`
-   - Generates consolidated `custom_models.yaml` for VS Code extensions
-   - Ensures `orchestrator` mode is always first in output
+```
+LazyAI Studio
+├── Backend (FastAPI)
+│   ├── app/main.py              # Main application entry
+│   ├── app/main_ultra.py        # Ultra-performance variant
+│   ├── app/core/                # Core services
+│   │   ├── database_service.py  # Main data management
+│   │   ├── database_service_lite.py # Performance-optimized
+│   │   ├── ultra_cache_system.py # Multi-level caching
+│   │   └── secure_logging.py    # Security-hardened logging
+│   ├── app/routers/            # API endpoints
+│   └── app/models/             # Data models
+└── Frontend (React + TypeScript)
+    ├── src/pages/              # Page components
+    ├── src/components/         # Reusable components
+    ├── src/contexts/           # React contexts (theme, etc)
+    └── src/api/               # API client layer
+```
 
-2. **Model Structure**
-   - Each mode defined in separate YAML under `resources/models/`
-   - Required fields: slug, name, roleDefinition, customInstructions, whenToUse, description, groups
-   - Modes include specialized variants for languages (code-python, code-golang, etc.)
+### Core Backend Services
 
-3. **Rules System** (`resources/rules*/`)
-   - Language-specific rules directories (rules-code-python, rules-code-golang, etc.)
-   - Core rules in `resources/rules/` including memory management, task delegation, mode selection
-   - Rules are copied to `~/.roo/` and `~/.kilocode/` during deployment
+1. **Database Service** (`app/core/database_service.py`)
+   - File-based data management with TinyDB
+   - Real-time file watching with watchdog
+   - YAML parsing and validation
+   - Caching layer for performance
 
-4. **Deployment** (`update.sh`)
-   - Copies generated `custom_models.yaml` to VS Code extension directories:
-     - `~/Library/Application Support/Code/User/globalStorage/rooveterinaryinc.roo-cline/`
-     - `~/Library/Application Support/Code/User/globalStorage/rooveterinaryinc.roo-code-nightly/`
-     - `~/Library/Application Support/Code/User/globalStorage/kilocode.kilo-code/`
-   - Deploys rules and commands to `~/.roo/` and `~/.kilocode/` directories
-   - Copies role files (bunny_maid.md) to rules directories
+2. **Ultra Cache System** (`app/core/ultra_cache_system.py`) 
+   - Multi-level caching (L1/L2/L3 + disk)
+   - LRU cache with TTL support
+   - Memory pool management
+   - Performance optimization for high-load scenarios
 
-### Key Modes
+3. **Secure Logging** (`app/core/secure_logging.py`)
+   - Log injection prevention (CWE-117)
+   - Input sanitization utilities
+   - Safe key-value logging formatters
 
-- **orchestrator** (Brain): Task decomposition and model selection hub
-- **architect**: System design and technical architecture  
-- **code/code-***: Language-specific implementation modes
-- **debug**: Systematic bug tracking and resolution
-- **doc-writer**: Technical documentation creation
-- **project-research**: Codebase analysis and insights
-- **memory**: Deterministic memory management workflows
+### Frontend Architecture
+
+1. **React Application** (`frontend/src/`)
+   - TypeScript for type safety
+   - Ant Design component library
+   - Multiple theme support (9 built-in themes)
+   - Responsive design
+
+2. **Key Components**
+   - System monitoring with real-time metrics
+   - Configuration management interface
+   - Theme switching capabilities
+   - Performance-optimized rendering
+
+### Performance Variants
+
+The system includes multiple performance tiers:
+- **Standard** (`main.py`): Full-featured with file watching
+- **Ultra** (`main_ultra.py`): Maximum performance with aggressive caching
+- **Lite** (`database_service_lite.py`): Minimal resource usage
 
 ## Development Guidelines
 
-### Mode Development
-- Edit mode definitions in `resources/models/*.yaml`
-- Run `uv run python merge.py` to regenerate `custom_models.yaml`
-- Use `./update.sh` to deploy changes locally
+### Security Requirements
+- Use `app/core/secure_logging.py` for all user input logging
+- All log statements must sanitize user-controlled data
+- Follow CWE-117 prevention guidelines
 
-### Testing
-- Tests directory doesn't exist yet - create `tests/` for Python tests
-- Use `uv run pytest tests/ -v` for Python testing
-- Test dependencies already included in `pyproject.toml` (pytest, pytest-asyncio, pytest-cov, httpx)
+### Performance Optimization
+- Reference `PERFORMANCE_OPTIMIZATION.md` for optimization techniques
+- Use appropriate service variant based on requirements
+- Implement caching for frequently accessed data
+- Monitor memory usage in production
+
+### Frontend Development
+```bash
+cd frontend
+npm start        # Development server
+npm test         # Run tests
+npm run build    # Production build
+npm audit        # Security audit
+```
+
+### Testing Strategy
+- **Unit Tests**: Individual function testing
+- **Integration Tests**: Full API endpoint testing
+- **Frontend Tests**: React component testing
+- **Performance Tests**: Benchmark comparisons
 
 ### Technology Stack
 - **Python**: 3.12+ with UV package manager
-- **Core Dependencies**: FastAPI, Flask, PyYAML, Rich, TinyDB, Uvicorn
-- **Development**: Virtual environment in `.venv/`, dependencies in `pyproject.toml`
-- **Backend Structure**: Minimal FastAPI app structure in `app/` (core, models, routers)
+- **Backend**: FastAPI, TinyDB, Uvicorn, PyYAML
+- **Performance**: psutil, orjson, uvloop for optimization  
+- **Frontend**: React 19, TypeScript, Ant Design 5
+- **Security**: Input sanitization, log injection prevention
+- **Testing**: pytest (backend), Jest (frontend)
+- **Development**: Hot reload, file watching, auto-testing
+
+### Code Structure Conventions
+- Backend follows FastAPI patterns with dependency injection
+- Frontend uses React functional components with hooks
+- Shared TypeScript interfaces between frontend/backend
+- Modular component architecture with clear separation of concerns
