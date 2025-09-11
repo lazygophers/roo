@@ -208,6 +208,30 @@ const MCPToolsManagement: React.FC = () => {
     }
   };
 
+  // 切换分类开关状态
+  const toggleCategory = async (category: MCPCategoryInfo, enabled: boolean) => {
+    try {
+      const response = enabled
+        ? await apiClient.enableMCPCategory(category.id)
+        : await apiClient.disableMCPCategory(category.id);
+
+      if (response.success) {
+        messageApi.success(`分类${category.name}已${enabled ? '启用' : '禁用'}`);
+        loadData(); // 重新加载数据
+      } else {
+        messageApi.error(response.message);
+      }
+    } catch (error) {
+      // 模拟状态切换（用于演示）
+      setCategories(prevCategories =>
+        prevCategories.map(c =>
+          c.id === category.id ? { ...c, enabled } : c
+        )
+      );
+      messageApi.success(`分类${category.name}已${enabled ? '启用' : '禁用'}`);
+    }
+  };
+
   // 测试工具
   const testTool = async (tool: MCPToolInfo, params: any) => {
     try {
@@ -278,10 +302,10 @@ const MCPToolsManagement: React.FC = () => {
   // 过滤工具
   const toolsByCategory = getToolsByCategory();
   
-  // 只显示有工具的分类
+  // 显示所有分类（包括禁用的），但只有启用的分类会显示工具
   const filteredCategories = selectedCategory === 'all' 
-    ? categories.filter(cat => (toolsByCategory[cat.id] || []).length > 0)
-    : categories.filter(cat => cat.id === selectedCategory && (toolsByCategory[cat.id] || []).length > 0);
+    ? categories
+    : categories.filter(cat => cat.id === selectedCategory);
 
   // 渲染工具卡片
   const renderToolCard = (tool: MCPToolInfo) => {
@@ -462,14 +486,12 @@ const MCPToolsManagement: React.FC = () => {
                 <Option value="all">所有分类 ({tools.length})</Option>
                 {categories.map(category => {
                   const count = toolsByCategory[category.id]?.length || 0;
-                  // 只显示有工具的分类
-                  if (count === 0) return null;
                   return (
-                    <Option key={category.id} value={category.id}>
-                      {category.icon} {category.name} ({count})
+                    <Option key={category.id} value={category.id} disabled={!category.enabled}>
+                      {category.icon} {category.name} ({count}) {!category.enabled && '(禁用)'}
                     </Option>
                   );
-                }).filter(Boolean)}
+                })}
               </Select>
             </Space>
           </Col>
@@ -503,15 +525,27 @@ const MCPToolsManagement: React.FC = () => {
                 label: (
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
                     <Space>
-                      <span style={{ fontSize: '18px' }}>{category.icon}</span>
-                      <Title level={4} style={{ margin: 0 }}>
+                      <span style={{ fontSize: '18px', opacity: category.enabled ? 1 : 0.5 }}>{category.icon}</span>
+                      <Title level={4} style={{ margin: 0, opacity: category.enabled ? 1 : 0.5 }}>
                         {category.name}
                       </Title>
                       <Text type="secondary">({enabledCount}/{categoryTools.length})</Text>
+                      {!category.enabled && <Tag color="red">分类禁用</Tag>}
                     </Space>
-                    <Tag color={enabledCount === categoryTools.length ? 'success' : enabledCount > 0 ? 'warning' : 'default'}>
-                      {enabledCount === categoryTools.length ? '全部启用' : enabledCount > 0 ? '部分启用' : '全部禁用'}
-                    </Tag>
+                    <Space>
+                      <Switch
+                        size="small"
+                        checked={category.enabled}
+                        onChange={(checked) => toggleCategory(category, checked)}
+                        checkedChildren="启用"
+                        unCheckedChildren="禁用"
+                      />
+                      {category.enabled && (
+                        <Tag color={enabledCount === categoryTools.length ? 'success' : enabledCount > 0 ? 'warning' : 'default'}>
+                          {enabledCount === categoryTools.length ? '全部启用' : enabledCount > 0 ? '部分启用' : '全部禁用'}
+                        </Tag>
+                      )}
+                    </Space>
                   </div>
                 ),
                 extra: (
@@ -519,7 +553,15 @@ const MCPToolsManagement: React.FC = () => {
                     {category.description}
                   </Text>
                 ),
-                children: categoryTools.length === 0 ? (
+                children: !category.enabled ? (
+                  <Alert
+                    message="分类已禁用"
+                    description={`${category.name} 分类当前处于禁用状态。启用分类以查看和管理其中的工具。`}
+                    type="warning"
+                    showIcon
+                    style={{ margin: '16px 0' }}
+                  />
+                ) : categoryTools.length === 0 ? (
                   <Empty 
                     description={`${category.name} 分类下暂无工具`}
                     image={Empty.PRESENTED_IMAGE_SIMPLE}

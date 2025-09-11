@@ -173,7 +173,7 @@ async def list_mcp_categories():
     """列出 MCP 工具分类"""
     try:
         tools_service = get_mcp_tools_service()
-        categories = tools_service.get_categories()
+        categories = tools_service.get_categories(enabled_only=False)  # 获取所有分类，包括禁用的
         tools_by_category = tools_service.get_tools_by_category()
         
         # 为每个分类添加工具数量
@@ -559,4 +559,66 @@ async def remove_mcp_tool(request: Dict[str, Any]):
         return {
             "success": False,
             "message": "Failed to remove tool: Internal server error"
+        }
+
+@router.post("/categories/enable")
+async def enable_mcp_category(request: Dict[str, Any]):
+    """启用MCP工具分类"""
+    try:
+        category_id = request.get("id")
+        if not category_id:
+            return {
+                "success": False,
+                "message": "Category ID is required"
+            }
+
+        tools_service = get_mcp_tools_service()
+        result = tools_service.enable_category(category_id)
+        
+        if result:
+            return {
+                "success": True,
+                "message": f"Category '{sanitize_for_log(category_id)}' enabled successfully"
+            }
+        else:
+            return {
+                "success": False,
+                "message": f"Category '{sanitize_for_log(category_id)}' not found"
+            }
+    except Exception as e:
+        logger.error(f"Failed to enable category: {sanitize_for_log(str(e))}")
+        return {
+            "success": False,
+            "message": "Failed to enable category: Internal server error"
+        }
+
+@router.post("/categories/disable")
+async def disable_mcp_category(request: Dict[str, Any]):
+    """禁用MCP工具分类"""
+    try:
+        category_id = request.get("id")
+        if not category_id:
+            return {
+                "success": False,
+                "message": "Category ID is required"
+            }
+
+        tools_service = get_mcp_tools_service()
+        result = tools_service.disable_category(category_id)
+        
+        if result:
+            return {
+                "success": True,
+                "message": f"Category '{sanitize_for_log(category_id)}' disabled successfully"
+            }
+        else:
+            return {
+                "success": False,
+                "message": f"Category '{sanitize_for_log(category_id)}' not found"
+            }
+    except Exception as e:
+        logger.error(f"Failed to disable category: {sanitize_for_log(str(e))}")
+        return {
+            "success": False,
+            "message": "Failed to disable category: Internal server error"
         }

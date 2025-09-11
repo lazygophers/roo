@@ -362,6 +362,18 @@ export const apiClient = {
   disableMCPTool: async (toolName: string) => {
     const response = await api.post('/mcp/tools/disable', { name: toolName });
     return response.data;
+  },
+
+  // 启用MCP工具分类
+  enableMCPCategory: async (categoryId: string) => {
+    const response = await api.post('/mcp/categories/enable', { id: categoryId });
+    return response.data;
+  },
+
+  // 禁用MCP工具分类
+  disableMCPCategory: async (categoryId: string) => {
+    const response = await api.post('/mcp/categories/disable', { id: categoryId });
+    return response.data;
   }
 };
 

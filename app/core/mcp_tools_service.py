@@ -68,63 +68,88 @@ class MCPToolsService:
         self.tools_table = self.db.table('mcp_tools')
         self.categories_table = self.db.table('mcp_categories')
         
-        # 初始化默认分类
-        self._initialize_categories()
-        
         logger.info(f"MCPToolsService initialized with db: {sanitize_for_log(db_path)}")
     
-    def _initialize_categories(self):
-        """初始化默认工具分类"""
-        default_categories = [
+    def register_builtin_categories(self):
+        """注册内置工具分类到数据库（启动时覆盖）"""
+        builtin_categories = [
             {
                 'id': 'system',
                 'name': '系统工具',
                 'description': '系统信息和监控相关工具',
                 'icon': '🖥️',
-                'enabled': True
+                'enabled': True,
+                'sort_order': 1
             },
             {
                 'id': 'time',
                 'name': '时间工具', 
                 'description': '时间戳和日期相关工具',
                 'icon': '⏰',
-                'enabled': True
+                'enabled': True,
+                'sort_order': 2
             },
             {
                 'id': 'ai',
                 'name': 'AI工具',
                 'description': 'AI模式和智能助手相关工具',
                 'icon': '🤖',
-                'enabled': True
+                'enabled': False,  # 默认禁用，因为没有工具
+                'sort_order': 3
             },
             {
                 'id': 'dev',
                 'name': '开发工具',
                 'description': '开发和调试相关工具',
                 'icon': '⚙️',
-                'enabled': True
+                'enabled': False,  # 默认禁用，因为没有工具
+                'sort_order': 4
             },
             {
                 'id': 'data',
                 'name': '数据工具',
                 'description': '数据处理和分析相关工具',
                 'icon': '📊',
-                'enabled': True
+                'enabled': False,  # 默认禁用，因为没有工具
+                'sort_order': 5
             }
         ]
         
+        registered_count = 0
+        updated_count = 0
+        
         Query_obj = Query()
-        for category in default_categories:
+        for category in builtin_categories:
             existing = self.categories_table.get(Query_obj.id == category['id'])
-            if not existing:
+            
+            if existing:
+                # 覆盖现有分类（保留enabled状态和created_at）
+                category['enabled'] = existing.get('enabled', category['enabled'])
+                category['created_at'] = existing['created_at']
+                category['updated_at'] = datetime.now().isoformat()
+                
+                self.categories_table.update(category, Query_obj.id == category['id'])
+                updated_count += 1
+                logger.info(f"Updated builtin category: {sanitize_for_log(category['name'])}")
+            else:
+                # 注册新分类
                 category['created_at'] = datetime.now().isoformat()
+                category['updated_at'] = datetime.now().isoformat()
                 self.categories_table.insert(category)
-                logger.info(f"Created default category: {sanitize_for_log(category['name'])}")
+                registered_count += 1
+                logger.info(f"Registered new builtin category: {sanitize_for_log(category['name'])}")
+        
+        logger.info(f"Builtin categories registration completed: {registered_count} new, {updated_count} updated")
+        return {"registered": registered_count, "updated": updated_count}
     
-    def get_categories(self) -> List[Dict[str, Any]]:
-        """获取所有工具分类"""
+    def get_categories(self, enabled_only: bool = True) -> List[Dict[str, Any]]:
+        """获取工具分类"""
         categories = self.categories_table.all()
-        return [cat for cat in categories if cat.get('enabled', True)]
+        if enabled_only:
+            categories = [cat for cat in categories if cat.get('enabled', True)]
+        
+        # 按sort_order排序
+        return sorted(categories, key=lambda x: x.get('sort_order', 999))
     
     def get_category(self, category_id: str) -> Optional[Dict[str, Any]]:
         """获取特定分类"""
@@ -132,7 +157,7 @@ class MCPToolsService:
         return self.categories_table.get(Query_obj.id == category_id)
     
     def register_builtin_tools(self):
-        """注册内置MCP工具到数据库"""
+        """注册内置MCP工具到数据库（启动时覆盖）"""
         builtin_tools = [
             MCPTool(
                 name="get_current_timestamp",
@@ -202,8 +227,9 @@ class MCPToolsService:
             existing = self.tools_table.get(Query_obj.name == tool.name)
             
             if existing:
-                # 更新现有工具
+                # 覆盖现有工具（保留enabled状态和created_at）
                 tool.id = existing['id']
+                tool.enabled = existing.get('enabled', tool.enabled)
                 tool.created_at = existing['created_at']
                 tool.updated_at = datetime.now().isoformat()
                 
@@ -212,6 +238,8 @@ class MCPToolsService:
                 logger.info(f"Updated builtin tool: {sanitize_for_log(tool.name)}")
             else:
                 # 注册新工具
+                tool.created_at = datetime.now().isoformat()
+                tool.updated_at = datetime.now().isoformat()
                 self.tools_table.insert(tool.to_dict())
                 registered_count += 1
                 logger.info(f"Registered new builtin tool: {sanitize_for_log(tool.name)}")
@@ -268,6 +296,24 @@ class MCPToolsService:
         result = self.tools_table.remove(Query_obj.name == name)
         if result:
             logger.info(f"Removed tool: {sanitize_for_log(name)}")
+        return len(result) > 0
+    
+    def enable_category(self, category_id: str) -> bool:
+        """启用工具分类"""
+        Query_obj = Query()
+        result = self.categories_table.update({'enabled': True, 'updated_at': datetime.now().isoformat()}, 
+                                            Query_obj.id == category_id)
+        if result:
+            logger.info(f"Enabled category: {sanitize_for_log(category_id)}")
+        return len(result) > 0
+    
+    def disable_category(self, category_id: str) -> bool:
+        """禁用工具分类"""
+        Query_obj = Query()
+        result = self.categories_table.update({'enabled': False, 'updated_at': datetime.now().isoformat()}, 
+                                            Query_obj.id == category_id)
+        if result:
+            logger.info(f"Disabled category: {sanitize_for_log(category_id)}")
         return len(result) > 0
     
     def get_tools_by_category(self) -> Dict[str, List[Dict[str, Any]]]:
@@ -332,8 +378,13 @@ def init_mcp_tools_service() -> MCPToolsService:
     
     mcp_service = get_mcp_tools_service()
     
-    # 注册内置工具
-    result = mcp_service.register_builtin_tools()
-    logger.info(f"MCP tools service initialized: {result}")
+    # 注册内置分类
+    categories_result = mcp_service.register_builtin_categories()
+    logger.info(f"MCP categories registered: {categories_result}")
     
+    # 注册内置工具
+    tools_result = mcp_service.register_builtin_tools()
+    logger.info(f"MCP tools registered: {tools_result}")
+    
+    logger.info("MCP tools service initialized successfully")
     return mcp_service
