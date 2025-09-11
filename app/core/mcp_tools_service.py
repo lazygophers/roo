@@ -112,6 +112,14 @@ class MCPToolsService:
                 'icon': '📊',
                 'enabled': False,  # 默认禁用，因为没有工具
                 'sort_order': 5
+            },
+            {
+                'id': 'file',
+                'name': '文件工具',
+                'description': '文件读写、目录操作和文件管理相关工具',
+                'icon': '📁',
+                'enabled': True,  # 启用文件工具分类
+                'sort_order': 6
             }
         ]
         
@@ -214,6 +222,199 @@ class MCPToolsService:
                     "examples": [
                         {"detailed": False},
                         {"detailed": True, "include_performance": True}
+                    ]
+                }
+            ),
+            MCPTool(
+                name="read_file",
+                description="读取指定路径的文件内容",
+                category="file",
+                schema={
+                    "type": "object",
+                    "properties": {
+                        "file_path": {
+                            "type": "string",
+                            "description": "要读取的文件路径（相对或绝对路径）"
+                        },
+                        "encoding": {
+                            "type": "string",
+                            "description": "文件编码格式",
+                            "default": "utf-8",
+                            "enum": ["utf-8", "gbk", "ascii", "latin1"]
+                        },
+                        "max_lines": {
+                            "type": "integer",
+                            "description": "最大读取行数，0表示读取全部",
+                            "default": 0,
+                            "minimum": 0
+                        }
+                    },
+                    "required": ["file_path"]
+                },
+                metadata={
+                    "tags": ["文件", "读取", "内容"],
+                    "examples": [
+                        {"file_path": "config.yaml"},
+                        {"file_path": "/etc/hosts", "encoding": "utf-8"},
+                        {"file_path": "large_file.txt", "max_lines": 100}
+                    ]
+                }
+            ),
+            MCPTool(
+                name="write_file",
+                description="写入内容到指定路径的文件",
+                category="file",
+                schema={
+                    "type": "object",
+                    "properties": {
+                        "file_path": {
+                            "type": "string",
+                            "description": "要写入的文件路径（相对或绝对路径）"
+                        },
+                        "content": {
+                            "type": "string",
+                            "description": "要写入的文件内容"
+                        },
+                        "encoding": {
+                            "type": "string",
+                            "description": "文件编码格式",
+                            "default": "utf-8",
+                            "enum": ["utf-8", "gbk", "ascii", "latin1"]
+                        },
+                        "mode": {
+                            "type": "string",
+                            "description": "写入模式",
+                            "default": "write",
+                            "enum": ["write", "append"]
+                        }
+                    },
+                    "required": ["file_path", "content"]
+                },
+                metadata={
+                    "tags": ["文件", "写入", "创建"],
+                    "examples": [
+                        {"file_path": "output.txt", "content": "Hello World"},
+                        {"file_path": "log.txt", "content": "New entry\\n", "mode": "append"}
+                    ]
+                }
+            ),
+            MCPTool(
+                name="list_directory",
+                description="列出指定目录下的文件和子目录",
+                category="file",
+                schema={
+                    "type": "object",
+                    "properties": {
+                        "directory_path": {
+                            "type": "string",
+                            "description": "要列出的目录路径",
+                            "default": "."
+                        },
+                        "show_hidden": {
+                            "type": "boolean",
+                            "description": "是否显示隐藏文件（以.开头的文件）",
+                            "default": False
+                        },
+                        "recursive": {
+                            "type": "boolean", 
+                            "description": "是否递归列出子目录",
+                            "default": False
+                        },
+                        "file_info": {
+                            "type": "boolean",
+                            "description": "是否显示文件详细信息（大小、修改时间等）",
+                            "default": True
+                        }
+                    },
+                    "required": []
+                },
+                metadata={
+                    "tags": ["目录", "文件列表", "浏览"],
+                    "examples": [
+                        {"directory_path": "."},
+                        {"directory_path": "/home/user", "show_hidden": True},
+                        {"directory_path": "src", "recursive": True, "file_info": True}
+                    ]
+                }
+            ),
+            MCPTool(
+                name="create_directory",
+                description="创建新目录（支持创建多级目录）",
+                category="file",
+                schema={
+                    "type": "object",
+                    "properties": {
+                        "directory_path": {
+                            "type": "string",
+                            "description": "要创建的目录路径"
+                        },
+                        "parents": {
+                            "type": "boolean",
+                            "description": "是否创建父目录（类似mkdir -p）",
+                            "default": True
+                        }
+                    },
+                    "required": ["directory_path"]
+                },
+                metadata={
+                    "tags": ["目录", "创建", "文件夹"],
+                    "examples": [
+                        {"directory_path": "new_folder"},
+                        {"directory_path": "path/to/deep/folder", "parents": True}
+                    ]
+                }
+            ),
+            MCPTool(
+                name="delete_file",
+                description="删除指定的文件或空目录",
+                category="file",
+                schema={
+                    "type": "object",
+                    "properties": {
+                        "file_path": {
+                            "type": "string",
+                            "description": "要删除的文件或目录路径"
+                        },
+                        "force": {
+                            "type": "boolean",
+                            "description": "是否强制删除（删除非空目录）",
+                            "default": False
+                        }
+                    },
+                    "required": ["file_path"]
+                },
+                metadata={
+                    "tags": ["删除", "文件", "目录"],
+                    "examples": [
+                        {"file_path": "temp.txt"},
+                        {"file_path": "temp_folder", "force": True}
+                    ]
+                }
+            ),
+            MCPTool(
+                name="file_info",
+                description="获取文件或目录的详细信息",
+                category="file",
+                schema={
+                    "type": "object",
+                    "properties": {
+                        "file_path": {
+                            "type": "string",
+                            "description": "要查询的文件或目录路径"
+                        },
+                        "checksum": {
+                            "type": "boolean",
+                            "description": "是否计算文件校验和（仅对文件有效）",
+                            "default": False
+                        }
+                    },
+                    "required": ["file_path"]
+                },
+                metadata={
+                    "tags": ["文件信息", "属性", "状态"],
+                    "examples": [
+                        {"file_path": "document.pdf"},
+                        {"file_path": "important.txt", "checksum": True}
                     ]
                 }
             )

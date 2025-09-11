@@ -81,7 +81,7 @@ const MCPToolsManagement: React.FC = () => {
         setCategories(categoriesRes.data.categories);
       }
 
-      if (toolsRes.success && toolsRes.data) {
+      if (toolsRes.success && toolsRes.data && toolsRes.data.tools) {
         setTools(toolsRes.data.tools);
       } else {
         // 如果API不可用，使用模拟数据
@@ -620,7 +620,9 @@ const MCPToolsManagement: React.FC = () => {
 
             <Title level={4}>Schema 定义</Title>
             <pre style={{ 
-              background: '#f6f8fa', 
+              background: currentTheme.token?.colorFillQuaternary || (themeType === 'nightRain' || themeType === 'plumRain' || themeType === 'deepSeaMoon' || themeType === 'greenMountain' ? 'rgba(255, 255, 255, 0.04)' : 'rgba(0, 0, 0, 0.02)'), 
+              border: `1px solid ${currentTheme.token?.colorBorder || (themeType === 'nightRain' || themeType === 'plumRain' || themeType === 'deepSeaMoon' || themeType === 'greenMountain' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.06)')}`,
+              color: currentTheme.token?.colorText || (themeType === 'nightRain' || themeType === 'plumRain' || themeType === 'deepSeaMoon' || themeType === 'greenMountain' ? 'rgba(255, 255, 255, 0.85)' : 'rgba(0, 0, 0, 0.85)'),
               padding: 16, 
               borderRadius: 6,
               fontSize: 12,
@@ -634,7 +636,9 @@ const MCPToolsManagement: React.FC = () => {
                 <Divider />
                 <Title level={4}>元数据</Title>
                 <pre style={{ 
-                  background: '#f6f8fa', 
+                  background: currentTheme.token?.colorFillQuaternary || (themeType === 'nightRain' || themeType === 'plumRain' || themeType === 'deepSeaMoon' || themeType === 'greenMountain' ? 'rgba(255, 255, 255, 0.04)' : 'rgba(0, 0, 0, 0.02)'), 
+                  border: `1px solid ${currentTheme.token?.colorBorder || (themeType === 'nightRain' || themeType === 'plumRain' || themeType === 'deepSeaMoon' || themeType === 'greenMountain' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.06)')}`,
+                  color: currentTheme.token?.colorText || (themeType === 'nightRain' || themeType === 'plumRain' || themeType === 'deepSeaMoon' || themeType === 'greenMountain' ? 'rgba(255, 255, 255, 0.85)' : 'rgba(0, 0, 0, 0.85)'),
                   padding: 16, 
                   borderRadius: 6,
                   fontSize: 12,
