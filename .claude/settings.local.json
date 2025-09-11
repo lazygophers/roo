@@ -28,7 +28,8 @@
       "Bash(make:*)",
       "Bash(export:*)",
       "Bash(npm test:*)",
-      "Bash(npm install)"
+      "Bash(npm install)",
+      "Bash(ALL_PROXY=\"\" curl -s http://localhost:8000/api/system/monitor)"
     ],
     "deny": [],
     "ask": []
