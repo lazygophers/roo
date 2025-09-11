@@ -12,6 +12,7 @@ import asyncio
 import threading
 from app.core.config import PROJECT_ROOT
 from app.core.logging import setup_logging
+from app.core.secure_logging import secure_log_key_value, sanitize_for_log
 
 logger = setup_logging("INFO")
 
@@ -375,7 +376,7 @@ class DatabaseService:
         try:
             table = self.db.table(table_name)
             table.insert(data)
-            logger.info(f"Data added to table '{table_name}': {data.get('name', 'unnamed')}")
+            logger.info(f"Data added to table '{sanitize_for_log(table_name)}': {sanitize_for_log(data.get('name', 'unnamed'))}")
             return True
         except Exception as e:
             logger.error(f"Failed to add data to table '{table_name}': {e}")
@@ -387,7 +388,7 @@ class DatabaseService:
             table = self.db.table(table_name)
             Query_obj = Query()
             table.update(data, Query_obj.name == key)
-            logger.info(f"Data updated in table '{table_name}': {key}")
+            logger.info(f"Data updated in table '{sanitize_for_log(table_name)}': {sanitize_for_log(key)}")
             return True
         except Exception as e:
             logger.error(f"Failed to update data in table '{table_name}': {e}")
@@ -399,7 +400,7 @@ class DatabaseService:
             table = self.db.table(table_name)
             Query_obj = Query()
             table.remove(Query_obj.name == key)
-            logger.info(f"Data removed from table '{table_name}': {key}")
+            logger.info(f"Data removed from table '{sanitize_for_log(table_name)}': {sanitize_for_log(key)}")
             return True
         except Exception as e:
             logger.error(f"Failed to remove data from table '{table_name}': {e}")
