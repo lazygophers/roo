@@ -3,6 +3,7 @@ import { Layout, Menu, theme } from 'antd';
 import { HomeOutlined, SettingOutlined } from '@ant-design/icons';
 import { useNavigate, useLocation } from 'react-router-dom';
 import ThemeToggle from '../Theme/ThemeToggle';
+import SystemMonitorMenuItem from '../SystemMonitor/SystemMonitorMenuItem';
 import './AppLayout.css';
 
 const { Header, Content, Sider } = Layout;
@@ -39,6 +40,8 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
         collapsedWidth="0"
         style={{
           background: colorBgContainer,
+          display: 'flex',
+          flexDirection: 'column'
         }}
       >
         <div 
@@ -58,16 +61,23 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
         >
           Roo AI
         </div>
-        <Menu
-          mode="inline"
-          selectedKeys={[location.pathname]}
-          items={menuItems}
-          onClick={(item) => navigate(item.key)}
-          style={{ 
-            borderRight: 0,
-            background: 'transparent'
-          }}
-        />
+        
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+          <Menu
+            mode="inline"
+            selectedKeys={[location.pathname]}
+            items={menuItems}
+            onClick={(item) => navigate(item.key)}
+            style={{ 
+              borderRight: 0,
+              background: 'transparent',
+              flex: 1
+            }}
+          />
+          
+          {/* 系统监控组件作为菜单的最后一项 */}
+          <SystemMonitorMenuItem />
+        </div>
       </Sider>
       <Layout>
         <Header style={{ 

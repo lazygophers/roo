@@ -20,4 +20,5 @@ dependencies = [
     "pytz>=2025.2",
     "pytest-cov>=6.2.1",
     "watchdog>=3.0.0",
+    "psutil>=6.1.0",
 ]
