@@ -170,9 +170,9 @@ const SystemMonitor: React.FC = () => {
               <DatabaseOutlined style={{ fontSize: '12px', marginRight: '6px', color: getMemoryColor(monitorData.memory.percent) }} />
               <Text style={{ fontSize: '12px' }}>内存</Text>
             </div>
-            <Tooltip title={`使用 ${monitorData.memory.used_mb.toFixed(1)} MB`}>
+            <Tooltip title={`内存使用率: ${monitorData.memory.percent.toFixed(1)}%`}>
               <Text style={{ fontSize: '12px', fontWeight: 500 }}>
-                {monitorData.memory.percent.toFixed(1)}%
+                {monitorData.memory.used_mb.toFixed(1)}MB
               </Text>
             </Tooltip>
           </div>

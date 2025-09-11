@@ -29,7 +29,11 @@
       "Bash(export:*)",
       "Bash(npm test:*)",
       "Bash(npm install)",
-      "Bash(ALL_PROXY=\"\" curl -s http://localhost:8000/api/system/monitor)"
+      "Bash(ALL_PROXY=\"\" curl -s http://localhost:8000/api/system/monitor)",
+      "Bash(ALL_PROXY=\"\" curl -s http://localhost:8001/api/system/monitor)",
+      "Bash(ALL_PROXY=\"\" curl -s http://localhost:8000/api/models)",
+      "Bash(ALL_PROXY=\"\" curl -s -X POST http://localhost:8000/api/models -H \"Content-Type: application/json\" -d '{}')",
+      "Bash(ALL_PROXY=\"\" curl -s -X POST http://localhost:8000/api/rules/by-slug -H \"Content-Type: application/json\" -d '{\"\"slug\"\": \"\"orchestrator\"\"}')"
     ],
     "deny": [],
     "ask": []

@@ -25,6 +25,7 @@ export interface ModelsResponse {
   success: boolean;
   message: string;
   data: ModelInfo[];
+  count: number;
   total: number;
 }
 
@@ -48,6 +49,7 @@ export interface CommandsResponse {
   success: boolean;
   message: string;
   data: FileMetadata[];
+  count: number;
   total: number;
 }
 
@@ -55,6 +57,7 @@ export interface RulesResponse {
   success: boolean;
   message: string;
   data: FileMetadata[];
+  count: number;
   total: number;
 }
 

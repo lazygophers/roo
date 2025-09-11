@@ -15,11 +15,15 @@ async def get_commands() -> CommandsResponse:
     try:
         metadata_list = CommandsService.get_commands_metadata()
         
+        # Convert FileMetadata objects to dictionaries
+        data_dicts = [item.model_dump() for item in metadata_list]
+        
         return CommandsResponse(
             success=True,
             message="Commands loaded successfully",
-            data=metadata_list,
-            total=len(metadata_list)
+            data=data_dicts,
+            count=len(data_dicts),
+            total=len(data_dicts)
         )
         
     except Exception as e:

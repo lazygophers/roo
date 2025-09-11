@@ -16,14 +16,15 @@ async def get_rules_by_slug(request: RulesRequest) -> RulesResponse:
         # 获取搜索结果
         searched_dirs, found_dirs, metadata_list = RulesService.get_rules_by_slug(request.slug)
         
+        # Convert FileMetadata objects to dictionaries
+        data_dicts = [item.model_dump() for item in metadata_list]
+        
         return RulesResponse(
             success=True,
             message=f"Rules loaded successfully for slug '{request.slug}'",
-            slug=request.slug,
-            searched_directories=searched_dirs,
-            found_directories=found_dirs,
-            data=metadata_list,
-            total=len(metadata_list)
+            data=data_dicts,
+            count=len(data_dicts),
+            total=len(data_dicts)
         )
         
     except Exception as e:

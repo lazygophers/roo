@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Typography, Progress, Tooltip, theme } from 'antd';
 import { 
   MonitorOutlined,
-  ClockCircleOutlined, 
   ThunderboltOutlined, 
   DatabaseOutlined,
   WifiOutlined
@@ -45,7 +44,6 @@ interface MonitorResponse {
 const SystemMonitorMenuItem: React.FC = () => {
   const {
     token: { 
-      colorBgContainer, 
       colorBorderSecondary, 
       colorText,
       colorTextSecondary,
