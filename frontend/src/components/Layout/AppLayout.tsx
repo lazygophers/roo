@@ -1,9 +1,10 @@
 import React from 'react';
-import { Layout, Menu, theme } from 'antd';
-import { HomeOutlined, SettingOutlined } from '@ant-design/icons';
+import { Layout, Menu, theme, Button, Space } from 'antd';
+import { HomeOutlined, SettingOutlined, GithubOutlined } from '@ant-design/icons';
 import { useNavigate, useLocation } from 'react-router-dom';
 import ThemeToggle from '../Theme/ThemeToggle';
 import SystemMonitorMenuItem from '../SystemMonitor/SystemMonitorMenuItem';
+import LicenseInfo from '../License/LicenseInfo';
 import './AppLayout.css';
 
 const { Header, Content, Sider } = Layout;
@@ -14,7 +15,7 @@ interface AppLayoutProps {
 
 const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   const {
-    token: { colorBgContainer, colorBorderSecondary },
+    token: { colorBgContainer, colorBorderSecondary, colorText },
   } = theme.useToken();
   
   const navigate = useNavigate();
@@ -40,29 +41,34 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
         collapsedWidth="0"
         style={{
           background: colorBgContainer,
-          display: 'flex',
-          flexDirection: 'column'
+          position: 'relative',
+          height: '100vh'
         }}
       >
-        <div 
-          className="nav-logo"
-          style={{ 
-            height: 48, 
-            margin: 16, 
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontWeight: 'bold',
-            fontSize: '16px',
-            cursor: 'pointer',
-            borderBottom: `1px solid ${colorBorderSecondary}`
-          }}
-          onClick={() => navigate('/')}
-        >
-          Roo AI
-        </div>
-        
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+        <div style={{
+          display: 'flex',
+          flexDirection: 'column', 
+          height: '100%'
+        }}>
+          <div 
+            className="nav-logo"
+            style={{ 
+              height: 48, 
+              margin: 16, 
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontWeight: 'bold',
+              fontSize: '16px',
+              cursor: 'pointer',
+              borderBottom: `1px solid ${colorBorderSecondary}`,
+              flexShrink: 0
+            }}
+            onClick={() => navigate('/')}
+          >
+            Roo AI
+          </div>
+          
           <Menu
             mode="inline"
             selectedKeys={[location.pathname]}
@@ -71,12 +77,25 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
             style={{ 
               borderRight: 0,
               background: 'transparent',
-              flex: 1
+              flexShrink: 0
             }}
           />
           
-          {/* 系统监控组件作为菜单的最后一项 */}
+          {/* 填充空间 */}
+          <div style={{ flex: 1 }} />
+        </div>
+        
+        {/* 系统监控和开源协议信息固定在底部 */}
+        <div style={{
+          position: 'absolute',
+          bottom: 0,
+          left: 0,
+          right: 0
+        }}>
+          {/* 系统监控组件 */}
           <SystemMonitorMenuItem />
+          {/* 开源协议信息 */}
+          <LicenseInfo />
         </div>
       </Sider>
       <Layout>
@@ -92,7 +111,21 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
             alignItems: 'center',
             height: '100%'
           }}>
-            <ThemeToggle />
+            <Space size="middle">
+              <Button 
+                type="text" 
+                icon={<GithubOutlined />}
+                onClick={() => window.open('https://github.com/lazygophers/roo', '_blank')}
+                style={{ 
+                  display: 'flex', 
+                  alignItems: 'center',
+                  color: colorText
+                }}
+              >
+                GitHub
+              </Button>
+              <ThemeToggle />
+            </Space>
           </div>
         </Header>
         <Content style={{ margin: '24px 16px 0' }}>
