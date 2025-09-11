@@ -20,6 +20,7 @@ from contextlib import asynccontextmanager
 from app.models.schemas import ModelsResponse, ErrorResponse, ModelInfo, ModelsRequest, ModelBySlugRequest
 from app.core.ultra_performance_service import get_ultra_yaml_service, get_ultra_cache
 from app.core.logging import setup_logging
+from app.core.secure_logging import sanitize_for_log
 
 logger = setup_logging("INFO")
 
@@ -168,7 +169,7 @@ async def get_model_by_slug_ultra(request: ModelBySlugRequest) -> Dict[str, Any]
         cache.set(cache_key, target_model, ttl=1800)  # 30分钟
         
         processing_time = (time.perf_counter() - start_time) * 1000
-        logger.info(f"Model '{request.slug}' found in {processing_time:.2f}ms")
+        logger.info(f"Model '{sanitize_for_log(request.slug)}' found in {processing_time:.2f}ms")
         
         return {
             "success": True,

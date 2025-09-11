@@ -2,6 +2,7 @@ from fastapi import APIRouter, HTTPException, Query
 from typing import Dict, List, Any, Optional
 from app.core.database_service import get_database_service
 from app.core.logging import setup_logging
+from app.core.secure_logging import sanitize_for_log
 
 logger = setup_logging("INFO")
 
@@ -46,7 +47,7 @@ async def sync_config(config_name: str):
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))
     except Exception as e:
-        logger.error(f"Failed to sync config '{config_name}': {e}")
+        logger.error(f"Failed to sync config '{sanitize_for_log(config_name)}': {sanitize_for_log(str(e))}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/data/{config_name}")
@@ -80,7 +81,7 @@ async def get_cached_data(
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))
     except Exception as e:
-        logger.error(f"Failed to get cached data for '{config_name}': {e}")
+        logger.error(f"Failed to get cached data for '{sanitize_for_log(config_name)}': {sanitize_for_log(str(e))}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/file/{config_name}")
@@ -104,7 +105,7 @@ async def get_file_by_path(config_name: str, file_path: str = Query(...)):
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"Failed to get file '{file_path}' from '{config_name}': {e}")
+        logger.error(f"Failed to get file '{sanitize_for_log(file_path)}' from '{sanitize_for_log(config_name)}': {sanitize_for_log(str(e))}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/models/fast", response_model=Dict[str, Any])

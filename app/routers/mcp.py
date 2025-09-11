@@ -72,7 +72,7 @@ async def call_mcp_tool(request: Dict[str, Any]):
         if tool_name not in available_tools:
             return {
                 "success": False,
-                "message": f"Tool '{tool_name}' not found"
+                "message": f"Tool '{sanitize_for_log(tool_name)}' not found"
             }
         
         # 直接实现工具函数
@@ -227,7 +227,7 @@ async def mcp_streamable_endpoint(request: Dict[str, Any]):
         method = request.get("method", "")
         params = request.get("params", {})
         
-        logger.info(f"MCP Streamable HTTP request: method={method}")
+        logger.info(f"MCP Streamable HTTP request: method={sanitize_for_log(method)}")
         
         if method == "tools/list":
             # 返回工具列表
@@ -269,7 +269,7 @@ async def mcp_streamable_endpoint(request: Dict[str, Any]):
                     "id": request.get("id"), 
                     "error": {
                         "code": -1,
-                        "message": f"Tool '{tool_name}' not found"
+                        "message": f"Tool '{sanitize_for_log(tool_name)}' not found"
                     }
                 }
             
@@ -339,7 +339,7 @@ async def mcp_streamable_endpoint(request: Dict[str, Any]):
                 "id": request.get("id"),
                 "error": {
                     "code": -1,
-                    "message": f"Method '{method}' not supported"
+                    "message": f"Method '{sanitize_for_log(method)}' not supported"
                 }
             }
             
