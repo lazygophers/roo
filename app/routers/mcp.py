@@ -11,33 +11,20 @@ from typing import Any, Dict
 
 from app.core.logging import setup_logging
 from app.core.secure_logging import sanitize_for_log
+from app.core.mcp_tools_service import get_mcp_tools_service
+from app.core.mcp_server import get_mcp_server
 
 logger = setup_logging()
 
-router = APIRouter(prefix="/api/mcp", tags=["MCP"])
+router = APIRouter(prefix="/mcp", tags=["MCP"])
 
 @router.get("/tools")
 async def list_mcp_tools():
     """列出可用的 MCP 工具"""
     try:
-        # 硬编码工具列表，避免 FastMCP 上下文问题
-        tools = [
-            {
-                "name": "get_current_timestamp",
-                "description": "获取当前时间戳",
-                "schema": {"type": "object", "properties": {}, "required": []}
-            },
-            {
-                "name": "get_system_info",
-                "description": "获取 LazyAI Studio 系统信息",
-                "schema": {"type": "object", "properties": {}, "required": []}
-            },
-            {
-                "name": "list_available_modes",
-                "description": "列出可用的 AI 模式",
-                "schema": {"type": "object", "properties": {}, "required": []}
-            }
-        ]
+        # 从MCP工具服务获取真实的工具数据
+        tools_service = get_mcp_tools_service()
+        tools = tools_service.get_tools(enabled_only=False)  # 获取所有工具，包括禁用的
         
         return {
             "success": True,
@@ -479,4 +466,97 @@ async def mcp_streamable_endpoint(request: Dict[str, Any]):
                 "code": -1,
                 "message": "Internal server error"
             }
+        }
+
+@router.post("/tools/enable")
+async def enable_mcp_tool(request: Dict[str, Any]):
+    """启用MCP工具"""
+    try:
+        tool_name = request.get("name")
+        if not tool_name:
+            return {
+                "success": False,
+                "message": "Tool name is required"
+            }
+
+        tools_service = get_mcp_tools_service()
+        result = tools_service.enable_tool(tool_name)
+        
+        if result:
+            return {
+                "success": True,
+                "message": f"Tool '{sanitize_for_log(tool_name)}' enabled successfully"
+            }
+        else:
+            return {
+                "success": False,
+                "message": f"Tool '{sanitize_for_log(tool_name)}' not found"
+            }
+    except Exception as e:
+        logger.error(f"Failed to enable tool: {sanitize_for_log(str(e))}")
+        return {
+            "success": False,
+            "message": "Failed to enable tool: Internal server error"
+        }
+
+@router.post("/tools/disable")
+async def disable_mcp_tool(request: Dict[str, Any]):
+    """禁用MCP工具"""
+    try:
+        tool_name = request.get("name")
+        if not tool_name:
+            return {
+                "success": False,
+                "message": "Tool name is required"
+            }
+
+        tools_service = get_mcp_tools_service()
+        result = tools_service.disable_tool(tool_name)
+        
+        if result:
+            return {
+                "success": True,
+                "message": f"Tool '{sanitize_for_log(tool_name)}' disabled successfully"
+            }
+        else:
+            return {
+                "success": False,
+                "message": f"Tool '{sanitize_for_log(tool_name)}' not found"
+            }
+    except Exception as e:
+        logger.error(f"Failed to disable tool: {sanitize_for_log(str(e))}")
+        return {
+            "success": False,
+            "message": "Failed to disable tool: Internal server error"
+        }
+
+@router.post("/tools/remove")
+async def remove_mcp_tool(request: Dict[str, Any]):
+    """从数据库中删除MCP工具"""
+    try:
+        tool_name = request.get("name")
+        if not tool_name:
+            return {
+                "success": False,
+                "message": "Tool name is required"
+            }
+
+        tools_service = get_mcp_tools_service()
+        result = tools_service.remove_tool(tool_name)
+        
+        if result:
+            return {
+                "success": True,
+                "message": f"Tool '{sanitize_for_log(tool_name)}' removed successfully"
+            }
+        else:
+            return {
+                "success": False,
+                "message": f"Tool '{sanitize_for_log(tool_name)}' not found"
+            }
+    except Exception as e:
+        logger.error(f"Failed to remove tool: {sanitize_for_log(str(e))}")
+        return {
+            "success": False,
+            "message": "Failed to remove tool: Internal server error"
         }

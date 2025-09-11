@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
@@ -128,6 +128,31 @@ async def global_exception_handler(request: Request, exc: Exception):
             "error_detail": str(exc) if DEBUG else "An error occurred"
         }
     )
+
+# 安全中间件 - 添加 CSP 头防止浏览器扩展干扰
+@app.middleware("http")
+async def add_security_headers(request: Request, call_next):
+    response = await call_next(request)
+    
+    # Content Security Policy - 防止扩展脚本干扰
+    csp_policy = (
+        "default-src 'self'; "
+        "script-src 'self' 'unsafe-inline' 'unsafe-eval'; "
+        "style-src 'self' 'unsafe-inline'; "
+        "img-src 'self' data: blob:; "
+        "font-src 'self' data:; "
+        "connect-src 'self' http://localhost:* ws://localhost:*; "
+        "frame-src 'none'; "
+        "object-src 'none'; "
+        "base-uri 'self';"
+    )
+    
+    response.headers["Content-Security-Policy"] = csp_policy
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    
+    return response
 
 # CORS 中间件配置
 app.add_middleware(

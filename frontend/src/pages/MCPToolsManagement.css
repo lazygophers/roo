@@ -1,0 +1,287 @@
+.tool-card {
+  transition: all 0.3s ease;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.tool-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* 深色主题下的悬浮效果 */
+.dark-theme .tool-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.tool-card.disabled {
+  /* 背景色由组件动态设置 */
+}
+
+.tool-card .ant-card-body {
+  flex: 1;
+  padding: 16px;
+}
+
+.tool-card .ant-card-actions {
+  border-top: 1px solid var(--ant-color-border-secondary, #f0f0f0);
+}
+
+/* 深色主题下的边框 */
+.dark-theme .tool-card .ant-card-actions {
+  border-top: 1px solid var(--ant-color-border-secondary, #434343);
+}
+
+.tool-card .ant-card-actions > li {
+  padding: 8px 0;
+  margin: 0;
+}
+
+.tool-card .ant-card-actions > li > span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 32px;
+}
+
+.tool-card .ant-card-meta-title {
+  margin-bottom: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ant-color-text, inherit);
+}
+
+.tool-card .ant-card-meta-description {
+  color: var(--ant-color-text-secondary, rgba(0, 0, 0, 0.65));
+}
+
+/* 分类面板样式 */
+.ant-collapse-ghost .ant-collapse-item {
+  border-bottom: 1px solid var(--ant-color-border-secondary, #f0f0f0);
+  margin-bottom: 16px;
+}
+
+.ant-collapse-ghost .ant-collapse-header {
+  padding: 16px 0;
+  background: linear-gradient(90deg, var(--ant-color-fill-secondary, #fafafa) 0%, transparent 100%);
+  border-radius: 6px;
+}
+
+/* 深色主题下的面板样式 */
+.dark-theme .ant-collapse-ghost .ant-collapse-item {
+  border-bottom: 1px solid var(--ant-color-border-secondary, #434343);
+}
+
+.dark-theme .ant-collapse-ghost .ant-collapse-header {
+  background: linear-gradient(90deg, var(--ant-color-fill-secondary, #2a2a2a) 0%, transparent 100%);
+}
+
+.ant-collapse-ghost .ant-collapse-content {
+  background: transparent;
+  border: none;
+}
+
+.ant-collapse-ghost .ant-collapse-content .ant-collapse-content-box {
+  padding: 0;
+}
+
+/* 工具状态指示器 */
+.tool-status-indicator {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--ant-color-success, #52c41a);
+}
+
+.tool-status-indicator.disabled {
+  background-color: var(--ant-color-text-quaternary, #d9d9d9);
+}
+
+/* 主题适配的文字颜色 */
+.theme-text {
+  color: var(--ant-color-text, inherit);
+}
+
+.theme-text-secondary {
+  color: var(--ant-color-text-secondary, rgba(0, 0, 0, 0.65));
+}
+
+.theme-text-tertiary {
+  color: var(--ant-color-text-tertiary, rgba(0, 0, 0, 0.45));
+}
+
+/* 主题适配的背景色 */
+.theme-bg-container {
+  background-color: var(--ant-color-bg-container, #ffffff);
+}
+
+.theme-border {
+  border-color: var(--ant-color-border, #d9d9d9);
+}
+
+/* 确保在所有主题下文字都清晰可读 */
+.tool-card .ant-typography {
+  color: var(--ant-color-text, inherit) !important;
+}
+
+.tool-card .ant-typography-paragraph {
+  color: var(--ant-color-text-secondary, rgba(0, 0, 0, 0.65)) !important;
+}
+
+/* 深色主题下强制修正文字颜色 */
+.dark-theme .tool-card .ant-typography-paragraph {
+  color: var(--ant-color-text-secondary, rgba(255, 255, 255, 0.65)) !important;
+}
+
+/* 工具卡片内描述文字的特殊处理 */
+.dark-theme .tool-card .ant-card-meta-description {
+  color: var(--ant-color-text-secondary, rgba(255, 255, 255, 0.65)) !important;
+}
+
+.dark-theme .tool-card .ant-card-meta-description .ant-typography {
+  color: var(--ant-color-text-secondary, rgba(255, 255, 255, 0.65)) !important;
+}
+
+/* Tag 在各主题下的适配 */
+.ant-tag {
+  border-color: var(--ant-color-border, #d9d9d9);
+}
+
+/* 深色主题下的特殊处理 */
+.dark-theme .ant-tag {
+  background: var(--ant-color-fill-tertiary, rgba(255, 255, 255, 0.04));
+  border-color: var(--ant-color-border, rgba(255, 255, 255, 0.15));
+  color: var(--ant-color-text-secondary, rgba(255, 255, 255, 0.65));
+}
+
+/* 确保开关在所有主题下都可见 */
+.ant-switch {
+  background-color: var(--ant-color-text-quaternary, rgba(0, 0, 0, 0.25));
+}
+
+.ant-switch-checked {
+  background-color: var(--ant-color-primary, #1677ff);
+}
+
+/* 响应式调整 */
+@media (max-width: 576px) {
+  .tool-card .ant-card-actions > li {
+    padding: 6px 0;
+  }
+  
+  .tool-card .ant-card-body {
+    padding: 12px;
+  }
+}
+
+/* 高对比度文字确保可读性 */
+.mcp-tools-management .ant-typography,
+.mcp-tools-management .ant-typography h1,
+.mcp-tools-management .ant-typography h2,
+.mcp-tools-management .ant-typography h3,
+.mcp-tools-management .ant-typography h4,
+.mcp-tools-management .ant-typography h5,
+.mcp-tools-management .ant-typography h6 {
+  color: var(--ant-color-text, inherit) !important;
+}
+
+.mcp-tools-management .ant-typography-caption {
+  color: var(--ant-color-text-secondary, rgba(0, 0, 0, 0.65)) !important;
+}
+
+/* 确保折叠面板标题文字清晰可读 */
+.mcp-tools-management .ant-collapse-header {
+  color: var(--ant-color-text, inherit) !important;
+}
+
+.mcp-tools-management .ant-collapse-header .ant-typography {
+  color: var(--ant-color-text, inherit) !important;
+}
+
+/* 深色主题下的特殊文字增强 */
+.dark-theme .mcp-tools-management .ant-typography,
+.dark-theme .mcp-tools-management .ant-typography h1,
+.dark-theme .mcp-tools-management .ant-typography h2,
+.dark-theme .mcp-tools-management .ant-typography h3,
+.dark-theme .mcp-tools-management .ant-typography h4 {
+  color: var(--ant-color-text, rgba(255, 255, 255, 0.85)) !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.dark-theme .mcp-tools-management .ant-typography-caption {
+  color: var(--ant-color-text-secondary, rgba(255, 255, 255, 0.65)) !important;
+}
+
+/* 确保统计卡片中的文字清晰 */
+.mcp-tools-management .ant-statistic-title {
+  color: var(--ant-color-text-secondary, rgba(0, 0, 0, 0.65)) !important;
+}
+
+.mcp-tools-management .ant-statistic-content {
+  color: var(--ant-color-text, inherit) !important;
+}
+
+/* 选择框中的文字 */
+.mcp-tools-management .ant-select-selection-item {
+  color: var(--ant-color-text, inherit) !important;
+}
+
+/* 工具卡片中标签的可读性优化 */
+.tool-card .ant-tag {
+  font-weight: 500;
+  border: 1px solid;
+}
+
+/* 确保所有颜色主题下Tag都有足够对比度 */
+.dark-theme .tool-card .ant-tag-blue {
+  background: rgba(24, 144, 255, 0.2);
+  border-color: rgba(24, 144, 255, 0.6);
+  color: #91d5ff;
+}
+
+.dark-theme .tool-card .ant-tag-green {
+  background: rgba(82, 196, 26, 0.2);
+  border-color: rgba(82, 196, 26, 0.6);
+  color: #95de64;
+}
+
+.dark-theme .tool-card .ant-tag-geekblue {
+  background: rgba(47, 84, 235, 0.2);
+  border-color: rgba(47, 84, 235, 0.6);
+  color: #85a5ff;
+}
+
+.dark-theme .tool-card .ant-tag-default {
+  background: var(--ant-color-fill-tertiary, rgba(255, 255, 255, 0.06));
+  border-color: var(--ant-color-border, rgba(255, 255, 255, 0.15));
+  color: var(--ant-color-text-tertiary, rgba(255, 255, 255, 0.45));
+}
+
+/* 全局深色主题文字修正 - 最高优先级 */
+.dark-theme .mcp-tools-management * {
+  color: inherit;
+}
+
+.dark-theme .mcp-tools-management .ant-card-meta-description * {
+  color: var(--ant-color-text-secondary, rgba(255, 255, 255, 0.65)) !important;
+}
+
+.dark-theme .mcp-tools-management .tool-card p,
+.dark-theme .mcp-tools-management .tool-card span:not(.ant-tag):not(.anticon),
+.dark-theme .mcp-tools-management .tool-card div:not(.ant-tag) {
+  color: var(--ant-color-text-secondary, rgba(255, 255, 255, 0.65)) !important;
+}
+
+/* 确保工具名称在深色主题下清晰 */
+.dark-theme .tool-card .ant-card-meta-title * {
+  color: var(--ant-color-text, rgba(255, 255, 255, 0.85)) !important;
+}
+
+/* 禁用元素在深色主题下的特殊处理 */
+.dark-theme .tool-card.disabled .ant-card-meta-description * {
+  color: var(--ant-color-text-disabled, rgba(255, 255, 255, 0.25)) !important;
+}

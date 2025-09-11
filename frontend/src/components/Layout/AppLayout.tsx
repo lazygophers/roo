@@ -1,6 +1,6 @@
 import React from 'react';
 import { Layout, Menu, theme, Button, Space } from 'antd';
-import { HomeOutlined, SettingOutlined, GithubOutlined } from '@ant-design/icons';
+import { HomeOutlined, SettingOutlined, GithubOutlined, ApiOutlined } from '@ant-design/icons';
 import { useNavigate, useLocation } from 'react-router-dom';
 import ThemeToggle from '../Theme/ThemeToggle';
 import SystemMonitorMenuItem from '../SystemMonitor/SystemMonitorMenuItem';
@@ -31,6 +31,11 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
       key: '/config',
       icon: <SettingOutlined />,
       label: '配置管理',
+    },
+    {
+      key: '/mcp-tools',
+      icon: <ApiOutlined />,
+      label: 'MCP 工具',
     },
   ];
 

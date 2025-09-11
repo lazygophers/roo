@@ -132,6 +132,65 @@ export interface CleanupResponse {
   errors: string[];
 }
 
+// MCP Types
+export interface MCPToolInfo {
+  id: string;
+  name: string;
+  description: string;
+  category: string;
+  schema: any;
+  enabled: boolean;
+  implementation_type: string;
+  created_at: string;
+  updated_at: string;
+  metadata?: any;
+}
+
+export interface MCPCategoryInfo {
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+  enabled: boolean;
+  tools_count?: number;
+}
+
+export interface MCPStatusResponse {
+  success: boolean;
+  message: string;
+  data: {
+    status: string;
+    server_name: string;
+    tools_count: number;
+    total_tools: number;
+    categories_count: number;
+    tools_by_category: Record<string, number>;
+    endpoints: Record<string, string>;
+    organization: string;
+    motto: string;
+    last_updated: string;
+  };
+}
+
+export interface MCPToolsResponse {
+  success: boolean;
+  message: string;
+  data: {
+    tools: MCPToolInfo[];
+    server: string;
+    organization: string;
+  };
+}
+
+export interface MCPCategoriesResponse {
+  success: boolean;
+  message: string;
+  data: {
+    categories: MCPCategoryInfo[];
+    total_categories: number;
+  };
+}
+
 // API 方法
 export const apiClient = {
   // 获取所有模型
@@ -244,6 +303,64 @@ export const apiClient = {
   // 清空配置
   cleanupConfigurations: async (request: CleanupRequest) => {
     const response = await api.post<CleanupResponse>('/deploy/cleanup', request);
+    return response.data;
+  },
+
+  // MCP API methods
+  // 获取MCP服务器状态
+  getMCPStatus: async () => {
+    const response = await api.get<MCPStatusResponse>('/mcp/status');
+    return response.data;
+  },
+
+  // 获取MCP工具分类
+  getMCPCategories: async () => {
+    const response = await api.get<MCPCategoriesResponse>('/mcp/categories');
+    return response.data;
+  },
+
+  // 获取所有MCP工具
+  getMCPTools: async () => {
+    const response = await api.get<MCPToolsResponse>('/mcp/tools');
+    return response.data;
+  },
+
+  // 根据分类获取MCP工具
+  getMCPToolsByCategory: async (category: string) => {
+    const response = await api.get<MCPToolsResponse>(`/mcp/tools/${category}`);
+    return response.data;
+  },
+
+  // 获取单个MCP工具信息
+  getMCPToolInfo: async (toolName: string) => {
+    const response = await api.get<{ success: boolean; message: string; data: { tool: MCPToolInfo } }>(`/mcp/tools/info/${toolName}`);
+    return response.data;
+  },
+
+  // 调用MCP工具
+  callMCPTool: async (toolName: string, arguments_: any = {}) => {
+    const response = await api.post('/mcp/call-tool', {
+      name: toolName,
+      arguments: arguments_
+    });
+    return response.data;
+  },
+
+  // 刷新MCP工具配置
+  refreshMCPTools: async () => {
+    const response = await api.post('/mcp/tools/refresh');
+    return response.data;
+  },
+
+  // 启用MCP工具
+  enableMCPTool: async (toolName: string) => {
+    const response = await api.post('/mcp/tools/enable', { name: toolName });
+    return response.data;
+  },
+
+  // 禁用MCP工具
+  disableMCPTool: async (toolName: string) => {
+    const response = await api.post('/mcp/tools/disable', { name: toolName });
     return response.data;
   }
 };

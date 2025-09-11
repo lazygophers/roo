@@ -191,89 +191,6 @@ class MCPToolsService:
                         {"detailed": True, "include_performance": True}
                     ]
                 }
-            ),
-            MCPTool(
-                name="list_available_modes", 
-                description="列出LazyAI Studio可用的AI模式和智能助手",
-                category="ai",
-                schema={
-                    "type": "object",
-                    "properties": {
-                        "category": {
-                            "type": "string",
-                            "description": "过滤特定分类的模式",
-                            "enum": ["code", "debug", "doc", "research", "all"],
-                            "default": "all"
-                        },
-                        "include_description": {
-                            "type": "boolean",
-                            "description": "是否包含详细描述",
-                            "default": True
-                        }
-                    },
-                    "required": []
-                },
-                metadata={
-                    "tags": ["AI", "模式", "助手", "LazyGophers"],
-                    "examples": [
-                        {"category": "all"},
-                        {"category": "code", "include_description": True}
-                    ]
-                }
-            ),
-            MCPTool(
-                name="get_project_stats",
-                description="获取项目统计信息，包括文件数量、模型数量等",
-                category="data",
-                schema={
-                    "type": "object",
-                    "properties": {
-                        "include_models": {
-                            "type": "boolean",
-                            "description": "是否包含模型统计",
-                            "default": True
-                        },
-                        "include_files": {
-                            "type": "boolean", 
-                            "description": "是否包含文件统计",
-                            "default": True
-                        }
-                    },
-                    "required": []
-                },
-                metadata={
-                    "tags": ["统计", "项目", "数据"],
-                    "examples": [
-                        {"include_models": True, "include_files": True}
-                    ]
-                }
-            ),
-            MCPTool(
-                name="health_check",
-                description="执行系统健康检查，验证各组件状态",
-                category="system",
-                schema={
-                    "type": "object",
-                    "properties": {
-                        "check_database": {
-                            "type": "boolean",
-                            "description": "是否检查数据库连接",
-                            "default": True
-                        },
-                        "check_cache": {
-                            "type": "boolean",
-                            "description": "是否检查缓存系统",
-                            "default": True
-                        }
-                    },
-                    "required": []
-                },
-                metadata={
-                    "tags": ["健康检查", "监控", "诊断"],
-                    "examples": [
-                        {"check_database": True, "check_cache": True}
-                    ]
-                }
             )
         ]
         
@@ -343,6 +260,14 @@ class MCPToolsService:
                                         Query_obj.name == name)
         if result:
             logger.info(f"Disabled tool: {sanitize_for_log(name)}")
+        return len(result) > 0
+    
+    def remove_tool(self, name: str) -> bool:
+        """从数据库中删除工具"""
+        Query_obj = Query()
+        result = self.tools_table.remove(Query_obj.name == name)
+        if result:
+            logger.info(f"Removed tool: {sanitize_for_log(name)}")
         return len(result) > 0
     
     def get_tools_by_category(self) -> Dict[str, List[Dict[str, Any]]]:
