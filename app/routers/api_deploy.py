@@ -19,6 +19,7 @@ class CustomDumper(yaml.SafeDumper):
 CustomDumper.add_representer(str, CustomDumper.represent_str)
 # BaseResponse不存在，直接使用内置响应模型
 from app.core.database_service import get_database_service
+from app.core.secure_logging import sanitize_for_log
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -118,7 +119,7 @@ def load_yaml_file(file_path: str) -> Dict[str, Any]:
         with open(file_path, 'r', encoding='utf-8') as f:
             return yaml.safe_load(f) or {}
     except Exception as e:
-        logger.error(f"Error loading YAML file {file_path}: {e}")
+        logger.error(f"Error loading YAML file {sanitize_for_log(file_path)}: {sanitize_for_log(str(e))}")
         return {}
 
 def load_markdown_file(file_path: str) -> str:
@@ -127,7 +128,7 @@ def load_markdown_file(file_path: str) -> str:
         with open(file_path, 'r', encoding='utf-8') as f:
             return f.read()
     except Exception as e:
-        logger.error(f"Error loading markdown file {file_path}: {e}")
+        logger.error(f"Error loading markdown file {sanitize_for_log(file_path)}: {sanitize_for_log(str(e))}")
         return ""
 
 def load_hooks() -> tuple[str, str]:
@@ -203,7 +204,7 @@ def generate_custom_modes_yaml(
                         continue
         
         if not model_file:
-            logger.warning(f"Model file not found for slug: {model_slug}")
+            logger.warning(f"Model file not found for slug: {sanitize_for_log(model_slug)}")
             continue
             
         # 加载模型数据
@@ -312,7 +313,7 @@ async def generate_custom_modes(request: DeployRequest):
         }
         
     except Exception as e:
-        logger.error(f"Error generating custom modes YAML: {e}")
+        logger.error(f"Error generating custom modes YAML: {sanitize_for_log(str(e))}")
         raise HTTPException(
             status_code=500,
             detail=f"Failed to generate custom modes YAML: {str(e)}"
@@ -364,7 +365,7 @@ async def deploy_custom_modes(request: DeployRequest):
                 shutil.copy2(str(temp_yaml_file), target_path)
                 deployed_files.append(target_path)
                 
-                logger.info(f"Successfully deployed custom modes to {target_config['name']}: {target_path}")
+                logger.info(f"Successfully deployed custom modes to {sanitize_for_log(target_config['name'])}: {sanitize_for_log(str(target_path))}")
                 
                 # 5. 部署选中的命令文件
                 if request.selected_commands and target_key in COMMAND_DEPLOY_PATHS:
@@ -379,7 +380,7 @@ async def deploy_custom_modes(request: DeployRequest):
                             try:
                                 shutil.copy2(command_path, command_target_path)
                                 deployed_files.append(command_target_path)
-                                logger.info(f"Successfully deployed command to {target_config['name']}: {command_target_path}")
+                                logger.info(f"Successfully deployed command to {sanitize_for_log(target_config['name'])}: {sanitize_for_log(str(command_target_path))}")
                             except Exception as e:
                                 error_msg = f"Failed to deploy command {command_filename} to {target_config['name']}: {str(e)}"
                                 errors.append(error_msg)
@@ -404,7 +405,7 @@ async def deploy_custom_modes(request: DeployRequest):
                         try:
                             shutil.copy2(role_file_path, role_target_path)
                             deployed_files.append(role_target_path)
-                            logger.info(f"Successfully deployed role to {target_config['name']}: {role_target_path}")
+                            logger.info(f"Successfully deployed role to {sanitize_for_log(target_config['name'])}: {sanitize_for_log(str(role_target_path))}")
                         except Exception as e:
                             error_msg = f"Failed to deploy role {request.selected_role} to {target_config['name']}: {str(e)}"
                             errors.append(error_msg)
@@ -435,7 +436,7 @@ async def deploy_custom_modes(request: DeployRequest):
         )
         
     except Exception as e:
-        logger.error(f"Error during deployment: {e}")
+        logger.error(f"Error during deployment: {sanitize_for_log(str(e))}")
         return DeployResponse(
             success=False,
             message=f"Deployment failed: {str(e)}",
@@ -469,9 +470,9 @@ async def cleanup_configurations(request: CleanupRequest):
                     if os.path.exists(target_path):
                         os.remove(target_path)
                         cleaned_items.append(target_path)
-                        logger.info(f"Successfully removed model config from {target_config['name']}: {target_path}")
+                        logger.info(f"Successfully removed model config from {sanitize_for_log(target_config['name'])}: {sanitize_for_log(str(target_path))}")
                     else:
-                        logger.info(f"Model config file not found at {target_path}")
+                        logger.info(f"Model config file not found at {sanitize_for_log(str(target_path))}")
                 except Exception as e:
                     error_msg = f"Failed to remove model config from {target_config['name']}: {str(e)}"
                     errors.append(error_msg)
@@ -489,9 +490,9 @@ async def cleanup_configurations(request: CleanupRequest):
                                 if os.path.isfile(file_path):
                                     os.remove(file_path)
                                     cleaned_items.append(file_path)
-                            logger.info(f"Successfully cleaned command directory for {target_config['name']}: {command_dir}")
+                            logger.info(f"Successfully cleaned command directory for {sanitize_for_log(target_config['name'])}: {sanitize_for_log(str(command_dir))}")
                         else:
-                            logger.info(f"Command directory not found at {command_dir}")
+                            logger.info(f"Command directory not found at {sanitize_for_log(str(command_dir))}")
                     except Exception as e:
                         error_msg = f"Failed to clean command directory for {target_config['name']}: {str(e)}"
                         errors.append(error_msg)
@@ -505,9 +506,9 @@ async def cleanup_configurations(request: CleanupRequest):
                         if os.path.exists(role_file_path):
                             os.remove(role_file_path)
                             cleaned_items.append(role_file_path)
-                            logger.info(f"Successfully cleaned role file for {target_config['name']}: {role_file_path}")
+                            logger.info(f"Successfully cleaned role file for {sanitize_for_log(target_config['name'])}: {sanitize_for_log(str(role_file_path))}")
                         else:
-                            logger.info(f"Role file not found at {role_file_path}")
+                            logger.info(f"Role file not found at {sanitize_for_log(str(role_file_path))}")
                     except Exception as e:
                         error_msg = f"Failed to clean role file for {target_config['name']}: {str(e)}"
                         errors.append(error_msg)
@@ -519,7 +520,7 @@ async def cleanup_configurations(request: CleanupRequest):
                     if os.path.exists(target_path):
                         os.remove(target_path)
                         cleaned_items.append(target_path)
-                        logger.info(f"Successfully removed model config from {target_config['name']}: {target_path}")
+                        logger.info(f"Successfully removed model config from {sanitize_for_log(target_config['name'])}: {sanitize_for_log(str(target_path))}")
                 except Exception as e:
                     error_msg = f"Failed to remove model config from {target_config['name']}: {str(e)}"
                     errors.append(error_msg)
@@ -541,7 +542,7 @@ async def cleanup_configurations(request: CleanupRequest):
         )
         
     except Exception as e:
-        logger.error(f"Error during cleanup: {e}")
+        logger.error(f"Error during cleanup: {sanitize_for_log(str(e))}")
         return CleanupResponse(
             success=False,
             message=f"Cleanup failed: {str(e)}",

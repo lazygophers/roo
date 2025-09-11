@@ -43,7 +43,9 @@
       "Bash(yarn install:*)",
       "Bash(yarn import:*)",
       "Bash(gh pr view:*)",
-      "Bash(gh pr create:*)"
+      "Bash(gh pr create:*)",
+      "WebSearch",
+      "Bash(uv add:*)"
     ],
     "deny": [],
     "ask": []

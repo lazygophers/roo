@@ -128,7 +128,7 @@ class DatabaseService:
                         logger.error(f"Failed to process {file_path}: {e}")
                         continue
         
-        logger.info(f"Scanned {len(results)} files for config '{config_name}'")
+        logger.info(f"Scanned {len(results)} files for config '{sanitize_for_log(config_name)}'")
         return results
     
     def sync_config(self, config_name: str) -> Dict[str, int]:
@@ -186,7 +186,7 @@ class DatabaseService:
         }
         self.metadata_table.upsert(metadata, Query_obj.config_name == config_name)
         
-        logger.info(f"Sync completed for '{config_name}': {stats}")
+        logger.info(f"Sync completed for '{sanitize_for_log(config_name)}': {stats}")
         return stats
     
     def sync_all(self) -> Dict[str, Dict[str, int]]:

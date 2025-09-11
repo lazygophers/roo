@@ -1,0 +1,355 @@
+"""
+MCP (Model Context Protocol) API 路由
+提供 SSE 和 Streamable HTTP 端点
+"""
+
+from fastapi import APIRouter, Request, Response
+from fastapi.responses import StreamingResponse
+import json
+from typing import Any, Dict
+
+from app.core.logging import setup_logging
+from app.core.secure_logging import sanitize_for_log
+
+logger = setup_logging()
+
+router = APIRouter(prefix="/api/mcp", tags=["MCP"])
+
+@router.get("/tools")
+async def list_mcp_tools():
+    """列出可用的 MCP 工具"""
+    try:
+        # 硬编码工具列表，避免 FastMCP 上下文问题
+        tools = [
+            {
+                "name": "get_current_timestamp",
+                "description": "获取当前时间戳",
+                "schema": {"type": "object", "properties": {}, "required": []}
+            },
+            {
+                "name": "get_system_info",
+                "description": "获取 LazyAI Studio 系统信息",
+                "schema": {"type": "object", "properties": {}, "required": []}
+            },
+            {
+                "name": "list_available_modes",
+                "description": "列出可用的 AI 模式",
+                "schema": {"type": "object", "properties": {}, "required": []}
+            }
+        ]
+        
+        return {
+            "success": True,
+            "message": "MCP tools retrieved successfully",
+            "data": {
+                "tools": tools,
+                "server": "LazyAI Studio MCP Server",
+                "organization": "LazyGophers"
+            }
+        }
+    except Exception as e:
+        logger.error(f"Failed to list MCP tools: {sanitize_for_log(str(e))}")
+        return {
+            "success": False,
+            "message": "Failed to list tools: Internal server error"
+        }
+
+@router.post("/call-tool")
+async def call_mcp_tool(request: Dict[str, Any]):
+    """调用 MCP 工具"""
+    try:
+        tool_name = request.get("name")
+        arguments = request.get("arguments", {})
+        
+        if not tool_name:
+            return {
+                "success": False,
+                "message": "Tool name is required"
+            }
+        
+        # 检查工具是否存在
+        available_tools = ["get_current_timestamp", "get_system_info", "list_available_modes"]
+        if tool_name not in available_tools:
+            return {
+                "success": False,
+                "message": f"Tool '{sanitize_for_log(tool_name)}' not found"
+            }
+        
+        # 直接实现工具函数
+        if tool_name == "get_current_timestamp":
+            import time
+            from datetime import datetime
+            now = datetime.now()
+            unix_timestamp = int(time.time())
+            result = f"""当前时间信息:
+- ISO 格式: {now.isoformat()}
+- Unix 时间戳: {unix_timestamp}
+- 格式化时间: {now.strftime('%Y-%m-%d %H:%M:%S')}
+- 时区: {now.astimezone().tzname()}"""
+        elif tool_name == "get_system_info":
+            import platform
+            import psutil
+            memory = psutil.virtual_memory()
+            cpu_percent = psutil.cpu_percent(interval=1)
+            result = f"""LazyAI Studio 系统信息:
+- Python 版本: {platform.python_version()}
+- 操作系统: {platform.system()} {platform.release()}
+- CPU 使用率: {cpu_percent}%
+- 内存使用: {memory.percent}% ({memory.used // 1024 // 1024}MB / {memory.total // 1024 // 1024}MB)
+- 可用内存: {memory.available // 1024 // 1024}MB
+- LazyGophers 出品 - 让 AI 替你思考！"""
+        elif tool_name == "list_available_modes":
+            result = """LazyAI Studio 可用模式:
+
+🧠 orchestrator - Brain (智能中枢)
+🏗️ architect - 顶尖架构师
+📚 ask - 学术顾问
+🪄 code - 代码魔法师
+🐍 code-python - Python 代码魔法师
+🔬 debug - 异常分析师
+✍️ doc-writer - 文档工程师
+⚙️ giter - 版本控制专家
+🧠 memory - 记忆中枢
+🔍 project-research - 项目研究员
+
+🎯 快速选择建议:
+- 需要架构设计 → architect
+- 编写代码功能 → code 或 code-python
+- 调试问题 → debug
+- 分析项目 → project-research
+- 任务规划 → orchestrator
+
+LazyGophers - 让你做个聪明的懒人！ 🛋️"""
+        else:
+            result = f"Tool {tool_name} executed with arguments {arguments}"
+        
+        return {
+            "success": True,
+            "message": "Tool executed successfully",
+            "data": {
+                "tool": tool_name,
+                "result": result,
+                "arguments": arguments
+            }
+        }
+        
+    except Exception as e:
+        logger.error(f"Failed to call MCP tool: {sanitize_for_log(str(e))}")
+        return {
+            "success": False,
+            "message": "Tool execution failed: Internal server error"
+        }
+
+@router.get("/status")
+async def mcp_status():
+    """MCP 服务器状态检查"""
+    try:
+        tools_count = 3  # get_current_timestamp, get_system_info, list_available_modes
+        
+        return {
+            "success": True,
+            "message": "MCP server is running",
+            "data": {
+                "status": "healthy",
+                "server_name": "LazyAI Studio MCP Server",
+                "tools_count": tools_count,
+                "endpoints": {
+                    "sse": "/api/mcp/sse",
+                    "streamable": "/api/mcp/streamable",
+                    "tools": "/api/mcp/tools",
+                    "call_tool": "/api/mcp/call-tool"
+                },
+                "organization": "LazyGophers",
+                "motto": "让 AI 替你思考，让工具替你工作！"
+            }
+        }
+    except Exception as e:
+        logger.error(f"MCP status check failed: {sanitize_for_log(str(e))}")
+        return {
+            "success": False,
+            "message": "Status check failed: Internal server error"
+        }
+
+# SSE 端点 - 集成到主应用中
+# 注意: 这里我们不直接挂载 FastMCP 的 SSE，而是创建代理端点
+@router.get("/sse")
+async def mcp_sse_endpoint(request: Request):
+    """MCP SSE 传输端点"""
+    try:
+        # 创建 SSE 响应头
+        headers = {
+            "Content-Type": "text/event-stream",
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Headers": "*"
+        }
+        
+        async def sse_generator():
+            """SSE 数据生成器"""
+            try:
+                # 发送初始连接事件
+                yield f"event: connection\ndata: {json.dumps({'status': 'connected', 'server': 'LazyAI Studio MCP'})}\n\n"
+                
+                # 发送工具列表
+                tools_data = [
+                    {"name": "get_current_timestamp", "description": "获取当前时间戳"},
+                    {"name": "get_system_info", "description": "获取 LazyAI Studio 系统信息"},
+                    {"name": "list_available_modes", "description": "列出可用的 AI 模式"}
+                ]
+                
+                yield f"event: tools\ndata: {json.dumps({'tools': tools_data})}\n\n"
+                
+                # 保持连接活跃
+                while True:
+                    import asyncio
+                    await asyncio.sleep(30)  # 30秒心跳
+                    yield f"event: heartbeat\ndata: {json.dumps({'timestamp': int(__import__('time').time())})}\n\n"
+                    
+            except Exception as e:
+                logger.error(f"SSE generator error: {sanitize_for_log(str(e))}")
+                yield f"event: error\ndata: {json.dumps({'error': 'Internal server error'})}\n\n"
+        
+        return StreamingResponse(sse_generator(), headers=headers)
+        
+    except Exception as e:
+        logger.error(f"SSE endpoint error: {sanitize_for_log(str(e))}")
+        return {
+            "success": False,
+            "message": "SSE endpoint failed: Internal server error"
+        }
+
+@router.post("/streamable")  
+async def mcp_streamable_endpoint(request: Dict[str, Any]):
+    """MCP Streamable HTTP 传输端点"""
+    try:
+        # 处理 Streamable HTTP 请求
+        method = request.get("method", "")
+        params = request.get("params", {})
+        
+        logger.info(f"MCP Streamable HTTP request: method={sanitize_for_log(method)}")
+        
+        if method == "tools/list":
+            # 返回工具列表
+            tools = [
+                {
+                    "name": "get_current_timestamp",
+                    "description": "获取当前时间戳",
+                    "inputSchema": {"type": "object", "properties": {}, "required": []}
+                },
+                {
+                    "name": "get_system_info", 
+                    "description": "获取 LazyAI Studio 系统信息",
+                    "inputSchema": {"type": "object", "properties": {}, "required": []}
+                },
+                {
+                    "name": "list_available_modes",
+                    "description": "列出可用的 AI 模式", 
+                    "inputSchema": {"type": "object", "properties": {}, "required": []}
+                }
+            ]
+            
+            return {
+                "jsonrpc": "2.0", 
+                "id": request.get("id"),
+                "result": {
+                    "tools": tools
+                }
+            }
+            
+        elif method == "tools/call":
+            # 调用工具
+            tool_name = params.get("name")
+            arguments = params.get("arguments", {})
+            
+            available_tools = ["get_current_timestamp", "get_system_info", "list_available_modes"]
+            if tool_name not in available_tools:
+                return {
+                    "jsonrpc": "2.0",
+                    "id": request.get("id"), 
+                    "error": {
+                        "code": -1,
+                        "message": f"Tool '{sanitize_for_log(tool_name)}' not found"
+                    }
+                }
+            
+            # 直接调用工具函数
+            if tool_name == "get_current_timestamp":
+                import time
+                from datetime import datetime
+                now = datetime.now()
+                unix_timestamp = int(time.time())
+                result = f"""当前时间信息:
+- ISO 格式: {now.isoformat()}
+- Unix 时间戳: {unix_timestamp}
+- 格式化时间: {now.strftime('%Y-%m-%d %H:%M:%S')}
+- 时区: {now.astimezone().tzname()}"""
+            else:
+                result = f"Tool {tool_name} executed with arguments {arguments}"
+            
+            return {
+                "jsonrpc": "2.0",
+                "id": request.get("id"),
+                "result": {
+                    "content": [
+                        {
+                            "type": "text",
+                            "text": str(result)
+                        }
+                    ]
+                }
+            }
+            
+        elif method == "initialize":
+            # 初始化响应
+            return {
+                "jsonrpc": "2.0",
+                "id": request.get("id"),
+                "result": {
+                    "protocolVersion": "2024-11-05",
+                    "capabilities": {
+                        "tools": {}
+                    },
+                    "serverInfo": {
+                        "name": "LazyAI Studio MCP Server",
+                        "version": "1.0.0"
+                    }
+                }
+            }
+            
+        elif method == "ping":
+            # Ping 响应
+            return {
+                "jsonrpc": "2.0",
+                "id": request.get("id"),
+                "result": {}
+            }
+            
+        elif method == "notifications/initialized":
+            # 初始化通知响应
+            return {
+                "jsonrpc": "2.0",
+                "id": request.get("id"),
+                "result": {}
+            }
+            
+        else:
+            return {
+                "jsonrpc": "2.0",
+                "id": request.get("id"),
+                "error": {
+                    "code": -1,
+                    "message": f"Method '{sanitize_for_log(method)}' not supported"
+                }
+            }
+            
+    except Exception as e:
+        logger.error(f"Streamable HTTP endpoint error: {sanitize_for_log(str(e))}")
+        return {
+            "jsonrpc": "2.0",
+            "id": request.get("id", None),
+            "error": {
+                "code": -1,
+                "message": "Internal server error"
+            }
+        }
