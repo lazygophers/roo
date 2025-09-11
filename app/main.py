@@ -7,6 +7,8 @@ from pathlib import Path
 from app.core.config import API_PREFIX, DEBUG, LOG_LEVEL, PROJECT_ROOT
 from app.core.logging import setup_logging, log_error
 from app.core.database_service import init_database_service, get_database_service
+from app.core.mcp_tools_service import init_mcp_tools_service
+from app.core.mcp_server import init_mcp_server
 from app.routers import api_router
 
 # 设置日志
@@ -15,11 +17,20 @@ logger = setup_logging(LOG_LEVEL)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """FastAPI 生命周期管理"""
-    # 启动时初始化数据库服务
+    # 启动时初始化服务
     logger.info("Initializing application...")
     try:
+        # 初始化数据库服务
         db_service = init_database_service()
         logger.info("Database service initialized successfully")
+        
+        # 初始化MCP工具服务
+        mcp_tools_service = init_mcp_tools_service()
+        logger.info("MCP tools service initialized successfully")
+        
+        # 初始化MCP服务器
+        mcp_server = init_mcp_server()
+        logger.info("MCP server initialized successfully")
         
         # 打印启动信息和访问地址
         import socket
@@ -45,7 +56,9 @@ async def lifespan(app: FastAPI):
 🔗 功能入口:
    📊 配置管理:    http://localhost:8000/
    📖 API 文档:    http://localhost:8000/docs
-   💚 健康检查:    http://localhost:8000/api/health"""
+   💚 健康检查:    http://localhost:8000/api/health
+   🔧 MCP 工具:    http://localhost:8000/api/mcp/tools
+   📊 MCP 状态:    http://localhost:8000/api/mcp/status"""
 
         # 检查前端构建状态
         frontend_build = PROJECT_ROOT / "frontend" / "build"

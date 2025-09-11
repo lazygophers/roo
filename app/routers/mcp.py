@@ -6,6 +6,7 @@ MCP (Model Context Protocol) API 路由
 from fastapi import APIRouter, Request, Response
 from fastapi.responses import StreamingResponse
 import json
+from datetime import datetime
 from typing import Any, Dict
 
 from app.core.logging import setup_logging
@@ -144,7 +145,12 @@ LazyGophers - 让你做个聪明的懒人！ 🛋️"""
 async def mcp_status():
     """MCP 服务器状态检查"""
     try:
-        tools_count = 3  # get_current_timestamp, get_system_info, list_available_modes
+        tools_service = get_mcp_tools_service()
+        mcp_server = get_mcp_server()
+        
+        # 获取统计信息
+        stats = tools_service.get_statistics()
+        tools_by_category = tools_service.get_tools_by_category()
         
         return {
             "success": True,
@@ -152,15 +158,20 @@ async def mcp_status():
             "data": {
                 "status": "healthy",
                 "server_name": "LazyAI Studio MCP Server",
-                "tools_count": tools_count,
+                "tools_count": stats['enabled_tools'],
+                "total_tools": stats['total_tools'],
+                "categories_count": stats['total_categories'],
+                "tools_by_category": {cat_id: info['count'] for cat_id, info in stats['by_category'].items()},
                 "endpoints": {
                     "sse": "/api/mcp/sse",
                     "streamable": "/api/mcp/streamable",
                     "tools": "/api/mcp/tools",
-                    "call_tool": "/api/mcp/call-tool"
+                    "call_tool": "/api/mcp/call-tool",
+                    "categories": "/api/mcp/categories"
                 },
                 "organization": "LazyGophers",
-                "motto": "让 AI 替你思考，让工具替你工作！"
+                "motto": "让 AI 替你思考，让工具替你工作！",
+                "last_updated": stats['last_updated']
             }
         }
     except Exception as e:
@@ -168,6 +179,122 @@ async def mcp_status():
         return {
             "success": False,
             "message": "Status check failed: Internal server error"
+        }
+
+@router.get("/categories")
+async def list_mcp_categories():
+    """列出 MCP 工具分类"""
+    try:
+        tools_service = get_mcp_tools_service()
+        categories = tools_service.get_categories()
+        tools_by_category = tools_service.get_tools_by_category()
+        
+        # 为每个分类添加工具数量
+        for category in categories:
+            cat_id = category['id']
+            category['tools_count'] = tools_by_category.get(cat_id, {}).get('count', 0)
+        
+        return {
+            "success": True,
+            "message": "MCP categories retrieved successfully",
+            "data": {
+                "categories": categories,
+                "total_categories": len(categories)
+            }
+        }
+    except Exception as e:
+        logger.error(f"Failed to list MCP categories: {sanitize_for_log(str(e))}")
+        return {
+            "success": False,
+            "message": "Failed to list categories: Internal server error"
+        }
+
+@router.get("/tools/{category}")
+async def list_tools_by_category(category: str):
+    """按分类列出 MCP 工具"""
+    try:
+        tools_service = get_mcp_tools_service()
+        
+        # 验证分类是否存在
+        category_info = tools_service.get_category(category)
+        if not category_info:
+            return {
+                "success": False,
+                "message": f"Category '{sanitize_for_log(category)}' not found"
+            }
+        
+        tools = tools_service.get_tools(category=category, enabled_only=True)
+        
+        return {
+            "success": True,
+            "message": f"Tools in category '{category}' retrieved successfully",
+            "data": {
+                "category": category_info,
+                "tools": tools,
+                "tools_count": len(tools)
+            }
+        }
+    except Exception as e:
+        logger.error(f"Failed to list tools for category '{sanitize_for_log(category)}': {sanitize_for_log(str(e))}")
+        return {
+            "success": False,
+            "message": "Failed to list tools: Internal server error"
+        }
+
+@router.get("/tools/info/{tool_name}")
+async def get_tool_info(tool_name: str):
+    """获取特定工具的详细信息"""
+    try:
+        tools_service = get_mcp_tools_service()
+        tool = tools_service.get_tool(tool_name)
+        
+        if not tool:
+            return {
+                "success": False,
+                "message": f"Tool '{sanitize_for_log(tool_name)}' not found"
+            }
+        
+        return {
+            "success": True,
+            "message": "Tool information retrieved successfully",
+            "data": {
+                "tool": tool
+            }
+        }
+    except Exception as e:
+        logger.error(f"Failed to get tool info for '{sanitize_for_log(tool_name)}': {sanitize_for_log(str(e))}")
+        return {
+            "success": False,
+            "message": "Failed to get tool information: Internal server error"
+        }
+
+@router.post("/tools/refresh")
+async def refresh_mcp_tools():
+    """刷新 MCP 工具配置"""
+    try:
+        tools_service = get_mcp_tools_service()
+        mcp_server = get_mcp_server()
+        
+        # 重新注册内置工具
+        result = tools_service.register_builtin_tools()
+        
+        # 刷新MCP服务器工具
+        mcp_result = mcp_server.refresh_tools()
+        
+        return {
+            "success": True,
+            "message": "MCP tools refreshed successfully",
+            "data": {
+                "tools_service_result": result,
+                "mcp_server_result": mcp_result,
+                "timestamp": datetime.now().isoformat()
+            }
+        }
+    except Exception as e:
+        logger.error(f"Failed to refresh MCP tools: {sanitize_for_log(str(e))}")
+        return {
+            "success": False,
+            "message": "Failed to refresh tools: Internal server error"
         }
 
 # SSE 端点 - 集成到主应用中
