@@ -1,22 +1,18 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Card, Row, Col, Typography, List, Tag, Space, message, Progress, Badge } from 'antd';
+import { Row, Col, Typography, message, Badge } from 'antd';
 import { 
-  CodeOutlined, 
   RocketOutlined,
-  BulbOutlined,
   ThunderboltOutlined,
-  StarOutlined,
   ApiOutlined,
   DatabaseOutlined,
-  CloudOutlined,
-  SafetyCertificateOutlined
+  CodeOutlined
 } from '@ant-design/icons';
-import { apiClient, ModelInfo } from '../api';
-import { PageTitle, CardTitle, StatTitle } from '../components/UI/TitleComponents';
+import { apiClient } from '../api';
+import { PageTitle, StatTitle } from '../components/UI/TitleComponents';
 import { useTheme } from '../contexts/ThemeContext';
+import { useDocumentTitle } from '../hooks/useDocumentTitle';
 import './Home.css';
 
-const { Paragraph, Text } = Typography;
 
 // 粒子系统组件
 const ParticleBackground: React.FC = () => {
@@ -135,6 +131,9 @@ const ParticleBackground: React.FC = () => {
 
 // 主页组件
 const Home: React.FC = () => {
+  // 设置页面标题
+  useDocumentTitle('首页');
+  
   const { themeType } = useTheme();
   const [stats, setStats] = useState({
     totalModels: 0,
@@ -143,7 +142,6 @@ const Home: React.FC = () => {
     commands: 0,
     rules: 0
   });
-  const [recentModels, setRecentModels] = useState<ModelInfo[]>([]);
   const [loading, setLoading] = useState(true);
   const [headerVisible, setHeaderVisible] = useState(false);
 
@@ -168,9 +166,6 @@ const Home: React.FC = () => {
           commands: commandsData.total,
           rules: rulesData.total
         });
-
-        // 显示最近的模型（取前6个）
-        setRecentModels(modelsData.data.slice(0, 6));
         
       } catch (error) {
         console.error('Failed to load data:', error);
@@ -186,17 +181,6 @@ const Home: React.FC = () => {
     setTimeout(() => setHeaderVisible(true), 300);
   }, []);
 
-  const getGroupColor = (groups: any[]) => {
-    if (groups.includes('core')) return '#1890ff';
-    if (groups.includes('coder')) return '#52c41a';
-    return '#722ed1';
-  };
-
-  const getGroupIcon = (groups: any[]) => {
-    if (groups.includes('core')) return <DatabaseOutlined />;
-    if (groups.includes('coder')) return <CodeOutlined />;
-    return <BulbOutlined />;
-  };
 
   return (
     <div className={`home-container ${themeType ? `theme-${themeType}` : ''}`}>
@@ -211,17 +195,17 @@ const Home: React.FC = () => {
             </div>
             <div className="header-text">
               <PageTitle
-                title="Roo AI Configuration Center"
-                subtitle="智能模型配置管理平台 - 统一管理您的AI模型、指令和规则配置"
+                title="LazyAI Studio"
+                subtitle="懒人的 AI 智能工作室 - 让复杂的开发工作变得简单高效"
                 level={1}
                 gradient={true}
                 animated={true}
               />
             </div>
             <div className="header-badges">
-              <Badge count="AI" style={{ backgroundColor: '#52c41a' }} />
-              <Badge count="Config" style={{ backgroundColor: '#1890ff' }} />
-              <Badge count="Smart" style={{ backgroundColor: '#722ed1' }} />
+              <Badge count="智能" style={{ backgroundColor: '#52c41a' }} />
+              <Badge count="高效" style={{ backgroundColor: '#1890ff' }} />
+              <Badge count="便捷" style={{ backgroundColor: '#722ed1' }} />
             </div>
           </div>
         </div>
@@ -272,146 +256,6 @@ const Home: React.FC = () => {
           </Row>
         </div>
 
-        {/* 主要内容区域 */}
-        <Row gutter={[24, 24]} className="main-content">
-          {/* 模型展示区 */}
-          <Col xs={24} lg={16}>
-            <Card 
-              className="models-card"
-              title={
-                <CardTitle
-                  title="精选AI模型"
-                  icon={<StarOutlined />}
-                  status="featured"
-                  tag={{ text: "最新配置", color: "blue" }}
-                />
-              }
-              loading={loading}
-            >
-              <List
-                className="models-list"
-                dataSource={recentModels}
-                renderItem={(model, index) => (
-                  <List.Item 
-                    className={`model-item delay-${index}`}
-                    style={{ animationDelay: `${600 + index * 100}ms` }}
-                  >
-                    <div className="model-content">
-                      <div className="model-icon" style={{ color: getGroupColor(model.groups) }}>
-                        {getGroupIcon(model.groups)}
-                      </div>
-                      <div className="model-info">
-                        <div className="model-header">
-                          <Text strong className="model-name">{model.name}</Text>
-                          <div className="model-tags">
-                            <Tag 
-                              color={getGroupColor(model.groups)} 
-                              className="model-tag"
-                            >
-                              {model.groups.includes('core') ? 'Core' : 
-                               model.groups.includes('coder') ? 'Coder' : 'General'}
-                            </Tag>
-                            <Tag className="model-slug">{model.slug}</Tag>
-                          </div>
-                        </div>
-                        <Paragraph 
-                          className="model-description"
-                          ellipsis={{ rows: 2, expandable: false }}
-                        >
-                          {model.description}
-                        </Paragraph>
-                      </div>
-                      <div className="model-status">
-                        <div className="status-dot"></div>
-                        <Text type="secondary">Active</Text>
-                      </div>
-                    </div>
-                  </List.Item>
-                )}
-              />
-            </Card>
-          </Col>
-
-          {/* 系统监控区 */}
-          <Col xs={24} lg={8}>
-            <Space direction="vertical" style={{ width: '100%' }} size="large">
-              {/* 系统状态卡片 */}
-              <Card 
-                className="system-card"
-                title={
-                  <CardTitle
-                    title="系统状态"
-                    icon={<SafetyCertificateOutlined />}
-                    status="hot"
-                  />
-                }
-                loading={loading}
-              >
-                <div className="system-status">
-                  <div className="status-item">
-                    <div className="status-indicator online"></div>
-                    <Text>配置服务</Text>
-                    <Tag color="success">正常</Tag>
-                  </div>
-                  <div className="status-item">
-                    <div className="status-indicator online"></div>
-                    <Text>模型引擎</Text>
-                    <Tag color="success">运行中</Tag>
-                  </div>
-                  <div className="status-item">
-                    <div className="status-indicator online"></div>
-                    <Text>数据同步</Text>
-                    <Tag color="processing">同步中</Tag>
-                  </div>
-                </div>
-              </Card>
-
-              {/* 快速统计 */}
-              <Card 
-                className="quick-stats-card"
-                title={
-                  <CardTitle
-                    title="资源概览"
-                    icon={<CloudOutlined />}
-                    status="new"
-                  />
-                }
-                loading={loading}
-              >
-                <div className="quick-stats">
-                  <div className="stat-row">
-                    <span>配置规则</span>
-                    <span className="stat-number">{stats.rules}</span>
-                  </div>
-                  <div className="stat-row">
-                    <span>活跃连接</span>
-                    <span className="stat-number">127</span>
-                  </div>
-                  <div className="stat-row">
-                    <span>处理请求</span>
-                    <span className="stat-number">2.3K</span>
-                  </div>
-                  <div className="stat-row">
-                    <span>响应时间</span>
-                    <span className="stat-number">45ms</span>
-                  </div>
-                </div>
-                
-                <div className="performance-chart">
-                  <Text type="secondary">系统负载</Text>
-                  <Progress 
-                    percent={75} 
-                    strokeColor={{
-                      '0%': '#108ee9',
-                      '100%': '#87d068',
-                    }}
-                    size="small"
-                  />
-                </div>
-              </Card>
-            </Space>
-          </Col>
-        </Row>
       </div>
     </div>
   );

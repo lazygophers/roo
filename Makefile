@@ -13,10 +13,11 @@ help:
 	@echo "  frontend-install  仅安装前端依赖"
 	@echo ""
 	@echo "🔧 开发命令:"
-	@echo "  run              构建并启动生产服务器"
-	@echo "  dev              启动完整开发环境（前端+后端）"
-	@echo "  backend-dev      仅启动后端开发服务器"
-	@echo "  frontend-dev     仅启动前端开发服务器"
+	@echo "  run                   构建并启动生产服务器"
+	@echo "  dev                   启动完整开发环境（前端+后端）"
+	@echo "  backend-dev           仅启动后端开发服务器"
+	@echo "  backend-dev-optimized ⚡启动高性能优化版本服务器"
+	@echo "  frontend-dev          仅启动前端开发服务器"
 	@echo ""
 	@echo "🏗️  构建命令:"
 	@echo "  build            构建前端生产版本"
@@ -33,6 +34,12 @@ help:
 	@echo ""
 	@echo "🚀 部署命令:"
 	@echo "  deploy           部署到生产环境"
+	@echo ""
+	@echo "⚡ 性能优化命令:"
+	@echo "  benchmark             运行性能基准测试对比"
+	@echo "  benchmark-original    测试原始服务性能"  
+	@echo "  benchmark-optimized   测试优化服务性能"
+	@echo "  benchmark-clean       清理性能测试进程"
 	@echo ""
 	@echo "🧹 清理命令:"
 	@echo "  clean            清理所有构建文件"
@@ -65,6 +72,15 @@ backend-dev:
 	@echo "🚀 启动后端开发服务器 (集成前端)..."
 	@echo "💡 服务启动后，请查看控制台中的访问地址指引"
 	uv run uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+
+# 启动优化版本服务器
+backend-dev-optimized:
+	@echo "⚡ 启动优化版本后端服务器 (高性能模式)..."
+	@echo "💡 使用懒加载、LRU缓存、无文件监控等优化技术"
+	@echo "💡 服务启动后，请查看控制台中的访问地址指引"
+	uv run uvicorn app.main_optimized:app --reload --host 0.0.0.0 --port 8000
+
+backend-optimized: backend-dev-optimized
 
 frontend-dev:
 	@echo "🚀 启动前端开发服务器..."
@@ -201,3 +217,39 @@ info:
 test-integration:
 	@echo "🧪 运行前后端集成测试..."
 	uv run python test_integration.py
+
+# ========== 性能优化相关 ==========
+# 运行性能基准测试
+benchmark:
+	@echo "📊 运行性能基准测试..."
+	@echo "💡 比较原始服务 vs 优化服务的性能差异"
+	uv run python performance_benchmark.py
+
+# 性能测试 - 原始版本
+benchmark-original:
+	@echo "📊 测试原始服务性能..."
+	@echo "⏱️ 启动原始版本服务器进行性能测试"
+	uv run uvicorn app.main:app --host 127.0.0.1 --port 8001 &
+	@sleep 3
+	@echo "🧪 运行负载测试..."
+	@curl -s http://localhost:8001/api/health > /dev/null && echo "✅ 原始服务运行正常"
+	@pkill -f "app.main:app" || true
+
+# 性能测试 - 优化版本
+benchmark-optimized:
+	@echo "⚡ 测试优化服务性能..."
+	@echo "⏱️ 启动优化版本服务器进行性能测试"
+	uv run uvicorn app.main_optimized:app --host 127.0.0.1 --port 8002 &
+	@sleep 3
+	@echo "🧪 运行负载测试..."
+	@curl -s http://localhost:8002/api/health > /dev/null && echo "✅ 优化服务运行正常"
+	@curl -s http://localhost:8002/api/performance | python -m json.tool
+	@pkill -f "app.main_optimized:app" || true
+
+# 清理性能测试进程
+benchmark-clean:
+	@echo "🧹 清理性能测试相关进程..."
+	@pkill -f "performance_benchmark" || true
+	@pkill -f "app.main" || true
+	@pkill -f "app.main_optimized" || true
+	@echo "✅ 清理完成"

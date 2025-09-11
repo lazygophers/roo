@@ -66,7 +66,8 @@ async def get_models(request: ModelsRequest = ModelsRequest()) -> ModelsResponse
             success=True,
             message="Models loaded successfully from cache",
             data=filtered_models,
-            total=len(filtered_models)
+            count=len(filtered_models),
+            total=len(models)
         )
         
     except Exception as e:

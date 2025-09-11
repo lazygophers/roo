@@ -20,7 +20,9 @@ class ModelsResponse(BaseModel):
     success: bool
     message: str
     data: List[ModelInfo]
+    count: int
     total: int
+    processing_time_ms: Optional[float] = None
 
 
 class ErrorResponse(BaseModel):
@@ -71,11 +73,10 @@ class RulesResponse(BaseModel):
     """Rules API 响应数据结构"""
     success: bool
     message: str
-    slug: str
-    searched_directories: List[str]
-    found_directories: List[str]
-    data: List[FileMetadata]
+    data: List[Dict[str, Any]]
+    count: int
     total: int
+    processing_time_ms: Optional[float] = None
 
 
 # POST 请求数据模型
@@ -100,8 +101,10 @@ class CommandsResponse(BaseModel):
     """Commands API 响应数据结构"""
     success: bool
     message: str
-    data: List[FileMetadata]
+    data: List[Dict[str, Any]]
+    count: int
     total: int
+    processing_time_ms: Optional[float] = None
 
 
 class SelectedItem(BaseModel):
@@ -182,3 +185,8 @@ class RoleResponse(BaseModel):
     message: str
     data: List[RoleInfo]
     total: int
+
+
+class RuleBySlugRequest(BaseModel):
+    """根据 slug 获取单个规则的请求数据结构"""
+    slug: str

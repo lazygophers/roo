@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { 
   List, 
   Card, 
@@ -52,7 +52,6 @@ const ModesListWithSelection: React.FC<ModesListProps> = ({
 }) => {
   const { token } = theme.useToken();
   const [models, setModels] = useState<ModelInfo[]>([]);
-  const [filteredModels, setFilteredModels] = useState<ModelInfo[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchText, setSearchText] = useState('');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
@@ -60,6 +59,44 @@ const ModesListWithSelection: React.FC<ModesListProps> = ({
   const [loadingRules, setLoadingRules] = useState<Record<string, boolean>>({});
   const [expandedModels, setExpandedModels] = useState<Set<string>>(new Set());
   const modelRulesRef = useRef<Record<string, FileMetadata[]>>({});
+
+  // Optimized filteredModels with useMemo to prevent unnecessary re-computations
+  const filteredModels = useMemo(() => {
+    let filtered = models;
+
+    // 分类过滤
+    if (categoryFilter !== 'all') {
+      filtered = filtered.filter(model => 
+        model.groups.includes(categoryFilter)
+      );
+    }
+
+    // 搜索过滤
+    if (searchText) {
+      const searchLower = searchText.toLowerCase();
+      filtered = filtered.filter(model =>
+        model.name.toLowerCase().includes(searchLower) ||
+        model.slug.toLowerCase().includes(searchLower) ||
+        model.description.toLowerCase().includes(searchLower) ||
+        model.roleDefinition.toLowerCase().includes(searchLower)
+      );
+    }
+
+    // 排序：参考 merge.py 的排序逻辑
+    // 'orchestrator' 类型的模型优先级最高，其他的按 slug 字母顺序排列
+    filtered.sort((a, b) => {
+      if (a.slug === "orchestrator" && b.slug !== "orchestrator") {
+        return -1; // a 排在前面
+      }
+      if (b.slug === "orchestrator" && a.slug !== "orchestrator") {
+        return 1; // b 排在前面
+      }
+      // 两者都是或都不是 orchestrator，按 slug 字母顺序排序
+      return a.slug.localeCompare(b.slug);
+    });
+
+    return filtered;
+  }, [models, categoryFilter, searchText]);
 
   useEffect(() => {
     loadModels();
@@ -119,9 +156,6 @@ const ModesListWithSelection: React.FC<ModesListProps> = ({
     }
   }, [modelRules, selectedItems]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  useEffect(() => {
-    filterModels();
-  }, [models, searchText, categoryFilter]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const loadModels = async () => {
     try {
@@ -136,42 +170,6 @@ const ModesListWithSelection: React.FC<ModesListProps> = ({
     }
   };
 
-  const filterModels = () => {
-    let filtered = models;
-
-    // 分类过滤
-    if (categoryFilter !== 'all') {
-      filtered = filtered.filter(model => 
-        model.groups.includes(categoryFilter)
-      );
-    }
-
-    // 搜索过滤
-    if (searchText) {
-      const searchLower = searchText.toLowerCase();
-      filtered = filtered.filter(model =>
-        model.name.toLowerCase().includes(searchLower) ||
-        model.slug.toLowerCase().includes(searchLower) ||
-        model.description.toLowerCase().includes(searchLower) ||
-        model.roleDefinition.toLowerCase().includes(searchLower)
-      );
-    }
-
-    // 排序：参考 merge.py 的排序逻辑
-    // 'orchestrator' 类型的模型优先级最高，其他的按 slug 字母顺序排列
-    filtered.sort((a, b) => {
-      if (a.slug === "orchestrator" && b.slug !== "orchestrator") {
-        return -1; // a 排在前面
-      }
-      if (b.slug === "orchestrator" && a.slug !== "orchestrator") {
-        return 1; // b 排在前面
-      }
-      // 两者都是或都不是 orchestrator，按 slug 字母顺序排序
-      return a.slug.localeCompare(b.slug);
-    });
-
-    setFilteredModels(filtered);
-  };
 
   const getGroupColor = (groups: any[]) => {
     if (groups.includes('core')) return 'blue';
@@ -336,8 +334,8 @@ const ModesListWithSelection: React.FC<ModesListProps> = ({
     return ruleSlugs;
   };
 
-  // 加载模型规则的独立函数
-  const loadModelRules = async (modelSlug: string) => {
+  // 加载模型规则的独立函数 (Memoized for performance)
+  const loadModelRules = useCallback(async (modelSlug: string) => {
     const ruleSlugs = getModelRuleSlug(modelSlug);
     
     if (ruleSlugs.length === 0) {
@@ -351,21 +349,39 @@ const ModesListWithSelection: React.FC<ModesListProps> = ({
       const allRules: FileMetadata[] = [];
       const ruleSlugResults: string[] = [];
       
-      for (const ruleSlug of ruleSlugs) {
+      // Use Promise.allSettled for parallel API calls instead of sequential
+      const promises = ruleSlugs.map(async (ruleSlug) => {
         try {
           const response = await apiClient.getRulesBySlug(ruleSlug);
-          if (response.data && response.data.length > 0) {
-            allRules.push(...response.data);
-            ruleSlugResults.push(ruleSlug);
-          }
-        } catch (error: any) {
+          return { ruleSlug, data: response.data || [] };
+        } catch (error) {
           console.debug(`Rule directory ${ruleSlug} not found for model ${modelSlug}, continuing...`);
+          return { ruleSlug, data: [] };
         }
+      });
+      
+      const results = await Promise.allSettled(promises);
+      
+      // Process results in chunks to avoid blocking the main thread
+      for (const result of results) {
+        if (result.status === 'fulfilled' && result.value.data.length > 0) {
+          allRules.push(...result.value.data);
+          ruleSlugResults.push(result.value.ruleSlug);
+        }
+        // Yield control to browser between processing chunks
+        await new Promise(resolve => setTimeout(resolve, 0));
       }
       
-      const uniqueRules = allRules.filter((rule, index, self) => 
-        index === self.findIndex(r => r.file_path === rule.file_path)
-      );
+      // Use Map for O(1) lookup instead of findIndex for deduplication
+      const rulesMap = new Map<string, FileMetadata>();
+      for (const rule of allRules) {
+        rulesMap.set(rule.file_path, rule);
+        // Yield control periodically during large operations
+        if (rulesMap.size % 10 === 0) {
+          await new Promise(resolve => setTimeout(resolve, 0));
+        }
+      }
+      const uniqueRules = Array.from(rulesMap.values());
       
       setModelRules(prev => ({ ...prev, [modelSlug]: uniqueRules }));
       
@@ -387,24 +403,27 @@ const ModesListWithSelection: React.FC<ModesListProps> = ({
     } finally {
       setLoadingRules(prev => ({ ...prev, [modelSlug]: false }));
     }
-  };
+  }, [onUpdateModelRules]);
 
   // 强制展开模型（不包含 toggle 逻辑）
-  const forceExpandModel = async (modelSlug: string) => {
+  const forceExpandModel = useCallback(async (modelSlug: string) => {
     console.log(`Force expanding model: ${modelSlug}`);
     const newExpandedModels = new Set(expandedModels);
     newExpandedModels.add(modelSlug);
     setExpandedModels(newExpandedModels);
     console.log(`Expanded models after force expand:`, Array.from(newExpandedModels));
     
-    // 如果还没有加载过这个模式的规则，则加载
+    // 如果还没有加载过这个模式的规则，则异步加载（不阻塞 UI）
     if (!modelRules[modelSlug] && !loadingRules[modelSlug]) {
       console.log(`Loading rules for model: ${modelSlug}`);
-      await loadModelRules(modelSlug);
+      // Use setTimeout to defer rule loading and prevent blocking
+      setTimeout(() => {
+        loadModelRules(modelSlug);
+      }, 0);
     } else {
       console.log(`Rules already loaded for model: ${modelSlug}`);
     }
-  };
+  }, [expandedModels, modelRules, loadingRules, loadModelRules]);
 
   // 切换模型展开状态（用于用户点击）
   const handleModelExpand = async (modelSlug: string) => {
@@ -419,9 +438,12 @@ const ModesListWithSelection: React.FC<ModesListProps> = ({
     newExpandedModels.add(modelSlug);
     setExpandedModels(newExpandedModels);
     
-    // 如果还没有加载过这个模式的规则，则加载
+    // 如果还没有加载过这个模式的规则，则异步加载（不阻塞 UI）
     if (!modelRules[modelSlug] && !loadingRules[modelSlug]) {
-      await loadModelRules(modelSlug);
+      // Use setTimeout to defer rule loading and prevent blocking
+      setTimeout(() => {
+        loadModelRules(modelSlug);
+      }, 0);
     }
   };
 
@@ -447,14 +469,15 @@ const ModesListWithSelection: React.FC<ModesListProps> = ({
     if (modelsToExpand.length > 0) {
       message.info(`正在展开并加载 ${modelsToExpand.length} 个模型的关联规则...`);
       
-      // 使用 Promise.all 并行处理所有模型的展开
-      const expandPromises = modelsToExpand.map(async (model) => {
-        console.log(`Processing model for expand: ${model.slug}`);
-        // 强制展开模型并加载规则
-        await forceExpandModel(model.slug);
-        
-        // 等待一段时间确保规则加载完成后再选择规则
-        return new Promise<void>((resolve) => {
+      // Process models in batches to prevent blocking the main thread
+      const batchSize = 3;
+      const processBatch = async (batch: typeof modelsToExpand) => {
+        for (const model of batch) {
+          console.log(`Processing model for expand: ${model.slug}`);
+          // Use non-blocking forceExpandModel
+          await forceExpandModel(model.slug);
+          
+          // Defer rule selection to prevent blocking
           setTimeout(() => {
             const associatedRules = modelRulesRef.current[model.slug] || [];
             console.log(`Auto-selecting ${associatedRules.length} rules for model: ${model.slug}`);
@@ -464,14 +487,22 @@ const ModesListWithSelection: React.FC<ModesListProps> = ({
                 onModelRuleBinding(model.slug, rule.file_path, true);
               }
             });
-            resolve();
-          }, 300);
-        });
-      });
+          }, 500);
+          
+          // Yield control between models
+          await new Promise(resolve => setTimeout(resolve, 0));
+        }
+      };
       
-      // 等待所有模型展开完成
-      await Promise.all(expandPromises);
-      console.log('All models expanded and rules selected');
+      // Process models in batches with yielding
+      for (let i = 0; i < modelsToExpand.length; i += batchSize) {
+        const batch = modelsToExpand.slice(i, i + batchSize);
+        await processBatch(batch);
+        // Yield control between batches
+        await new Promise(resolve => setTimeout(resolve, 10));
+      }
+      
+      console.log('All models processed for expansion and rule selection');
     }
   };
 

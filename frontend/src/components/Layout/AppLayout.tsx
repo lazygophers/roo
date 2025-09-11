@@ -1,8 +1,10 @@
 import React from 'react';
-import { Layout, Menu, theme } from 'antd';
-import { HomeOutlined, SettingOutlined } from '@ant-design/icons';
+import { Layout, Menu, theme, Button, Space } from 'antd';
+import { HomeOutlined, SettingOutlined, GithubOutlined } from '@ant-design/icons';
 import { useNavigate, useLocation } from 'react-router-dom';
 import ThemeToggle from '../Theme/ThemeToggle';
+import SystemMonitorMenuItem from '../SystemMonitor/SystemMonitorMenuItem';
+import LicenseInfo from '../License/LicenseInfo';
 import './AppLayout.css';
 
 const { Header, Content, Sider } = Layout;
@@ -13,7 +15,7 @@ interface AppLayoutProps {
 
 const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   const {
-    token: { colorBgContainer, colorBorderSecondary },
+    token: { colorBgContainer, colorBorderSecondary, colorText },
   } = theme.useToken();
   
   const navigate = useNavigate();
@@ -39,35 +41,62 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
         collapsedWidth="0"
         style={{
           background: colorBgContainer,
+          position: 'relative',
+          height: '100vh'
         }}
       >
-        <div 
-          className="nav-logo"
-          style={{ 
-            height: 48, 
-            margin: 16, 
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontWeight: 'bold',
-            fontSize: '16px',
-            cursor: 'pointer',
-            borderBottom: `1px solid ${colorBorderSecondary}`
-          }}
-          onClick={() => navigate('/')}
-        >
-          Roo AI
+        <div style={{
+          display: 'flex',
+          flexDirection: 'column', 
+          height: '100%'
+        }}>
+          <div 
+            className="nav-logo"
+            style={{ 
+              height: 48, 
+              margin: 16, 
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontWeight: 'bold',
+              fontSize: '16px',
+              cursor: 'pointer',
+              borderBottom: `1px solid ${colorBorderSecondary}`,
+              flexShrink: 0
+            }}
+            onClick={() => navigate('/')}
+          >
+            Roo AI
+          </div>
+          
+          <Menu
+            mode="inline"
+            selectedKeys={[location.pathname]}
+            items={menuItems}
+            onClick={(item) => navigate(item.key)}
+            style={{ 
+              borderRight: 0,
+              background: 'transparent',
+              flexShrink: 0
+            }}
+          />
+          
+          {/* 填充空间 */}
+          <div style={{ flex: 1 }} />
         </div>
-        <Menu
-          mode="inline"
-          selectedKeys={[location.pathname]}
-          items={menuItems}
-          onClick={(item) => navigate(item.key)}
-          style={{ 
-            borderRight: 0,
-            background: 'transparent'
-          }}
-        />
+        
+        {/* 系统监控和开源协议信息固定在底部 */}
+        <div style={{
+          position: 'absolute',
+          bottom: 0,
+          left: 0,
+          right: 0
+        }}>
+          {/* 系统监控组件 */}
+          <SystemMonitorMenuItem />
+          {/* 开源协议信息 */}
+          <LicenseInfo />
+        </div>
       </Sider>
       <Layout>
         <Header style={{ 
@@ -78,14 +107,25 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
           <div style={{ 
             padding: '0 24px', 
             display: 'flex',
-            justifyContent: 'space-between',
+            justifyContent: 'flex-end',
             alignItems: 'center',
             height: '100%'
           }}>
-            <h2 style={{ margin: 0, fontSize: '18px', fontWeight: 'normal' }}>
-              配置中心
-            </h2>
-            <ThemeToggle />
+            <Space size="middle">
+              <Button 
+                type="text" 
+                icon={<GithubOutlined />}
+                onClick={() => window.open('https://github.com/lazygophers/roo', '_blank')}
+                style={{ 
+                  display: 'flex', 
+                  alignItems: 'center',
+                  color: colorText
+                }}
+              >
+                GitHub
+              </Button>
+              <ThemeToggle />
+            </Space>
           </div>
         </Header>
         <Content style={{ margin: '24px 16px 0' }}>
