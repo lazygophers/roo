@@ -9,6 +9,7 @@ import json
 from typing import Any, Dict
 
 from app.core.logging import setup_logging
+from app.core.secure_logging import sanitize_for_log
 
 logger = setup_logging()
 
@@ -47,10 +48,10 @@ async def list_mcp_tools():
             }
         }
     except Exception as e:
-        logger.error(f"Failed to list MCP tools: {e}")
+        logger.error(f"Failed to list MCP tools: {sanitize_for_log(str(e))}")
         return {
             "success": False,
-            "message": f"Failed to list tools: {str(e)}"
+            "message": "Failed to list tools: Internal server error"
         }
 
 @router.post("/call-tool")
@@ -133,10 +134,10 @@ LazyGophers - 让你做个聪明的懒人！ 🛋️"""
         }
         
     except Exception as e:
-        logger.error(f"Failed to call MCP tool: {e}")
+        logger.error(f"Failed to call MCP tool: {sanitize_for_log(str(e))}")
         return {
             "success": False,
-            "message": f"Tool execution failed: {str(e)}"
+            "message": "Tool execution failed: Internal server error"
         }
 
 @router.get("/status")
@@ -163,10 +164,10 @@ async def mcp_status():
             }
         }
     except Exception as e:
-        logger.error(f"MCP status check failed: {e}")
+        logger.error(f"MCP status check failed: {sanitize_for_log(str(e))}")
         return {
             "success": False,
-            "message": f"Status check failed: {str(e)}"
+            "message": "Status check failed: Internal server error"
         }
 
 # SSE 端点 - 集成到主应用中
@@ -206,16 +207,16 @@ async def mcp_sse_endpoint(request: Request):
                     yield f"event: heartbeat\ndata: {json.dumps({'timestamp': int(__import__('time').time())})}\n\n"
                     
             except Exception as e:
-                logger.error(f"SSE generator error: {e}")
-                yield f"event: error\ndata: {json.dumps({'error': str(e)})}\n\n"
+                logger.error(f"SSE generator error: {sanitize_for_log(str(e))}")
+                yield f"event: error\ndata: {json.dumps({'error': 'Internal server error'})}\n\n"
         
         return StreamingResponse(sse_generator(), headers=headers)
         
     except Exception as e:
-        logger.error(f"SSE endpoint error: {e}")
+        logger.error(f"SSE endpoint error: {sanitize_for_log(str(e))}")
         return {
             "success": False,
-            "message": f"SSE endpoint failed: {str(e)}"
+            "message": "SSE endpoint failed: Internal server error"
         }
 
 @router.post("/streamable")  
@@ -343,12 +344,12 @@ async def mcp_streamable_endpoint(request: Dict[str, Any]):
             }
             
     except Exception as e:
-        logger.error(f"Streamable HTTP endpoint error: {e}")
+        logger.error(f"Streamable HTTP endpoint error: {sanitize_for_log(str(e))}")
         return {
             "jsonrpc": "2.0",
             "id": request.get("id", None),
             "error": {
                 "code": -1,
-                "message": str(e)
+                "message": "Internal server error"
             }
         }
