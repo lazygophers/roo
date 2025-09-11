@@ -22,6 +22,7 @@ from app.core.mcp_tools_service import get_mcp_tools_service
 from app.core.database_service import get_database_service
 from app.core.logging import setup_logging
 from app.core.secure_logging import sanitize_for_log
+from app.core.file_security import get_file_security_manager
 
 logger = setup_logging("INFO")
 
@@ -33,6 +34,7 @@ class LazyAIMCPServer:
         self.mcp = FastMCP("LazyAI Studio")
         self.tools_service = get_mcp_tools_service()
         self.db_service = get_database_service()
+        self.file_security = get_file_security_manager()
         self._setup_tools_from_database()
         
     def _setup_tools_from_database(self):
@@ -220,24 +222,39 @@ class LazyAIMCPServer:
             def read_file_impl(file_path: str, encoding: str = 'utf-8', max_lines: int = 0) -> str:
                 """读取文件内容实现"""
                 try:
+                    # 安全权限检查
+                    allowed, error_msg = self.file_security.validate_operation("read", file_path)
+                    if not allowed:
+                        return f"🚫 {error_msg}"
+                    
                     path = Path(file_path)
                     
-                    # 安全检查
+                    # 文件存在性检查
                     if not path.exists():
                         return f"❌ 文件不存在: {file_path}"
                     
                     if not path.is_file():
                         return f"❌ 路径不是文件: {file_path}"
                     
+                    # 应用行数限制
+                    limited_lines = self.file_security.get_limited_read_lines(max_lines)
+                    
                     # 读取文件
                     with open(path, 'r', encoding=encoding) as f:
                         if max_lines == 0:
-                            content = f.read()
-                            line_count = len(content.splitlines())
+                            lines = []
+                            for i, line in enumerate(f):
+                                if i >= limited_lines:
+                                    break
+                                lines.append(line.rstrip('\n'))
+                            content = '\n'.join(lines)
+                            line_count = len(lines)
+                            if limited_lines < len(content.splitlines()) and limited_lines > 0:
+                                content += f"\n... (显示前 {limited_lines} 行，文件可能有更多内容)"
                         else:
                             lines = []
                             for i, line in enumerate(f):
-                                if i >= max_lines:
+                                if i >= limited_lines:
                                     break
                                 lines.append(line.rstrip('\n'))
                             content = '\n'.join(lines)
@@ -257,6 +274,11 @@ class LazyAIMCPServer:
             def write_file_impl(file_path: str, content: str, encoding: str = 'utf-8', mode: str = 'write') -> str:
                 """写入文件内容实现"""
                 try:
+                    # 安全权限检查
+                    allowed, error_msg = self.file_security.validate_operation("write", file_path)
+                    if not allowed:
+                        return f"🚫 {error_msg}"
+                    
                     path = Path(file_path)
                     
                     # 确保父目录存在
@@ -281,6 +303,11 @@ class LazyAIMCPServer:
             def list_directory_impl(directory_path: str = '.', show_hidden: bool = False, recursive: bool = False, file_info: bool = True) -> str:
                 """列出目录内容实现"""
                 try:
+                    # 安全权限检查
+                    allowed, error_msg = self.file_security.validate_operation("list", directory_path)
+                    if not allowed:
+                        return f"🚫 {error_msg}"
+                    
                     path = Path(directory_path)
                     
                     if not path.exists():
@@ -351,6 +378,11 @@ class LazyAIMCPServer:
             def create_directory_impl(directory_path: str, parents: bool = True) -> str:
                 """创建目录实现"""
                 try:
+                    # 安全权限检查
+                    allowed, error_msg = self.file_security.validate_operation("write", directory_path)
+                    if not allowed:
+                        return f"🚫 {error_msg}"
+                    
                     path = Path(directory_path)
                     
                     if path.exists():
@@ -371,6 +403,11 @@ class LazyAIMCPServer:
             def delete_file_impl(file_path: str, force: bool = False) -> str:
                 """删除文件或目录实现"""
                 try:
+                    # 安全权限检查
+                    allowed, error_msg = self.file_security.validate_operation("delete", file_path)
+                    if not allowed:
+                        return f"🚫 {error_msg}"
+                    
                     path = Path(file_path)
                     
                     if not path.exists():
@@ -401,6 +438,11 @@ class LazyAIMCPServer:
             def file_info_impl(file_path: str, checksum: bool = False) -> str:
                 """获取文件信息实现"""
                 try:
+                    # 安全权限检查
+                    allowed, error_msg = self.file_security.validate_operation("read", file_path)
+                    if not allowed:
+                        return f"🚫 {error_msg}"
+                    
                     path = Path(file_path)
                     
                     if not path.exists():
@@ -453,6 +495,155 @@ class LazyAIMCPServer:
                 except Exception as e:
                     logger.error(f"File info failed: {sanitize_for_log(str(e))}")
                     return f"❌ 获取文件信息失败: {str(e)}"
+        
+        elif tool_name == "get_file_security_info":
+            @self.mcp.tool(name=tool_name, description=tool_description)
+            def get_file_security_info_impl() -> str:
+                """获取文件安全配置信息实现"""
+                try:
+                    security_info = self.file_security.get_security_info()
+                    
+                    result = "🔒 文件工具安全配置信息\n"
+                    result += "=" * 50 + "\n\n"
+                    
+                    result += f"🛡️ 安全模式: {'严格模式' if security_info['strict_mode'] else '宽松模式'}\n\n"
+                    
+                    result += f"📖 可读取目录 ({len(security_info['readable_directories'])} 个):\n"
+                    for dir_path in security_info['readable_directories']:
+                        result += f"  📁 {dir_path}\n"
+                    result += "\n"
+                    
+                    result += f"✏️ 可写入目录 ({len(security_info['writable_directories'])} 个):\n"
+                    for dir_path in security_info['writable_directories']:
+                        result += f"  📝 {dir_path}\n"
+                    result += "\n"
+                    
+                    result += f"🗑️ 可删除目录 ({len(security_info['deletable_directories'])} 个):\n"
+                    for dir_path in security_info['deletable_directories']:
+                        result += f"  🗂️ {dir_path}\n"
+                    result += "\n"
+                    
+                    result += f"🚫 禁止访问目录 ({len(security_info['forbidden_directories'])} 个):\n"
+                    for dir_path in security_info['forbidden_directories']:
+                        result += f"  ⛔ {dir_path}\n"
+                    result += "\n"
+                    
+                    result += "📊 限制设置:\n"
+                    result += f"  📏 最大文件大小: {security_info['max_file_size_mb']:.1f} MB\n"
+                    result += f"  📄 最大读取行数: {security_info['max_read_lines']} 行\n\n"
+                    
+                    result += "ℹ️ 说明:\n"
+                    result += "- 严格模式下，只能访问明确允许的目录\n"
+                    result += "- 宽松模式下，除了禁止目录外都可以访问\n"
+                    result += "- 所有文件操作都会进行安全检查\n"
+                    result += "- 配置存储在数据库中，可通过 update_file_security_* 工具修改"
+                    
+                    return result
+                    
+                except Exception as e:
+                    logger.error(f"Get file security info failed: {sanitize_for_log(str(e))}")
+                    return f"❌ 获取安全配置信息失败: {str(e)}"
+
+        elif tool_name == "update_file_security_paths":
+            @self.mcp.tool(name=tool_name, description=tool_description)
+            def update_file_security_paths_impl(config_type: str, paths: List[str]) -> str:
+                """更新文件安全路径配置实现"""
+                try:
+                    # 验证配置类型
+                    valid_types = ["readable", "writable", "deletable", "forbidden"]
+                    if config_type not in valid_types:
+                        return f"❌ 无效的配置类型: {config_type}，有效类型: {', '.join(valid_types)}"
+                    
+                    # 更新数据库配置
+                    success = self.file_security.security_service.update_path_config(config_type, paths)
+                    if not success:
+                        return f"❌ 更新{config_type}路径配置失败"
+                    
+                    # 重新加载配置到内存
+                    self.file_security.reload_config()
+                    
+                    result = f"✅ 成功更新{config_type}路径配置\n"
+                    result += f"📁 已配置 {len(paths)} 个路径:\n"
+                    for path in paths:
+                        result += f"  • {path}\n"
+                    result += "\n💾 配置已保存到数据库并刷新到内存"
+                    
+                    return result
+                    
+                except Exception as e:
+                    logger.error(f"Update file security paths failed: {sanitize_for_log(str(e))}")
+                    return f"❌ 更新路径配置失败: {str(e)}"
+
+        elif tool_name == "update_file_security_limits":
+            @self.mcp.tool(name=tool_name, description=tool_description)
+            def update_file_security_limits_impl(limit_type: str, value) -> str:
+                """更新文件安全限制配置实现"""
+                try:
+                    # 验证限制类型
+                    valid_types = ["max_file_size", "max_read_lines", "strict_mode"]
+                    if limit_type not in valid_types:
+                        return f"❌ 无效的限制类型: {limit_type}，有效类型: {', '.join(valid_types)}"
+                    
+                    # 验证值类型
+                    if limit_type == "max_file_size" and not isinstance(value, (int, float)):
+                        return f"❌ max_file_size 必须是数字类型（字节数）"
+                    elif limit_type == "max_read_lines" and not isinstance(value, int):
+                        return f"❌ max_read_lines 必须是整数类型"
+                    elif limit_type == "strict_mode" and not isinstance(value, bool):
+                        return f"❌ strict_mode 必须是布尔类型"
+                    
+                    # 更新数据库配置
+                    success = self.file_security.security_service.update_limit_config(limit_type, value)
+                    if not success:
+                        return f"❌ 更新{limit_type}限制配置失败"
+                    
+                    # 重新加载配置到内存
+                    self.file_security.reload_config()
+                    
+                    # 格式化显示值
+                    display_value = value
+                    if limit_type == "max_file_size":
+                        display_value = f"{value / (1024 * 1024):.1f} MB"
+                    elif limit_type == "strict_mode":
+                        display_value = "启用" if value else "禁用"
+                    
+                    result = f"✅ 成功更新{limit_type}限制配置\n"
+                    result += f"📊 新值: {display_value}\n"
+                    result += "💾 配置已保存到数据库并刷新到内存"
+                    
+                    return result
+                    
+                except Exception as e:
+                    logger.error(f"Update file security limits failed: {sanitize_for_log(str(e))}")
+                    return f"❌ 更新限制配置失败: {str(e)}"
+
+        elif tool_name == "reload_file_security_config":
+            @self.mcp.tool(name=tool_name, description=tool_description)
+            def reload_file_security_config_impl() -> str:
+                """重新加载文件安全配置实现"""
+                try:
+                    # 重新加载配置
+                    self.file_security.reload_config()
+                    
+                    # 获取更新后的配置信息
+                    security_info = self.file_security.get_security_info()
+                    
+                    result = "🔄 文件安全配置已重新加载\n"
+                    result += "=" * 30 + "\n\n"
+                    result += f"🛡️ 安全模式: {'严格模式' if security_info['strict_mode'] else '宽松模式'}\n"
+                    result += f"📖 可读取目录: {len(security_info['readable_directories'])} 个\n"
+                    result += f"✏️ 可写入目录: {len(security_info['writable_directories'])} 个\n"
+                    result += f"🗑️ 可删除目录: {len(security_info['deletable_directories'])} 个\n"
+                    result += f"🚫 禁止访问目录: {len(security_info['forbidden_directories'])} 个\n"
+                    result += f"📏 最大文件大小: {security_info['max_file_size_mb']:.1f} MB\n"
+                    result += f"📄 最大读取行数: {security_info['max_read_lines']} 行\n\n"
+                    result += "✅ 所有配置已从数据库刷新到内存"
+                    
+                    return result
+                    
+                except Exception as e:
+                    logger.error(f"Reload file security config failed: {sanitize_for_log(str(e))}")
+                    return f"❌ 重新加载安全配置失败: {str(e)}"
     
     def get_available_tools(self) -> List[Dict[str, Any]]:
         """获取可用工具列表"""

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Layout, Menu, theme, Button, Space } from 'antd';
-import { HomeOutlined, SettingOutlined, GithubOutlined, ApiOutlined } from '@ant-design/icons';
+import { HomeOutlined, SettingOutlined, GithubOutlined, ApiOutlined, SecurityScanOutlined } from '@ant-design/icons';
 import { useNavigate, useLocation } from 'react-router-dom';
 import ThemeToggle from '../Theme/ThemeToggle';
 import SystemMonitorMenuItem from '../SystemMonitor/SystemMonitorMenuItem';
@@ -20,6 +20,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   
   const navigate = useNavigate();
   const location = useLocation();
+  const [collapsed, setCollapsed] = React.useState(false);
 
   const menuItems = [
     {
@@ -37,6 +38,11 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
       icon: <ApiOutlined />,
       label: 'MCP 工具',
     },
+    {
+      key: '/file-security',
+      icon: <SecurityScanOutlined />,
+      label: '文件安全',
+    },
   ];
 
   return (
@@ -44,10 +50,14 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
       <Sider
         breakpoint="lg"
         collapsedWidth="0"
+        onCollapse={(collapsed) => setCollapsed(collapsed)}
         style={{
           background: colorBgContainer,
-          position: 'relative',
-          height: '100vh'
+          position: 'fixed',
+          left: 0,
+          top: 0,
+          height: '100vh',
+          zIndex: 1000
         }}
       >
         <div style={{
@@ -103,11 +113,16 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
           <LicenseInfo />
         </div>
       </Sider>
-      <Layout>
+      <Layout style={{ marginLeft: collapsed ? 0 : 200 }}>
         <Header style={{ 
           padding: 0, 
           background: colorBgContainer,
-          borderBottom: `1px solid ${colorBorderSecondary}`
+          borderBottom: `1px solid ${colorBorderSecondary}`,
+          position: 'fixed',
+          top: 0,
+          right: 0,
+          left: collapsed ? 0 : 200,
+          zIndex: 999
         }}>
           <div style={{ 
             padding: '0 24px', 
@@ -133,7 +148,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
             </Space>
           </div>
         </Header>
-        <Content style={{ margin: '24px 16px 0' }}>
+        <Content style={{ margin: '88px 16px 24px 16px' }}>
           <div
             style={{
               padding: 24,

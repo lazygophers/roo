@@ -45,7 +45,22 @@
       "Bash(gh pr view:*)",
       "Bash(gh pr create:*)",
       "WebSearch",
-      "Bash(uv add:*)"
+      "Bash(uv add:*)",
+      "Bash(git rm:*)",
+      "Bash(npm cache clean:*)",
+      "Bash(yarn dev)",
+      "Read(//Users/luoxin/persons/knowledge/**)",
+      "Bash(ALL_PROXY=\"\" curl 'http://localhost:8000/api/mcp/tools/enable' )",
+      "Bash(ALL_PROXY=\"\" curl -X POST 'http://localhost:8000/api/mcp/tools/enable' )",
+      "Bash(ALL_PROXY=\"\" curl -X GET 'http://localhost:8000/docs')",
+      "Bash(ALL_PROXY=\"\" curl -X GET 'http://localhost:8000/openapi.json')",
+      "Bash(ALL_PROXY=\"\" curl -X POST 'http://localhost:8000/api/api/mcp/tools/enable' )",
+      "Bash(ALL_PROXY=\"\" curl -X POST 'http://localhost:8000/api/mcp/tools/disable' )",
+      "Bash(ALL_PROXY=\"\" curl -X GET 'http://localhost:8000/api/mcp/tools')",
+      "Bash(ALL_PROXY=\"\" curl -X GET 'http://localhost:8000/api/mcp/status')",
+      "Bash(ALL_PROXY=\"\" curl -X GET 'http://localhost:8000/api/mcp/categories')",
+      "Bash(ALL_PROXY=\"\" curl -s 'http://localhost:8000/api/mcp/tools')",
+      "Bash(ALL_PROXY=\"\" curl -s 'http://localhost:8000/api/mcp/categories')"
     ],
     "deny": [],
     "ask": []

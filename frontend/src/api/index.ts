@@ -191,6 +191,40 @@ export interface MCPCategoriesResponse {
   };
 }
 
+// File Security Types
+export interface FileSecurityInfo {
+  readable_directories: string[];
+  writable_directories: string[];
+  deletable_directories: string[];
+  forbidden_directories: string[];
+  max_file_size_mb: number;
+  max_read_lines: number;
+  strict_mode: boolean;
+  database_summary?: any;
+}
+
+export interface FileSecurityResponse {
+  success: boolean;
+  message: string;
+  data: FileSecurityInfo;
+}
+
+export interface UpdatePathsRequest {
+  config_type: 'readable' | 'writable' | 'deletable' | 'forbidden';
+  paths: string[];
+}
+
+export interface UpdateLimitsRequest {
+  limit_type: 'max_file_size' | 'max_read_lines' | 'strict_mode';
+  value: number | boolean;
+}
+
+export interface SecurityActionResponse {
+  success: boolean;
+  message: string;
+  data?: any;
+}
+
 // API 方法
 export const apiClient = {
   // 获取所有模型
@@ -373,6 +407,43 @@ export const apiClient = {
   // 禁用MCP工具分类
   disableMCPCategory: async (categoryId: string) => {
     const response = await api.post('/mcp/categories/disable', { id: categoryId });
+    return response.data;
+  },
+
+  // File Security API methods
+  // 获取文件安全配置信息
+  getFileSecurityInfo: async () => {
+    const response = await api.post('/mcp/call-tool', {
+      name: 'get_file_security_info',
+      arguments: {}
+    });
+    return response.data;
+  },
+
+  // 更新文件安全路径配置
+  updateFileSecurityPaths: async (request: UpdatePathsRequest) => {
+    const response = await api.post('/mcp/call-tool', {
+      name: 'update_file_security_paths',
+      arguments: request
+    });
+    return response.data;
+  },
+
+  // 更新文件安全限制配置
+  updateFileSecurityLimits: async (request: UpdateLimitsRequest) => {
+    const response = await api.post('/mcp/call-tool', {
+      name: 'update_file_security_limits',
+      arguments: request
+    });
+    return response.data;
+  },
+
+  // 重新加载文件安全配置
+  reloadFileSecurityConfig: async () => {
+    const response = await api.post('/mcp/call-tool', {
+      name: 'reload_file_security_config',
+      arguments: {}
+    });
     return response.data;
   }
 };

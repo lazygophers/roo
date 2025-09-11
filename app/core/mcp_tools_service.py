@@ -417,6 +417,89 @@ class MCPToolsService:
                         {"file_path": "important.txt", "checksum": True}
                     ]
                 }
+            ),
+            MCPTool(
+                name="get_file_security_info",
+                description="获取文件工具安全配置信息，包括可访问的目录权限设置",
+                category="system",
+                schema={
+                    "type": "object",
+                    "properties": {},
+                    "required": []
+                },
+                metadata={
+                    "tags": ["安全", "配置", "权限", "文件系统"],
+                    "examples": [{}]
+                }
+            ),
+            MCPTool(
+                name="update_file_security_paths",
+                description="更新文件安全路径配置（可读取、可写入、可删除、禁止访问目录）",
+                category="system", 
+                schema={
+                    "type": "object",
+                    "properties": {
+                        "config_type": {
+                            "type": "string",
+                            "description": "配置类型",
+                            "enum": ["readable", "writable", "deletable", "forbidden"]
+                        },
+                        "paths": {
+                            "type": "array",
+                            "items": {"type": "string"},
+                            "description": "路径列表"
+                        }
+                    },
+                    "required": ["config_type", "paths"]
+                },
+                metadata={
+                    "tags": ["安全", "配置", "权限", "目录管理"],
+                    "examples": [
+                        {"config_type": "readable", "paths": ["/home/user", "/tmp"]},
+                        {"config_type": "forbidden", "paths": ["/etc", "/bin"]}
+                    ]
+                }
+            ),
+            MCPTool(
+                name="update_file_security_limits", 
+                description="更新文件安全限制配置（最大文件大小、最大读取行数、严格模式）",
+                category="system",
+                schema={
+                    "type": "object", 
+                    "properties": {
+                        "limit_type": {
+                            "type": "string",
+                            "description": "限制类型",
+                            "enum": ["max_file_size", "max_read_lines", "strict_mode"]
+                        },
+                        "value": {
+                            "description": "限制值（文件大小为字节数，行数为整数，严格模式为布尔值）"
+                        }
+                    },
+                    "required": ["limit_type", "value"]
+                },
+                metadata={
+                    "tags": ["安全", "配置", "限制", "参数设置"],
+                    "examples": [
+                        {"limit_type": "max_file_size", "value": 104857600},
+                        {"limit_type": "max_read_lines", "value": 5000},
+                        {"limit_type": "strict_mode", "value": True}
+                    ]
+                }
+            ),
+            MCPTool(
+                name="reload_file_security_config",
+                description="重新加载文件安全配置（从数据库刷新内存中的配置）",
+                category="system",
+                schema={
+                    "type": "object",
+                    "properties": {},
+                    "required": []
+                },
+                metadata={
+                    "tags": ["安全", "配置", "刷新", "重载"],
+                    "examples": [{}]
+                }
             )
         ]
         
