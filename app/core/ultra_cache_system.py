@@ -29,6 +29,7 @@ import yaml
 import psutil
 from app.core.config import PROJECT_ROOT
 from app.core.logging import setup_logging
+from app.core.secure_logging import secure_log_key_value
 
 logger = setup_logging("INFO")
 
@@ -273,7 +274,7 @@ class UltraCacheSystem:
                     self._save_to_disk(key, result)
                     return result
             except Exception as e:
-                logger.error(f"Loader failed for key '{key}': {e}")
+                logger.error(f"Loader failed for {secure_log_key_value(key)}: {e}")
         
         self.global_stats.misses += 1
         return None
@@ -301,7 +302,7 @@ class UltraCacheSystem:
                     else:
                         cache_file.unlink()
         except Exception as e:
-            logger.error(f"Failed to load disk cache for '{key}': {e}")
+            logger.error(f"Failed to load disk cache for {secure_log_key_value(key)}: {e}")
         return None
         
     def _save_to_disk(self, key: str, value: Any):
@@ -316,7 +317,7 @@ class UltraCacheSystem:
             with open(cache_file, 'wb') as f:
                 pickle.dump(data, f, pickle.HIGHEST_PROTOCOL)
         except Exception as e:
-            logger.error(f"Failed to save disk cache for '{key}': {e}")
+            logger.error(f"Failed to save disk cache for {secure_log_key_value(key)}: {e}")
     
     def _hash_key(self, key: str) -> str:
         """生成缓存键哈希"""

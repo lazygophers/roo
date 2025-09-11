@@ -41,7 +41,9 @@
       "Bash(npm view:*)",
       "Bash(yarn install)",
       "Bash(yarn install:*)",
-      "Bash(yarn import:*)"
+      "Bash(yarn import:*)",
+      "Bash(gh pr view:*)",
+      "Bash(gh pr create:*)"
     ],
     "deny": [],
     "ask": []
