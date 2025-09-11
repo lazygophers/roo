@@ -14,6 +14,7 @@ import {
 import { apiClient, ModelInfo } from '../api';
 import { PageTitle, CardTitle, StatTitle } from '../components/UI/TitleComponents';
 import { useTheme } from '../contexts/ThemeContext';
+import { useDocumentTitle } from '../hooks/useDocumentTitle';
 import './Home.css';
 
 const { Paragraph, Text } = Typography;
@@ -135,6 +136,9 @@ const ParticleBackground: React.FC = () => {
 
 // 主页组件
 const Home: React.FC = () => {
+  // 设置页面标题
+  useDocumentTitle('首页');
+  
   const { themeType } = useTheme();
   const [stats, setStats] = useState({
     totalModels: 0,

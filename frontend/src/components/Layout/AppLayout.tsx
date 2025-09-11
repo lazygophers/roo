@@ -88,13 +88,10 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
           <div style={{ 
             padding: '0 24px', 
             display: 'flex',
-            justifyContent: 'space-between',
+            justifyContent: 'flex-end',
             alignItems: 'center',
             height: '100%'
           }}>
-            <h2 style={{ margin: 0, fontSize: '18px', fontWeight: 'normal' }}>
-              配置中心
-            </h2>
             <ThemeToggle />
           </div>
         </Header>

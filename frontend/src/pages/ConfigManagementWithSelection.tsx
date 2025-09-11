@@ -9,9 +9,13 @@ import SelectionPreviewPanel from '../components/Preview/SelectionPreviewPanel';
 import ExportToolbar from '../components/ExportToolbar/ExportToolbar';
 import { SelectedItem, ModelRuleBinding } from '../types/selection';
 import { FileMetadata } from '../api';
+import { useDocumentTitle } from '../hooks/useDocumentTitle';
 import './ConfigManagement.css';
 
 const ConfigManagementWithSelection: React.FC = () => {
+  // 设置页面标题
+  useDocumentTitle('配置管理');
+  
   const { token } = theme.useToken();
   const [selectedItems, setSelectedItems] = useState<SelectedItem[]>([]);
   const [modelRuleBindings, setModelRuleBindings] = useState<ModelRuleBinding[]>([]);
