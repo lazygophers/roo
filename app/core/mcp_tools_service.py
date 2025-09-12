@@ -13,6 +13,7 @@ from tinydb import TinyDB, Query
 from app.core.config import PROJECT_ROOT
 from app.core.logging import setup_logging
 from app.core.secure_logging import sanitize_for_log
+from app.core.unified_database import get_unified_database, TableNames
 
 logger = setup_logging("INFO")
 
@@ -56,19 +57,28 @@ class MCPTool:
 class MCPToolsService:
     """MCP工具管理服务"""
     
-    def __init__(self, db_path: str = None):
+    def __init__(self, use_unified_db: bool = True):
         """初始化MCP工具服务"""
-        if db_path is None:
+        self.use_unified_db = use_unified_db
+        
+        if use_unified_db:
+            self.unified_db = get_unified_database()
+            self.db = self.unified_db.db
+            self.db_path = self.unified_db.db_path
+        else:
+            # 兼容模式：使用独立数据库文件
             db_dir = PROJECT_ROOT / "data"
             db_dir.mkdir(exist_ok=True)
             db_path = str(db_dir / "mcp_tools.db")
-            
-        self.db_path = db_path
-        self.db = TinyDB(db_path)
-        self.tools_table = self.db.table('mcp_tools')
-        self.categories_table = self.db.table('mcp_categories')
+            self.db_path = db_path
+            self.db = TinyDB(db_path)
+            self.unified_db = None
         
-        logger.info(f"MCPToolsService initialized with db: {sanitize_for_log(db_path)}")
+        # 使用统一表名
+        self.tools_table = self.db.table(TableNames.MCP_TOOLS)
+        self.categories_table = self.db.table(TableNames.MCP_CATEGORIES)
+        
+        logger.info(f"MCPToolsService initialized with unified db: {use_unified_db}")
     
     def register_builtin_categories(self):
         """注册内置工具分类到数据库（启动时覆盖）"""
@@ -642,25 +652,27 @@ class MCPToolsService:
     
     def close(self):
         """关闭数据库连接"""
-        self.db.close()
+        if not self.use_unified_db:
+            # 只有非统一数据库模式才需要手动关闭
+            self.db.close()
         logger.info("MCPToolsService closed")
 
 
 # 全局MCP工具服务实例
 _mcp_tools_service = None
 
-def get_mcp_tools_service() -> MCPToolsService:
+def get_mcp_tools_service(use_unified_db: bool = True) -> MCPToolsService:
     """获取MCP工具服务实例"""
     global _mcp_tools_service
     if _mcp_tools_service is None:
-        _mcp_tools_service = MCPToolsService()
+        _mcp_tools_service = MCPToolsService(use_unified_db=use_unified_db)
     return _mcp_tools_service
 
-def init_mcp_tools_service() -> MCPToolsService:
+def init_mcp_tools_service(use_unified_db: bool = True) -> MCPToolsService:
     """初始化MCP工具服务"""
     logger.info("Initializing MCP tools service...")
     
-    mcp_service = get_mcp_tools_service()
+    mcp_service = get_mcp_tools_service(use_unified_db=use_unified_db)
     
     # 注册内置分类
     categories_result = mcp_service.register_builtin_categories()
@@ -670,5 +682,5 @@ def init_mcp_tools_service() -> MCPToolsService:
     tools_result = mcp_service.register_builtin_tools()
     logger.info(f"MCP tools registered: {tools_result}")
     
-    logger.info("MCP tools service initialized successfully")
+    logger.info(f"MCP tools service initialized successfully (unified_db: {use_unified_db})")
     return mcp_service

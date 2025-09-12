@@ -30,10 +30,10 @@ logger = setup_logging("INFO")
 class LazyAIMCPServer:
     """LazyAI Studio MCP 服务器实现"""
     
-    def __init__(self):
+    def __init__(self, use_unified_db: bool = True):
         self.mcp = FastMCP("LazyAI Studio")
-        self.tools_service = get_mcp_tools_service()
-        self.db_service = get_database_service()
+        self.tools_service = get_mcp_tools_service(use_unified_db=use_unified_db)
+        self.db_service = get_database_service(use_unified_db=use_unified_db)
         self.file_security = get_file_security_manager()
         self._setup_tools_from_database()
         
@@ -673,19 +673,19 @@ class LazyAIMCPServer:
 # 全局 MCP 服务器实例
 _mcp_server = None
 
-def get_mcp_server() -> LazyAIMCPServer:
+def get_mcp_server(use_unified_db: bool = True) -> LazyAIMCPServer:
     """获取 MCP 服务器实例"""
     global _mcp_server
     if _mcp_server is None:
-        _mcp_server = LazyAIMCPServer()
+        _mcp_server = LazyAIMCPServer(use_unified_db=use_unified_db)
     return _mcp_server
 
-def init_mcp_server() -> LazyAIMCPServer:
+def init_mcp_server(use_unified_db: bool = True) -> LazyAIMCPServer:
     """初始化 MCP 服务器"""
     logger.info("Initializing MCP server...")
     
-    mcp_server = get_mcp_server()
+    mcp_server = get_mcp_server(use_unified_db=use_unified_db)
     tools_count = len(mcp_server.get_available_tools())
     
-    logger.info(f"MCP server initialized with {tools_count} tools")
+    logger.info(f"MCP server initialized with {tools_count} tools (unified_db: {use_unified_db})")
     return mcp_server

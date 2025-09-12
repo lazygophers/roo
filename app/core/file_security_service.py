@@ -11,6 +11,7 @@ from tinydb import TinyDB, Query
 from app.core.config import PROJECT_ROOT
 from app.core.secure_logging import sanitize_for_log
 from app.core.logging import setup_logging
+from app.core.unified_database import get_unified_database, TableNames
 
 logger = setup_logging("INFO")
 
@@ -83,19 +84,28 @@ class FileSecurityLimits:
 class FileSecurityService:
     """文件安全配置数据库服务"""
     
-    def __init__(self, db_path: str = None):
+    def __init__(self, use_unified_db: bool = True):
         """初始化文件安全配置服务"""
-        if db_path is None:
+        self.use_unified_db = use_unified_db
+        
+        if use_unified_db:
+            self.unified_db = get_unified_database()
+            self.db = self.unified_db.db
+            self.db_path = self.unified_db.db_path
+        else:
+            # 兼容模式：使用独立数据库文件
             db_dir = PROJECT_ROOT / "data"
             db_dir.mkdir(exist_ok=True)
             db_path = str(db_dir / "file_security.db")
-            
-        self.db_path = db_path
-        self.db = TinyDB(db_path)
-        self.paths_table = self.db.table('security_paths')
-        self.limits_table = self.db.table('security_limits')
+            self.db_path = db_path
+            self.db = TinyDB(db_path)
+            self.unified_db = None
         
-        logger.info(f"FileSecurityService initialized with db: {sanitize_for_log(db_path)}")
+        # 使用统一表名
+        self.paths_table = self.db.table(TableNames.SECURITY_PATHS)
+        self.limits_table = self.db.table(TableNames.SECURITY_LIMITS)
+        
+        logger.info(f"FileSecurityService initialized with unified db: {use_unified_db}")
         
         # 初始化默认配置
         self._init_default_config()
@@ -293,16 +303,18 @@ class FileSecurityService:
     
     def close(self):
         """关闭数据库连接"""
-        self.db.close()
+        if not self.use_unified_db:
+            # 只有非统一数据库模式才需要手动关闭
+            self.db.close()
         logger.info("FileSecurityService closed")
 
 
 # 全局文件安全服务实例
 _file_security_service = None
 
-def get_file_security_service() -> FileSecurityService:
+def get_file_security_service(use_unified_db: bool = True) -> FileSecurityService:
     """获取文件安全服务实例"""
     global _file_security_service
     if _file_security_service is None:
-        _file_security_service = FileSecurityService()
+        _file_security_service = FileSecurityService(use_unified_db=use_unified_db)
     return _file_security_service

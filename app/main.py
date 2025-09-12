@@ -6,6 +6,7 @@ from contextlib import asynccontextmanager
 from pathlib import Path
 from app.core.config import API_PREFIX, DEBUG, LOG_LEVEL, PROJECT_ROOT
 from app.core.logging import setup_logging, log_error
+from app.core.unified_database import init_unified_database
 from app.core.database_service import init_database_service, get_database_service
 from app.core.mcp_tools_service import init_mcp_tools_service
 from app.core.mcp_server import init_mcp_server
@@ -20,16 +21,24 @@ async def lifespan(app: FastAPI):
     # 启动时初始化服务
     logger.info("Initializing application...")
     try:
-        # 初始化数据库服务
+        # 初始化统一数据库系统
+        unified_db, migration_log = init_unified_database()
+        logger.info("Unified database system initialized successfully")
+        if migration_log:
+            logger.info("Migration completed with logs:")
+            for log_entry in migration_log:
+                logger.info(f"  - {log_entry}")
+        
+        # 初始化数据库服务（使用统一数据库）
         db_service = init_database_service()
         logger.info("Database service initialized successfully")
         
-        # 初始化MCP工具服务
-        mcp_tools_service = init_mcp_tools_service()
+        # 初始化MCP工具服务（使用统一数据库）
+        mcp_tools_service = init_mcp_tools_service(use_unified_db=True)
         logger.info("MCP tools service initialized successfully")
         
-        # 初始化MCP服务器
-        mcp_server = init_mcp_server()
+        # 初始化MCP服务器（使用统一数据库）
+        mcp_server = init_mcp_server(use_unified_db=True)
         logger.info("MCP server initialized successfully")
         
         # 打印启动信息和访问地址

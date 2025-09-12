@@ -9,6 +9,7 @@ from functools import lru_cache
 import yaml
 from app.core.config import PROJECT_ROOT
 from app.core.logging import setup_logging
+from app.core.unified_database import get_unified_database, TableNames
 
 logger = setup_logging("INFO")
 
@@ -22,24 +23,32 @@ class LiteDatabaseService:
     4. 简化数据结构 - 只存储必要数据
     """
     
-    def __init__(self, db_path: str = None):
+    def __init__(self, use_unified_db: bool = True):
         """初始化轻量级数据库服务"""
-        if db_path is None:
+        self.use_unified_db = use_unified_db
+        
+        if use_unified_db:
+            self.unified_db = get_unified_database()
+            self.db = self.unified_db.db
+            self.db_path = self.unified_db.db_path
+        else:
+            # 兼容模式：使用独立数据库文件
             db_dir = PROJECT_ROOT / "data"
             db_dir.mkdir(exist_ok=True)
             db_path = str(db_dir / "lite_cache.db")
+            self.db_path = db_path
+            self.db = TinyDB(db_path)
+            self.unified_db = None
         
-        self.db_path = db_path
-        self.db = TinyDB(db_path)
         self._memory_cache = {}
         self._cache_timestamps = {}
         self._cache_ttl = 300  # 5分钟缓存TTL
         
-        # 简化的表结构
-        self.models_table = self.db.table('models')
-        self.metadata_table = self.db.table('metadata')
+        # 使用统一表名
+        self.models_table = self.db.table(TableNames.LITE_MODELS)
+        self.metadata_table = self.db.table(TableNames.LITE_METADATA)
         
-        logger.info(f"LiteDatabaseService initialized with db: {db_path}")
+        logger.info(f"LiteDatabaseService initialized with unified db: {use_unified_db}")
     
     def _get_file_hash(self, file_path: Path) -> str:
         """快速计算文件哈希（只读取前1KB）"""
@@ -254,27 +263,29 @@ class LiteDatabaseService:
     def close(self):
         """关闭服务"""
         self.clear_all_cache()
-        self.db.close()
+        if not self.use_unified_db:
+            # 只有非统一数据库模式才需要手动关闭
+            self.db.close()
         logger.info("LiteDatabaseService closed")
 
 
 # 全局轻量级数据库服务实例
 _lite_db_service = None
 
-def get_lite_database_service() -> LiteDatabaseService:
+def get_lite_database_service(use_unified_db: bool = True) -> LiteDatabaseService:
     """获取轻量级数据库服务实例"""
     global _lite_db_service
     if _lite_db_service is None:
-        _lite_db_service = LiteDatabaseService()
+        _lite_db_service = LiteDatabaseService(use_unified_db=use_unified_db)
     return _lite_db_service
 
-def init_lite_database_service() -> LiteDatabaseService:
+def init_lite_database_service(use_unified_db: bool = True) -> LiteDatabaseService:
     """初始化轻量级数据库服务（快速启动）"""
     logger.info("Initializing lite database service...")
     
-    db_service = get_lite_database_service()
+    db_service = get_lite_database_service(use_unified_db=use_unified_db)
     
     # 不执行全量同步，按需加载
-    logger.info("Lite database service initialized (lazy loading enabled)")
+    logger.info(f"Lite database service initialized (unified_db: {use_unified_db}, lazy loading enabled)")
     
     return db_service

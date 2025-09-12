@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException, Query
 from typing import Dict, List, Any, Optional
 from app.core.database_service import get_database_service
+from app.core.unified_database import get_unified_database
 from app.core.logging import setup_logging
 from app.core.secure_logging import sanitize_for_log
 
@@ -13,11 +14,21 @@ async def get_database_status():
     """获取数据库同步状态"""
     try:
         db_service = get_database_service()
+        unified_db = get_unified_database()
+        
         status = db_service.get_sync_status()
+        tables_info = unified_db.get_all_tables()
         
         return {
             "success": True,
-            "data": status,
+            "data": {
+                "sync_status": status,
+                "unified_database": {
+                    "db_path": unified_db.db_path,
+                    "tables": tables_info,
+                    "total_records": sum(tables_info.values())
+                }
+            },
             "message": "Database status retrieved successfully"
         }
     except Exception as e:
@@ -183,4 +194,44 @@ async def get_rules_from_cache():
         }
     except Exception as e:
         logger.error(f"Failed to get rules from cache: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.post("/migrate")
+async def migrate_databases():
+    """手动执行数据库迁移（从旧数据库文件迁移到统一数据库）"""
+    try:
+        unified_db = get_unified_database()
+        migration_log = unified_db.migrate_from_old_databases()
+        
+        return {
+            "success": True,
+            "data": {
+                "migration_log": migration_log,
+                "tables_after_migration": unified_db.get_all_tables()
+            },
+            "message": f"Database migration completed with {len(migration_log)} operations"
+        }
+    except Exception as e:
+        logger.error(f"Failed to migrate databases: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/tables")
+async def get_all_tables():
+    """获取统一数据库中的所有表及其记录数"""
+    try:
+        unified_db = get_unified_database()
+        tables_info = unified_db.get_all_tables()
+        
+        return {
+            "success": True,
+            "data": {
+                "db_path": unified_db.db_path,
+                "tables": tables_info,
+                "total_tables": len(tables_info),
+                "total_records": sum(tables_info.values())
+            },
+            "message": "Tables information retrieved successfully"
+        }
+    except Exception as e:
+        logger.error(f"Failed to get tables info: {e}")
         raise HTTPException(status_code=500, detail=str(e))
