@@ -33,7 +33,6 @@ import {
   ExclamationCircleOutlined,
   FilterOutlined,
   SecurityScanOutlined,
-  SettingOutlined,
   FileTextOutlined
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';

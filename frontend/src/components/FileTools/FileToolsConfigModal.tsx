@@ -37,6 +37,7 @@ import {
   UpdatePathsRequest, 
   UpdateLimitsRequest 
 } from '../../api';
+import { useTheme } from '../../contexts/ThemeContext';
 
 const { Title, Text, Paragraph } = Typography;
 const { TextArea } = Input;
@@ -52,6 +53,7 @@ const FileToolsConfigModal: React.FC<FileToolsConfigModalProps> = ({
   visible,
   onCancel
 }) => {
+  const { currentTheme } = useTheme();
   const { message: messageApi } = useApp();
   const [loading, setLoading] = useState(false);
   const [securityInfo, setSecurityInfo] = useState<FileSecurityInfo | null>(null);
@@ -133,14 +135,24 @@ const FileToolsConfigModal: React.FC<FileToolsConfigModalProps> = ({
   const reloadConfig = async () => {
     try {
       setLoading(true);
-      const response = await apiClient.reloadFileSecurityConfig();
       
-      if (response.success) {
-        messageApi.success('文件安全配置重新加载成功');
-        await loadSecurityInfo();
-      } else {
-        messageApi.error(response.message || '重新加载配置失败');
+      try {
+        const response = await apiClient.reloadFileSecurityConfig();
+        if (response.success) {
+          messageApi.success('文件安全配置重新加载成功');
+          await loadSecurityInfo();
+          return;
+        } else {
+          console.warn('Reload config API failed, falling back to reload security info');
+        }
+      } catch (error) {
+        console.warn('Reload config API error, falling back to reload security info:', error);
       }
+      
+      // 备用方案：直接重新加载安全信息
+      await loadSecurityInfo();
+      messageApi.success('配置信息已刷新');
+      
     } catch (error) {
       console.error('Failed to reload config:', error);
       messageApi.error('重新加载配置失败');
@@ -261,12 +273,21 @@ const FileToolsConfigModal: React.FC<FileToolsConfigModalProps> = ({
               <>
                 <Row gutter={16} style={{ marginBottom: 24 }}>
                   <Col span={8}>
-                    <Card>
+                    <Card style={{ 
+                      backgroundColor: currentTheme.token?.colorBgContainer,
+                      borderColor: currentTheme.token?.colorBorder
+                    }}>
                       <Statistic
-                        title="安全评分"
+                        title={<span style={{ color: currentTheme.token?.colorTextSecondary }}>安全评分</span>}
                         value={securityScore}
                         suffix="/ 100"
-                        valueStyle={{ color: scoreStatus.status === 'success' ? '#3f8600' : scoreStatus.status === 'warning' ? '#cf1322' : '#ff4d4f' }}
+                        valueStyle={{ 
+                          color: scoreStatus.status === 'success' 
+                            ? (currentTheme.token?.colorSuccess || '#3f8600')
+                            : scoreStatus.status === 'warning' 
+                            ? (currentTheme.token?.colorWarning || '#faad14')
+                            : (currentTheme.token?.colorError || '#ff4d4f')
+                        }}
                         prefix={scoreStatus.status === 'success' ? <CheckCircleOutlined /> : <WarningOutlined />}
                       />
                       <div style={{ marginTop: 8 }}>
@@ -277,37 +298,52 @@ const FileToolsConfigModal: React.FC<FileToolsConfigModalProps> = ({
                     </Card>
                   </Col>
                   <Col span={8}>
-                    <Card>
+                    <Card style={{ 
+                      backgroundColor: currentTheme.token?.colorBgContainer,
+                      borderColor: currentTheme.token?.colorBorder
+                    }}>
                       <Statistic
-                        title="安全模式"
+                        title={<span style={{ color: currentTheme.token?.colorTextSecondary }}>安全模式</span>}
                         value={securityInfo.strict_mode ? '严格模式' : '宽松模式'}
-                        valueStyle={{ color: securityInfo.strict_mode ? '#3f8600' : '#faad14' }}
+                        valueStyle={{ 
+                          color: securityInfo.strict_mode 
+                            ? (currentTheme.token?.colorSuccess || '#3f8600')
+                            : (currentTheme.token?.colorWarning || '#faad14')
+                        }}
                       />
                     </Card>
                   </Col>
                   <Col span={8}>
-                    <Card>
+                    <Card style={{ 
+                      backgroundColor: currentTheme.token?.colorBgContainer,
+                      borderColor: currentTheme.token?.colorBorder
+                    }}>
                       <Statistic
-                        title="配置目录"
+                        title={<span style={{ color: currentTheme.token?.colorTextSecondary }}>配置目录</span>}
                         value={securityInfo.readable_directories.length + securityInfo.writable_directories.length + securityInfo.deletable_directories.length + securityInfo.forbidden_directories.length}
                         suffix="个"
+                        valueStyle={{ color: currentTheme.token?.colorText }}
                       />
                     </Card>
                   </Col>
                 </Row>
 
                 <Alert
-                  message="文件工具集安全说明"
+                  message={<span style={{ color: currentTheme.token?.colorText }}>文件工具集安全说明</span>}
                   description={
-                    <div>
-                      <p><strong>严格模式：</strong>所有文件工具只能访问明确配置的允许目录</p>
-                      <p><strong>宽松模式：</strong>所有文件工具可以访问除禁止目录外的所有目录</p>
-                      <p><strong>路径权限：</strong>统一配置所有文件工具的读取、写入、删除权限</p>
-                      <p><strong>安全限制：</strong>统一限制所有文件工具的文件大小和读取行数，防止资源滥用</p>
+                    <div style={{ color: currentTheme.token?.colorTextSecondary }}>
+                      <p><strong style={{ color: currentTheme.token?.colorText }}>严格模式：</strong>所有文件工具只能访问明确配置的允许目录</p>
+                      <p><strong style={{ color: currentTheme.token?.colorText }}>宽松模式：</strong>所有文件工具可以访问除禁止目录外的所有目录</p>
+                      <p><strong style={{ color: currentTheme.token?.colorText }}>路径权限：</strong>统一配置所有文件工具的读取、写入、删除权限</p>
+                      <p><strong style={{ color: currentTheme.token?.colorText }}>安全限制：</strong>统一限制所有文件工具的文件大小和读取行数，防止资源滥用</p>
                     </div>
                   }
                   type="info"
                   showIcon
+                  style={{
+                    backgroundColor: currentTheme.token?.colorInfoBg,
+                    borderColor: currentTheme.token?.colorInfoBorder
+                  }}
                 />
               </>
             )}
@@ -328,37 +364,59 @@ const FileToolsConfigModal: React.FC<FileToolsConfigModalProps> = ({
               <>
                 <Row gutter={16} style={{ marginBottom: 16 }}>
                   <Col span={12}>
-                    <Card title="📖 可读取目录" size="small" extra={
-                      <Button type="text" size="small" icon={<EditOutlined />} 
-                        onClick={() => handleEditPaths('readable')}>编辑</Button>
-                    }>
+                    <Card 
+                      title={<span style={{ color: currentTheme.token?.colorText }}>📖 可读取目录</span>}
+                      size="small" 
+                      extra={
+                        <Button type="text" size="small" icon={<EditOutlined />} 
+                          onClick={() => handleEditPaths('readable')}>编辑</Button>
+                      }
+                      style={{
+                        backgroundColor: currentTheme.token?.colorBgContainer,
+                        borderColor: currentTheme.token?.colorBorder
+                      }}
+                    >
                       <div style={{ maxHeight: 120, overflow: 'auto' }}>
                         {securityInfo.readable_directories.length > 0 ? (
                           securityInfo.readable_directories.map((path, index) => (
                             <div key={index} style={{ marginBottom: 4 }}>
-                              <Text code>{path}</Text>
+                              <Text code style={{ 
+                                backgroundColor: currentTheme.token?.colorFillQuaternary,
+                                color: currentTheme.token?.colorText
+                              }}>{path}</Text>
                             </div>
                           ))
                         ) : (
-                          <Text type="secondary">未配置</Text>
+                          <Text type="secondary" style={{ color: currentTheme.token?.colorTextSecondary }}>未配置</Text>
                         )}
                       </div>
                     </Card>
                   </Col>
                   <Col span={12}>
-                    <Card title="✏️ 可写入目录" size="small" extra={
-                      <Button type="text" size="small" icon={<EditOutlined />} 
-                        onClick={() => handleEditPaths('writable')}>编辑</Button>
-                    }>
+                    <Card 
+                      title={<span style={{ color: currentTheme.token?.colorText }}>✏️ 可写入目录</span>}
+                      size="small" 
+                      extra={
+                        <Button type="text" size="small" icon={<EditOutlined />} 
+                          onClick={() => handleEditPaths('writable')}>编辑</Button>
+                      }
+                      style={{
+                        backgroundColor: currentTheme.token?.colorBgContainer,
+                        borderColor: currentTheme.token?.colorBorder
+                      }}
+                    >
                       <div style={{ maxHeight: 120, overflow: 'auto' }}>
                         {securityInfo.writable_directories.length > 0 ? (
                           securityInfo.writable_directories.map((path, index) => (
                             <div key={index} style={{ marginBottom: 4 }}>
-                              <Text code>{path}</Text>
+                              <Text code style={{ 
+                                backgroundColor: currentTheme.token?.colorFillQuaternary,
+                                color: currentTheme.token?.colorText
+                              }}>{path}</Text>
                             </div>
                           ))
                         ) : (
-                          <Text type="secondary">未配置</Text>
+                          <Text type="secondary" style={{ color: currentTheme.token?.colorTextSecondary }}>未配置</Text>
                         )}
                       </div>
                     </Card>
@@ -367,37 +425,59 @@ const FileToolsConfigModal: React.FC<FileToolsConfigModalProps> = ({
 
                 <Row gutter={16} style={{ marginBottom: 16 }}>
                   <Col span={12}>
-                    <Card title="🗑️ 可删除目录" size="small" extra={
-                      <Button type="text" size="small" icon={<EditOutlined />} 
-                        onClick={() => handleEditPaths('deletable')}>编辑</Button>
-                    }>
+                    <Card 
+                      title={<span style={{ color: currentTheme.token?.colorText }}>🗑️ 可删除目录</span>}
+                      size="small" 
+                      extra={
+                        <Button type="text" size="small" icon={<EditOutlined />} 
+                          onClick={() => handleEditPaths('deletable')}>编辑</Button>
+                      }
+                      style={{
+                        backgroundColor: currentTheme.token?.colorBgContainer,
+                        borderColor: currentTheme.token?.colorBorder
+                      }}
+                    >
                       <div style={{ maxHeight: 120, overflow: 'auto' }}>
                         {securityInfo.deletable_directories.length > 0 ? (
                           securityInfo.deletable_directories.map((path, index) => (
                             <div key={index} style={{ marginBottom: 4 }}>
-                              <Text code>{path}</Text>
+                              <Text code style={{ 
+                                backgroundColor: currentTheme.token?.colorFillQuaternary,
+                                color: currentTheme.token?.colorText
+                              }}>{path}</Text>
                             </div>
                           ))
                         ) : (
-                          <Text type="secondary">未配置</Text>
+                          <Text type="secondary" style={{ color: currentTheme.token?.colorTextSecondary }}>未配置</Text>
                         )}
                       </div>
                     </Card>
                   </Col>
                   <Col span={12}>
-                    <Card title="🚫 禁止访问目录" size="small" extra={
-                      <Button type="text" size="small" icon={<EditOutlined />} 
-                        onClick={() => handleEditPaths('forbidden')}>编辑</Button>
-                    }>
+                    <Card 
+                      title={<span style={{ color: currentTheme.token?.colorText }}>🚫 禁止访问目录</span>}
+                      size="small" 
+                      extra={
+                        <Button type="text" size="small" icon={<EditOutlined />} 
+                          onClick={() => handleEditPaths('forbidden')}>编辑</Button>
+                      }
+                      style={{
+                        backgroundColor: currentTheme.token?.colorBgContainer,
+                        borderColor: currentTheme.token?.colorBorder
+                      }}
+                    >
                       <div style={{ maxHeight: 120, overflow: 'auto' }}>
                         {securityInfo.forbidden_directories.length > 0 ? (
                           securityInfo.forbidden_directories.map((path, index) => (
                             <div key={index} style={{ marginBottom: 4 }}>
-                              <Text code>{path}</Text>
+                              <Text code style={{ 
+                                backgroundColor: currentTheme.token?.colorFillQuaternary,
+                                color: currentTheme.token?.colorText
+                              }}>{path}</Text>
                             </div>
                           ))
                         ) : (
-                          <Text type="secondary">未配置</Text>
+                          <Text type="secondary" style={{ color: currentTheme.token?.colorTextSecondary }}>未配置</Text>
                         )}
                       </div>
                     </Card>
@@ -443,19 +523,30 @@ const FileToolsConfigModal: React.FC<FileToolsConfigModalProps> = ({
         >
           <div style={{ padding: '16px 0' }}>
             {securityInfo && (
-              <Card title="文件操作限制设置">
+              <Card 
+                title={<span style={{ color: currentTheme.token?.colorText }}>文件操作限制设置</span>}
+                style={{
+                  backgroundColor: currentTheme.token?.colorBgContainer,
+                  borderColor: currentTheme.token?.colorBorder
+                }}
+              >
                 <Form form={limitForm} onFinish={handleLimitSubmit} layout="vertical">
                   <Row gutter={16}>
                     <Col span={12}>
                       <Form.Item
                         name="max_file_size_mb"
-                        label="最大文件大小 (MB)"
+                        label={<span style={{ color: currentTheme.token?.colorText }}>最大文件大小 (MB)</span>}
                         rules={[{ required: true, min: 1, type: 'number', message: '请输入有效的文件大小' }]}
                       >
                         <InputNumber
                           min={1}
                           max={10000}
-                          style={{ width: '100%' }}
+                          style={{ 
+                            width: '100%',
+                            backgroundColor: currentTheme.token?.colorBgContainer,
+                            borderColor: currentTheme.token?.colorBorder,
+                            color: currentTheme.token?.colorText
+                          }}
                           placeholder="单位：MB"
                         />
                       </Form.Item>
@@ -463,13 +554,18 @@ const FileToolsConfigModal: React.FC<FileToolsConfigModalProps> = ({
                     <Col span={12}>
                       <Form.Item
                         name="max_read_lines"
-                        label="最大读取行数"
+                        label={<span style={{ color: currentTheme.token?.colorText }}>最大读取行数</span>}
                         rules={[{ required: true, min: 1, type: 'number', message: '请输入有效的行数' }]}
                       >
                         <InputNumber
                           min={1}
                           max={100000}
-                          style={{ width: '100%' }}
+                          style={{ 
+                            width: '100%',
+                            backgroundColor: currentTheme.token?.colorBgContainer,
+                            borderColor: currentTheme.token?.colorBorder,
+                            color: currentTheme.token?.colorText
+                          }}
                           placeholder="单位：行"
                         />
                       </Form.Item>
