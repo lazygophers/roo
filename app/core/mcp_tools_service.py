@@ -610,6 +610,99 @@ class MCPToolsService:
             logger.info(f"Disabled category: {sanitize_for_log(category_id)}")
         return len(result) > 0
     
+    def create_category(self, category_data: Dict[str, Any]) -> bool:
+        """创建新的工具分类"""
+        try:
+            # 检查分类ID是否已存在
+            Query_obj = Query()
+            existing = self.categories_table.get(Query_obj.id == category_data['id'])
+            if existing:
+                logger.warning(f"Category with ID '{sanitize_for_log(category_data['id'])}' already exists")
+                return False
+            
+            # 设置默认值
+            category = {
+                'id': category_data['id'],
+                'name': category_data['name'],
+                'description': category_data.get('description', ''),
+                'icon': category_data.get('icon', '🔧'),
+                'enabled': category_data.get('enabled', True),
+                'sort_order': category_data.get('sort_order', 999),
+                'created_at': datetime.now().isoformat(),
+                'updated_at': datetime.now().isoformat()
+            }
+            
+            self.categories_table.insert(category)
+            logger.info(f"Created new category: {sanitize_for_log(category['name'])}")
+            return True
+            
+        except Exception as e:
+            logger.error(f"Failed to create category: {sanitize_for_log(str(e))}")
+            return False
+    
+    def update_category(self, category_id: str, updates: Dict[str, Any]) -> bool:
+        """更新工具分类"""
+        try:
+            Query_obj = Query()
+            existing = self.categories_table.get(Query_obj.id == category_id)
+            if not existing:
+                logger.warning(f"Category with ID '{sanitize_for_log(category_id)}' not found")
+                return False
+            
+            # 准备更新数据
+            update_data = {}
+            allowed_fields = ['name', 'description', 'icon', 'enabled', 'sort_order']
+            
+            for field in allowed_fields:
+                if field in updates:
+                    update_data[field] = updates[field]
+            
+            if update_data:
+                update_data['updated_at'] = datetime.now().isoformat()
+                self.categories_table.update(update_data, Query_obj.id == category_id)
+                logger.info(f"Updated category: {sanitize_for_log(category_id)}")
+                return True
+            
+            return False
+            
+        except Exception as e:
+            logger.error(f"Failed to update category: {sanitize_for_log(str(e))}")
+            return False
+    
+    def delete_category(self, category_id: str, force: bool = False) -> bool:
+        """删除工具分类（需要检查是否有关联的工具）"""
+        try:
+            Query_obj = Query()
+            
+            # 检查分类是否存在
+            existing = self.categories_table.get(Query_obj.id == category_id)
+            if not existing:
+                logger.warning(f"Category with ID '{sanitize_for_log(category_id)}' not found")
+                return False
+            
+            # 检查是否有关联的工具
+            if not force:
+                tools_in_category = self.tools_table.search(Query_obj.category == category_id)
+                if tools_in_category:
+                    logger.warning(f"Cannot delete category '{sanitize_for_log(category_id)}': {len(tools_in_category)} tools still in this category")
+                    return False
+            
+            # 删除分类
+            self.categories_table.remove(Query_obj.id == category_id)
+            
+            # 如果强制删除，也删除分类下的所有工具
+            if force:
+                deleted_tools = self.tools_table.remove(Query_obj.category == category_id)
+                logger.info(f"Force deleted category '{sanitize_for_log(category_id)}' and {len(deleted_tools)} associated tools")
+            else:
+                logger.info(f"Deleted category: {sanitize_for_log(category_id)}")
+            
+            return True
+            
+        except Exception as e:
+            logger.error(f"Failed to delete category: {sanitize_for_log(str(e))}")
+            return False
+    
     def get_tools_by_category(self) -> Dict[str, List[Dict[str, Any]]]:
         """按分类获取工具清单"""
         categories = self.get_categories()

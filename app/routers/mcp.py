@@ -622,3 +622,84 @@ async def disable_mcp_category(request: Dict[str, Any]):
             "success": False,
             "message": "Failed to disable category: Internal server error"
         }
+
+@router.post("/categories/create")
+async def create_mcp_category(request: Dict[str, Any]):
+    """创建新的MCP工具分类"""
+    try:
+        category_data = request
+        if not category_data.get("id") or not category_data.get("name"):
+            return {
+                "success": False,
+                "message": "Category ID and name are required"
+            }
+
+        tools_service = get_mcp_tools_service()
+        result = tools_service.create_category(category_data)
+        
+        if result:
+            return {
+                "success": True,
+                "message": f"Category '{sanitize_for_log(category_data['id'])}' created successfully"
+            }
+        else:
+            return {
+                "success": False,
+                "message": f"Category '{sanitize_for_log(category_data['id'])}' already exists"
+            }
+    except Exception as e:
+        logger.error(f"Failed to create category: {sanitize_for_log(str(e))}")
+        return {
+            "success": False,
+            "message": "Failed to create category: Internal server error"
+        }
+
+@router.put("/categories/{category_id}")
+async def update_mcp_category(category_id: str, request: Dict[str, Any]):
+    """更新MCP工具分类"""
+    try:
+        update_data = request
+        
+        tools_service = get_mcp_tools_service()
+        result = tools_service.update_category(category_id, update_data)
+        
+        if result:
+            return {
+                "success": True,
+                "message": f"Category '{sanitize_for_log(category_id)}' updated successfully"
+            }
+        else:
+            return {
+                "success": False,
+                "message": f"Category '{sanitize_for_log(category_id)}' not found"
+            }
+    except Exception as e:
+        logger.error(f"Failed to update category: {sanitize_for_log(str(e))}")
+        return {
+            "success": False,
+            "message": "Failed to update category: Internal server error"
+        }
+
+@router.delete("/categories/{category_id}")
+async def delete_mcp_category(category_id: str):
+    """删除MCP工具分类"""
+    try:
+        tools_service = get_mcp_tools_service()
+        result = tools_service.delete_category(category_id)
+        
+        if result:
+            return {
+                "success": True,
+                "message": f"Category '{sanitize_for_log(category_id)}' deleted successfully"
+            }
+        else:
+            return {
+                "success": False,
+                "message": f"Category '{sanitize_for_log(category_id)}' not found or has associated tools"
+            }
+    except Exception as e:
+        logger.error(f"Failed to delete category: {sanitize_for_log(str(e))}")
+        return {
+            "success": False,
+            "message": "Failed to delete category: Internal server error"
+        }
