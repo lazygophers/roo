@@ -114,38 +114,25 @@ class FileSecurityService:
         """初始化默认安全配置"""
         logger.info("Initializing default file security configuration...")
         
-        # 默认路径配置
+        # 默认路径配置（空路径表示允许所有路径）
         default_path_configs = [
             FileSecurityConfig(
                 config_type="readable",
                 name="可读取目录",
-                description="允许读取文件的目录列表",
-                paths=[
-                    str(PROJECT_ROOT),  # 项目根目录
-                    str(Path.home()),   # 用户主目录
-                    "/tmp",             # 临时目录
-                ]
+                description="允许读取文件的目录列表（空表示允许所有路径）",
+                paths=[]
             ),
             FileSecurityConfig(
                 config_type="writable", 
                 name="可写入目录",
-                description="允许写入/创建文件的目录列表",
-                paths=[
-                    str(PROJECT_ROOT),  # 项目根目录
-                    str(Path.home() / "Documents"),  # 用户文档目录
-                    "/tmp",             # 临时目录
-                ]
+                description="允许写入/创建文件的目录列表（空表示允许所有路径）",
+                paths=[]
             ),
             FileSecurityConfig(
                 config_type="deletable",
                 name="可删除目录", 
-                description="允许删除文件的目录列表",
-                paths=[
-                    str(PROJECT_ROOT / "temp"),      # 项目临时目录
-                    str(PROJECT_ROOT / "data" / "temp"),  # 数据临时目录
-                    "/tmp",                         # 系统临时目录
-                    str(Path.home() / "Downloads"),  # 用户下载目录
-                ]
+                description="允许删除文件的目录列表（空表示允许所有路径）",
+                paths=[]
             ),
             FileSecurityConfig(
                 config_type="forbidden",

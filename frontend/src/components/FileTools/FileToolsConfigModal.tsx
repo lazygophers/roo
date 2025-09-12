@@ -489,10 +489,9 @@ const FileToolsConfigModal: React.FC<FileToolsConfigModalProps> = ({
                     <Form form={pathForm} onFinish={handlePathSubmit} layout="vertical">
                       <Form.Item
                         name="paths"
-                        label="路径列表（每行一个路径）"
-                        rules={[{ required: true, message: '请输入至少一个路径' }]}
+                        label="路径列表（每行一个路径，空表示允许所有路径）"
                       >
-                        <TextArea rows={6} placeholder="例如：&#10;/home/user/documents&#10;/var/www/html&#10;/tmp" />
+                        <TextArea rows={6} placeholder="留空表示允许所有路径&#10;或指定具体路径：&#10;/home/user/documents&#10;/var/www/html&#10;/tmp" />
                       </Form.Item>
                       <Form.Item>
                         <Space>
