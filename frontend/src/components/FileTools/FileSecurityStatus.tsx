@@ -100,9 +100,9 @@ const FileSecurityStatus: React.FC<FileSecurityStatusProps> = ({
     setLoading(true);
     try {
       const response = await apiClient.getFileSecurityInfo();
-      if (response.success && response.data) {
-        const parsedInfo = parseSecurityInfo(response.data);
-        setSecurityInfo(parsedInfo as FileSecurityInfo);
+      if (response.status === 'success' && response.data) {
+        // 新的API直接返回结构化数据，不需要解析
+        setSecurityInfo(response.data);
       }
     } catch (error) {
       console.error('Failed to load file security info:', error);

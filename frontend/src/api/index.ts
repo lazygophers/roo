@@ -204,8 +204,7 @@ export interface FileSecurityInfo {
 }
 
 export interface FileSecurityResponse {
-  success: boolean;
-  message: string;
+  status: string;
   data: FileSecurityInfo;
 }
 
@@ -220,8 +219,8 @@ export interface UpdateLimitsRequest {
 }
 
 export interface SecurityActionResponse {
-  success: boolean;
-  message: string;
+  status: string;
+  message?: string;
   data?: any;
 }
 
@@ -412,38 +411,31 @@ export const apiClient = {
 
   // File Security API methods
   // 获取文件安全配置信息
-  getFileSecurityInfo: async () => {
-    const response = await api.post('/mcp/call-tool', {
-      name: 'get_file_security_info',
-      arguments: {}
-    });
+  getFileSecurityInfo: async (): Promise<FileSecurityResponse> => {
+    const response = await api.get('/file-security/status');
     return response.data;
   },
 
   // 更新文件安全路径配置
-  updateFileSecurityPaths: async (request: UpdatePathsRequest) => {
-    const response = await api.post('/mcp/call-tool', {
-      name: 'update_file_security_paths',
-      arguments: request
+  updateFileSecurityPaths: async (request: UpdatePathsRequest): Promise<SecurityActionResponse> => {
+    const response = await api.put(`/file-security/paths/${request.config_type}`, {
+      paths: request.paths
     });
     return response.data;
   },
 
   // 更新文件安全限制配置
-  updateFileSecurityLimits: async (request: UpdateLimitsRequest) => {
-    const response = await api.post('/mcp/call-tool', {
-      name: 'update_file_security_limits',
-      arguments: request
+  updateFileSecurityLimits: async (request: UpdateLimitsRequest): Promise<SecurityActionResponse> => {
+    const response = await api.put(`/file-security/limits/${request.limit_type}`, {
+      value: request.value
     });
     return response.data;
   },
 
   // 重新加载文件安全配置
-  reloadFileSecurityConfig: async () => {
-    const response = await api.post('/mcp/call-tool', {
-      name: 'reload_file_security_config',
-      arguments: {}
-    });
+  reloadFileSecurityConfig: async (): Promise<FileSecurityResponse> => {
+    // 新的API架构下，配置会自动重新加载，所以只需要获取最新状态
+    const response = await api.get('/file-security/status');
     return response.data;
   }
 };

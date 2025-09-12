@@ -71,7 +71,7 @@ const FileToolsConfigModal: React.FC<FileToolsConfigModalProps> = ({
       setLoading(true);
       const response = await apiClient.getFileSecurityInfo();
       
-      if (response.success && response.data) {
+      if (response.status === 'success' && response.data) {
         setSecurityInfo(response.data);
         // 更新限制表单的初始值
         limitForm.setFieldsValue({
@@ -95,7 +95,7 @@ const FileToolsConfigModal: React.FC<FileToolsConfigModalProps> = ({
       const request: UpdatePathsRequest = { config_type: type, paths };
       const response = await apiClient.updateFileSecurityPaths(request);
       
-      if (response.success) {
+      if (response.status === 'success') {
         messageApi.success(`${type}路径配置更新成功`);
         await loadSecurityInfo(); // 重新加载配置
         setEditingPaths({ type: null, paths: [] });
@@ -117,7 +117,7 @@ const FileToolsConfigModal: React.FC<FileToolsConfigModalProps> = ({
       const request: UpdateLimitsRequest = { limit_type: limitType, value };
       const response = await apiClient.updateFileSecurityLimits(request);
       
-      if (response.success) {
+      if (response.status === 'success') {
         messageApi.success(`${limitType}限制配置更新成功`);
         await loadSecurityInfo(); // 重新加载配置
       } else {
@@ -138,7 +138,7 @@ const FileToolsConfigModal: React.FC<FileToolsConfigModalProps> = ({
       
       try {
         const response = await apiClient.reloadFileSecurityConfig();
-        if (response.success) {
+        if (response.status === 'success') {
           messageApi.success('文件安全配置重新加载成功');
           await loadSecurityInfo();
           return;
