@@ -55,15 +55,40 @@ async def call_mcp_tool(request: Dict[str, Any]):
                 "message": "Tool name is required"
             }
         
-        # 检查工具是否存在
-        available_tools = ["get_current_timestamp", "get_system_info", "list_available_modes"]
-        if tool_name not in available_tools:
+        # 获取MCP服务器实例并调用工具
+        try:
+            from app.core.mcp_server import get_mcp_server
+            mcp_server = get_mcp_server()
+            
+            # 检查工具是否存在
+            available_tools = mcp_server.get_available_tools()
+            if tool_name not in [tool['name'] for tool in available_tools]:
+                return {
+                    "success": False,
+                    "message": f"Tool '{sanitize_for_log(tool_name)}' not found"
+                }
+            
+            # 调用MCP工具
+            result = await mcp_server.call_tool(tool_name, arguments)
+            
+            return {
+                "success": True,
+                "message": "Tool executed successfully",
+                "data": {
+                    "tool": tool_name,
+                    "result": result,
+                    "arguments": arguments
+                }
+            }
+            
+        except Exception as e:
+            logger.error(f"Error calling MCP tool {tool_name}: {sanitize_for_log(str(e))}")
             return {
                 "success": False,
-                "message": f"Tool '{sanitize_for_log(tool_name)}' not found"
+                "message": f"Tool execution failed: {str(e)}"
             }
         
-        # 直接实现工具函数
+        # Legacy fallback implementation (should not be reached with new MCP server)
         if tool_name == "get_current_timestamp":
             import time
             from datetime import datetime
@@ -424,18 +449,51 @@ async def mcp_streamable_endpoint(request: Dict[str, Any]):
             tool_name = params.get("name")
             arguments = params.get("arguments", {})
             
-            available_tools = ["get_current_timestamp", "get_system_info", "list_available_modes"]
-            if tool_name not in available_tools:
+            # 获取MCP服务器实例并调用工具
+            try:
+                from app.core.mcp_server import get_mcp_server
+                mcp_server = get_mcp_server()
+                
+                # 检查工具是否存在
+                available_tools = mcp_server.get_available_tools()
+                if tool_name not in [tool['name'] for tool in available_tools]:
+                    return {
+                        "jsonrpc": "2.0",
+                        "id": request.get("id"), 
+                        "error": {
+                            "code": -1,
+                            "message": f"Tool '{sanitize_for_log(tool_name)}' not found"
+                        }
+                    }
+                
+                # 调用MCP工具
+                result = await mcp_server.call_tool(tool_name, arguments)
+                
                 return {
                     "jsonrpc": "2.0",
-                    "id": request.get("id"), 
+                    "id": request.get("id"),
+                    "result": {
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": result
+                            }
+                        ]
+                    }
+                }
+                
+            except Exception as e:
+                logger.error(f"Error in streamable MCP tool call: {sanitize_for_log(str(e))}")
+                return {
+                    "jsonrpc": "2.0",
+                    "id": request.get("id"),
                     "error": {
                         "code": -1,
-                        "message": f"Tool '{sanitize_for_log(tool_name)}' not found"
+                        "message": f"Tool execution failed: {str(e)}"
                     }
                 }
             
-            # 直接调用工具函数
+            # Legacy fallback implementation
             if tool_name == "get_current_timestamp":
                 import time
                 from datetime import datetime

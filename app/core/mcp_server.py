@@ -13,7 +13,7 @@ import hashlib
 import shutil
 from pathlib import Path
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Union
 
 from fastmcp import FastMCP
 from mcp import types
@@ -56,51 +56,340 @@ class LazyAIMCPServer:
         # 创建工具实现函数
         if tool_name == "get_current_timestamp":
             @self.mcp.tool(name=tool_name, description=tool_description)
-            def get_current_timestamp_impl(format: str = 'iso') -> str:
-                """获取当前时间戳实现"""
-                from app.core.time_tools_service import get_time_tools_service
-                
+            def get_current_timestamp_impl() -> str:
+                """获取当前Unix时间戳（纯数字）"""
                 try:
-                    # 获取时间工具配置服务
-                    time_service = get_time_tools_service()
-                    
-                    # 获取配置的时区
-                    tz_obj = time_service.get_timezone_object()
-                    show_tz_info = time_service.should_display_timezone_info()
-                    default_tz_str = time_service.get_default_timezone()
-                    
-                    # 生成时间
-                    if tz_obj:
-                        now = datetime.now(tz_obj)
-                        tz_name = str(tz_obj)
-                    else:
-                        now = datetime.now()
-                        tz_name = str(now.astimezone().tzinfo)
-                    
-                    unix_timestamp = int(now.timestamp())
-                    
-                    if format == 'unix':
-                        return str(unix_timestamp)
-                    elif format == 'formatted':
-                        if show_tz_info:
-                            return f"{now.strftime('%Y-%m-%d %H:%M:%S')} ({tz_name})"
-                        else:
-                            return now.strftime('%Y-%m-%d %H:%M:%S')
-                    else:  # iso
-                        return now.isoformat()
-                        
+                    now = datetime.now()
+                    return str(int(now.timestamp()))
                 except Exception as e:
                     logger.error(f"Error in get_current_timestamp: {str(e)}")
-                    # 回退到基本实现
-                    now = datetime.now()
-                    unix_timestamp = int(now.timestamp())
+                    return str(int(datetime.now().timestamp()))
                     
-                    if format == 'unix':
-                        return str(unix_timestamp)
-                    elif format == 'formatted':
-                        return now.strftime('%Y-%m-%d %H:%M:%S')
-                    else:  # iso
-                        return now.isoformat()
+        elif tool_name == "format_time":
+            @self.mcp.tool(name=tool_name, description=tool_description)
+            def format_time_impl(timestamp: Optional[Union[int, float, str]] = None, 
+                                format: str = 'formatted',
+                                custom_format: str = '%Y-%m-%d %H:%M:%S',
+                                timezone: Optional[str] = None,
+                                include_timezone_info: Optional[bool] = None) -> str:
+                """格式化时间输出实现"""
+                from app.core.time_tools_service import get_time_tools_service
+                import pytz
+                
+                try:
+                    time_service = get_time_tools_service()
+                    
+                    # 确定时间对象
+                    if timestamp is None:
+                        dt = datetime.now()
+                    else:
+                        if isinstance(timestamp, str):
+                            # 尝试解析字符串时间戳
+                            try:
+                                timestamp = float(timestamp)
+                            except ValueError:
+                                # 可能是ISO格式
+                                dt = datetime.fromisoformat(timestamp.replace('Z', '+00:00'))
+                                timestamp = None
+                        
+                        if timestamp is not None:
+                            dt = datetime.fromtimestamp(timestamp)
+                    
+                    # 确定时区
+                    if timezone is None:
+                        tz_obj = time_service.get_timezone_object()
+                        timezone_name = time_service.get_default_timezone()
+                    else:
+                        if timezone.lower() == "local":
+                            tz_obj = None
+                            timezone_name = "local"
+                        elif timezone.upper() == "UTC":
+                            tz_obj = pytz.UTC
+                            timezone_name = "UTC"
+                        else:
+                            tz_obj = pytz.timezone(timezone)
+                            timezone_name = timezone
+                    
+                    # 应用时区
+                    if tz_obj:
+                        if dt.tzinfo is None:
+                            dt = tz_obj.localize(dt)
+                        else:
+                            dt = dt.astimezone(tz_obj)
+                    else:
+                        # 本地时区
+                        if dt.tzinfo is None:
+                            dt = dt.astimezone()
+                    
+                    # 确定是否显示时区信息
+                    if include_timezone_info is None:
+                        show_tz_info = time_service.should_display_timezone_info()
+                    else:
+                        show_tz_info = include_timezone_info
+                    
+                    # 格式化输出
+                    if format == 'iso':
+                        return dt.isoformat()
+                    elif format == 'custom':
+                        formatted_time = dt.strftime(custom_format)
+                        if show_tz_info:
+                            return f"{formatted_time} ({str(dt.tzinfo)})"
+                        return formatted_time
+                    else:  # formatted
+                        formatted_time = dt.strftime('%Y-%m-%d %H:%M:%S')
+                        if show_tz_info:
+                            return f"格式化时间: {formatted_time} ({str(dt.tzinfo)})\n\n完整时间信息:\n- ISO 格式: {dt.isoformat()}\n- Unix 时间戳: {int(dt.timestamp())}\n- 格式化时间: {formatted_time}\n- 配置时区: {timezone_name}\n- 实际时区: {str(dt.tzinfo)}"
+                        return formatted_time
+                        
+                except Exception as e:
+                    logger.error(f"Error in format_time: {str(e)}")
+                    return f"格式化时间失败: {str(e)}"
+                    
+        elif tool_name == "convert_timezone":
+            @self.mcp.tool(name=tool_name, description=tool_description)
+            def convert_timezone_impl(time_input: str, to_timezone: str, 
+                                    from_timezone: str = "local", 
+                                    output_format: str = "formatted") -> str:
+                """时区转换工具实现"""
+                import pytz
+                from dateutil.parser import parse
+                
+                try:
+                    # 解析输入时间
+                    try:
+                        # 尝试作为Unix时间戳
+                        timestamp = float(time_input)
+                        dt = datetime.fromtimestamp(timestamp)
+                    except ValueError:
+                        # 作为时间字符串解析
+                        dt = parse(time_input)
+                    
+                    # 设置源时区
+                    if from_timezone.lower() == "local":
+                        if dt.tzinfo is None:
+                            dt = dt.astimezone()
+                    elif from_timezone.upper() == "UTC":
+                        if dt.tzinfo is None:
+                            dt = pytz.UTC.localize(dt)
+                    else:
+                        from_tz = pytz.timezone(from_timezone)
+                        if dt.tzinfo is None:
+                            dt = from_tz.localize(dt)
+                        else:
+                            dt = dt.astimezone(from_tz)
+                    
+                    # 转换到目标时区
+                    if to_timezone.upper() == "UTC":
+                        to_tz = pytz.UTC
+                    else:
+                        to_tz = pytz.timezone(to_timezone)
+                    
+                    converted_dt = dt.astimezone(to_tz)
+                    
+                    # 格式化输出
+                    if output_format == "iso":
+                        return converted_dt.isoformat()
+                    elif output_format == "unix":
+                        return str(int(converted_dt.timestamp()))
+                    else:  # formatted
+                        result = f"时区转换结果:\n\n"
+                        result += f"输入时间: {dt.strftime('%Y-%m-%d %H:%M:%S')} ({str(dt.tzinfo)})\n"
+                        result += f"转换后: {converted_dt.strftime('%Y-%m-%d %H:%M:%S')} ({str(converted_dt.tzinfo)})\n"
+                        result += f"时差: {(converted_dt.utcoffset() - dt.utcoffset()).total_seconds() / 3600} 小时"
+                        return result
+                        
+                except Exception as e:
+                    logger.error(f"Error in convert_timezone: {str(e)}")
+                    return f"时区转换失败: {str(e)}"
+                    
+        elif tool_name == "parse_time":
+            @self.mcp.tool(name=tool_name, description=tool_description)
+            def parse_time_impl(time_string: str, 
+                              input_format: Optional[str] = None,
+                              timezone: str = "local",
+                              output_timezone: Optional[str] = None) -> str:
+                """时间解析工具实现"""
+                from dateutil.parser import parse
+                import pytz
+                
+                try:
+                    # 解析时间字符串
+                    if input_format:
+                        dt = datetime.strptime(time_string, input_format)
+                    else:
+                        dt = parse(time_string)
+                    
+                    # 应用输入时区
+                    if timezone.lower() == "local":
+                        if dt.tzinfo is None:
+                            dt = dt.astimezone()
+                    elif timezone.upper() == "UTC":
+                        if dt.tzinfo is None:
+                            dt = pytz.UTC.localize(dt)
+                    else:
+                        input_tz = pytz.timezone(timezone)
+                        if dt.tzinfo is None:
+                            dt = input_tz.localize(dt)
+                    
+                    # 转换输出时区
+                    if output_timezone:
+                        if output_timezone.upper() == "UTC":
+                            dt = dt.astimezone(pytz.UTC)
+                        else:
+                            output_tz = pytz.timezone(output_timezone)
+                            dt = dt.astimezone(output_tz)
+                    
+                    result = f"时间解析结果:\n\n"
+                    result += f"原始输入: {time_string}\n"
+                    result += f"解析结果: {dt.strftime('%Y-%m-%d %H:%M:%S')} ({str(dt.tzinfo)})\n"
+                    result += f"ISO 格式: {dt.isoformat()}\n"
+                    result += f"Unix 时间戳: {int(dt.timestamp())}\n"
+                    return result
+                    
+                except Exception as e:
+                    logger.error(f"Error in parse_time: {str(e)}")
+                    return f"时间解析失败: {str(e)}"
+                    
+        elif tool_name == "calculate_time_diff":
+            @self.mcp.tool(name=tool_name, description=tool_description)
+            def calculate_time_diff_impl(start_time: str, 
+                                       end_time: Optional[str] = None,
+                                       unit: str = "auto",
+                                       precision: int = 2,
+                                       human_readable: bool = True) -> str:
+                """时间差值计算工具实现"""
+                from dateutil.parser import parse
+                
+                try:
+                    # 解析开始时间
+                    try:
+                        start_timestamp = float(start_time)
+                        start_dt = datetime.fromtimestamp(start_timestamp)
+                    except ValueError:
+                        start_dt = parse(start_time)
+                    
+                    # 解析结束时间
+                    if end_time is None:
+                        end_dt = datetime.now()
+                    else:
+                        try:
+                            end_timestamp = float(end_time)
+                            end_dt = datetime.fromtimestamp(end_timestamp)
+                        except ValueError:
+                            end_dt = parse(end_time)
+                    
+                    # 计算时间差
+                    diff = end_dt - start_dt
+                    total_seconds = abs(diff.total_seconds())
+                    
+                    # 单位转换
+                    if unit == "seconds":
+                        value = total_seconds
+                        unit_name = "秒"
+                    elif unit == "minutes":
+                        value = total_seconds / 60
+                        unit_name = "分钟"
+                    elif unit == "hours":
+                        value = total_seconds / 3600
+                        unit_name = "小时"
+                    elif unit == "days":
+                        value = total_seconds / 86400
+                        unit_name = "天"
+                    elif unit == "weeks":
+                        value = total_seconds / (86400 * 7)
+                        unit_name = "周"
+                    elif unit == "months":
+                        value = total_seconds / (86400 * 30.44)  # 平均月长度
+                        unit_name = "月"
+                    elif unit == "years":
+                        value = total_seconds / (86400 * 365.25)  # 平均年长度
+                        unit_name = "年"
+                    else:  # auto
+                        if total_seconds < 60:
+                            value = total_seconds
+                            unit_name = "秒"
+                        elif total_seconds < 3600:
+                            value = total_seconds / 60
+                            unit_name = "分钟"
+                        elif total_seconds < 86400:
+                            value = total_seconds / 3600
+                            unit_name = "小时"
+                        else:
+                            value = total_seconds / 86400
+                            unit_name = "天"
+                    
+                    result = f"时间差值计算结果:\n\n"
+                    result += f"开始时间: {start_dt.strftime('%Y-%m-%d %H:%M:%S')}\n"
+                    result += f"结束时间: {end_dt.strftime('%Y-%m-%d %H:%M:%S')}\n"
+                    result += f"时间差: {round(value, precision)} {unit_name}\n"
+                    
+                    if human_readable and total_seconds >= 60:
+                        days = int(total_seconds // 86400)
+                        hours = int((total_seconds % 86400) // 3600)
+                        minutes = int((total_seconds % 3600) // 60)
+                        seconds = int(total_seconds % 60)
+                        
+                        human_parts = []
+                        if days > 0:
+                            human_parts.append(f"{days}天")
+                        if hours > 0:
+                            human_parts.append(f"{hours}小时")
+                        if minutes > 0:
+                            human_parts.append(f"{minutes}分钟")
+                        if seconds > 0 or not human_parts:
+                            human_parts.append(f"{seconds}秒")
+                        
+                        result += f"人类可读: {' '.join(human_parts)}"
+                    
+                    return result
+                    
+                except Exception as e:
+                    logger.error(f"Error in calculate_time_diff: {str(e)}")
+                    return f"时间差值计算失败: {str(e)}"
+                    
+        elif tool_name == "get_timezone_info":
+            @self.mcp.tool(name=tool_name, description=tool_description)
+            def get_timezone_info_impl(timezone: str = "local", include_dst_info: bool = True) -> str:
+                """获取时区信息实现"""
+                import pytz
+                
+                try:
+                    # 获取时区对象
+                    if timezone.lower() == "local":
+                        dt = datetime.now()
+                        tz_obj = dt.astimezone().tzinfo
+                        tz_name = "本地时区"
+                    elif timezone.upper() == "UTC":
+                        dt = datetime.now(pytz.UTC)
+                        tz_obj = pytz.UTC
+                        tz_name = "UTC (协调世界时)"
+                    else:
+                        tz_obj = pytz.timezone(timezone)
+                        dt = datetime.now(tz_obj)
+                        tz_name = timezone
+                    
+                    result = f"时区信息:\n\n"
+                    result += f"时区名称: {tz_name}\n"
+                    result += f"当前时间: {dt.strftime('%Y-%m-%d %H:%M:%S')}\n"
+                    result += f"UTC 偏移: {dt.strftime('%z')} ({dt.utcoffset()})\n"
+                    result += f"时区简写: {dt.strftime('%Z')}\n"
+                    
+                    if include_dst_info and hasattr(tz_obj, 'localize'):
+                        # 检查夏令时信息
+                        try:
+                            dst_offset = dt.dst()
+                            if dst_offset and dst_offset.total_seconds() != 0:
+                                result += f"夏令时: 是 (偏移 {dst_offset})\n"
+                            else:
+                                result += f"夏令时: 否\n"
+                        except:
+                            result += f"夏令时: 信息不可用\n"
+                    
+                    return result
+                    
+                except Exception as e:
+                    logger.error(f"Error in get_timezone_info: {str(e)}")
+                    return f"获取时区信息失败: {str(e)}"
                     
         elif tool_name == "get_system_info":
             @self.mcp.tool(name=tool_name, description=tool_description) 
@@ -682,6 +971,104 @@ class LazyAIMCPServer:
     def get_available_tools(self) -> List[Dict[str, Any]]:
         """获取可用工具列表"""
         return self.tools_service.get_tools(enabled_only=True)
+    
+    async def call_tool(self, tool_name: str, arguments: Dict[str, Any]) -> str:
+        """调用MCP工具"""
+        try:
+            # 获取工具信息
+            available_tools = self.get_available_tools()
+            tool_info = next((tool for tool in available_tools if tool['name'] == tool_name), None)
+            
+            if not tool_info:
+                raise ValueError(f"Tool '{tool_name}' not found")
+            
+            # 调用FastMCP服务器的工具
+            # 需要通过MCP协议调用已注册的工具
+            # 这里我们需要直接调用对应的实现函数
+            
+            if tool_name == "get_current_timestamp":
+                now = datetime.now()
+                return str(int(now.timestamp()))
+                
+            elif tool_name == "format_time":
+                from app.core.time_tools_service import get_time_tools_service
+                import pytz
+                
+                timestamp = arguments.get('timestamp')
+                format_type = arguments.get('format', 'formatted')
+                custom_format = arguments.get('custom_format', '%Y-%m-%d %H:%M:%S')
+                timezone = arguments.get('timezone')
+                include_timezone_info = arguments.get('include_timezone_info')
+                
+                time_service = get_time_tools_service()
+                
+                # 确定时间对象
+                if timestamp is None:
+                    dt = datetime.now()
+                else:
+                    if isinstance(timestamp, str):
+                        try:
+                            timestamp = float(timestamp)
+                        except ValueError:
+                            dt = datetime.fromisoformat(timestamp.replace('Z', '+00:00'))
+                            timestamp = None
+                    
+                    if timestamp is not None:
+                        dt = datetime.fromtimestamp(timestamp)
+                
+                # 确定时区
+                if timezone is None:
+                    tz_obj = time_service.get_timezone_object()
+                    timezone_name = time_service.get_default_timezone()
+                else:
+                    if timezone.lower() == "local":
+                        tz_obj = None
+                        timezone_name = "local"
+                    elif timezone.upper() == "UTC":
+                        tz_obj = pytz.UTC
+                        timezone_name = "UTC"
+                    else:
+                        tz_obj = pytz.timezone(timezone)
+                        timezone_name = timezone
+                
+                # 应用时区
+                if tz_obj:
+                    if dt.tzinfo is None:
+                        dt = tz_obj.localize(dt)
+                    else:
+                        dt = dt.astimezone(tz_obj)
+                else:
+                    if dt.tzinfo is None:
+                        dt = dt.astimezone()
+                
+                # 确定是否显示时区信息
+                if include_timezone_info is None:
+                    show_tz_info = time_service.should_display_timezone_info()
+                else:
+                    show_tz_info = include_timezone_info
+                
+                # 格式化输出
+                if format_type == 'iso':
+                    return dt.isoformat()
+                elif format_type == 'custom':
+                    formatted_time = dt.strftime(custom_format)
+                    if show_tz_info:
+                        return f"{formatted_time} ({str(dt.tzinfo)})"
+                    return formatted_time
+                else:  # formatted
+                    formatted_time = dt.strftime('%Y-%m-%d %H:%M:%S')
+                    if show_tz_info:
+                        return f"格式化时间: {formatted_time} ({str(dt.tzinfo)})\n\n完整时间信息:\n- ISO 格式: {dt.isoformat()}\n- Unix 时间戳: {int(dt.timestamp())}\n- 格式化时间: {formatted_time}\n- 配置时区: {timezone_name}\n- 实际时区: {str(dt.tzinfo)}"
+                    return formatted_time
+            
+            # 对于其他工具，可以添加类似的实现
+            # 这是一个简化的实现，实际中可能需要更完善的工具调用机制
+            else:
+                return f"Tool '{tool_name}' is registered but not implemented in call_tool method"
+                
+        except Exception as e:
+            logger.error(f"Error calling tool '{tool_name}': {str(e)}")
+            raise
     
     def get_tools_by_category(self) -> Dict[str, Any]:
         """按分类获取工具"""

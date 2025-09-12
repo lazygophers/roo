@@ -25,4 +25,5 @@ dependencies = [
     "uvloop>=0.21.0",
     "mcp>=1.13.1",
     "fastmcp>=2.12.2",
+    "python-dateutil>=2.9.0.post0",
 ]
