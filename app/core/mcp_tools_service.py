@@ -189,11 +189,6 @@ class MCPToolsService:
                             "description": "时间格式 (iso, unix, formatted)",
                             "enum": ["iso", "unix", "formatted"],
                             "default": "iso"
-                        },
-                        "timezone": {
-                            "type": "string", 
-                            "description": "时区设置",
-                            "default": "local"
                         }
                     },
                     "required": []
@@ -203,7 +198,7 @@ class MCPToolsService:
                     "examples": [
                         {"format": "iso"},
                         {"format": "unix"},
-                        {"format": "formatted", "timezone": "UTC"}
+                        {"format": "formatted"}
                     ]
                 }
             ),

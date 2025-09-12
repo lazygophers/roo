@@ -10,6 +10,8 @@ from app.core.unified_database import init_unified_database
 from app.core.database_service import init_database_service, get_database_service
 from app.core.mcp_tools_service import init_mcp_tools_service
 from app.core.mcp_server import init_mcp_server
+from app.core.recycle_bin_scheduler import startup_recycle_bin_scheduler, shutdown_recycle_bin_scheduler
+from app.core.time_tools_service import init_time_tools_service
 from app.routers import api_router
 
 # 设置日志
@@ -40,6 +42,14 @@ async def lifespan(app: FastAPI):
         # 初始化MCP服务器（使用统一数据库）
         mcp_server = init_mcp_server(use_unified_db=True)
         logger.info("MCP server initialized successfully")
+        
+        # 启动回收站调度器
+        await startup_recycle_bin_scheduler()
+        logger.info("Recycle bin scheduler started successfully")
+        
+        # 初始化时间工具配置服务
+        time_service = init_time_tools_service(use_unified_db=True)
+        logger.info("Time tools service initialized successfully")
         
         # 打印启动信息和访问地址
         import socket
@@ -108,9 +118,15 @@ async def lifespan(app: FastAPI):
     print(shutdown_message, flush=True)
     
     try:
+        # 停止回收站调度器
+        await shutdown_recycle_bin_scheduler()
+        logger.info("Recycle bin scheduler stopped successfully")
+        
+        # 关闭数据库服务
         db_service = get_database_service()
         db_service.close()
         logger.info("Database service closed successfully")
+        
         print("✅ 服务已安全关闭\n", flush=True)
     except Exception as e:
         logger.error(f"Error during shutdown: {e}")

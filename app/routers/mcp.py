@@ -67,9 +67,57 @@ async def call_mcp_tool(request: Dict[str, Any]):
         if tool_name == "get_current_timestamp":
             import time
             from datetime import datetime
-            now = datetime.now()
-            unix_timestamp = int(time.time())
-            result = f"""当前时间信息:
+            from app.core.time_tools_service import get_time_tools_service
+            
+            try:
+                # 从参数获取格式设置
+                format_type = arguments.get('format', 'iso')
+                
+                # 获取时间工具配置服务
+                time_service = get_time_tools_service()
+                
+                # 获取配置的时区
+                tz_obj = time_service.get_timezone_object()
+                show_tz_info = time_service.should_display_timezone_info()
+                default_tz_str = time_service.get_default_timezone()
+                
+                # 生成时间
+                if tz_obj:
+                    now = datetime.now(tz_obj)
+                    tz_name = str(tz_obj)
+                else:
+                    now = datetime.now()
+                    tz_name = str(now.astimezone().tzinfo)
+                
+                unix_timestamp = int(now.timestamp())
+                
+                if format_type == 'unix':
+                    result = f"Unix时间戳: {unix_timestamp}"
+                elif format_type == 'formatted':
+                    if show_tz_info:
+                        result = f"格式化时间: {now.strftime('%Y-%m-%d %H:%M:%S')} ({tz_name})"
+                    else:
+                        result = f"格式化时间: {now.strftime('%Y-%m-%d %H:%M:%S')}"
+                else:  # iso
+                    result = f"ISO格式时间: {now.isoformat()}"
+                
+                # 完整信息总是包含
+                result += f"""
+
+完整时间信息:
+- ISO 格式: {now.isoformat()}
+- Unix 时间戳: {unix_timestamp}
+- 格式化时间: {now.strftime('%Y-%m-%d %H:%M:%S')}"""
+                if show_tz_info:
+                    result += f"\n- 配置时区: {default_tz_str}"
+                    result += f"\n- 实际时区: {tz_name}"
+                
+            except Exception as e:
+                logger.error(f"Error in get_current_timestamp API: {sanitize_for_log(str(e))}")
+                # 回退实现
+                now = datetime.now()
+                unix_timestamp = int(time.time())
+                result = f"""当前时间信息:
 - ISO 格式: {now.isoformat()}
 - Unix 时间戳: {unix_timestamp}
 - 格式化时间: {now.strftime('%Y-%m-%d %H:%M:%S')}
@@ -391,9 +439,57 @@ async def mcp_streamable_endpoint(request: Dict[str, Any]):
             if tool_name == "get_current_timestamp":
                 import time
                 from datetime import datetime
-                now = datetime.now()
-                unix_timestamp = int(time.time())
-                result = f"""当前时间信息:
+                from app.core.time_tools_service import get_time_tools_service
+                
+                try:
+                    # 从参数获取格式设置
+                    format_type = arguments.get('format', 'iso')
+                    
+                    # 获取时间工具配置服务
+                    time_service = get_time_tools_service()
+                    
+                    # 获取配置的时区
+                    tz_obj = time_service.get_timezone_object()
+                    show_tz_info = time_service.should_display_timezone_info()
+                    default_tz_str = time_service.get_default_timezone()
+                    
+                    # 生成时间
+                    if tz_obj:
+                        now = datetime.now(tz_obj)
+                        tz_name = str(tz_obj)
+                    else:
+                        now = datetime.now()
+                        tz_name = str(now.astimezone().tzinfo)
+                    
+                    unix_timestamp = int(now.timestamp())
+                    
+                    if format_type == 'unix':
+                        result = f"Unix时间戳: {unix_timestamp}"
+                    elif format_type == 'formatted':
+                        if show_tz_info:
+                            result = f"格式化时间: {now.strftime('%Y-%m-%d %H:%M:%S')} ({tz_name})"
+                        else:
+                            result = f"格式化时间: {now.strftime('%Y-%m-%d %H:%M:%S')}"
+                    else:  # iso
+                        result = f"ISO格式时间: {now.isoformat()}"
+                    
+                    # 完整信息总是包含
+                    result += f"""
+
+完整时间信息:
+- ISO 格式: {now.isoformat()}
+- Unix 时间戳: {unix_timestamp}
+- 格式化时间: {now.strftime('%Y-%m-%d %H:%M:%S')}"""
+                    if show_tz_info:
+                        result += f"\n- 配置时区: {default_tz_str}"
+                        result += f"\n- 实际时区: {tz_name}"
+                        
+                except Exception as e:
+                    logger.error(f"Error in get_current_timestamp streamable: {sanitize_for_log(str(e))}")
+                    # 回退实现
+                    now = datetime.now()
+                    unix_timestamp = int(time.time())
+                    result = f"""当前时间信息:
 - ISO 格式: {now.isoformat()}
 - Unix 时间戳: {unix_timestamp}
 - 格式化时间: {now.strftime('%Y-%m-%d %H:%M:%S')}

@@ -176,6 +176,12 @@ class TableNames:
     # 系统表
     SYSTEM_CONFIG = "system_config"
     SYSTEM_LOGS = "system_logs"
+    
+    # 回收站表
+    RECYCLE_BIN = "recycle_bin"
+    
+    # 时间工具配置表
+    TIME_TOOLS_CONFIG = "time_tools_config"
 
 def init_unified_database():
     """初始化统一数据库并执行迁移"""

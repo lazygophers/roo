@@ -56,17 +56,51 @@ class LazyAIMCPServer:
         # 创建工具实现函数
         if tool_name == "get_current_timestamp":
             @self.mcp.tool(name=tool_name, description=tool_description)
-            def get_current_timestamp_impl(format: str = 'iso', timezone: str = 'local') -> str:
+            def get_current_timestamp_impl(format: str = 'iso') -> str:
                 """获取当前时间戳实现"""
-                now = datetime.now()
-                unix_timestamp = int(time.time())
+                from app.core.time_tools_service import get_time_tools_service
                 
-                if format == 'unix':
-                    return str(unix_timestamp)
-                elif format == 'formatted':
-                    return now.strftime('%Y-%m-%d %H:%M:%S')
-                else:  # iso
-                    return now.isoformat()
+                try:
+                    # 获取时间工具配置服务
+                    time_service = get_time_tools_service()
+                    
+                    # 获取配置的时区
+                    tz_obj = time_service.get_timezone_object()
+                    show_tz_info = time_service.should_display_timezone_info()
+                    default_tz_str = time_service.get_default_timezone()
+                    
+                    # 生成时间
+                    if tz_obj:
+                        now = datetime.now(tz_obj)
+                        tz_name = str(tz_obj)
+                    else:
+                        now = datetime.now()
+                        tz_name = str(now.astimezone().tzinfo)
+                    
+                    unix_timestamp = int(now.timestamp())
+                    
+                    if format == 'unix':
+                        return str(unix_timestamp)
+                    elif format == 'formatted':
+                        if show_tz_info:
+                            return f"{now.strftime('%Y-%m-%d %H:%M:%S')} ({tz_name})"
+                        else:
+                            return now.strftime('%Y-%m-%d %H:%M:%S')
+                    else:  # iso
+                        return now.isoformat()
+                        
+                except Exception as e:
+                    logger.error(f"Error in get_current_timestamp: {str(e)}")
+                    # 回退到基本实现
+                    now = datetime.now()
+                    unix_timestamp = int(now.timestamp())
+                    
+                    if format == 'unix':
+                        return str(unix_timestamp)
+                    elif format == 'formatted':
+                        return now.strftime('%Y-%m-%d %H:%M:%S')
+                    else:  # iso
+                        return now.isoformat()
                     
         elif tool_name == "get_system_info":
             @self.mcp.tool(name=tool_name, description=tool_description) 
