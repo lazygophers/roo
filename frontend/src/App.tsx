@@ -8,7 +8,6 @@ import ErrorBoundary from './components/ErrorBoundary';
 import Home from './pages/Home';
 import ConfigManagementWithSelection from './pages/ConfigManagementWithSelection';
 import MCPToolsManagement from './pages/MCPToolsManagement';
-import FileSecurityManagement from './pages/FileSecurityManagement';
 import './App.css';
 import './styles/theme.css';
 
@@ -27,7 +26,6 @@ const AppContent: React.FC = () => {
               <Route path="/" element={<Home />} />
               <Route path="/config" element={<ConfigManagementWithSelection />} />
               <Route path="/mcp-tools" element={<MCPToolsManagement />} />
-              <Route path="/file-security" element={<FileSecurityManagement />} />
             </Routes>
           </AppLayout>
         </Router>

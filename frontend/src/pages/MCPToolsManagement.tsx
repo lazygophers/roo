@@ -31,10 +31,15 @@ import {
   ApiOutlined,
   CheckCircleOutlined,
   ExclamationCircleOutlined,
-  FilterOutlined
+  FilterOutlined,
+  SecurityScanOutlined,
+  SettingOutlined,
+  FileTextOutlined
 } from '@ant-design/icons';
+import { useNavigate } from 'react-router-dom';
 import { apiClient, MCPToolInfo, MCPCategoryInfo, MCPStatusResponse } from '../api';
 import { useTheme } from '../contexts/ThemeContext';
+import FileToolsConfigModal from '../components/FileTools/FileToolsConfigModal';
 import './MCPToolsManagement.css';
 
 const { Title, Text, Paragraph } = Typography;
@@ -43,6 +48,7 @@ const { TextArea } = Input;
 const { useApp } = App;
 
 const MCPToolsManagement: React.FC = () => {
+  const navigate = useNavigate();
   const { currentTheme, themeType } = useTheme();
   const { message: messageApi } = useApp();
   const [loading, setLoading] = useState(false);
@@ -60,6 +66,7 @@ const MCPToolsManagement: React.FC = () => {
     form: any;
   }>({ visible: false, tool: null, form: null });
   const [testResult, setTestResult] = useState<string>('');
+  const [fileToolsConfigModal, setFileToolsConfigModal] = useState(false);
 
   const [form] = Form.useForm();
 
@@ -81,8 +88,8 @@ const MCPToolsManagement: React.FC = () => {
         setCategories(categoriesRes.data.categories);
       }
 
-      if (toolsRes.success && toolsRes.data && toolsRes.data.tools) {
-        setTools(toolsRes.data.tools);
+      if (toolsRes.success && toolsRes.data && Array.isArray((toolsRes.data as any).tools)) {
+        setTools((toolsRes.data as any).tools);
       } else {
         // 如果API不可用，使用模拟数据
         const mockTools: MCPToolInfo[] = [
@@ -145,6 +152,54 @@ const MCPToolsManagement: React.FC = () => {
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString(),
             metadata: { tags: ['健康检查', '监控', '诊断'] }
+          },
+          {
+            id: '6',
+            name: 'read_file',
+            description: '读取文件内容，支持多种编码格式',
+            category: 'file',
+            schema: { type: 'object', properties: { file_path: { type: 'string' }, encoding: { type: 'string' }, max_lines: { type: 'number' } } },
+            enabled: true,
+            implementation_type: 'builtin',
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+            metadata: { tags: ['文件', '读取', 'I/O'] }
+          },
+          {
+            id: '7',
+            name: 'write_file',
+            description: '写入或追加内容到文件',
+            category: 'file',
+            schema: { type: 'object', properties: { file_path: { type: 'string' }, content: { type: 'string' }, mode: { type: 'string' } } },
+            enabled: true,
+            implementation_type: 'builtin',
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+            metadata: { tags: ['文件', '写入', 'I/O'] }
+          },
+          {
+            id: '8',
+            name: 'list_directory',
+            description: '列出目录内容，支持递归和详细信息',
+            category: 'file',
+            schema: { type: 'object', properties: { directory_path: { type: 'string' }, show_hidden: { type: 'boolean' }, recursive: { type: 'boolean' } } },
+            enabled: false,
+            implementation_type: 'builtin',
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+            metadata: { tags: ['目录', '浏览', '文件系统'] }
+          },
+          {
+            id: '9',
+            name: 'file_info',
+            description: '获取文件详细信息和元数据',
+            category: 'file',
+            schema: { type: 'object', properties: { file_path: { type: 'string' }, checksum: { type: 'boolean' } } },
+            enabled: true,
+            implementation_type: 'builtin',
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+            metadata: { tags: ['文件信息', '元数据', '校验'] }
           }
         ];
 
@@ -153,7 +208,8 @@ const MCPToolsManagement: React.FC = () => {
           { id: 'time', name: '时间工具', description: '时间戳和日期相关工具', icon: '⏰', enabled: true },
           { id: 'ai', name: 'AI工具', description: 'AI模式和智能助手相关工具', icon: '🤖', enabled: true },
           { id: 'dev', name: '开发工具', description: '开发和调试相关工具', icon: '⚙️', enabled: true },
-          { id: 'data', name: '数据工具', description: '数据处理和分析相关工具', icon: '📊', enabled: true }
+          { id: 'data', name: '数据工具', description: '数据处理和分析相关工具', icon: '📊', enabled: true },
+          { id: 'file', name: '文件工具', description: '文件和目录操作相关工具', icon: '📁', enabled: true }
         ];
 
         setTools(mockTools);
@@ -168,7 +224,8 @@ const MCPToolsManagement: React.FC = () => {
             system: 2,
             time: 1,
             ai: 1,
-            data: 1
+            data: 1,
+            file: 4
           },
           endpoints: {},
           organization: 'LazyGophers',
@@ -299,6 +356,7 @@ const MCPToolsManagement: React.FC = () => {
     return grouped;
   };
 
+
   // 过滤工具
   const toolsByCategory = getToolsByCategory();
   
@@ -335,34 +393,6 @@ const MCPToolsManagement: React.FC = () => {
             borderColor: cardBorder,
             backgroundColor: token?.colorBgContainer
           }}
-          actions={[
-            <Tooltip title={tool.enabled ? '禁用工具' : '启用工具'} key="toggle">
-              <Switch
-                size="small"
-                checked={tool.enabled}
-                onChange={(checked) => toggleTool(tool, checked)}
-                checkedChildren={<CheckCircleOutlined />}
-                unCheckedChildren={<ExclamationCircleOutlined />}
-              />
-            </Tooltip>,
-            <Tooltip title="查看详情" key="detail">
-              <Button
-                type="text"
-                size="small"
-                icon={<InfoCircleOutlined />}
-                onClick={() => setToolDetailModal({ visible: true, tool })}
-              />
-            </Tooltip>,
-            <Tooltip title={tool.enabled ? '测试工具' : '需要先启用工具'} key="test">
-              <Button
-                type="text"
-                size="small"
-                icon={<BugOutlined />}
-                disabled={!tool.enabled}
-                onClick={() => setTestToolModal({ visible: true, tool, form })}
-              />
-            </Tooltip>
-          ]}
         >
           <Card.Meta
             avatar={
@@ -382,7 +412,37 @@ const MCPToolsManagement: React.FC = () => {
             }
             title={
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <Text strong style={{ fontSize: 14, color: token?.colorText }}>{tool.name}</Text>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <Text strong style={{ fontSize: 14, color: token?.colorText }}>{tool.name}</Text>
+                  <Space size="small">
+                    <Tooltip title={tool.enabled ? '禁用工具' : '启用工具'}>
+                      <Switch
+                        size="small"
+                        checked={tool.enabled}
+                        onChange={(checked) => toggleTool(tool, checked)}
+                        checkedChildren={<CheckCircleOutlined />}
+                        unCheckedChildren={<ExclamationCircleOutlined />}
+                      />
+                    </Tooltip>
+                    <Tooltip title="查看详情">
+                      <Button
+                        type="text"
+                        size="small"
+                        icon={<InfoCircleOutlined />}
+                        onClick={() => setToolDetailModal({ visible: true, tool })}
+                      />
+                    </Tooltip>
+                    <Tooltip title={tool.enabled ? '测试工具' : '需要先启用工具'}>
+                      <Button
+                        type="text"
+                        size="small"
+                        icon={<BugOutlined />}
+                        disabled={!tool.enabled}
+                        onClick={() => setTestToolModal({ visible: true, tool, form })}
+                      />
+                    </Tooltip>
+                  </Space>
+                </div>
                 <Tag color={tool.implementation_type === 'builtin' ? 'blue' : 'green'}>
                   {tool.implementation_type}
                 </Tag>
@@ -530,9 +590,6 @@ const MCPToolsManagement: React.FC = () => {
                         {category.name}
                       </Title>
                       <Text type="secondary">({enabledCount}/{categoryTools.length})</Text>
-                      {!category.enabled && <Tag color="red">分类禁用</Tag>}
-                    </Space>
-                    <Space>
                       <Switch
                         size="small"
                         checked={category.enabled}
@@ -545,7 +602,25 @@ const MCPToolsManagement: React.FC = () => {
                           {enabledCount === categoryTools.length ? '全部启用' : enabledCount > 0 ? '部分启用' : '全部禁用'}
                         </Tag>
                       )}
+                      {!category.enabled && <Tag color="red">分类禁用</Tag>}
+                      {category.id === 'file' && (
+                        <Tooltip title="文件工具安全配置">
+                          <Button
+                            size="small"
+                            icon={<SecurityScanOutlined />}
+                            onClick={() => setFileToolsConfigModal(true)}
+                            style={{
+                              color: currentTheme.token?.colorPrimary,
+                              borderColor: currentTheme.token?.colorPrimary,
+                              backgroundColor: 'transparent'
+                            }}
+                          >
+                            安全配置
+                          </Button>
+                        </Tooltip>
+                      )}
                     </Space>
+                    <div></div>
                   </div>
                 ),
                 extra: (
@@ -725,6 +800,12 @@ const MCPToolsManagement: React.FC = () => {
           </div>
         )}
       </Modal>
+
+      {/* 文件工具配置Modal */}
+      <FileToolsConfigModal
+        visible={fileToolsConfigModal}
+        onCancel={() => setFileToolsConfigModal(false)}
+      />
     </div>
   );
 };
