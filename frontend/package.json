@@ -14,7 +14,7 @@
     "@types/react-dom": "^19.1.9",
     "@types/react-router-dom": "^5.3.3",
     "antd": "^5.27.3",
-    "axios": "^1.11.0",
+    "axios": "^1.12.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-router-dom": "^7.8.2",
