@@ -4,7 +4,7 @@
  */
 
 import React, {useState} from 'react';
-import {Alert, Space, Tooltip, Typography, Divider} from 'antd';
+import {Alert, Space, Tooltip, Typography} from 'antd';
 import {ModalForm, ProCard, ProFormDigit, ProFormSelect, ProFormSwitch, ProFormText} from '@ant-design/pro-components';
 import {ClockCircleOutlined, DatabaseOutlined, InfoCircleOutlined, SettingOutlined} from '@ant-design/icons';
 import {apiClient} from '../../api';
@@ -21,10 +21,6 @@ export interface CacheToolsConfig {
     compression_enabled: boolean;
     stats_enabled: boolean;
     // Backend-specific configs
-    redis_host?: string;
-    redis_port?: number;
-    redis_db?: number;
-    redis_password?: string;
     diskcache_directory?: string;
     diskcache_size_limit?: number;
     memcached_host?: string;
@@ -81,12 +77,7 @@ const CacheToolsConfigModal: React.FC<CacheToolsConfigModalProps> = ({
             // 提取后端配置
             const backendConfig: any = {};
 
-            if (values.backend_type === 'redis') {
-                if (values.redis_host) backendConfig.host = values.redis_host;
-                if (values.redis_port) backendConfig.port = values.redis_port;
-                if (values.redis_db !== undefined) backendConfig.db = values.redis_db;
-                if (values.redis_password) backendConfig.password = values.redis_password;
-            } else if (values.backend_type === 'diskcache') {
+            if (values.backend_type === 'diskcache') {
                 if (values.diskcache_directory) backendConfig.directory = values.diskcache_directory;
                 if (values.diskcache_size_limit) backendConfig.size_limit = values.diskcache_size_limit * 1024 * 1024; // Convert MB to bytes
             } else if (values.backend_type === 'memcached') {
@@ -132,7 +123,6 @@ const CacheToolsConfigModal: React.FC<CacheToolsConfigModalProps> = ({
     // 存储后端选项
     const backendOptions = [
         {label: 'TinyDB（默认）', value: 'tinydb', description: '基于文件的轻量级数据库'},
-        {label: 'Redis', value: 'redis', description: '高性能内存数据库'},
         {label: 'DiskCache', value: 'diskcache', description: '磁盘缓存，支持大容量存储'},
         {label: 'Memcached', value: 'memcached', description: '分布式内存缓存系统'},
         {label: 'LMDB', value: 'lmdb', description: '高性能嵌入式数据库'}
@@ -170,7 +160,7 @@ const CacheToolsConfigModal: React.FC<CacheToolsConfigModalProps> = ({
         >
             <Alert
                 message="缓存工具配置"
-                description="配置Redis风格缓存工具的运行参数，包括默认TTL时间、内存限制和持久化选项。"
+                description="配置缓存工具的运行参数，包括默认TTL时间、内存限制和持久化选项。"
                 type="info"
                 showIcon={false}
                 style={{marginBottom: 24}}
@@ -209,49 +199,9 @@ const CacheToolsConfigModal: React.FC<CacheToolsConfigModalProps> = ({
                 rules={[
                     {required: true, message: '请选择存储后端'}
                 ]}
-                extra="TinyDB为默认选项，无需额外服务；Redis、Memcached需要独立运行的服务"
+                extra="TinyDB为默认选项，无需额外服务；Memcached需要独立运行的服务"
                 initialValue={'tinydb'}
             />
-
-            {/* Redis配置 */}
-            {currentBackend === 'redis' && (
-                <>
-                    <ProFormText
-                        name="redis_host"
-                        label="Redis主机地址"
-                        placeholder="localhost"
-                        initialValue="localhost"
-                        extra="Redis服务器的主机地址"
-                    />
-                    <ProFormDigit
-                        name="redis_port"
-                        label="Redis端口"
-                        placeholder="6379"
-                        initialValue={6379}
-                        min={1}
-                        max={65535}
-                        extra="Redis服务器的端口号"
-                    />
-                    <ProFormDigit
-                        name="redis_db"
-                        label="数据库索引"
-                        placeholder="0"
-                        initialValue={0}
-                        min={0}
-                        max={15}
-                        extra="Redis数据库索引（0-15）"
-                    />
-                    <ProFormText
-                        name="redis_password"
-                        label="密码"
-                        placeholder="可选"
-                        fieldProps={{
-                            type: 'password'
-                        }}
-                        extra="Redis连接密码（可选）"
-                    />
-                </>
-            )}
 
             {/* DiskCache配置 */}
             {currentBackend === 'diskcache' && (
@@ -428,15 +378,15 @@ const CacheToolsConfigModal: React.FC<CacheToolsConfigModalProps> = ({
                 />
             )}
 
-            {/* Redis/Memcached 特有选项提示 */}
-            {(currentBackend === 'redis' || currentBackend === 'memcached') && (
+            {/* Memcached 特有选项提示 */}
+            {currentBackend === 'memcached' && (
                 <Alert
-                    message={`${currentBackend === 'redis' ? 'Redis' : 'Memcached'} 存储特性`}
+                    message="Memcached 存储特性"
                     description={
                         <div>
                             <p><strong>内存存储</strong>：数据存储在内存中，重启后数据会丢失</p>
                             <p><strong>高性能</strong>：提供极高的读写性能</p>
-                            <p><strong>分布式</strong>：{currentBackend === 'redis' ? '支持集群和主从复制' : '原生支持分布式部署'}</p>
+                            <p><strong>分布式</strong>：原生支持分布式部署</p>
                         </div>
                     }
                     type="info"

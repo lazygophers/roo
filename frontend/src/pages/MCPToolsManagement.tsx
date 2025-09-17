@@ -28,8 +28,7 @@ import {
     ExclamationCircleOutlined,
     FilterOutlined,
     InfoCircleOutlined,
-    ReloadOutlined,
-    SettingOutlined
+    ReloadOutlined
 } from '@ant-design/icons';
 import {apiClient, MCPCategoryInfo, MCPStatusResponse, MCPToolInfo} from '../api';
 import {useTheme} from '../contexts/ThemeContext';
@@ -216,7 +215,7 @@ const MCPToolsManagement: React.FC = () => {
                     {
                         id: 'cache',
                         name: '缓存工具',
-                        description: 'Redis风格的缓存操作相关工具',
+                        description: '缓存操作相关工具',
                         icon: '🗄️',
                         enabled: true
                     }
@@ -404,19 +403,6 @@ const MCPToolsManagement: React.FC = () => {
                     title={
                         <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
                             <div style={{display: 'flex', alignItems: 'center', gap: 8}}>
-                                <div style={{
-                                    width: 32,
-                                    height: 32,
-                                    borderRadius: '50%',
-                                    backgroundColor: enabledBg,
-                                    border: `2px solid ${enabledBorder}`,
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    fontSize: '14px'
-                                }}>
-                                    {categoryInfo?.icon || '🔧'}
-                                </div>
                                 <Text strong style={{fontSize: 14, color: token?.colorText}}>{tool.name}</Text>
                             </div>
                             <Tag color={tool.implementation_type === 'builtin' ? 'blue' : 'green'}>
@@ -547,21 +533,19 @@ const MCPToolsManagement: React.FC = () => {
                                         width: '100%'
                                     }}>
                                         <Space>
-                                            <span style={{
-                                                fontSize: '18px',
-                                                opacity: category.enabled ? 1 : 0.5
-                                            }}>{category.icon}</span>
                                             <Title level={4} style={{margin: 0, opacity: category.enabled ? 1 : 0.5}}>
                                                 {category.name}
                                             </Title>
                                             <Text type="secondary">({enabledCount}/{categoryTools.length})</Text>
-                                            <Switch
-                                                size="small"
-                                                checked={category.enabled}
-                                                onChange={(checked) => toggleCategory(category, checked)}
-                                                checkedChildren="启用"
-                                                unCheckedChildren="禁用"
-                                            />
+                                            <div onClick={(e) => e.stopPropagation()}>
+                                                <Switch
+                                                    size="small"
+                                                    checked={category.enabled}
+                                                    onChange={(checked) => toggleCategory(category, checked)}
+                                                    checkedChildren="启用"
+                                                    unCheckedChildren="禁用"
+                                                />
+                                            </div>
                                             {category.enabled && (
                                                 <Tag
                                                     color={enabledCount === categoryTools.length ? 'success' : enabledCount > 0 ? 'warning' : 'default'}>
@@ -575,7 +559,10 @@ const MCPToolsManagement: React.FC = () => {
                                                     <Button
                                                         type="text"
                                                         size="small"
-                                                        onClick={() => setFileToolsConfigModal(true)}
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            setFileToolsConfigModal(true);
+                                                        }}
                                                         style={{
                                                             color: currentTheme.token?.colorPrimary,
                                                             borderColor: currentTheme.token?.colorPrimary,
@@ -602,7 +589,10 @@ const MCPToolsManagement: React.FC = () => {
                                                     <Button
                                                         type="text"
                                                         size="small"
-                                                        onClick={() => setTimeToolsConfigModal(true)}
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            setTimeToolsConfigModal(true);
+                                                        }}
                                                         style={{
                                                             color: currentTheme.token?.colorPrimary,
                                                             borderColor: currentTheme.token?.colorPrimary,
@@ -629,7 +619,10 @@ const MCPToolsManagement: React.FC = () => {
                                                     <Button
                                                         type="text"
                                                         size="small"
-                                                        onClick={() => setCacheToolsConfigModal(true)}
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            setCacheToolsConfigModal(true);
+                                                        }}
                                                         style={{
                                                             color: currentTheme.token?.colorPrimary,
                                                             borderColor: currentTheme.token?.colorPrimary,
@@ -652,7 +645,6 @@ const MCPToolsManagement: React.FC = () => {
                                                 </Tooltip>
                                             )}
                                         </Space>
-                                        <div></div>
                                     </div>
                                 ),
                                 extra: (
