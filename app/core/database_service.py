@@ -13,32 +13,40 @@ import threading
 from app.core.config import PROJECT_ROOT
 from app.core.logging import setup_logging
 from app.core.secure_logging import secure_log_key_value, sanitize_for_log
+from app.core.unified_database import get_unified_database, TableNames
 
 logger = setup_logging("INFO")
 
 class DatabaseService:
     """数据库服务：自动扫描文件并生成数据库表"""
     
-    def __init__(self, db_path: str = None):
+    def __init__(self, use_unified_db: bool = True):
         """初始化数据库服务
         
         Args:
-            db_path: 数据库文件路径，默认为项目根目录下的 data/cache.db
+            use_unified_db: 是否使用统一数据库，默认为True
         """
-        if db_path is None:
+        self.use_unified_db = use_unified_db
+        
+        if use_unified_db:
+            self.unified_db = get_unified_database()
+            self.db = self.unified_db.db
+        else:
+            # 兼容模式：使用独立数据库文件
             db_dir = PROJECT_ROOT / "data"
             db_dir.mkdir(exist_ok=True)
             db_path = str(db_dir / "cache.db")
+            self.db = TinyDB(db_path)
+            self.unified_db = None
         
-        self.db = TinyDB(db_path)
         self.file_monitor = None
         self.observer = None
         self._scan_configs = {}
         self._running = False
         
-        # 初始化表
-        self.files_table = self.db.table('files')
-        self.metadata_table = self.db.table('metadata')
+        # 初始化表（使用统一表名）
+        self.files_table = self.db.table(TableNames.CACHE_FILES)
+        self.metadata_table = self.db.table(TableNames.CACHE_METADATA)
         
     def add_scan_config(self, name: str, path: str, patterns: List[str] = None, 
                        parser_func: callable = None, watch: bool = True):
@@ -54,17 +62,24 @@ class DatabaseService:
         if patterns is None:
             patterns = ['*.yaml', '*.yml']
             
+        # 为每个配置创建独立的表（使用统一命名规范）
+        table_name = f'{name}_cache'
+        if name == 'models':
+            table_name = TableNames.MODELS_CACHE
+        elif name == 'hooks':
+            table_name = TableNames.HOOKS_CACHE
+        elif name == 'rules':
+            table_name = TableNames.RULES_CACHE
+        
         self._scan_configs[name] = {
             'path': Path(path),
             'patterns': patterns,
             'parser_func': parser_func or self._default_yaml_parser,
             'watch': watch,
-            'table_name': f'{name}_cache'
+            'table_name': table_name
         }
-        
-        # 为每个配置创建独立的表
-        table = self.db.table(f'{name}_cache')
-        logger.info(f"Added scan config: {name} -> {path}")
+        table = self.db.table(table_name)
+        logger.info(f"Added scan config: {name} -> {path} (table: {table_name})")
         
     def _default_yaml_parser(self, file_path: Path) -> Dict[str, Any]:
         """默认YAML文件解析器"""
@@ -418,17 +433,19 @@ class DatabaseService:
     def close(self):
         """关闭数据库连接"""
         self.stop_watching()
-        self.db.close()
+        if not self.use_unified_db:
+            # 只有非统一数据库模式才需要手动关闭
+            self.db.close()
 
 
 # 全局数据库服务实例
 _db_service = None
 
-def get_database_service() -> DatabaseService:
+def get_database_service(use_unified_db: bool = True) -> DatabaseService:
     """获取全局数据库服务实例"""
     global _db_service
     if _db_service is None:
-        _db_service = DatabaseService()
+        _db_service = DatabaseService(use_unified_db=use_unified_db)
         
         # 添加默认的模型文件扫描配置
         models_dir = PROJECT_ROOT / "resources" / "models"
@@ -479,11 +496,11 @@ def get_database_service() -> DatabaseService:
     
     return _db_service
 
-def init_database_service():
+def init_database_service(use_unified_db: bool = True):
     """初始化数据库服务并执行首次同步"""
     logger.info("Initializing database service...")
     
-    db_service = get_database_service()
+    db_service = get_database_service(use_unified_db=use_unified_db)
     
     # 执行首次全量同步
     sync_results = db_service.sync_all()
@@ -492,4 +509,5 @@ def init_database_service():
     # 启动文件监听
     db_service.start_watching()
     
+    logger.info(f"Database service initialized (unified_db: {use_unified_db})")
     return db_service

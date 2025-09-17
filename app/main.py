@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
@@ -6,7 +6,13 @@ from contextlib import asynccontextmanager
 from pathlib import Path
 from app.core.config import API_PREFIX, DEBUG, LOG_LEVEL, PROJECT_ROOT
 from app.core.logging import setup_logging, log_error
+from app.core.unified_database import init_unified_database
 from app.core.database_service import init_database_service, get_database_service
+from app.core.mcp_tools_service import init_mcp_tools_service
+from app.core.mcp_server import init_mcp_server
+from app.core.recycle_bin_scheduler import startup_recycle_bin_scheduler, shutdown_recycle_bin_scheduler
+from app.core.time_tools_service import init_time_tools_service
+from app.core.cache_tools_service_v2 import init_cache_tools_service
 from app.routers import api_router
 
 # 设置日志
@@ -15,11 +21,40 @@ logger = setup_logging(LOG_LEVEL)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """FastAPI 生命周期管理"""
-    # 启动时初始化数据库服务
+    # 启动时初始化服务
     logger.info("Initializing application...")
     try:
+        # 初始化统一数据库系统
+        unified_db, migration_log = init_unified_database()
+        logger.info("Unified database system initialized successfully")
+        if migration_log:
+            logger.info("Migration completed with logs:")
+            for log_entry in migration_log:
+                logger.info(f"  - {log_entry}")
+        
+        # 初始化数据库服务（使用统一数据库）
         db_service = init_database_service()
         logger.info("Database service initialized successfully")
+        
+        # 初始化MCP工具服务（使用统一数据库）
+        mcp_tools_service = init_mcp_tools_service(use_unified_db=True)
+        logger.info("MCP tools service initialized successfully")
+        
+        # 初始化MCP服务器（使用统一数据库）
+        mcp_server = init_mcp_server(use_unified_db=True)
+        logger.info("MCP server initialized successfully")
+        
+        # 启动回收站调度器
+        await startup_recycle_bin_scheduler()
+        logger.info("Recycle bin scheduler started successfully")
+        
+        # 初始化时间工具配置服务
+        time_service = init_time_tools_service(use_unified_db=True)
+        logger.info("Time tools service initialized successfully")
+
+        # 初始化缓存工具服务
+        cache_service = init_cache_tools_service(use_unified_db=True)
+        logger.info("Cache tools service initialized successfully")
         
         # 打印启动信息和访问地址
         import socket
@@ -45,7 +80,9 @@ async def lifespan(app: FastAPI):
 🔗 功能入口:
    📊 配置管理:    http://localhost:8000/
    📖 API 文档:    http://localhost:8000/docs
-   💚 健康检查:    http://localhost:8000/api/health"""
+   💚 健康检查:    http://localhost:8000/api/health
+   🔧 MCP 工具:    http://localhost:8000/api/mcp/tools
+   📊 MCP 状态:    http://localhost:8000/api/mcp/status"""
 
         # 检查前端构建状态
         frontend_build = PROJECT_ROOT / "frontend" / "build"
@@ -86,9 +123,15 @@ async def lifespan(app: FastAPI):
     print(shutdown_message, flush=True)
     
     try:
+        # 停止回收站调度器
+        await shutdown_recycle_bin_scheduler()
+        logger.info("Recycle bin scheduler stopped successfully")
+        
+        # 关闭数据库服务
         db_service = get_database_service()
         db_service.close()
         logger.info("Database service closed successfully")
+        
         print("✅ 服务已安全关闭\n", flush=True)
     except Exception as e:
         logger.error(f"Error during shutdown: {e}")
@@ -115,6 +158,31 @@ async def global_exception_handler(request: Request, exc: Exception):
             "error_detail": str(exc) if DEBUG else "An error occurred"
         }
     )
+
+# 安全中间件 - 添加 CSP 头防止浏览器扩展干扰
+@app.middleware("http")
+async def add_security_headers(request: Request, call_next):
+    response = await call_next(request)
+    
+    # Content Security Policy - 防止扩展脚本干扰
+    csp_policy = (
+        "default-src 'self'; "
+        "script-src 'self' 'unsafe-inline' 'unsafe-eval'; "
+        "style-src 'self' 'unsafe-inline'; "
+        "img-src 'self' data: blob:; "
+        "font-src 'self' data:; "
+        "connect-src 'self' http://localhost:* ws://localhost:*; "
+        "frame-src 'none'; "
+        "object-src 'none'; "
+        "base-uri 'self';"
+    )
+    
+    response.headers["Content-Security-Policy"] = csp_policy
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    
+    return response
 
 # CORS 中间件配置
 app.add_middleware(

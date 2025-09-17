@@ -3,21 +3,28 @@
   "version": "1.0.0",
   "private": true,
   "dependencies": {
-    "@ant-design/icons": "^6.0.1",
+    "@ant-design/icons": "^6.0.2",
+    "@ant-design/pro-card": "^2.10.0",
+    "@ant-design/pro-components": "^2.8.10",
+    "@ant-design/pro-descriptions": "^2.6.10",
+    "@ant-design/pro-form": "^2.32.0",
+    "@ant-design/pro-layout": "^7.22.7",
+    "@ant-design/pro-list": "^2.6.10",
+    "@ant-design/pro-table": "^3.21.0",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.8.0",
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^13.5.0",
     "@types/jest": "^27.5.2",
     "@types/node": "^16.18.126",
-    "@types/react": "^19.1.12",
-    "@types/react-dom": "^19.1.9",
+    "@types/react": "^18.3.24",
+    "@types/react-dom": "^18.3.7",
     "@types/react-router-dom": "^5.3.3",
-    "antd": "^5.27.3",
-    "axios": "^1.11.0",
-    "react": "^19.1.1",
-    "react-dom": "^19.1.1",
-    "react-router-dom": "^7.8.2",
+    "antd": "^5.27.4",
+    "axios": "^1.12.2",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^7.9.1",
     "react-scripts": "5.0.1",
     "typescript": "^4.9.5",
     "web-vitals": "^2.1.4"
@@ -52,8 +59,11 @@
   },
   "proxy": "http://localhost:8000",
   "overrides": {
-    "webpack-dev-server": ">=5.2.1",
-    "postcss": ">=8.4.31", 
+    "webpack-dev-server": "4.15.2",
+    "postcss": ">=8.4.31",
     "nth-check": ">=2.0.1"
+  },
+  "resolutions": {
+    "webpack-dev-server": "4.15.2"
   }
 }

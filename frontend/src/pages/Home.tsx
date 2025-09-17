@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Row, Col, message, Badge } from 'antd';
+import { message, Badge } from 'antd';
+import { StatisticCard } from '@ant-design/pro-components';
 import { 
   RocketOutlined,
   ThunderboltOutlined,
@@ -8,7 +9,7 @@ import {
   CodeOutlined
 } from '@ant-design/icons';
 import { apiClient } from '../api';
-import { PageTitle, StatTitle } from '../components/UI/TitleComponents';
+import { PageTitle } from '../components/UI/TitleComponents';
 import { useTheme } from '../contexts/ThemeContext';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
 import './Home.css';
@@ -142,6 +143,7 @@ const Home: React.FC = () => {
     commands: 0,
     rules: 0
   });
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [loading, setLoading] = useState(true);
   const [headerVisible, setHeaderVisible] = useState(false);
 
@@ -212,48 +214,44 @@ const Home: React.FC = () => {
 
         {/* 统计卡片区域 */}
         <div className="stats-section">
-          <Row gutter={[24, 24]}>
-            <Col xs={24} sm={12} md={6}>
-              <StatTitle
-                title="AI 模型总数"
-                value={stats.totalModels}
-                icon={<ApiOutlined />}
-                color="#1890ff"
-                animated={!loading}
-                trend="up"
-              />
-            </Col>
-            <Col xs={24} sm={12} md={6}>
-              <StatTitle
-                title="编程助手"
-                value={stats.coderModels}
-                icon={<CodeOutlined />}
-                color="#52c41a"
-                animated={!loading}
-                trend="stable"
-              />
-            </Col>
-            <Col xs={24} sm={12} md={6}>
-              <StatTitle
-                title="核心模型"
-                value={stats.coreModels}
-                icon={<DatabaseOutlined />}
-                color="#722ed1"
-                animated={!loading}
-                trend="up"
-              />
-            </Col>
-            <Col xs={24} sm={12} md={6}>
-              <StatTitle
-                title="智能指令"
-                value={stats.commands}
-                icon={<ThunderboltOutlined />}
-                color="#fa8c16"
-                animated={!loading}
-                trend="stable"
-              />
-            </Col>
-          </Row>
+          <StatisticCard.Group>
+            <StatisticCard
+              statistic={{
+                title: 'AI 模型总数',
+                value: stats.totalModels,
+                icon: <ApiOutlined style={{ color: '#1890ff' }} />,
+                status: 'success'
+              }}
+              style={{ width: '25%' }}
+            />
+            <StatisticCard
+              statistic={{
+                title: '编程助手',
+                value: stats.coderModels,
+                icon: <CodeOutlined style={{ color: '#52c41a' }} />,
+                status: 'success'
+              }}
+              style={{ width: '25%' }}
+            />
+            <StatisticCard
+              statistic={{
+                title: '核心模型',
+                value: stats.coreModels,
+                icon: <DatabaseOutlined style={{ color: '#722ed1' }} />,
+                status: 'success'
+              }}
+              style={{ width: '25%' }}
+            />
+            <StatisticCard
+              statistic={{
+                title: '智能指令',
+                value: stats.commands,
+                icon: <ThunderboltOutlined style={{ color: '#fa8c16' }} />,
+                status: 'success'
+              }}
+              style={{ width: '25%' }}
+            />
+          </StatisticCard.Group>
         </div>
 
       </div>

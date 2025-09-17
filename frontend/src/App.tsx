@@ -1,11 +1,13 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { ConfigProvider } from 'antd';
+import { ConfigProvider, App as AntdApp } from 'antd';
 import zhCN from 'antd/locale/zh_CN';
 import { ThemeProvider, useTheme } from './contexts/ThemeContext';
 import AppLayout from './components/Layout/AppLayout';
+import ErrorBoundary from './components/ErrorBoundary';
 import Home from './pages/Home';
 import ConfigManagementWithSelection from './pages/ConfigManagementWithSelection';
+import MCPToolsManagement from './pages/MCPToolsManagement';
 import './App.css';
 import './styles/theme.css';
 
@@ -17,23 +19,28 @@ const AppContent: React.FC = () => {
       locale={zhCN}
       theme={currentTheme}
     >
-      <Router>
-        <AppLayout>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/config" element={<ConfigManagementWithSelection />} />
-          </Routes>
-        </AppLayout>
-      </Router>
+      <AntdApp>
+        <Router>
+          <AppLayout>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/config" element={<ConfigManagementWithSelection />} />
+              <Route path="/mcp-tools" element={<MCPToolsManagement />} />
+            </Routes>
+          </AppLayout>
+        </Router>
+      </AntdApp>
     </ConfigProvider>
   );
 };
 
 function App() {
   return (
-    <ThemeProvider>
-      <AppContent />
-    </ThemeProvider>
+    <ErrorBoundary>
+      <ThemeProvider>
+        <AppContent />
+      </ThemeProvider>
+    </ErrorBoundary>
   );
 }
 
