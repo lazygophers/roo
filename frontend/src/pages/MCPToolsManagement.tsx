@@ -18,7 +18,9 @@ import {
   Typography,
   Empty,
   Collapse,
-  App
+  App,
+  Card,
+  Descriptions
 } from 'antd';
 import {
   ProCard,
@@ -54,7 +56,7 @@ const MCPToolsManagement: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [tools, setTools] = useState<MCPToolInfo[]>([]);
   const [categories, setCategories] = useState<MCPCategoryInfo[]>([]);
-  // const [status, setStatus] = useState<MCPStatusResponse['data'] | null>(null);
+  const [status, setStatus] = useState<MCPStatusResponse['data'] | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [toolDetailModal, setToolDetailModal] = useState<{
     visible: boolean;

@@ -323,34 +323,26 @@ async def get_security_summary():
         logger.error(f"Failed to get security summary: {sanitize_for_log(str(e))}")
         raise HTTPException(status_code=500, detail=f"获取安全配置总览失败: {str(e)}")
 
+class FileValidationRequest(BaseModel):
+    """文件操作验证请求模型"""
+    operation: str = Field(..., regex=r"^(read|write|delete|list)$", description="操作类型")
+    file_path: str = Field(..., min_length=1, max_length=1000, description="文件路径")
+    check_size: bool = Field(default=True, description="是否检查文件大小")
+
 @router.post("/validate", response_model=Dict[str, Any])
-async def validate_file_operation(
-    operation: str,
-    file_path: str,
-    check_size: bool = True
-):
+async def validate_file_operation(request: FileValidationRequest):
     """验证文件操作权限"""
     try:
-        # 验证操作类型
-        valid_operations = ["read", "write", "delete", "list"]
-        if operation not in valid_operations:
-            raise HTTPException(
-                status_code=400,
-                detail=f"无效的操作类型: {operation}，允许的操作: {valid_operations}"
-            )
-        
         file_security_manager = get_file_security_manager()
-        allowed, message = file_security_manager.validate_operation(operation, file_path)
-        
+        allowed, message = file_security_manager.validate_operation(request.operation, request.file_path)
+
         return {
             "allowed": allowed,
-            "operation": operation,
-            "file_path": file_path,
+            "operation": request.operation,
+            "file_path": sanitize_for_log(request.file_path),  # 在响应中也进行日志安全处理
             "message": message or "操作被允许",
             "timestamp": datetime.now().isoformat()
         }
-    except HTTPException:
-        raise
     except Exception as e:
         logger.error(f"Failed to validate file operation: {sanitize_for_log(str(e))}")
         raise HTTPException(status_code=500, detail=f"文件操作验证失败: {str(e)}")

@@ -46,13 +46,26 @@ class FileSecurityManager:
         self.strict_mode = strict_mode_config["value"] if strict_mode_config else False
     
     def _normalize_path(self, file_path: str) -> Path:
-        """标准化路径"""
+        """标准化路径，防止路径遍历攻击"""
         try:
+            # 移除危险的路径字符和序列
+            dangerous_patterns = ['../', '..\\', '../', '..\\\\']
+            for pattern in dangerous_patterns:
+                if pattern in file_path:
+                    logger.warning(f"Potentially dangerous path pattern detected: {sanitize_for_log(file_path)}")
+
+            # 标准化路径
             path = Path(file_path).resolve()
+
+            # 确保路径不是空的
+            if not str(path) or str(path) == ".":
+                raise ValueError("Empty or invalid path")
+
             return path
-        except Exception:
-            # 如果路径无法解析，返回原始路径
-            return Path(file_path)
+        except Exception as e:
+            logger.error(f"Path normalization failed for {sanitize_for_log(file_path)}: {sanitize_for_log(str(e))}")
+            # 如果路径无法解析，抛出异常而不是返回原始路径
+            raise ValueError(f"Invalid file path: {sanitize_for_log(file_path)}")
     
     def _is_path_allowed(self, path: Path, allowed_dirs: List[Path]) -> Tuple[bool, Optional[str]]:
         """检查路径是否在允许的目录列表中"""

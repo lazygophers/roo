@@ -1,5 +1,7 @@
 import React from 'react';
 import { Layout, Button, Space, Menu, theme } from 'antd';
+
+const { Sider, Header, Content } = Layout;
 import { HomeOutlined, SettingOutlined, GithubOutlined, ApiOutlined } from '@ant-design/icons';
 import { useNavigate, useLocation } from 'react-router-dom';
 import ThemeToggle from '../Theme/ThemeToggle';
