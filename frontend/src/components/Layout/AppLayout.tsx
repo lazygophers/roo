@@ -1,7 +1,5 @@
 import React from 'react';
 import { Layout, Button, Space, Menu, theme } from 'antd';
-
-const { Sider, Header, Content } = Layout;
 import { HomeOutlined, SettingOutlined, GithubOutlined, ApiOutlined } from '@ant-design/icons';
 import { useNavigate, useLocation } from 'react-router-dom';
 import ThemeToggle from '../Theme/ThemeToggle';
@@ -9,12 +7,11 @@ import SystemMonitorMenuItem from '../SystemMonitor/SystemMonitorMenuItem';
 import LicenseInfo from '../License/LicenseInfo';
 import './AppLayout.css';
 
+const { Sider, Header, Content } = Layout;
 
 interface AppLayoutProps {
   children: React.ReactNode;
 }
-
-const { Header, Content, Sider } = Layout;
 
 const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   const {

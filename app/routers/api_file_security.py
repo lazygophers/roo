@@ -325,7 +325,7 @@ async def get_security_summary():
 
 class FileValidationRequest(BaseModel):
     """文件操作验证请求模型"""
-    operation: str = Field(..., regex=r"^(read|write|delete|list)$", description="操作类型")
+    operation: str = Field(..., pattern=r"^(read|write|delete|list)$", description="操作类型")
     file_path: str = Field(..., min_length=1, max_length=1000, description="文件路径")
     check_size: bool = Field(default=True, description="是否检查文件大小")
 

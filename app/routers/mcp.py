@@ -5,7 +5,7 @@ MCP (Model Context Protocol) API 路由
 
 from fastapi import APIRouter, Request, Response, HTTPException
 from fastapi.responses import StreamingResponse
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, field_validator
 import json
 from datetime import datetime
 from typing import Any, Dict, Optional
@@ -25,7 +25,8 @@ class MCPToolCallRequest(BaseModel):
     name: str = Field(..., min_length=1, max_length=100, description="工具名称")
     arguments: Dict[str, Any] = Field(default_factory=dict, description="工具参数")
 
-    @validator('name')
+    @field_validator('name')
+    @classmethod
     def validate_tool_name(cls, v):
         # 只允许字母数字、下划线和连字符
         import re
@@ -33,7 +34,8 @@ class MCPToolCallRequest(BaseModel):
             raise ValueError('工具名称只能包含字母、数字、下划线和连字符')
         return v
 
-    @validator('arguments')
+    @field_validator('arguments')
+    @classmethod
     def validate_arguments(cls, v):
         # 限制参数字典的大小以防止DoS攻击
         if len(str(v)) > 10000:  # 限制序列化后的大小
