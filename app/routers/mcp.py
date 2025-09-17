@@ -857,3 +857,105 @@ async def delete_mcp_category(category_id: str):
             "success": False,
             "message": "Failed to delete category: Internal server error"
         }
+
+@router.get("/categories/{category_id}/config")
+async def get_category_config(category_id: str):
+    """获取MCP工具分类的配置"""
+    try:
+        tools_service = get_mcp_tools_service()
+        config = tools_service.get_category_config(category_id)
+        
+        if config is None:
+            return {
+                "success": False,
+                "message": f"Category '{sanitize_for_log(category_id)}' not found"
+            }
+        
+        return {
+            "success": True,
+            "message": "Category configuration retrieved successfully",
+            "data": {
+                "category_id": category_id,
+                "config": config
+            }
+        }
+    except Exception as e:
+        logger.error(f"Failed to get category config: {sanitize_for_log(str(e))}")
+        return {
+            "success": False,
+            "message": "Failed to get category configuration: Internal server error"
+        }
+
+@router.put("/categories/{category_id}/config")
+async def update_category_config(category_id: str, request: Dict[str, Any]):
+    """更新MCP工具分类的配置"""
+    try:
+        config_data = request.get("config", {})
+        if not config_data:
+            return {
+                "success": False,
+                "message": "Configuration data is required"
+            }
+        
+        tools_service = get_mcp_tools_service()
+        result = tools_service.update_category_configs(category_id, config_data)
+        
+        if result:
+            return {
+                "success": True,
+                "message": f"Category '{sanitize_for_log(category_id)}' configuration updated successfully",
+                "data": {
+                    "category_id": category_id,
+                    "updated_config": config_data,
+                    "timestamp": datetime.now().isoformat()
+                }
+            }
+        else:
+            return {
+                "success": False,
+                "message": f"Category '{sanitize_for_log(category_id)}' not found or update failed"
+            }
+    except Exception as e:
+        logger.error(f"Failed to update category config: {sanitize_for_log(str(e))}")
+        return {
+            "success": False,
+            "message": "Failed to update category configuration: Internal server error"
+        }
+
+@router.put("/categories/{category_id}/config/{config_key}")
+async def update_category_config_item(category_id: str, config_key: str, request: Dict[str, Any]):
+    """更新MCP工具分类配置的单个项目"""
+    try:
+        config_value = request.get("value")
+        if config_value is None:
+            return {
+                "success": False,
+                "message": "Configuration value is required"
+            }
+
+        tools_service = get_mcp_tools_service()
+        result = tools_service.update_category_config(category_id, config_key, config_value)
+
+        if result:
+            return {
+                "success": True,
+                "message": f"Category '{sanitize_for_log(category_id)}' configuration '{sanitize_for_log(config_key)}' updated successfully",
+                "data": {
+                    "category_id": category_id,
+                    "config_key": config_key,
+                    "config_value": config_value,
+                    "timestamp": datetime.now().isoformat()
+                }
+            }
+        else:
+            return {
+                "success": False,
+                "message": f"Category '{sanitize_for_log(category_id)}' not found or update failed"
+            }
+    except Exception as e:
+        logger.error(f"Failed to update category config item: {sanitize_for_log(str(e))}")
+        return {
+            "success": False,
+            "message": "Failed to update category configuration item: Internal server error"
+        }
+

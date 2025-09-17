@@ -97,7 +97,18 @@ class MCPToolsService:
                 'description': '时间戳和日期相关工具',
                 'icon': '⏰',
                 'enabled': True,
-                'sort_order': 2
+                'sort_order': 2,
+                'config': {
+                    'default_timezone': 'local',
+                    'display_format': 'formatted',
+                    'show_timezone_info': True,
+                    'auto_detect_timezone': True,
+                    'precision_level': 'second',
+                    'date_format_locale': 'zh_CN',
+                    'enable_relative_time': False,
+                    'cache_timezone_info': True,
+                    'enable_business_days': False
+                }
             },
             {
                 'id': 'ai',
@@ -141,10 +152,18 @@ class MCPToolsService:
             existing = self.categories_table.get(Query_obj.id == category['id'])
             
             if existing:
-                # 覆盖现有分类（保留enabled状态和created_at）
+                # 覆盖现有分类（保留enabled状态、created_at和现有配置）
                 category['enabled'] = existing.get('enabled', category['enabled'])
                 category['created_at'] = existing['created_at']
                 category['updated_at'] = datetime.now().isoformat()
+                
+                # 合并配置：保留现有配置并添加新的配置选项
+                if 'config' in category and 'config' in existing:
+                    existing_config = existing['config']
+                    new_config = category['config']
+                    # 合并配置，新配置优先级更高（用于添加新配置项）
+                    merged_config = {**new_config, **existing_config}
+                    category['config'] = merged_config
                 
                 self.categories_table.update(category, Query_obj.id == category['id'])
                 updated_count += 1
@@ -173,6 +192,67 @@ class MCPToolsService:
         """获取特定分类"""
         Query_obj = Query()
         return self.categories_table.get(Query_obj.id == category_id)
+    
+    def get_category_config(self, category_id: str) -> Optional[Dict[str, Any]]:
+        """获取分类的配置"""
+        category = self.get_category(category_id)
+        if category:
+            return category.get('config', {})
+        return None
+    
+    def update_category_config(self, category_id: str, config_key: str, config_value: Any) -> bool:
+        """更新分类的特定配置项"""
+        try:
+            Query_obj = Query()
+            category = self.categories_table.get(Query_obj.id == category_id)
+            
+            if not category:
+                logger.warning(f"Category '{category_id}' not found for config update")
+                return False
+            
+            # 确保config字段存在
+            if 'config' not in category:
+                category['config'] = {}
+            
+            # 更新配置项
+            category['config'][config_key] = config_value
+            category['updated_at'] = datetime.now().isoformat()
+            
+            # 保存到数据库
+            self.categories_table.update(category, Query_obj.id == category_id)
+            logger.info(f"Updated category '{category_id}' config: {config_key} = {sanitize_for_log(str(config_value))}")
+            return True
+            
+        except Exception as e:
+            logger.error(f"Failed to update category config: {sanitize_for_log(str(e))}")
+            return False
+    
+    def update_category_configs(self, category_id: str, configs: Dict[str, Any]) -> bool:
+        """批量更新分类配置"""
+        try:
+            Query_obj = Query()
+            category = self.categories_table.get(Query_obj.id == category_id)
+            
+            if not category:
+                logger.warning(f"Category '{category_id}' not found for config update")
+                return False
+            
+            # 确保config字段存在
+            if 'config' not in category:
+                category['config'] = {}
+            
+            # 批量更新配置项
+            category['config'].update(configs)
+            category['updated_at'] = datetime.now().isoformat()
+            
+            # 保存到数据库
+            self.categories_table.update(category, Query_obj.id == category_id)
+            logger.info(f"Updated category '{category_id}' configs: {len(configs)} items")
+            return True
+            
+        except Exception as e:
+            logger.error(f"Failed to update category configs: {sanitize_for_log(str(e))}")
+            return False
     
     def register_builtin_tools(self):
         """注册内置MCP工具到数据库（启动时覆盖）"""

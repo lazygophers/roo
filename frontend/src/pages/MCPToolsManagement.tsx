@@ -37,7 +37,6 @@ import {
   SecurityScanOutlined,
   FileTextOutlined
 } from '@ant-design/icons';
-import { useNavigate } from 'react-router-dom';
 import { apiClient, MCPToolInfo, MCPCategoryInfo, MCPStatusResponse } from '../api';
 import { useTheme } from '../contexts/ThemeContext';
 import FileToolsConfigModal from '../components/FileTools/FileToolsConfigModal';
@@ -51,7 +50,6 @@ const { useApp } = App;
 
 const MCPToolsManagement: React.FC = () => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const navigate = useNavigate();
   const { currentTheme, themeType } = useTheme();
   const { message: messageApi } = useApp();
   const [loading, setLoading] = useState(false);
