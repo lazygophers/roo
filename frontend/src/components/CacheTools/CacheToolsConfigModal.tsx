@@ -3,8 +3,8 @@
  * 支持配置默认TTL、最大内存项、清理间隔等参数
  */
 
-import React, {useEffect, useState} from 'react';
-import {Alert, Space, Tooltip, Typography, Row, Col} from 'antd';
+import React, {useState} from 'react';
+import {Alert, Space, Tooltip, Typography} from 'antd';
 import {ModalForm, ProCard, ProFormDigit, ProFormSelect, ProFormSwitch, ProFormText} from '@ant-design/pro-components';
 import {ClockCircleOutlined, DatabaseOutlined, InfoCircleOutlined, SettingOutlined} from '@ant-design/icons';
 import {apiClient} from '../../api';

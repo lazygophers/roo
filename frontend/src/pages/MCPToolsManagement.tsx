@@ -33,8 +33,6 @@ import {
   CheckCircleOutlined,
   ExclamationCircleOutlined,
   FilterOutlined,
-  SecurityScanOutlined,
-  FileTextOutlined,
   SettingOutlined
 } from '@ant-design/icons';
 import { apiClient, MCPToolInfo, MCPCategoryInfo, MCPStatusResponse } from '../api';
@@ -56,7 +54,7 @@ const MCPToolsManagement: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [tools, setTools] = useState<MCPToolInfo[]>([]);
   const [categories, setCategories] = useState<MCPCategoryInfo[]>([]);
-  const [status, setStatus] = useState<MCPStatusResponse['data'] | null>(null);
+  // const [status, setStatus] = useState<MCPStatusResponse['data'] | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [toolDetailModal, setToolDetailModal] = useState<{
     visible: boolean;
@@ -84,9 +82,9 @@ const MCPToolsManagement: React.FC = () => {
         apiClient.getMCPTools().catch(e => ({ success: false, data: { tools: [], server: '', organization: '' } }))
       ]);
 
-      if (statusRes.success && statusRes.data) {
-        setStatus(statusRes.data);
-      }
+      // if (statusRes.success && statusRes.data) {
+      //   setStatus(statusRes.data);
+      // }
 
       if (categoriesRes.success && categoriesRes.data) {
         setCategories(categoriesRes.data.categories);

@@ -7,7 +7,6 @@ import {
   Tabs,
   Button,
   Space,
-  Tag,
   Alert,
   Typography,
   Card,
@@ -21,9 +20,7 @@ import {
   EditOutlined,
   ReloadOutlined,
   FileTextOutlined,
-  WarningOutlined,
-  CheckCircleOutlined,
-  SettingOutlined
+  CheckCircleOutlined
 } from '@ant-design/icons';
 import { 
   apiClient, 
@@ -33,7 +30,7 @@ import {
 } from '../../api';
 import { useTheme } from '../../contexts/ThemeContext';
 
-const { Text, Paragraph } = Typography;
+const { Text } = Typography;
 const { TextArea } = Input;
 const { useApp } = App;
 
@@ -251,7 +248,7 @@ const FileToolsConfigModal: React.FC<FileToolsConfigModalProps> = ({
     return { status: 'error', text: '风险' };
   };
 
-  const scoreStatus = getScoreStatus(securityScore);
+  // const scoreStatus = getScoreStatus(securityScore);
 
   // Tab items for new Tabs API
   const tabItems = [
