@@ -386,7 +386,8 @@ async def deploy_custom_modes(request: DeployRequest):
                                 errors.append(error_msg)
                                 logger.error(error_msg)
                         else:
-                            error_msg = f"Command file not found: {command_path}"
+                            sanitized_command_path = command_path.replace('\r', '').replace('\n', '')
+                            error_msg = f"Command file not found: {sanitized_command_path}"
                             errors.append(error_msg)
                             logger.warning(error_msg)
 
