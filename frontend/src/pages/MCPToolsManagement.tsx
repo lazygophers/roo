@@ -502,105 +502,104 @@ const MCPToolsManagement: React.FC = () => {
             <StatisticCard.Group>
               <ProCard
                 style={{
-                  // 深色主题下的卡片样式优化
-                  background: isDarkTheme ? currentTheme.token?.colorBgElevated : undefined,
-                  border: isDarkTheme ? `1px solid ${currentTheme.token?.colorBorder}` : undefined,
-                  // 统一卡片尺寸
                   minWidth: '180px',
-                  minHeight: '100px'
+                  minHeight: '100px',
+                  background: isDarkTheme ? currentTheme.token?.colorBgElevated : undefined,
+                  border: isDarkTheme ? `1px solid ${currentTheme.token?.colorBorder}` : undefined
                 }}
-                title={
-                  <span style={{
-                    color: currentTheme.token?.colorText || (isDarkTheme ? 'rgba(255, 255, 255, 0.85)' : 'rgba(0, 0, 0, 0.65)'),
-                    fontSize: '14px'
+              >
+                <div style={{ textAlign: 'center' }}>
+                  <div style={{
+                    color: currentTheme.token?.colorText || (isDarkTheme ? 'rgba(255, 255, 255, 0.65)' : 'rgba(0, 0, 0, 0.65)'),
+                    fontSize: '14px',
+                    marginBottom: '8px'
                   }}>
                     可用工具
-                  </span>
-                }
-              >
-                <div style={{
-                  color: currentTheme.token?.colorSuccess || (isDarkTheme ? '#73d13d' : '#52c41a'),
-                  fontWeight: 600,
-                  fontSize: '24px'
-                }}>
-                  {status.tools_count} / {status.total_tools}
+                  </div>
+                  <div style={{
+                    color: currentTheme.token?.colorSuccess || (isDarkTheme ? '#73d13d' : '#52c41a'),
+                    fontWeight: 600,
+                    fontSize: '24px'
+                  }}>
+                    {status.tools_count} / {status.total_tools}
+                  </div>
                 </div>
               </ProCard>
               <ProCard
                 style={{
-                  background: isDarkTheme ? currentTheme.token?.colorBgElevated : undefined,
-                  border: isDarkTheme ? `1px solid ${currentTheme.token?.colorBorder}` : undefined,
-                  // 统一卡片尺寸
                   minWidth: '180px',
-                  minHeight: '100px'
+                  minHeight: '100px',
+                  background: isDarkTheme ? currentTheme.token?.colorBgElevated : undefined,
+                  border: isDarkTheme ? `1px solid ${currentTheme.token?.colorBorder}` : undefined
                 }}
-                title={
-                  <span style={{
-                    color: currentTheme.token?.colorText || (isDarkTheme ? 'rgba(255, 255, 255, 0.85)' : 'rgba(0, 0, 0, 0.65)'),
-                    fontSize: '14px'
+              >
+                <div style={{ textAlign: 'center' }}>
+                  <div style={{
+                    color: currentTheme.token?.colorText || (isDarkTheme ? 'rgba(255, 255, 255, 0.65)' : 'rgba(0, 0, 0, 0.65)'),
+                    fontSize: '14px',
+                    marginBottom: '8px'
                   }}>
                     工具分类
-                  </span>
-                }
-              >
-                <div style={{
-                  color: currentTheme.token?.colorPrimary || (isDarkTheme ? '#40a9ff' : '#1890ff'),
-                  fontWeight: 600,
-                  fontSize: '24px'
-                }}>
-                  {status.categories_count}
+                  </div>
+                  <div style={{
+                    color: currentTheme.token?.colorPrimary || (isDarkTheme ? '#40a9ff' : '#1890ff'),
+                    fontWeight: 600,
+                    fontSize: '24px'
+                  }}>
+                    {status.categories_count}
+                  </div>
                 </div>
               </ProCard>
               <ProCard
                 style={{
-                  background: isDarkTheme ? currentTheme.token?.colorBgElevated : undefined,
-                  border: isDarkTheme ? `1px solid ${currentTheme.token?.colorBorder}` : undefined,
-                  // 统一卡片尺寸
                   minWidth: '180px',
-                  minHeight: '100px'
+                  minHeight: '100px',
+                  background: isDarkTheme ? currentTheme.token?.colorBgElevated : undefined,
+                  border: isDarkTheme ? `1px solid ${currentTheme.token?.colorBorder}` : undefined
                 }}
-                title={
-                  <span style={{
-                    color: currentTheme.token?.colorText || (isDarkTheme ? 'rgba(255, 255, 255, 0.85)' : 'rgba(0, 0, 0, 0.65)'),
-                    fontSize: '14px'
+              >
+                <div style={{ textAlign: 'center' }}>
+                  <div style={{
+                    color: currentTheme.token?.colorText || (isDarkTheme ? 'rgba(255, 255, 255, 0.65)' : 'rgba(0, 0, 0, 0.65)'),
+                    fontSize: '14px',
+                    marginBottom: '8px'
                   }}>
                     服务状态
-                  </span>
-                }
-              >
-                <div style={{
-                  color: status.status === 'healthy'
-                    ? (currentTheme.token?.colorSuccess || (isDarkTheme ? '#73d13d' : '#52c41a'))
-                    : (currentTheme.token?.colorError || (isDarkTheme ? '#ff7875' : '#ff4d4f')),
-                  fontWeight: 600,
-                  fontSize: '24px'
-                }}>
-                  {status.status === 'healthy' ? '正常' : '异常'}
+                  </div>
+                  <div style={{
+                    color: status.status === 'healthy'
+                      ? (currentTheme.token?.colorSuccess || (isDarkTheme ? '#73d13d' : '#52c41a'))
+                      : (currentTheme.token?.colorError || (isDarkTheme ? '#ff7875' : '#ff4d4f')),
+                    fontWeight: 600,
+                    fontSize: '24px'
+                  }}>
+                    {status.status === 'healthy' ? '正常' : '异常'}
+                  </div>
                 </div>
               </ProCard>
               <ProCard
                 style={{
-                  background: isDarkTheme ? currentTheme.token?.colorBgElevated : undefined,
-                  border: isDarkTheme ? `1px solid ${currentTheme.token?.colorBorder}` : undefined,
-                  // 统一卡片尺寸
                   minWidth: '180px',
-                  minHeight: '100px'
+                  minHeight: '100px',
+                  background: isDarkTheme ? currentTheme.token?.colorBgElevated : undefined,
+                  border: isDarkTheme ? `1px solid ${currentTheme.token?.colorBorder}` : undefined
                 }}
-                title={
-                  <span style={{
-                    color: currentTheme.token?.colorText || (isDarkTheme ? 'rgba(255, 255, 255, 0.85)' : 'rgba(0, 0, 0, 0.65)'),
-                    fontSize: '14px'
+              >
+                <div style={{ textAlign: 'center' }}>
+                  <div style={{
+                    color: currentTheme.token?.colorText || (isDarkTheme ? 'rgba(255, 255, 255, 0.65)' : 'rgba(0, 0, 0, 0.65)'),
+                    fontSize: '14px',
+                    marginBottom: '8px'
                   }}>
                     最后更新
-                  </span>
-                }
-              >
-                <div style={{
-                  fontSize: '16px',
-                  color: currentTheme.token?.colorText || (isDarkTheme ? 'rgba(255, 255, 255, 0.85)' : 'rgba(0, 0, 0, 0.85)'),
-                  fontWeight: 500
-                }}>
-                  {new Date(status.last_updated).toLocaleString()}
+                  </div>
+                  <div style={{
+                    color: currentTheme.token?.colorText || (isDarkTheme ? 'rgba(255, 255, 255, 0.85)' : 'rgba(0, 0, 0, 0.85)'),
+                    fontWeight: 500,
+                    fontSize: '16px'
+                  }}>
+                    {new Date(status.last_updated).toLocaleString()}
+                  </div>
                 </div>
               </ProCard>
             </StatisticCard.Group>
