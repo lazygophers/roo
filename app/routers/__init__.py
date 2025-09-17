@@ -11,6 +11,7 @@ from .api_system_monitor import router as system_monitor_router
 from .api_file_security import router as file_security_router
 from .api_recycle_bin import router as recycle_bin_router
 from .api_time_tools import router as time_tools_router
+from .api_cache_tools import router as cache_tools_router
 from .mcp import router as mcp_router
 
 # 创建主路由
@@ -29,4 +30,5 @@ api_router.include_router(system_monitor_router, tags=["system"])
 api_router.include_router(file_security_router, tags=["file-security"])
 api_router.include_router(recycle_bin_router, tags=["recycle-bin"])
 api_router.include_router(time_tools_router, tags=["time-tools"])
+api_router.include_router(cache_tools_router, tags=["cache-tools"])
 api_router.include_router(mcp_router, tags=["mcp"])

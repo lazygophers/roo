@@ -183,6 +183,10 @@ class TableNames:
     # 时间工具配置表
     TIME_TOOLS_CONFIG = "time_tools_config"
 
+    # 缓存工具相关表
+    CACHE_DATA = "cache_data"  # 缓存数据表
+    CACHE_CONFIG = "cache_config"  # 缓存配置表
+
 def init_unified_database():
     """初始化统一数据库并执行迁移"""
     logger.info("Initializing unified database system...")

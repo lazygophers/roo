@@ -467,6 +467,18 @@ export const apiClient = {
     return response.data;
   },
 
+  // 获取分类配置
+  getCategoryConfig: async (categoryId: string) => {
+    const response = await api.get(`/mcp/categories/${categoryId}/config`);
+    return response.data;
+  },
+
+  // 更新分类配置
+  updateCategoryConfigs: async (categoryId: string, configs: any) => {
+    const response = await api.put(`/mcp/categories/${categoryId}/config`, { config: configs });
+    return response.data;
+  },
+
   // File Security API methods
   // 获取文件安全配置信息
   getFileSecurityInfo: async (): Promise<FileSecurityResponse> => {

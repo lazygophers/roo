@@ -111,36 +111,26 @@ class MCPToolsService:
                 }
             },
             {
-                'id': 'ai',
-                'name': 'AI工具',
-                'description': 'AI模式和智能助手相关工具',
-                'icon': '🤖',
-                'enabled': False,  # 默认禁用，因为没有工具
-                'sort_order': 3
-            },
-            {
-                'id': 'dev',
-                'name': '开发工具',
-                'description': '开发和调试相关工具',
-                'icon': '⚙️',
-                'enabled': False,  # 默认禁用，因为没有工具
-                'sort_order': 4
-            },
-            {
-                'id': 'data',
-                'name': '数据工具',
-                'description': '数据处理和分析相关工具',
-                'icon': '📊',
-                'enabled': False,  # 默认禁用，因为没有工具
-                'sort_order': 5
-            },
-            {
                 'id': 'file',
                 'name': '文件工具',
                 'description': '文件读写、目录操作和文件管理相关工具',
                 'icon': '📁',
-                'enabled': True,  # 启用文件工具分类
-                'sort_order': 6
+                'enabled': True,
+                'sort_order': 3
+            },
+            {
+                'id': 'cache',
+                'name': '缓存工具',
+                'description': 'Redis风格的缓存操作相关工具',
+                'icon': '🗄️',
+                'enabled': True,
+                'sort_order': 4,
+                'config': {
+                    'default_ttl': 3600,  # 1小时默认TTL
+                    'persistence_enabled': True,
+                    'compression_enabled': False,
+                    'stats_enabled': True
+                }
             }
         ]
         
@@ -768,6 +758,281 @@ class MCPToolsService:
                 },
                 metadata={
                     "tags": ["安全", "配置", "刷新", "重载"],
+                    "examples": [{}]
+                }
+            ),
+            # 缓存工具
+            MCPTool(
+                name="cache_set",
+                description="设置缓存键值对，支持TTL过期时间",
+                category="cache",
+                schema={
+                    "type": "object",
+                    "properties": {
+                        "key": {
+                            "type": "string",
+                            "description": "缓存键名"
+                        },
+                        "value": {
+                            "description": "缓存值（支持任意类型）"
+                        },
+                        "ttl": {
+                            "type": "integer",
+                            "description": "生存时间（秒），不指定则使用默认值",
+                            "minimum": 1
+                        },
+                        "tags": {
+                            "type": "array",
+                            "items": {"type": "string"},
+                            "description": "标签列表，用于批量操作"
+                        }
+                    },
+                    "required": ["key", "value"]
+                },
+                metadata={
+                    "tags": ["缓存", "SET", "Redis"],
+                    "examples": [
+                        {"key": "user:123", "value": "Alice"},
+                        {"key": "session", "value": {"user_id": 123, "token": "abc"}, "ttl": 3600}
+                    ]
+                }
+            ),
+            MCPTool(
+                name="cache_get",
+                description="获取缓存值",
+                category="cache",
+                schema={
+                    "type": "object",
+                    "properties": {
+                        "key": {
+                            "type": "string",
+                            "description": "缓存键名"
+                        }
+                    },
+                    "required": ["key"]
+                },
+                metadata={
+                    "tags": ["缓存", "GET", "Redis"],
+                    "examples": [
+                        {"key": "user:123"},
+                        {"key": "session"}
+                    ]
+                }
+            ),
+            MCPTool(
+                name="cache_delete",
+                description="删除缓存键",
+                category="cache",
+                schema={
+                    "type": "object",
+                    "properties": {
+                        "key": {
+                            "type": "string",
+                            "description": "要删除的缓存键名"
+                        }
+                    },
+                    "required": ["key"]
+                },
+                metadata={
+                    "tags": ["缓存", "DEL", "Redis"],
+                    "examples": [
+                        {"key": "user:123"}
+                    ]
+                }
+            ),
+            MCPTool(
+                name="cache_exists",
+                description="检查缓存键是否存在",
+                category="cache",
+                schema={
+                    "type": "object",
+                    "properties": {
+                        "key": {
+                            "type": "string",
+                            "description": "要检查的缓存键名"
+                        }
+                    },
+                    "required": ["key"]
+                },
+                metadata={
+                    "tags": ["缓存", "EXISTS", "Redis"],
+                    "examples": [
+                        {"key": "user:123"}
+                    ]
+                }
+            ),
+            MCPTool(
+                name="cache_ttl",
+                description="获取缓存键的剩余生存时间",
+                category="cache",
+                schema={
+                    "type": "object",
+                    "properties": {
+                        "key": {
+                            "type": "string",
+                            "description": "缓存键名"
+                        }
+                    },
+                    "required": ["key"]
+                },
+                metadata={
+                    "tags": ["缓存", "TTL", "Redis"],
+                    "examples": [
+                        {"key": "user:123"}
+                    ]
+                }
+            ),
+            MCPTool(
+                name="cache_expire",
+                description="设置缓存键的过期时间",
+                category="cache",
+                schema={
+                    "type": "object",
+                    "properties": {
+                        "key": {
+                            "type": "string",
+                            "description": "缓存键名"
+                        },
+                        "ttl": {
+                            "type": "integer",
+                            "description": "生存时间（秒）",
+                            "minimum": 1
+                        }
+                    },
+                    "required": ["key", "ttl"]
+                },
+                metadata={
+                    "tags": ["缓存", "EXPIRE", "Redis"],
+                    "examples": [
+                        {"key": "user:123", "ttl": 3600}
+                    ]
+                }
+            ),
+            MCPTool(
+                name="cache_keys",
+                description="查找匹配模式的缓存键",
+                category="cache",
+                schema={
+                    "type": "object",
+                    "properties": {
+                        "pattern": {
+                            "type": "string",
+                            "description": "匹配模式，支持*通配符",
+                            "default": "*"
+                        }
+                    },
+                    "required": []
+                },
+                metadata={
+                    "tags": ["缓存", "KEYS", "Redis"],
+                    "examples": [
+                        {},
+                        {"pattern": "user:*"},
+                        {"pattern": "session:*"}
+                    ]
+                }
+            ),
+            MCPTool(
+                name="cache_mset",
+                description="批量设置多个缓存键值对",
+                category="cache",
+                schema={
+                    "type": "object",
+                    "properties": {
+                        "key_values": {
+                            "type": "object",
+                            "description": "键值对字典"
+                        },
+                        "ttl": {
+                            "type": "integer",
+                            "description": "统一的生存时间（秒）",
+                            "minimum": 1
+                        }
+                    },
+                    "required": ["key_values"]
+                },
+                metadata={
+                    "tags": ["缓存", "MSET", "Redis", "批量"],
+                    "examples": [
+                        {"key_values": {"user:1": "Alice", "user:2": "Bob"}},
+                        {"key_values": {"temp:1": "data1", "temp:2": "data2"}, "ttl": 300}
+                    ]
+                }
+            ),
+            MCPTool(
+                name="cache_mget",
+                description="批量获取多个缓存键的值",
+                category="cache",
+                schema={
+                    "type": "object",
+                    "properties": {
+                        "keys": {
+                            "type": "array",
+                            "items": {"type": "string"},
+                            "description": "要获取的键列表"
+                        }
+                    },
+                    "required": ["keys"]
+                },
+                metadata={
+                    "tags": ["缓存", "MGET", "Redis", "批量"],
+                    "examples": [
+                        {"keys": ["user:1", "user:2", "user:3"]}
+                    ]
+                }
+            ),
+            MCPTool(
+                name="cache_incr",
+                description="原子性递增数值型缓存值",
+                category="cache",
+                schema={
+                    "type": "object",
+                    "properties": {
+                        "key": {
+                            "type": "string",
+                            "description": "缓存键名"
+                        },
+                        "amount": {
+                            "type": "integer",
+                            "description": "递增量",
+                            "default": 1
+                        }
+                    },
+                    "required": ["key"]
+                },
+                metadata={
+                    "tags": ["缓存", "INCR", "Redis", "计数器"],
+                    "examples": [
+                        {"key": "counter"},
+                        {"key": "visits", "amount": 5}
+                    ]
+                }
+            ),
+            MCPTool(
+                name="cache_info",
+                description="获取缓存系统信息和统计",
+                category="cache",
+                schema={
+                    "type": "object",
+                    "properties": {},
+                    "required": []
+                },
+                metadata={
+                    "tags": ["缓存", "INFO", "Redis", "统计"],
+                    "examples": [{}]
+                }
+            ),
+            MCPTool(
+                name="cache_flushall",
+                description="清空所有缓存数据",
+                category="cache",
+                schema={
+                    "type": "object",
+                    "properties": {},
+                    "required": []
+                },
+                metadata={
+                    "tags": ["缓存", "FLUSHALL", "Redis", "清空"],
                     "examples": [{}]
                 }
             )

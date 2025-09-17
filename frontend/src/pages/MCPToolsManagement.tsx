@@ -41,6 +41,7 @@ import { apiClient, MCPToolInfo, MCPCategoryInfo, MCPStatusResponse } from '../a
 import { useTheme } from '../contexts/ThemeContext';
 import FileToolsConfigModal from '../components/FileTools/FileToolsConfigModal';
 import TimeToolsConfigModal from '../components/TimeTools/TimeToolsConfigModal';
+import CacheToolsConfigModal from '../components/CacheTools/CacheToolsConfigModal';
 import './MCPToolsManagement.css';
 
 const { Title, Text, Paragraph } = Typography;
@@ -69,6 +70,7 @@ const MCPToolsManagement: React.FC = () => {
   const [testResult, setTestResult] = useState<string>('');
   const [fileToolsConfigModal, setFileToolsConfigModal] = useState(false);
   const [timeToolsConfigModal, setTimeToolsConfigModal] = useState(false);
+  const [cacheToolsConfigModal, setCacheToolsConfigModal] = useState(false);
 
   const [form] = Form.useForm();
 
@@ -208,10 +210,8 @@ const MCPToolsManagement: React.FC = () => {
         const mockCategories: MCPCategoryInfo[] = [
           { id: 'system', name: '系统工具', description: '系统信息和监控相关工具', icon: '🖥️', enabled: true },
           { id: 'time', name: '时间工具', description: '时间戳和日期相关工具', icon: '⏰', enabled: true },
-          { id: 'ai', name: 'AI工具', description: 'AI模式和智能助手相关工具', icon: '🤖', enabled: true },
-          { id: 'dev', name: '开发工具', description: '开发和调试相关工具', icon: '⚙️', enabled: true },
-          { id: 'data', name: '数据工具', description: '数据处理和分析相关工具', icon: '📊', enabled: true },
-          { id: 'file', name: '文件工具', description: '文件和目录操作相关工具', icon: '📁', enabled: true }
+          { id: 'file', name: '文件工具', description: '文件和目录操作相关工具', icon: '📁', enabled: true },
+          { id: 'cache', name: '缓存工具', description: 'Redis风格的缓存操作相关工具', icon: '🗄️', enabled: true }
         ];
 
         setTools(mockTools);
@@ -709,6 +709,22 @@ const MCPToolsManagement: React.FC = () => {
                           </Button>
                         </Tooltip>
                       )}
+                      {category.id === 'cache' && (
+                        <Tooltip title="缓存工具配置">
+                          <Button
+                            size="small"
+                            icon={<FileTextOutlined />}
+                            onClick={() => setCacheToolsConfigModal(true)}
+                            style={{
+                              color: currentTheme.token?.colorInfo,
+                              borderColor: currentTheme.token?.colorInfo,
+                              backgroundColor: 'transparent'
+                            }}
+                          >
+                            配置
+                          </Button>
+                        </Tooltip>
+                      )}
                     </Space>
                     <div></div>
                   </div>
@@ -895,6 +911,15 @@ const MCPToolsManagement: React.FC = () => {
       <TimeToolsConfigModal
         visible={timeToolsConfigModal}
         onCancel={() => setTimeToolsConfigModal(false)}
+      />
+
+      {/* 缓存工具配置Modal */}
+      <CacheToolsConfigModal
+        visible={cacheToolsConfigModal}
+        onCancel={() => setCacheToolsConfigModal(false)}
+        onSuccess={() => {
+          loadData(); // 重新加载数据
+        }}
       />
     </div>
   );

@@ -12,6 +12,7 @@ from app.core.mcp_tools_service import init_mcp_tools_service
 from app.core.mcp_server import init_mcp_server
 from app.core.recycle_bin_scheduler import startup_recycle_bin_scheduler, shutdown_recycle_bin_scheduler
 from app.core.time_tools_service import init_time_tools_service
+from app.core.cache_tools_service import init_cache_tools_service
 from app.routers import api_router
 
 # 设置日志
@@ -50,6 +51,10 @@ async def lifespan(app: FastAPI):
         # 初始化时间工具配置服务
         time_service = init_time_tools_service(use_unified_db=True)
         logger.info("Time tools service initialized successfully")
+
+        # 初始化缓存工具服务
+        cache_service = init_cache_tools_service(use_unified_db=True)
+        logger.info("Cache tools service initialized successfully")
         
         # 打印启动信息和访问地址
         import socket
