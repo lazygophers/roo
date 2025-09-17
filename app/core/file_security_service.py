@@ -170,6 +170,24 @@ class FileSecurityService:
                 name="严格模式",
                 value=False,
                 description="是否启用严格模式（严格模式下只能访问明确允许的目录）"
+            ),
+            FileSecurityLimits(
+                limit_type="recycle_bin_enabled",
+                name="启用回收站",
+                value=True,
+                description="是否启用回收站功能（启用后删除的数据会进入回收站）"
+            ),
+            FileSecurityLimits(
+                limit_type="recycle_bin_retention_days",
+                name="回收站保留天数",
+                value=3,
+                description="回收站中数据的默认保留天数"
+            ),
+            FileSecurityLimits(
+                limit_type="recycle_bin_auto_cleanup_hours",
+                name="自动清理间隔",
+                value=6,
+                description="回收站自动清理的时间间隔（小时），设为0表示不自动清理"
             )
         ]
         

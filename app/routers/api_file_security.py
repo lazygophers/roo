@@ -267,7 +267,14 @@ async def update_limit_config(limit_type: str, request: LimitConfigRequest):
     """更新指定类型的限制配置"""
     try:
         # 验证限制类型
-        valid_types = ["max_file_size", "max_read_lines", "strict_mode"]
+        valid_types = [
+            "max_file_size", 
+            "max_read_lines", 
+            "strict_mode", 
+            "recycle_bin_enabled",
+            "recycle_bin_retention_days",
+            "recycle_bin_auto_cleanup_hours"
+        ]
         if limit_type not in valid_types:
             raise HTTPException(
                 status_code=400, 
