@@ -121,7 +121,7 @@ class MCPToolsService:
             {
                 'id': 'cache',
                 'name': '缓存工具',
-                'description': 'Redis风格的缓存操作相关工具',
+                'description': '缓存操作相关工具',
                 'icon': '🗄️',
                 'enabled': True,
                 'sort_order': 4,
@@ -142,18 +142,25 @@ class MCPToolsService:
             existing = self.categories_table.get(Query_obj.id == category['id'])
             
             if existing:
-                # 覆盖现有分类（保留enabled状态、created_at和现有配置）
-                category['enabled'] = existing.get('enabled', category['enabled'])
-                category['created_at'] = existing['created_at']
+                # 覆盖现有分类（仅保留用户配置：enabled状态、created_at和用户自定义的config）
+                user_enabled = existing.get('enabled', category['enabled'])
+                user_created_at = existing['created_at']
+                user_config = existing.get('config', {})
+
+                # 完全覆盖内置属性
+                category['created_at'] = user_created_at
                 category['updated_at'] = datetime.now().isoformat()
-                
-                # 合并配置：保留现有配置并添加新的配置选项
-                if 'config' in category and 'config' in existing:
-                    existing_config = existing['config']
-                    new_config = category['config']
-                    # 合并配置，新配置优先级更高（用于添加新配置项）
-                    merged_config = {**new_config, **existing_config}
+                category['enabled'] = user_enabled
+
+                # 合并配置：内置配置为基础，保留用户的自定义配置覆盖
+                if 'config' in category:
+                    # 内置配置作为基础
+                    builtin_config = category['config']
+                    # 用户配置覆盖内置配置（保留用户自定义）
+                    merged_config = {**builtin_config, **user_config}
                     category['config'] = merged_config
+                else:
+                    category['config'] = user_config
                 
                 self.categories_table.update(category, Query_obj.id == category['id'])
                 updated_count += 1
@@ -790,7 +797,7 @@ class MCPToolsService:
                     "required": ["key", "value"]
                 },
                 metadata={
-                    "tags": ["缓存", "SET", "Redis"],
+                    "tags": ["缓存", "SET", "存储"],
                     "examples": [
                         {"key": "user:123", "value": "Alice"},
                         {"key": "session", "value": {"user_id": 123, "token": "abc"}, "ttl": 3600}
@@ -812,7 +819,7 @@ class MCPToolsService:
                     "required": ["key"]
                 },
                 metadata={
-                    "tags": ["缓存", "GET", "Redis"],
+                    "tags": ["缓存", "GET", "读取"],
                     "examples": [
                         {"key": "user:123"},
                         {"key": "session"}
@@ -834,7 +841,7 @@ class MCPToolsService:
                     "required": ["key"]
                 },
                 metadata={
-                    "tags": ["缓存", "DEL", "Redis"],
+                    "tags": ["缓存", "DEL", "删除"],
                     "examples": [
                         {"key": "user:123"}
                     ]
@@ -855,7 +862,7 @@ class MCPToolsService:
                     "required": ["key"]
                 },
                 metadata={
-                    "tags": ["缓存", "EXISTS", "Redis"],
+                    "tags": ["缓存", "EXISTS", "检查"],
                     "examples": [
                         {"key": "user:123"}
                     ]
@@ -876,7 +883,7 @@ class MCPToolsService:
                     "required": ["key"]
                 },
                 metadata={
-                    "tags": ["缓存", "TTL", "Redis"],
+                    "tags": ["缓存", "TTL", "过期"],
                     "examples": [
                         {"key": "user:123"}
                     ]
@@ -902,7 +909,7 @@ class MCPToolsService:
                     "required": ["key", "ttl"]
                 },
                 metadata={
-                    "tags": ["缓存", "EXPIRE", "Redis"],
+                    "tags": ["缓存", "EXPIRE", "设置过期"],
                     "examples": [
                         {"key": "user:123", "ttl": 3600}
                     ]
@@ -924,7 +931,7 @@ class MCPToolsService:
                     "required": []
                 },
                 metadata={
-                    "tags": ["缓存", "KEYS", "Redis"],
+                    "tags": ["缓存", "KEYS", "查找"],
                     "examples": [
                         {},
                         {"pattern": "user:*"},
@@ -952,7 +959,7 @@ class MCPToolsService:
                     "required": ["key_values"]
                 },
                 metadata={
-                    "tags": ["缓存", "MSET", "Redis", "批量"],
+                    "tags": ["缓存", "MSET", "批量设置", "批量"],
                     "examples": [
                         {"key_values": {"user:1": "Alice", "user:2": "Bob"}},
                         {"key_values": {"temp:1": "data1", "temp:2": "data2"}, "ttl": 300}
@@ -975,7 +982,7 @@ class MCPToolsService:
                     "required": ["keys"]
                 },
                 metadata={
-                    "tags": ["缓存", "MGET", "Redis", "批量"],
+                    "tags": ["缓存", "MGET", "批量获取", "批量"],
                     "examples": [
                         {"keys": ["user:1", "user:2", "user:3"]}
                     ]
@@ -1001,7 +1008,7 @@ class MCPToolsService:
                     "required": ["key"]
                 },
                 metadata={
-                    "tags": ["缓存", "INCR", "Redis", "计数器"],
+                    "tags": ["缓存", "INCR", "递增", "计数器"],
                     "examples": [
                         {"key": "counter"},
                         {"key": "visits", "amount": 5}
@@ -1018,7 +1025,7 @@ class MCPToolsService:
                     "required": []
                 },
                 metadata={
-                    "tags": ["缓存", "INFO", "Redis", "统计"],
+                    "tags": ["缓存", "INFO", "信息", "统计"],
                     "examples": [{}]
                 }
             ),
@@ -1032,7 +1039,7 @@ class MCPToolsService:
                     "required": []
                 },
                 metadata={
-                    "tags": ["缓存", "FLUSHALL", "Redis", "清空"],
+                    "tags": ["缓存", "FLUSHALL", "清空", "删除全部"],
                     "examples": [{}]
                 }
             )
@@ -1046,11 +1053,15 @@ class MCPToolsService:
             existing = self.tools_table.get(Query_obj.name == tool.name)
             
             if existing:
-                # 覆盖现有工具（保留enabled状态和created_at）
+                # 覆盖现有工具（仅保留用户配置：enabled状态和created_at）
+                user_enabled = existing.get('enabled', tool.enabled)
+                user_created_at = existing['created_at']
+
+                # 完全覆盖所有内置属性（description、schema、metadata等）
                 tool.id = existing['id']
-                tool.enabled = existing.get('enabled', tool.enabled)
-                tool.created_at = existing['created_at']
+                tool.created_at = user_created_at
                 tool.updated_at = datetime.now().isoformat()
+                tool.enabled = user_enabled
                 
                 self.tools_table.update(tool.to_dict(), Query_obj.name == tool.name)
                 updated_count += 1

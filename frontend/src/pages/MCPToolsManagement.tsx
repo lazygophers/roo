@@ -26,11 +26,10 @@ import {
     BugOutlined,
     CheckCircleOutlined,
     ExclamationCircleOutlined,
-    FilterOutlined,
     InfoCircleOutlined,
     ReloadOutlined
 } from '@ant-design/icons';
-import {apiClient, MCPCategoryInfo, MCPStatusResponse, MCPToolInfo} from '../api';
+import {apiClient, MCPCategoryInfo, MCPToolInfo} from '../api';
 import {useTheme} from '../contexts/ThemeContext';
 import FileToolsConfigModal from '../components/FileTools/FileToolsConfigModal';
 import TimeToolsConfigModal from '../components/TimeTools/TimeToolsConfigModal';
@@ -49,8 +48,6 @@ const MCPToolsManagement: React.FC = () => {
     const [loading, setLoading] = useState(false);
     const [tools, setTools] = useState<MCPToolInfo[]>([]);
     const [categories, setCategories] = useState<MCPCategoryInfo[]>([]);
-    const [status, setStatus] = useState<MCPStatusResponse['data'] | null>(null);
-    const [selectedCategory, setSelectedCategory] = useState<string>('all');
     const [toolDetailModal, setToolDetailModal] = useState<{
         visible: boolean;
         tool: MCPToolInfo | null;
@@ -71,7 +68,7 @@ const MCPToolsManagement: React.FC = () => {
     const loadData = useCallback(async () => {
         setLoading(true);
         try {
-            const [statusRes, categoriesRes, toolsRes] = await Promise.all([
+            const [, categoriesRes, toolsRes] = await Promise.all([
                 apiClient.getMCPStatus().catch(e => ({success: false, data: null})),
                 apiClient.getMCPCategories().catch(e => ({
                     success: false,
@@ -223,22 +220,6 @@ const MCPToolsManagement: React.FC = () => {
 
                 setTools(mockTools);
                 setCategories(mockCategories);
-                setStatus({
-                    status: 'healthy',
-                    server_name: 'LazyAI Studio MCP Server',
-                    tools_count: mockTools.filter(t => t.enabled).length,
-                    total_tools: mockTools.length,
-                    categories_count: mockCategories.length,
-                    tools_by_category: {
-                        system: 2,
-                        time: 1,
-                        file: 4
-                    },
-                    endpoints: {},
-                    organization: 'LazyGophers',
-                    motto: '让 AI 替你思考，让工具替你工作！',
-                    last_updated: new Date().toISOString()
-                });
             }
         } catch (error) {
             console.error('Failed to load MCP data:', error);
@@ -367,19 +348,14 @@ const MCPToolsManagement: React.FC = () => {
     // 过滤工具
     const toolsByCategory = getToolsByCategory();
 
-    // 显示所有分类（包括禁用的），但只有启用的分类会显示工具
-    const filteredCategories = selectedCategory === 'all'
-        ? categories
-        : categories.filter(cat => cat.id === selectedCategory);
+    // 显示所有分类（包括禁用的）
+    const filteredCategories = categories;
 
     // 渲染工具卡片
     const renderToolCard = (tool: MCPToolInfo) => {
-        const categoryInfo = categories.find(c => c.id === tool.category);
 
         // 使用主题token来获取颜色
         const token = currentTheme.token;
-        const enabledBg = tool.enabled ? token?.colorSuccessBg || '#f6ffed' : token?.colorFillTertiary || '#f5f5f5';
-        const enabledBorder = tool.enabled ? token?.colorSuccess || '#52c41a' : token?.colorBorderSecondary || '#d9d9d9';
         const cardBorder = tool.enabled ? token?.colorBorder || '#d9d9d9' : token?.colorBorderSecondary || '#f0f0f0';
 
         // 根据主题类型确定描述文字颜色，确保在所有主题下都可读
@@ -474,42 +450,20 @@ const MCPToolsManagement: React.FC = () => {
             </div>
 
 
-            {/* 工具筛选和操作栏 */}
-            <ProCard style={{marginBottom: 16}}>
-                <Row justify="space-between" align="middle">
-                    <Col>
-                        <Space>
-                            <FilterOutlined/>
-                            <Text>工具分类：</Text>
-                            <Select
-                                value={selectedCategory}
-                                onChange={setSelectedCategory}
-                                style={{width: 160}}
-                            >
-                                <Option value="all">所有分类 ({tools.length})</Option>
-                                {categories.map(category => {
-                                    const count = toolsByCategory[category.id]?.length || 0;
-                                    return (
-                                        <Option key={category.id} value={category.id} disabled={!category.enabled}>
-                                            {category.icon} {category.name} ({count}) {!category.enabled && '(禁用)'}
-                                        </Option>
-                                    );
-                                })}
-                            </Select>
-                        </Space>
-                    </Col>
-                    <Col>
-                        <Button
-                            type="primary"
-                            icon={<ReloadOutlined/>}
-                            onClick={refreshTools}
-                            loading={loading}
-                        >
-                            刷新配置
-                        </Button>
-                    </Col>
-                </Row>
-            </ProCard>
+
+            {/* 操作栏 */}
+            <Row justify="end" style={{marginBottom: 16}}>
+                <Col>
+                    <Button
+                        type="primary"
+                        icon={<ReloadOutlined/>}
+                        onClick={refreshTools}
+                        loading={loading}
+                    >
+                        刷新配置
+                    </Button>
+                </Col>
+            </Row>
 
             {/* 工具分类展示 */}
             <Spin spinning={loading}>
@@ -517,7 +471,7 @@ const MCPToolsManagement: React.FC = () => {
                     <Empty description="暂无工具分类"/>
                 ) : (
                     <Collapse
-                        defaultActiveKey={selectedCategory === 'all' ? filteredCategories.map(c => c.id) : [selectedCategory]}
+                        defaultActiveKey={filteredCategories.map(c => c.id)}
                         ghost
                         items={filteredCategories.map(category => {
                             const categoryTools = toolsByCategory[category.id] || [];
