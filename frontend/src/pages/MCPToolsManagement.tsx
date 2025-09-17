@@ -22,8 +22,7 @@ import {
 } from 'antd';
 import {
   ProCard,
-  ProDescriptions,
-  StatisticCard
+  ProDescriptions
 } from '@ant-design/pro-components';
 import {
   ToolOutlined,
@@ -35,7 +34,8 @@ import {
   ExclamationCircleOutlined,
   FilterOutlined,
   SecurityScanOutlined,
-  FileTextOutlined
+  FileTextOutlined,
+  SettingOutlined
 } from '@ant-design/icons';
 import { apiClient, MCPToolInfo, MCPCategoryInfo, MCPStatusResponse } from '../api';
 import { useTheme } from '../contexts/ThemeContext';
@@ -455,129 +455,6 @@ const MCPToolsManagement: React.FC = () => {
         </Paragraph>
       </div>
 
-      {/* 状态卡片 */}
-      {status && (() => {
-        // 判断是否为深色主题
-        const isDarkTheme = themeType === 'nightRain' || themeType === 'plumRain' ||
-                           themeType === 'deepSeaMoon' || themeType === 'greenMountain';
-
-        return (
-          <div
-            style={{
-              marginBottom: 24,
-              // 深色主题下增强背景对比度
-              background: isDarkTheme ? currentTheme.token?.colorBgContainer : undefined,
-              borderRadius: 8,
-              padding: isDarkTheme ? '12px' : undefined
-            }}
-          >
-            <StatisticCard.Group>
-              <ProCard
-                style={{
-                  minWidth: '180px',
-                  minHeight: '100px',
-                  background: isDarkTheme ? currentTheme.token?.colorBgElevated : undefined,
-                  border: isDarkTheme ? `1px solid ${currentTheme.token?.colorBorder}` : undefined
-                }}
-              >
-                <div style={{ textAlign: 'center' }}>
-                  <div style={{
-                    color: currentTheme.token?.colorText || (isDarkTheme ? 'rgba(255, 255, 255, 0.65)' : 'rgba(0, 0, 0, 0.65)'),
-                    fontSize: '14px',
-                    marginBottom: '8px'
-                  }}>
-                    可用工具
-                  </div>
-                  <div style={{
-                    color: currentTheme.token?.colorSuccess || (isDarkTheme ? '#73d13d' : '#52c41a'),
-                    fontWeight: 600,
-                    fontSize: '24px'
-                  }}>
-                    {status.tools_count} / {status.total_tools}
-                  </div>
-                </div>
-              </ProCard>
-              <ProCard
-                style={{
-                  minWidth: '180px',
-                  minHeight: '100px',
-                  background: isDarkTheme ? currentTheme.token?.colorBgElevated : undefined,
-                  border: isDarkTheme ? `1px solid ${currentTheme.token?.colorBorder}` : undefined
-                }}
-              >
-                <div style={{ textAlign: 'center' }}>
-                  <div style={{
-                    color: currentTheme.token?.colorText || (isDarkTheme ? 'rgba(255, 255, 255, 0.65)' : 'rgba(0, 0, 0, 0.65)'),
-                    fontSize: '14px',
-                    marginBottom: '8px'
-                  }}>
-                    工具分类
-                  </div>
-                  <div style={{
-                    color: currentTheme.token?.colorPrimary || (isDarkTheme ? '#40a9ff' : '#1890ff'),
-                    fontWeight: 600,
-                    fontSize: '24px'
-                  }}>
-                    {status.categories_count}
-                  </div>
-                </div>
-              </ProCard>
-              <ProCard
-                style={{
-                  minWidth: '180px',
-                  minHeight: '100px',
-                  background: isDarkTheme ? currentTheme.token?.colorBgElevated : undefined,
-                  border: isDarkTheme ? `1px solid ${currentTheme.token?.colorBorder}` : undefined
-                }}
-              >
-                <div style={{ textAlign: 'center' }}>
-                  <div style={{
-                    color: currentTheme.token?.colorText || (isDarkTheme ? 'rgba(255, 255, 255, 0.65)' : 'rgba(0, 0, 0, 0.65)'),
-                    fontSize: '14px',
-                    marginBottom: '8px'
-                  }}>
-                    服务状态
-                  </div>
-                  <div style={{
-                    color: status.status === 'healthy'
-                      ? (currentTheme.token?.colorSuccess || (isDarkTheme ? '#73d13d' : '#52c41a'))
-                      : (currentTheme.token?.colorError || (isDarkTheme ? '#ff7875' : '#ff4d4f')),
-                    fontWeight: 600,
-                    fontSize: '24px'
-                  }}>
-                    {status.status === 'healthy' ? '正常' : '异常'}
-                  </div>
-                </div>
-              </ProCard>
-              <ProCard
-                style={{
-                  minWidth: '180px',
-                  minHeight: '100px',
-                  background: isDarkTheme ? currentTheme.token?.colorBgElevated : undefined,
-                  border: isDarkTheme ? `1px solid ${currentTheme.token?.colorBorder}` : undefined
-                }}
-              >
-                <div style={{ textAlign: 'center' }}>
-                  <div style={{
-                    color: currentTheme.token?.colorText || (isDarkTheme ? 'rgba(255, 255, 255, 0.65)' : 'rgba(0, 0, 0, 0.65)'),
-                    fontSize: '14px',
-                    marginBottom: '8px'
-                  }}>
-                    最后更新
-                  </div>
-                  <div style={{
-                    color: currentTheme.token?.colorText || (isDarkTheme ? 'rgba(255, 255, 255, 0.85)' : 'rgba(0, 0, 0, 0.85)'),
-                    fontWeight: 500,
-                    fontSize: '16px'
-                  }}>
-                    {new Date(status.last_updated).toLocaleString()}
-                  </div>
-                </div>
-              </ProCard>
-            </StatisticCard.Group>
-          </div>
-        );
-      })()}
 
       {/* 工具筛选和操作栏 */}
       <ProCard style={{ marginBottom: 16 }}>
@@ -651,51 +528,88 @@ const MCPToolsManagement: React.FC = () => {
                         </Tag>
                       )}
                       {!category.enabled && <Tag color="red">分类禁用</Tag>}
+                      {/* 统一的配置按钮样式 */}
                       {category.id === 'file' && (
                         <Tooltip title="文件工具安全配置">
                           <Button
+                            type="text"
                             size="small"
-                            icon={<SecurityScanOutlined />}
+                            icon={<SettingOutlined />}
                             onClick={() => setFileToolsConfigModal(true)}
                             style={{
                               color: currentTheme.token?.colorPrimary,
                               borderColor: currentTheme.token?.colorPrimary,
-                              backgroundColor: 'transparent'
+                              backgroundColor: 'rgba(24, 144, 255, 0.06)',
+                              borderRadius: 6,
+                              border: `1px solid ${currentTheme.token?.colorPrimary}20`,
+                              transition: 'all 0.2s ease'
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.backgroundColor = 'rgba(24, 144, 255, 0.12)';
+                              e.currentTarget.style.borderColor = currentTheme.token?.colorPrimary || '#1890ff';
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.backgroundColor = 'rgba(24, 144, 255, 0.06)';
+                              e.currentTarget.style.borderColor = `${currentTheme.token?.colorPrimary}20` || '#1890ff20';
                             }}
                           >
-                            安全配置
+                            工具配置
                           </Button>
                         </Tooltip>
                       )}
                       {category.id === 'time' && (
                         <Tooltip title="时间工具配置">
                           <Button
+                            type="text"
                             size="small"
-                            icon={<FileTextOutlined />}
+                            icon={<SettingOutlined />}
                             onClick={() => setTimeToolsConfigModal(true)}
                             style={{
-                              color: currentTheme.token?.colorWarning,
-                              borderColor: currentTheme.token?.colorWarning,
-                              backgroundColor: 'transparent'
+                              color: currentTheme.token?.colorPrimary,
+                              borderColor: currentTheme.token?.colorPrimary,
+                              backgroundColor: 'rgba(24, 144, 255, 0.06)',
+                              borderRadius: 6,
+                              border: `1px solid ${currentTheme.token?.colorPrimary}20`,
+                              transition: 'all 0.2s ease'
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.backgroundColor = 'rgba(24, 144, 255, 0.12)';
+                              e.currentTarget.style.borderColor = currentTheme.token?.colorPrimary || '#1890ff';
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.backgroundColor = 'rgba(24, 144, 255, 0.06)';
+                              e.currentTarget.style.borderColor = `${currentTheme.token?.colorPrimary}20` || '#1890ff20';
                             }}
                           >
-                            配置
+                            工具配置
                           </Button>
                         </Tooltip>
                       )}
                       {category.id === 'cache' && (
                         <Tooltip title="缓存工具配置">
                           <Button
+                            type="text"
                             size="small"
-                            icon={<FileTextOutlined />}
+                            icon={<SettingOutlined />}
                             onClick={() => setCacheToolsConfigModal(true)}
                             style={{
-                              color: currentTheme.token?.colorInfo,
-                              borderColor: currentTheme.token?.colorInfo,
-                              backgroundColor: 'transparent'
+                              color: currentTheme.token?.colorPrimary,
+                              borderColor: currentTheme.token?.colorPrimary,
+                              backgroundColor: 'rgba(24, 144, 255, 0.06)',
+                              borderRadius: 6,
+                              border: `1px solid ${currentTheme.token?.colorPrimary}20`,
+                              transition: 'all 0.2s ease'
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.backgroundColor = 'rgba(24, 144, 255, 0.12)';
+                              e.currentTarget.style.borderColor = currentTheme.token?.colorPrimary || '#1890ff';
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.backgroundColor = 'rgba(24, 144, 255, 0.06)';
+                              e.currentTarget.style.borderColor = `${currentTheme.token?.colorPrimary}20` || '#1890ff20';
                             }}
                           >
-                            配置
+                            工具配置
                           </Button>
                         </Tooltip>
                       )}

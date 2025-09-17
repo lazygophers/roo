@@ -4,10 +4,13 @@
  */
 
 import React, {useEffect, useState} from 'react';
-import {Alert, Card, Col, Divider, Row, Space, Statistic, Tooltip} from 'antd';
-import {ModalForm, ProFormDigit, ProFormSelect, ProFormSwitch, ProFormText} from '@ant-design/pro-components';
+import {Alert, Space, Tooltip, Typography, Row, Col} from 'antd';
+import {ModalForm, ProCard, ProFormDigit, ProFormSelect, ProFormSwitch, ProFormText} from '@ant-design/pro-components';
 import {ClockCircleOutlined, DatabaseOutlined, InfoCircleOutlined, SettingOutlined} from '@ant-design/icons';
 import {apiClient} from '../../api';
+import {useTheme} from '../../contexts/ThemeContext';
+
+const {Text, Paragraph} = Typography;
 
 // const { Text, Title } = Typography;
 
@@ -41,26 +44,8 @@ const CacheToolsConfigModal: React.FC<CacheToolsConfigModalProps> = ({
                                                                          onCancel,
                                                                          onSuccess
                                                                      }) => {
+    const {currentTheme} = useTheme();
     const [loading, setLoading] = useState(false);
-    const [cacheInfo, setCacheInfo] = useState<any>(null);
-
-    // 获取缓存系统信息
-    const loadCacheInfo = async () => {
-        try {
-            const response = await apiClient.getCacheInfo();
-            if (response.success) {
-                setCacheInfo(response.data);
-            }
-        } catch (error) {
-            console.error('Failed to load cache info:', error);
-        }
-    };
-
-    useEffect(() => {
-        if (visible) {
-            loadCacheInfo();
-        }
-    }, [visible]);
 
     // 请求初始配置数据
     const handleRequest = async () => {
@@ -159,8 +144,10 @@ const CacheToolsConfigModal: React.FC<CacheToolsConfigModalProps> = ({
         <ModalForm<CacheToolsConfig>
             title={
                 <Space>
-                    <SettingOutlined/>
-                    缓存工具配置
+                    <DatabaseOutlined style={{color: currentTheme.token?.colorPrimary}}/>
+                    <Text strong style={{color: currentTheme.token?.colorText, fontSize: 16}}>
+                        缓存工具配置
+                    </Text>
                 </Space>
             }
             open={visible}
@@ -190,45 +177,18 @@ const CacheToolsConfigModal: React.FC<CacheToolsConfigModalProps> = ({
                 style={{marginBottom: 24}}
             />
 
-            {/* 系统状态展示 */}
-            {cacheInfo && (
-                <Card
-                    title={
-                        <Space>
-                            <DatabaseOutlined/>
-                            缓存系统状态
-                        </Space>
-                    }
-                    size="small"
-                    style={{marginBottom: 24}}
-                >
-                    <Row gutter={16}>
-                        <Col span={6}>
-                            <Statistic
-                                title="持久化缓存项"
-                                value={cacheInfo.persistent_items || 0}
-                                prefix={<DatabaseOutlined/>}
-                            />
-                        </Col>
-                        <Col span={6}>
-                            <Statistic
-                                title="总访问次数"
-                                value={cacheInfo.total_access_count || 0}
-                                prefix={<ClockCircleOutlined/>}
-                            />
-                        </Col>
-                        <Col span={6}>
-                            <Statistic
-                                title="系统状态"
-                                value={cacheInfo.status === 'active' ? '正常' : '异常'}
-                                valueStyle={{color: cacheInfo.status === 'active' ? '#3f8600' : '#cf1322'}}
-                            />
-                        </Col>
-                    </Row>
-                </Card>
-            )}
 
-            <Divider orientation="left">存储后端配置</Divider>
+            {/* 存储后端配置 */}
+            <ProCard
+                title={
+                    <Space>
+                        <DatabaseOutlined/>
+                        <Text strong>存储后端配置</Text>
+                    </Space>
+                }
+                size="small"
+                style={{marginBottom: 16}}
+            >
 
             <ProFormSelect
                 name="backend_type"
@@ -361,8 +321,19 @@ const CacheToolsConfigModal: React.FC<CacheToolsConfigModalProps> = ({
                     />
                 </>
             )}
+            </ProCard>
 
-            <Divider orientation="left">基础配置</Divider>
+            {/* 基础配置 */}
+            <ProCard
+                title={
+                    <Space>
+                        <ClockCircleOutlined/>
+                        <Text strong>基础配置</Text>
+                    </Space>
+                }
+                size="small"
+                style={{marginBottom: 16}}
+            >
 
             <ProFormDigit
                 name="default_ttl"
@@ -387,9 +358,21 @@ const CacheToolsConfigModal: React.FC<CacheToolsConfigModalProps> = ({
                 ]}
                 extra="缓存项在指定时间后会自动过期删除，建议设置为3600秒（1小时）"
             />
+            </ProCard>
 
-
-            <Divider orientation="left">高级选项</Divider>
+            {/* 高级选项 */}
+            <ProCard
+                title={
+                    <Space>
+                        <SettingOutlined/>
+                        <Text strong>高级选项</Text>
+                    </Space>
+                }
+                size="small"
+                style={{marginBottom: 16}}
+                collapsible
+                defaultCollapsed={false}
+            >
 
             {/* 持久化存储 - TinyDB, DiskCache, LMDB 支持 */}
             {(currentBackend === 'tinydb' || currentBackend === 'diskcache' || currentBackend === 'lmdb') && (
@@ -462,18 +445,26 @@ const CacheToolsConfigModal: React.FC<CacheToolsConfigModalProps> = ({
                     style={{ marginBottom: 16 }}
                 />
             )}
+            </ProCard>
 
             <Alert
                 message="配置说明"
                 description={
                     <div>
-                        <p><strong>默认TTL时间</strong>：建议设置为3600秒（1小时），平衡缓存效果和内存使用。</p>
-                        <p><strong>持久化存储</strong>：推荐开启，确保数据不会因重启而丢失。</p>
+                        <Paragraph style={{margin: '8px 0', fontSize: 13}}>
+                            • <Text strong>默认TTL时间</Text>: 建议设置为3600秒（1小时），平衡缓存效果和内存使用
+                        </Paragraph>
+                        <Paragraph style={{margin: '8px 0', fontSize: 13}}>
+                            • <Text strong>持久化存储</Text>: 推荐开启，确保数据不会因重启而丢失
+                        </Paragraph>
+                        <Paragraph style={{margin: '8px 0', fontSize: 13}}>
+                            • <Text strong>存储后端</Text>: 根据性能需求选择合适的存储后端类型
+                        </Paragraph>
                     </div>
                 }
-                type="warning"
+                type="info"
                 showIcon
-                style={{marginTop: 16}}
+                style={{fontSize: 12, marginTop: 16}}
             />
         </ModalForm>
     );

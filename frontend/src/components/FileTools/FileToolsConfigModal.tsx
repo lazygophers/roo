@@ -11,7 +11,6 @@ import {
   Alert,
   Typography,
   Card,
-  Statistic,
   Row,
   Col,
   App
@@ -23,7 +22,8 @@ import {
   ReloadOutlined,
   FileTextOutlined,
   WarningOutlined,
-  CheckCircleOutlined
+  CheckCircleOutlined,
+  SettingOutlined
 } from '@ant-design/icons';
 import { 
   apiClient, 
@@ -33,7 +33,7 @@ import {
 } from '../../api';
 import { useTheme } from '../../contexts/ThemeContext';
 
-const { Text } = Typography;
+const { Text, Paragraph } = Typography;
 const { TextArea } = Input;
 const { useApp } = App;
 
@@ -267,62 +267,6 @@ const FileToolsConfigModal: React.FC<FileToolsConfigModalProps> = ({
         <div style={{ padding: '16px 0' }}>
           {securityInfo && (
             <>
-              <Row gutter={16} style={{ marginBottom: 24 }}>
-                <Col span={8}>
-                  <Card style={{ 
-                    backgroundColor: currentTheme.token?.colorBgContainer,
-                    borderColor: currentTheme.token?.colorBorder
-                  }}>
-                    <Statistic
-                      title={<span style={{ color: currentTheme.token?.colorTextSecondary }}>安全评分</span>}
-                      value={securityScore}
-                      suffix="/ 100"
-                      valueStyle={{ 
-                        color: scoreStatus.status === 'success' 
-                          ? (currentTheme.token?.colorSuccess || '#3f8600')
-                          : scoreStatus.status === 'warning' 
-                          ? (currentTheme.token?.colorWarning || '#faad14')
-                          : (currentTheme.token?.colorError || '#ff4d4f')
-                      }}
-                      prefix={scoreStatus.status === 'success' ? <CheckCircleOutlined /> : <WarningOutlined />}
-                    />
-                    <div style={{ marginTop: 8 }}>
-                      <Tag color={scoreStatus.status === 'success' ? 'green' : scoreStatus.status === 'warning' ? 'orange' : 'red'}>
-                        {scoreStatus.text}
-                      </Tag>
-                    </div>
-                  </Card>
-                </Col>
-                <Col span={8}>
-                  <Card style={{ 
-                    backgroundColor: currentTheme.token?.colorBgContainer,
-                    borderColor: currentTheme.token?.colorBorder
-                  }}>
-                    <Statistic
-                      title={<span style={{ color: currentTheme.token?.colorTextSecondary }}>安全模式</span>}
-                      value={securityInfo.strict_mode ? '严格模式' : '宽松模式'}
-                      valueStyle={{ 
-                        color: securityInfo.strict_mode 
-                          ? (currentTheme.token?.colorSuccess || '#3f8600')
-                          : (currentTheme.token?.colorWarning || '#faad14')
-                      }}
-                    />
-                  </Card>
-                </Col>
-                <Col span={8}>
-                  <Card style={{ 
-                    backgroundColor: currentTheme.token?.colorBgContainer,
-                    borderColor: currentTheme.token?.colorBorder
-                  }}>
-                    <Statistic
-                      title={<span style={{ color: currentTheme.token?.colorTextSecondary }}>配置目录</span>}
-                      value={securityInfo.readable_directories.length + securityInfo.writable_directories.length + securityInfo.deletable_directories.length + securityInfo.forbidden_directories.length}
-                      suffix="个"
-                      valueStyle={{ color: currentTheme.token?.colorText }}
-                    />
-                  </Card>
-                </Col>
-              </Row>
 
               <Alert
                 message={<span style={{ color: currentTheme.token?.colorText }}>文件工具集安全说明</span>}
