@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Progress, Space, Typography, Tooltip, Alert } from 'antd';
+import { Progress, Space, Typography, Tooltip, Alert } from 'antd';
+import { ProCard } from '@ant-design/pro-components';
 import { 
   ClockCircleOutlined, 
   ThunderboltOutlined, 
@@ -95,24 +96,24 @@ const SystemMonitor: React.FC = () => {
 
   if (loading) {
     return (
-      <Card size="small" style={{ margin: '8px 0' }}>
+      <ProCard size="small" style={{ margin: '8px 0' }}>
         <div style={{ textAlign: 'center', padding: '12px 0' }}>
           <Text type="secondary">加载监控数据...</Text>
         </div>
-      </Card>
+      </ProCard>
     );
   }
 
   if (error) {
     return (
-      <Card size="small" style={{ margin: '8px 0' }}>
+      <ProCard size="small" style={{ margin: '8px 0' }}>
         <Alert
           message="监控数据获取失败"
           description={error}
           type="warning"
           showIcon
         />
-      </Card>
+      </ProCard>
     );
   }
 

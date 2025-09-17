@@ -4,28 +4,22 @@ import {
   Form,
   Input,
   InputNumber,
-  Switch,
   Tabs,
   Button,
   Space,
-  Table,
   Tag,
   Alert,
-  Divider,
   Typography,
   Card,
   Statistic,
   Row,
   Col,
-  Tooltip,
   App
 } from 'antd';
 import {
   SecurityScanOutlined,
   FolderOutlined,
   EditOutlined,
-  DeleteOutlined,
-  PlusOutlined,
   ReloadOutlined,
   FileTextOutlined,
   WarningOutlined,
@@ -39,9 +33,8 @@ import {
 } from '../../api';
 import { useTheme } from '../../contexts/ThemeContext';
 
-const { Title, Text, Paragraph } = Typography;
+const { Text } = Typography;
 const { TextArea } = Input;
-const { TabPane } = Tabs;
 const { useApp } = App;
 
 interface FileToolsConfigModalProps {
@@ -73,12 +66,17 @@ const FileToolsConfigModal: React.FC<FileToolsConfigModalProps> = ({
       
       if (response.status === 'success' && response.data) {
         setSecurityInfo(response.data);
-        // 更新限制表单的初始值
-        limitForm.setFieldsValue({
-          max_file_size_mb: response.data.max_file_size_mb,
-          max_read_lines: response.data.max_read_lines,
-          strict_mode: response.data.strict_mode
-        });
+        // 使用 setTimeout 确保 Form 已经被渲染
+        setTimeout(() => {
+          limitForm.setFieldsValue({
+            max_file_size_mb: response.data.max_file_size_mb,
+            max_read_lines: response.data.max_read_lines,
+            strict_mode: response.data.strict_mode,
+            recycle_bin_enabled: response.data.recycle_bin_enabled ?? true,
+            recycle_bin_retention_days: response.data.recycle_bin_retention_days ?? 3,
+            recycle_bin_auto_cleanup_hours: response.data.recycle_bin_auto_cleanup_hours ?? 6
+          });
+        }, 100);
       }
     } catch (error) {
       console.error('Failed to load file security info:', error);
@@ -111,7 +109,7 @@ const FileToolsConfigModal: React.FC<FileToolsConfigModalProps> = ({
   };
 
   // 更新限制配置
-  const updateLimits = async (limitType: 'max_file_size' | 'max_read_lines' | 'strict_mode', value: number | boolean) => {
+  const updateLimits = async (limitType: 'max_file_size' | 'max_read_lines' | 'strict_mode' | 'recycle_bin_enabled' | 'recycle_bin_retention_days' | 'recycle_bin_auto_cleanup_hours', value: number | boolean) => {
     try {
       setLoading(true);
       const request: UpdateLimitsRequest = { limit_type: limitType, value };
@@ -170,6 +168,12 @@ const FileToolsConfigModal: React.FC<FileToolsConfigModalProps> = ({
         await updateLimits('max_read_lines', value as number);
       } else if (key === 'strict_mode' && value !== securityInfo?.strict_mode) {
         await updateLimits('strict_mode', value as boolean);
+      } else if (key === 'recycle_bin_enabled' && value !== securityInfo?.recycle_bin_enabled) {
+        await updateLimits('recycle_bin_enabled', value as boolean);
+      } else if (key === 'recycle_bin_retention_days' && value !== securityInfo?.recycle_bin_retention_days) {
+        await updateLimits('recycle_bin_retention_days', value as number);
+      } else if (key === 'recycle_bin_auto_cleanup_hours' && value !== securityInfo?.recycle_bin_auto_cleanup_hours) {
+        await updateLimits('recycle_bin_auto_cleanup_hours', value as number);
       }
     }
   };
@@ -212,9 +216,14 @@ const FileToolsConfigModal: React.FC<FileToolsConfigModalProps> = ({
 
   useEffect(() => {
     if (visible) {
-      loadSecurityInfo();
+      // 使用 setTimeout 确保 Form 组件已经渲染完成
+      const timer = setTimeout(() => {
+        loadSecurityInfo();
+      }, 0);
+
+      return () => clearTimeout(timer);
     }
-  }, [visible]);
+  }, [visible]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // 计算安全评分
   const getSecurityScore = () => {
@@ -244,6 +253,361 @@ const FileToolsConfigModal: React.FC<FileToolsConfigModalProps> = ({
 
   const scoreStatus = getScoreStatus(securityScore);
 
+  // Tab items for new Tabs API
+  const tabItems = [
+    {
+      key: 'overview',
+      label: (
+        <span>
+          <CheckCircleOutlined />
+          安全概览
+        </span>
+      ),
+      children: (
+        <div style={{ padding: '16px 0' }}>
+          {securityInfo && (
+            <>
+              <Row gutter={16} style={{ marginBottom: 24 }}>
+                <Col span={8}>
+                  <Card style={{ 
+                    backgroundColor: currentTheme.token?.colorBgContainer,
+                    borderColor: currentTheme.token?.colorBorder
+                  }}>
+                    <Statistic
+                      title={<span style={{ color: currentTheme.token?.colorTextSecondary }}>安全评分</span>}
+                      value={securityScore}
+                      suffix="/ 100"
+                      valueStyle={{ 
+                        color: scoreStatus.status === 'success' 
+                          ? (currentTheme.token?.colorSuccess || '#3f8600')
+                          : scoreStatus.status === 'warning' 
+                          ? (currentTheme.token?.colorWarning || '#faad14')
+                          : (currentTheme.token?.colorError || '#ff4d4f')
+                      }}
+                      prefix={scoreStatus.status === 'success' ? <CheckCircleOutlined /> : <WarningOutlined />}
+                    />
+                    <div style={{ marginTop: 8 }}>
+                      <Tag color={scoreStatus.status === 'success' ? 'green' : scoreStatus.status === 'warning' ? 'orange' : 'red'}>
+                        {scoreStatus.text}
+                      </Tag>
+                    </div>
+                  </Card>
+                </Col>
+                <Col span={8}>
+                  <Card style={{ 
+                    backgroundColor: currentTheme.token?.colorBgContainer,
+                    borderColor: currentTheme.token?.colorBorder
+                  }}>
+                    <Statistic
+                      title={<span style={{ color: currentTheme.token?.colorTextSecondary }}>安全模式</span>}
+                      value={securityInfo.strict_mode ? '严格模式' : '宽松模式'}
+                      valueStyle={{ 
+                        color: securityInfo.strict_mode 
+                          ? (currentTheme.token?.colorSuccess || '#3f8600')
+                          : (currentTheme.token?.colorWarning || '#faad14')
+                      }}
+                    />
+                  </Card>
+                </Col>
+                <Col span={8}>
+                  <Card style={{ 
+                    backgroundColor: currentTheme.token?.colorBgContainer,
+                    borderColor: currentTheme.token?.colorBorder
+                  }}>
+                    <Statistic
+                      title={<span style={{ color: currentTheme.token?.colorTextSecondary }}>配置目录</span>}
+                      value={securityInfo.readable_directories.length + securityInfo.writable_directories.length + securityInfo.deletable_directories.length + securityInfo.forbidden_directories.length}
+                      suffix="个"
+                      valueStyle={{ color: currentTheme.token?.colorText }}
+                    />
+                  </Card>
+                </Col>
+              </Row>
+
+              <Alert
+                message={<span style={{ color: currentTheme.token?.colorText }}>文件工具集安全说明</span>}
+                description={
+                  <div style={{ color: currentTheme.token?.colorTextSecondary }}>
+                    <p><strong style={{ color: currentTheme.token?.colorText }}>严格模式：</strong>所有文件工具只能访问明确配置的允许目录</p>
+                    <p><strong style={{ color: currentTheme.token?.colorText }}>宽松模式：</strong>所有文件工具可以访问除禁止目录外的所有目录</p>
+                    <p><strong style={{ color: currentTheme.token?.colorText }}>路径权限：</strong>统一配置所有文件工具的读取、写入、删除权限</p>
+                    <p><strong style={{ color: currentTheme.token?.colorText }}>安全限制：</strong>统一限制所有文件工具的文件大小和读取行数，防止资源滥用</p>
+                  </div>
+                }
+                type="info"
+                showIcon
+                style={{
+                  backgroundColor: currentTheme.token?.colorInfoBg,
+                  borderColor: currentTheme.token?.colorInfoBorder
+                }}
+              />
+            </>
+          )}
+        </div>
+      ),
+    },
+    {
+      key: 'paths',
+      label: (
+        <span>
+          <FolderOutlined />
+          路径管理
+        </span>
+      ),
+      children: (
+        <div style={{ padding: '16px 0' }}>
+          {securityInfo && (
+            <>
+              <Row gutter={16} style={{ marginBottom: 16 }}>
+                <Col span={12}>
+                  <Card 
+                    title={<span style={{ color: currentTheme.token?.colorText }}>📖 可读取目录</span>}
+                    size="small" 
+                    extra={
+                      <Button type="text" size="small" icon={<EditOutlined />} 
+                        onClick={() => handleEditPaths('readable')}>编辑</Button>
+                    }
+                    style={{
+                      backgroundColor: currentTheme.token?.colorBgContainer,
+                      borderColor: currentTheme.token?.colorBorder
+                    }}
+                  >
+                    <div style={{ maxHeight: 120, overflow: 'auto' }}>
+                      {securityInfo.readable_directories.length > 0 ? (
+                        securityInfo.readable_directories.map((path, index) => (
+                          <div key={index} style={{ marginBottom: 4 }}>
+                            <Text code style={{ 
+                              backgroundColor: currentTheme.token?.colorFillQuaternary,
+                              color: currentTheme.token?.colorText
+                            }}>{path}</Text>
+                          </div>
+                        ))
+                      ) : (
+                        <Text type="secondary" style={{ color: currentTheme.token?.colorTextSecondary }}>未配置</Text>
+                      )}
+                    </div>
+                  </Card>
+                </Col>
+                <Col span={12}>
+                  <Card 
+                    title={<span style={{ color: currentTheme.token?.colorText }}>✏️ 可写入目录</span>}
+                    size="small" 
+                    extra={
+                      <Button type="text" size="small" icon={<EditOutlined />} 
+                        onClick={() => handleEditPaths('writable')}>编辑</Button>
+                    }
+                    style={{
+                      backgroundColor: currentTheme.token?.colorBgContainer,
+                      borderColor: currentTheme.token?.colorBorder
+                    }}
+                  >
+                    <div style={{ maxHeight: 120, overflow: 'auto' }}>
+                      {securityInfo.writable_directories.length > 0 ? (
+                        securityInfo.writable_directories.map((path, index) => (
+                          <div key={index} style={{ marginBottom: 4 }}>
+                            <Text code style={{ 
+                              backgroundColor: currentTheme.token?.colorFillQuaternary,
+                              color: currentTheme.token?.colorText
+                            }}>{path}</Text>
+                          </div>
+                        ))
+                      ) : (
+                        <Text type="secondary" style={{ color: currentTheme.token?.colorTextSecondary }}>未配置</Text>
+                      )}
+                    </div>
+                  </Card>
+                </Col>
+              </Row>
+
+              <Row gutter={16} style={{ marginBottom: 16 }}>
+                <Col span={12}>
+                  <Card 
+                    title={<span style={{ color: currentTheme.token?.colorText }}>🗑️ 可删除目录</span>}
+                    size="small" 
+                    extra={
+                      <Button type="text" size="small" icon={<EditOutlined />} 
+                        onClick={() => handleEditPaths('deletable')}>编辑</Button>
+                    }
+                    style={{
+                      backgroundColor: currentTheme.token?.colorBgContainer,
+                      borderColor: currentTheme.token?.colorBorder
+                    }}
+                  >
+                    <div style={{ maxHeight: 120, overflow: 'auto' }}>
+                      {securityInfo.deletable_directories.length > 0 ? (
+                        securityInfo.deletable_directories.map((path, index) => (
+                          <div key={index} style={{ marginBottom: 4 }}>
+                            <Text code style={{ 
+                              backgroundColor: currentTheme.token?.colorFillQuaternary,
+                              color: currentTheme.token?.colorText
+                            }}>{path}</Text>
+                          </div>
+                        ))
+                      ) : (
+                        <Text type="secondary" style={{ color: currentTheme.token?.colorTextSecondary }}>未配置</Text>
+                      )}
+                    </div>
+                  </Card>
+                </Col>
+                <Col span={12}>
+                  <Card 
+                    title={<span style={{ color: currentTheme.token?.colorText }}>🚫 禁止访问目录</span>}
+                    size="small" 
+                    extra={
+                      <Button type="text" size="small" icon={<EditOutlined />} 
+                        onClick={() => handleEditPaths('forbidden')}>编辑</Button>
+                    }
+                    style={{
+                      backgroundColor: currentTheme.token?.colorBgContainer,
+                      borderColor: currentTheme.token?.colorBorder
+                    }}
+                  >
+                    <div style={{ maxHeight: 120, overflow: 'auto' }}>
+                      {securityInfo.forbidden_directories.length > 0 ? (
+                        securityInfo.forbidden_directories.map((path, index) => (
+                          <div key={index} style={{ marginBottom: 4 }}>
+                            <Text code style={{ 
+                              backgroundColor: currentTheme.token?.colorFillQuaternary,
+                              color: currentTheme.token?.colorText
+                            }}>{path}</Text>
+                          </div>
+                        ))
+                      ) : (
+                        <Text type="secondary" style={{ color: currentTheme.token?.colorTextSecondary }}>未配置</Text>
+                      )}
+                    </div>
+                  </Card>
+                </Col>
+              </Row>
+
+              {editingPaths.type && (
+                <Card title={`编辑${editingPaths.type}路径`} style={{ marginTop: 16 }}>
+                  <Form form={pathForm} onFinish={handlePathSubmit} layout="vertical">
+                    <Form.Item
+                      name="paths"
+                      label="路径列表（每行一个路径，空表示允许所有路径）"
+                    >
+                      <TextArea rows={6} placeholder="留空表示允许所有路径&#10;或指定具体路径：&#10;/home/user/documents&#10;/var/www/html&#10;/tmp" />
+                    </Form.Item>
+                    <Form.Item>
+                      <Space>
+                        <Button type="primary" htmlType="submit" loading={loading}>
+                          保存配置
+                        </Button>
+                        <Button onClick={() => setEditingPaths({ type: null, paths: [] })}>
+                          取消
+                        </Button>
+                      </Space>
+                    </Form.Item>
+                  </Form>
+                </Card>
+              )}
+            </>
+          )}
+        </div>
+      ),
+    },
+    {
+      key: 'limits',
+      label: (
+        <span>
+          <FileTextOutlined />
+          限制设置
+        </span>
+      ),
+      children: (
+        <div style={{ padding: '16px 0' }}>
+          {securityInfo && (
+            <Card 
+              title={<span style={{ color: currentTheme.token?.colorText }}>文件操作限制设置</span>}
+              style={{
+                backgroundColor: currentTheme.token?.colorBgContainer,
+                borderColor: currentTheme.token?.colorBorder
+              }}
+            >
+              <Form form={limitForm} onFinish={handleLimitSubmit} layout="vertical">
+                <Row gutter={16}>
+                  <Col span={12}>
+                    <Form.Item
+                      name="max_file_size_mb"
+                      label={<span style={{ color: currentTheme.token?.colorText }}>最大文件大小 (MB)</span>}
+                      rules={[{ required: true, min: 1, type: 'number', message: '请输入有效的文件大小' }]}
+                    >
+                      <InputNumber
+                        min={1}
+                        max={10000}
+                        style={{ 
+                          width: '100%',
+                          backgroundColor: currentTheme.token?.colorBgContainer,
+                          borderColor: currentTheme.token?.colorBorder,
+                          color: currentTheme.token?.colorText
+                        }}
+                        placeholder="单位：MB"
+                      />
+                    </Form.Item>
+                  </Col>
+                  <Col span={12}>
+                    <Form.Item
+                      name="max_read_lines"
+                      label={<span style={{ color: currentTheme.token?.colorText }}>最大读取行数</span>}
+                      rules={[{ required: true, min: 1, type: 'number', message: '请输入有效的行数' }]}
+                    >
+                      <InputNumber
+                        min={1}
+                        max={1000000}
+                        style={{ 
+                          width: '100%',
+                          backgroundColor: currentTheme.token?.colorBgContainer,
+                          borderColor: currentTheme.token?.colorBorder,
+                          color: currentTheme.token?.colorText
+                        }}
+                        placeholder="单位：行"
+                      />
+                    </Form.Item>
+                  </Col>
+                </Row>
+                <Row gutter={16} style={{ marginTop: 16 }}>
+                  <Col span={24}>
+                    <Form.Item>
+                      <Space>
+                        <Button type="primary" htmlType="submit" loading={loading}>
+                          <FileTextOutlined />
+                          保存限制配置
+                        </Button>
+                        <Button onClick={reloadConfig} loading={loading}>
+                          <ReloadOutlined />
+                          重新加载
+                        </Button>
+                      </Space>
+                    </Form.Item>
+                  </Col>
+                </Row>
+              </Form>
+
+              <Alert
+                message={<span style={{ color: currentTheme.token?.colorText }}>配置说明</span>}
+                description={
+                  <div style={{ color: currentTheme.token?.colorTextSecondary }}>
+                    <p><strong style={{ color: currentTheme.token?.colorText }}>文件大小限制：</strong>防止读取过大的文件导致内存溢出</p>
+                    <p><strong style={{ color: currentTheme.token?.colorText }}>读取行数限制：</strong>防止读取过多行数影响性能</p>
+                    <p><strong style={{ color: currentTheme.token?.colorText }}>适用范围：</strong>这些限制将应用于所有文件工具的读取操作</p>
+                  </div>
+                }
+                type="info"
+                showIcon
+                style={{
+                  marginTop: 16,
+                  backgroundColor: currentTheme.token?.colorInfoBg,
+                  borderColor: currentTheme.token?.colorInfoBorder
+                }}
+              />
+            </Card>
+          )}
+        </div>
+      ),
+    },
+  ];
+
   return (
     <Modal
       title={
@@ -256,358 +620,9 @@ const FileToolsConfigModal: React.FC<FileToolsConfigModalProps> = ({
       onCancel={onCancel}
       footer={null}
       width={800}
-      destroyOnClose
+      destroyOnHidden
     >
-      <Tabs activeKey={activeTab} onChange={setActiveTab}>
-        <TabPane 
-          tab={
-            <span>
-              <CheckCircleOutlined />
-              安全概览
-            </span>
-          } 
-          key="overview"
-        >
-          <div style={{ padding: '16px 0' }}>
-            {securityInfo && (
-              <>
-                <Row gutter={16} style={{ marginBottom: 24 }}>
-                  <Col span={8}>
-                    <Card style={{ 
-                      backgroundColor: currentTheme.token?.colorBgContainer,
-                      borderColor: currentTheme.token?.colorBorder
-                    }}>
-                      <Statistic
-                        title={<span style={{ color: currentTheme.token?.colorTextSecondary }}>安全评分</span>}
-                        value={securityScore}
-                        suffix="/ 100"
-                        valueStyle={{ 
-                          color: scoreStatus.status === 'success' 
-                            ? (currentTheme.token?.colorSuccess || '#3f8600')
-                            : scoreStatus.status === 'warning' 
-                            ? (currentTheme.token?.colorWarning || '#faad14')
-                            : (currentTheme.token?.colorError || '#ff4d4f')
-                        }}
-                        prefix={scoreStatus.status === 'success' ? <CheckCircleOutlined /> : <WarningOutlined />}
-                      />
-                      <div style={{ marginTop: 8 }}>
-                        <Tag color={scoreStatus.status === 'success' ? 'green' : scoreStatus.status === 'warning' ? 'orange' : 'red'}>
-                          {scoreStatus.text}
-                        </Tag>
-                      </div>
-                    </Card>
-                  </Col>
-                  <Col span={8}>
-                    <Card style={{ 
-                      backgroundColor: currentTheme.token?.colorBgContainer,
-                      borderColor: currentTheme.token?.colorBorder
-                    }}>
-                      <Statistic
-                        title={<span style={{ color: currentTheme.token?.colorTextSecondary }}>安全模式</span>}
-                        value={securityInfo.strict_mode ? '严格模式' : '宽松模式'}
-                        valueStyle={{ 
-                          color: securityInfo.strict_mode 
-                            ? (currentTheme.token?.colorSuccess || '#3f8600')
-                            : (currentTheme.token?.colorWarning || '#faad14')
-                        }}
-                      />
-                    </Card>
-                  </Col>
-                  <Col span={8}>
-                    <Card style={{ 
-                      backgroundColor: currentTheme.token?.colorBgContainer,
-                      borderColor: currentTheme.token?.colorBorder
-                    }}>
-                      <Statistic
-                        title={<span style={{ color: currentTheme.token?.colorTextSecondary }}>配置目录</span>}
-                        value={securityInfo.readable_directories.length + securityInfo.writable_directories.length + securityInfo.deletable_directories.length + securityInfo.forbidden_directories.length}
-                        suffix="个"
-                        valueStyle={{ color: currentTheme.token?.colorText }}
-                      />
-                    </Card>
-                  </Col>
-                </Row>
-
-                <Alert
-                  message={<span style={{ color: currentTheme.token?.colorText }}>文件工具集安全说明</span>}
-                  description={
-                    <div style={{ color: currentTheme.token?.colorTextSecondary }}>
-                      <p><strong style={{ color: currentTheme.token?.colorText }}>严格模式：</strong>所有文件工具只能访问明确配置的允许目录</p>
-                      <p><strong style={{ color: currentTheme.token?.colorText }}>宽松模式：</strong>所有文件工具可以访问除禁止目录外的所有目录</p>
-                      <p><strong style={{ color: currentTheme.token?.colorText }}>路径权限：</strong>统一配置所有文件工具的读取、写入、删除权限</p>
-                      <p><strong style={{ color: currentTheme.token?.colorText }}>安全限制：</strong>统一限制所有文件工具的文件大小和读取行数，防止资源滥用</p>
-                    </div>
-                  }
-                  type="info"
-                  showIcon
-                  style={{
-                    backgroundColor: currentTheme.token?.colorInfoBg,
-                    borderColor: currentTheme.token?.colorInfoBorder
-                  }}
-                />
-              </>
-            )}
-          </div>
-        </TabPane>
-
-        <TabPane 
-          tab={
-            <span>
-              <FolderOutlined />
-              路径管理
-            </span>
-          } 
-          key="paths"
-        >
-          <div style={{ padding: '16px 0' }}>
-            {securityInfo && (
-              <>
-                <Row gutter={16} style={{ marginBottom: 16 }}>
-                  <Col span={12}>
-                    <Card 
-                      title={<span style={{ color: currentTheme.token?.colorText }}>📖 可读取目录</span>}
-                      size="small" 
-                      extra={
-                        <Button type="text" size="small" icon={<EditOutlined />} 
-                          onClick={() => handleEditPaths('readable')}>编辑</Button>
-                      }
-                      style={{
-                        backgroundColor: currentTheme.token?.colorBgContainer,
-                        borderColor: currentTheme.token?.colorBorder
-                      }}
-                    >
-                      <div style={{ maxHeight: 120, overflow: 'auto' }}>
-                        {securityInfo.readable_directories.length > 0 ? (
-                          securityInfo.readable_directories.map((path, index) => (
-                            <div key={index} style={{ marginBottom: 4 }}>
-                              <Text code style={{ 
-                                backgroundColor: currentTheme.token?.colorFillQuaternary,
-                                color: currentTheme.token?.colorText
-                              }}>{path}</Text>
-                            </div>
-                          ))
-                        ) : (
-                          <Text type="secondary" style={{ color: currentTheme.token?.colorTextSecondary }}>未配置</Text>
-                        )}
-                      </div>
-                    </Card>
-                  </Col>
-                  <Col span={12}>
-                    <Card 
-                      title={<span style={{ color: currentTheme.token?.colorText }}>✏️ 可写入目录</span>}
-                      size="small" 
-                      extra={
-                        <Button type="text" size="small" icon={<EditOutlined />} 
-                          onClick={() => handleEditPaths('writable')}>编辑</Button>
-                      }
-                      style={{
-                        backgroundColor: currentTheme.token?.colorBgContainer,
-                        borderColor: currentTheme.token?.colorBorder
-                      }}
-                    >
-                      <div style={{ maxHeight: 120, overflow: 'auto' }}>
-                        {securityInfo.writable_directories.length > 0 ? (
-                          securityInfo.writable_directories.map((path, index) => (
-                            <div key={index} style={{ marginBottom: 4 }}>
-                              <Text code style={{ 
-                                backgroundColor: currentTheme.token?.colorFillQuaternary,
-                                color: currentTheme.token?.colorText
-                              }}>{path}</Text>
-                            </div>
-                          ))
-                        ) : (
-                          <Text type="secondary" style={{ color: currentTheme.token?.colorTextSecondary }}>未配置</Text>
-                        )}
-                      </div>
-                    </Card>
-                  </Col>
-                </Row>
-
-                <Row gutter={16} style={{ marginBottom: 16 }}>
-                  <Col span={12}>
-                    <Card 
-                      title={<span style={{ color: currentTheme.token?.colorText }}>🗑️ 可删除目录</span>}
-                      size="small" 
-                      extra={
-                        <Button type="text" size="small" icon={<EditOutlined />} 
-                          onClick={() => handleEditPaths('deletable')}>编辑</Button>
-                      }
-                      style={{
-                        backgroundColor: currentTheme.token?.colorBgContainer,
-                        borderColor: currentTheme.token?.colorBorder
-                      }}
-                    >
-                      <div style={{ maxHeight: 120, overflow: 'auto' }}>
-                        {securityInfo.deletable_directories.length > 0 ? (
-                          securityInfo.deletable_directories.map((path, index) => (
-                            <div key={index} style={{ marginBottom: 4 }}>
-                              <Text code style={{ 
-                                backgroundColor: currentTheme.token?.colorFillQuaternary,
-                                color: currentTheme.token?.colorText
-                              }}>{path}</Text>
-                            </div>
-                          ))
-                        ) : (
-                          <Text type="secondary" style={{ color: currentTheme.token?.colorTextSecondary }}>未配置</Text>
-                        )}
-                      </div>
-                    </Card>
-                  </Col>
-                  <Col span={12}>
-                    <Card 
-                      title={<span style={{ color: currentTheme.token?.colorText }}>🚫 禁止访问目录</span>}
-                      size="small" 
-                      extra={
-                        <Button type="text" size="small" icon={<EditOutlined />} 
-                          onClick={() => handleEditPaths('forbidden')}>编辑</Button>
-                      }
-                      style={{
-                        backgroundColor: currentTheme.token?.colorBgContainer,
-                        borderColor: currentTheme.token?.colorBorder
-                      }}
-                    >
-                      <div style={{ maxHeight: 120, overflow: 'auto' }}>
-                        {securityInfo.forbidden_directories.length > 0 ? (
-                          securityInfo.forbidden_directories.map((path, index) => (
-                            <div key={index} style={{ marginBottom: 4 }}>
-                              <Text code style={{ 
-                                backgroundColor: currentTheme.token?.colorFillQuaternary,
-                                color: currentTheme.token?.colorText
-                              }}>{path}</Text>
-                            </div>
-                          ))
-                        ) : (
-                          <Text type="secondary" style={{ color: currentTheme.token?.colorTextSecondary }}>未配置</Text>
-                        )}
-                      </div>
-                    </Card>
-                  </Col>
-                </Row>
-
-                {editingPaths.type && (
-                  <Card title={`编辑${editingPaths.type}路径`} style={{ marginTop: 16 }}>
-                    <Form form={pathForm} onFinish={handlePathSubmit} layout="vertical">
-                      <Form.Item
-                        name="paths"
-                        label="路径列表（每行一个路径，空表示允许所有路径）"
-                      >
-                        <TextArea rows={6} placeholder="留空表示允许所有路径&#10;或指定具体路径：&#10;/home/user/documents&#10;/var/www/html&#10;/tmp" />
-                      </Form.Item>
-                      <Form.Item>
-                        <Space>
-                          <Button type="primary" htmlType="submit" loading={loading}>
-                            保存配置
-                          </Button>
-                          <Button onClick={() => setEditingPaths({ type: null, paths: [] })}>
-                            取消
-                          </Button>
-                        </Space>
-                      </Form.Item>
-                    </Form>
-                  </Card>
-                )}
-              </>
-            )}
-          </div>
-        </TabPane>
-
-        <TabPane 
-          tab={
-            <span>
-              <FileTextOutlined />
-              限制设置
-            </span>
-          } 
-          key="limits"
-        >
-          <div style={{ padding: '16px 0' }}>
-            {securityInfo && (
-              <Card 
-                title={<span style={{ color: currentTheme.token?.colorText }}>文件操作限制设置</span>}
-                style={{
-                  backgroundColor: currentTheme.token?.colorBgContainer,
-                  borderColor: currentTheme.token?.colorBorder
-                }}
-              >
-                <Form form={limitForm} onFinish={handleLimitSubmit} layout="vertical">
-                  <Row gutter={16}>
-                    <Col span={12}>
-                      <Form.Item
-                        name="max_file_size_mb"
-                        label={<span style={{ color: currentTheme.token?.colorText }}>最大文件大小 (MB)</span>}
-                        rules={[{ required: true, min: 1, type: 'number', message: '请输入有效的文件大小' }]}
-                      >
-                        <InputNumber
-                          min={1}
-                          max={10000}
-                          style={{ 
-                            width: '100%',
-                            backgroundColor: currentTheme.token?.colorBgContainer,
-                            borderColor: currentTheme.token?.colorBorder,
-                            color: currentTheme.token?.colorText
-                          }}
-                          placeholder="单位：MB"
-                        />
-                      </Form.Item>
-                    </Col>
-                    <Col span={12}>
-                      <Form.Item
-                        name="max_read_lines"
-                        label={<span style={{ color: currentTheme.token?.colorText }}>最大读取行数</span>}
-                        rules={[{ required: true, min: 1, type: 'number', message: '请输入有效的行数' }]}
-                      >
-                        <InputNumber
-                          min={1}
-                          max={100000}
-                          style={{ 
-                            width: '100%',
-                            backgroundColor: currentTheme.token?.colorBgContainer,
-                            borderColor: currentTheme.token?.colorBorder,
-                            color: currentTheme.token?.colorText
-                          }}
-                          placeholder="单位：行"
-                        />
-                      </Form.Item>
-                    </Col>
-                  </Row>
-
-                  <Form.Item
-                    name="strict_mode"
-                    label="严格模式"
-                    valuePropName="checked"
-                  >
-                    <Switch
-                      checkedChildren="严格"
-                      unCheckedChildren="宽松"
-                    />
-                  </Form.Item>
-
-                  <Form.Item>
-                    <Button type="primary" htmlType="submit" loading={loading}>
-                      更新限制设置
-                    </Button>
-                  </Form.Item>
-                </Form>
-
-                <Divider />
-
-                <Alert
-                  message="文件工具集限制配置说明"
-                  description={
-                    <div>
-                      <p><strong>最大文件大小：</strong>统一限制所有文件工具可操作的单个文件大小，超过此大小的文件将被拒绝操作</p>
-                      <p><strong>最大读取行数：</strong>统一限制所有文件工具读取文件时的最大行数，防止读取超大文件导致内存溢出</p>
-                      <p><strong>严格模式：</strong>启用后所有文件工具只能访问明确配置的目录，禁用后可访问除禁止目录外的所有目录</p>
-                    </div>
-                  }
-                  type="info"
-                  showIcon
-                />
-              </Card>
-            )}
-          </div>
-        </TabPane>
-      </Tabs>
+      <Tabs activeKey={activeTab} onChange={setActiveTab} items={tabItems} />
 
       <div style={{ textAlign: 'right', paddingTop: 16, borderTop: '1px solid #f0f0f0' }}>
         <Space>

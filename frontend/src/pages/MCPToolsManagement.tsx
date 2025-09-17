@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import {
-  Card,
   Button,
   Switch,
   Tag,
@@ -9,13 +8,11 @@ import {
   Form,
   Input,
   Select,
-  Descriptions,
   Badge,
   Tooltip,
   Divider,
   Row,
   Col,
-  Statistic,
   Alert,
   Spin,
   Typography,
@@ -23,6 +20,11 @@ import {
   Collapse,
   App
 } from 'antd';
+import {
+  ProCard,
+  ProDescriptions,
+  StatisticCard
+} from '@ant-design/pro-components';
 import {
   ToolOutlined,
   ReloadOutlined,
@@ -39,6 +41,7 @@ import { useNavigate } from 'react-router-dom';
 import { apiClient, MCPToolInfo, MCPCategoryInfo, MCPStatusResponse } from '../api';
 import { useTheme } from '../contexts/ThemeContext';
 import FileToolsConfigModal from '../components/FileTools/FileToolsConfigModal';
+import TimeToolsConfigModal from '../components/TimeTools/TimeToolsConfigModal';
 import './MCPToolsManagement.css';
 
 const { Title, Text, Paragraph } = Typography;
@@ -47,6 +50,7 @@ const { TextArea } = Input;
 const { useApp } = App;
 
 const MCPToolsManagement: React.FC = () => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const navigate = useNavigate();
   const { currentTheme, themeType } = useTheme();
   const { message: messageApi } = useApp();
@@ -66,6 +70,7 @@ const MCPToolsManagement: React.FC = () => {
   }>({ visible: false, tool: null, form: null });
   const [testResult, setTestResult] = useState<string>('');
   const [fileToolsConfigModal, setFileToolsConfigModal] = useState(false);
+  const [timeToolsConfigModal, setTimeToolsConfigModal] = useState(false);
 
   const [form] = Form.useForm();
 
@@ -382,91 +387,87 @@ const MCPToolsManagement: React.FC = () => {
     
     return (
       <Col xs={24} sm={12} lg={8} xl={6} key={tool.id}>
-        <Card
+        <ProCard
           size="small"
           hoverable
           className={`tool-card ${!tool.enabled ? 'disabled' : ''}`}
-          style={{ 
+          style={{
             height: '100%',
             opacity: tool.enabled ? 1 : 0.6,
             borderColor: cardBorder,
             backgroundColor: token?.colorBgContainer
           }}
+          title={
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <div style={{
+                  width: 32,
+                  height: 32,
+                  borderRadius: '50%',
+                  backgroundColor: enabledBg,
+                  border: `2px solid ${enabledBorder}`,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '14px'
+                }}>
+                  {categoryInfo?.icon || '🔧'}
+                </div>
+                <Text strong style={{ fontSize: 14, color: token?.colorText }}>{tool.name}</Text>
+              </div>
+              <Tag color={tool.implementation_type === 'builtin' ? 'blue' : 'green'}>
+                {tool.implementation_type}
+              </Tag>
+            </div>
+          }
+          extra={
+            <Space size="small">
+              <Tooltip title={tool.enabled ? '禁用工具' : '启用工具'}>
+                <Switch
+                  size="small"
+                  checked={tool.enabled}
+                  onChange={(checked) => toggleTool(tool, checked)}
+                  checkedChildren={<CheckCircleOutlined />}
+                  unCheckedChildren={<ExclamationCircleOutlined />}
+                />
+              </Tooltip>
+              <Tooltip title="查看详情">
+                <Button
+                  type="text"
+                  size="small"
+                  icon={<InfoCircleOutlined />}
+                  onClick={() => setToolDetailModal({ visible: true, tool })}
+                />
+              </Tooltip>
+              <Tooltip title={tool.enabled ? '测试工具' : '需要先启用工具'}>
+                <Button
+                  type="text"
+                  size="small"
+                  icon={<BugOutlined />}
+                  disabled={!tool.enabled}
+                  onClick={() => setTestToolModal({ visible: true, tool, form })}
+                />
+              </Tooltip>
+            </Space>
+          }
         >
-          <Card.Meta
-            avatar={
-              <div style={{ 
-                width: 40, 
-                height: 40, 
-                borderRadius: '50%', 
-                backgroundColor: enabledBg,
-                border: `2px solid ${enabledBorder}`,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '16px'
-              }}>
-                {categoryInfo?.icon || '🔧'}
-              </div>
-            }
-            title={
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <Text strong style={{ fontSize: 14, color: token?.colorText }}>{tool.name}</Text>
-                  <Space size="small">
-                    <Tooltip title={tool.enabled ? '禁用工具' : '启用工具'}>
-                      <Switch
-                        size="small"
-                        checked={tool.enabled}
-                        onChange={(checked) => toggleTool(tool, checked)}
-                        checkedChildren={<CheckCircleOutlined />}
-                        unCheckedChildren={<ExclamationCircleOutlined />}
-                      />
-                    </Tooltip>
-                    <Tooltip title="查看详情">
-                      <Button
-                        type="text"
-                        size="small"
-                        icon={<InfoCircleOutlined />}
-                        onClick={() => setToolDetailModal({ visible: true, tool })}
-                      />
-                    </Tooltip>
-                    <Tooltip title={tool.enabled ? '测试工具' : '需要先启用工具'}>
-                      <Button
-                        type="text"
-                        size="small"
-                        icon={<BugOutlined />}
-                        disabled={!tool.enabled}
-                        onClick={() => setTestToolModal({ visible: true, tool, form })}
-                      />
-                    </Tooltip>
-                  </Space>
-                </div>
-                <Tag color={tool.implementation_type === 'builtin' ? 'blue' : 'green'}>
-                  {tool.implementation_type}
-                </Tag>
-              </div>
-            }
-            description={
-              <div>
-                <Paragraph 
-                  ellipsis={{ rows: 2, tooltip: tool.description }} 
-                  style={{ margin: 0, fontSize: 12, color: descriptionColor }}
-                >
-                  {tool.description}
-                </Paragraph>
-                <div style={{ marginTop: 8, display: 'flex', flexWrap: 'wrap', gap: 4 }}>
-                  {tool.metadata?.tags?.slice(0, 3).map((tag: string, index: number) => (
-                    <Tag key={index} color="geekblue" style={{ fontSize: '11px' }}>{tag}</Tag>
-                  ))}
-                  {tool.metadata?.tags?.length > 3 && (
-                    <Tag color="default" style={{ fontSize: '11px' }}>+{tool.metadata.tags.length - 3}</Tag>
-                  )}
-                </div>
-              </div>
-            }
-          />
-        </Card>
+          <div>
+            <Typography.Paragraph
+              ellipsis={{ rows: 2, tooltip: tool.description }}
+              style={{ margin: 0, fontSize: 12, color: descriptionColor }}
+            >
+              {tool.description}
+            </Typography.Paragraph>
+            <div style={{ marginTop: 8, display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+              {tool.metadata?.tags?.slice(0, 3).map((tag: string, index: number) => (
+                <Tag key={index} color="geekblue" style={{ fontSize: '11px' }}>{tag}</Tag>
+              ))}
+              {tool.metadata?.tags?.length > 3 && (
+                <Tag color="default" style={{ fontSize: '11px' }}>+{tool.metadata.tags.length - 3}</Tag>
+              )}
+            </div>
+          </div>
+        </ProCard>
       </Col>
     );
   };
@@ -483,55 +484,132 @@ const MCPToolsManagement: React.FC = () => {
       </div>
 
       {/* 状态卡片 */}
-      {status && (
-        <Row gutter={16} style={{ marginBottom: 24 }}>
-          <Col span={6}>
-            <Card>
-              <Statistic
-                title="可用工具"
-                value={status.tools_count}
-                suffix={`/ ${status.total_tools}`}
-                valueStyle={{ color: '#3f8600' }}
-              />
-            </Card>
-          </Col>
-          <Col span={6}>
-            <Card>
-              <Statistic
-                title="工具分类"
-                value={status.categories_count}
-                valueStyle={{ color: '#1890ff' }}
-              />
-            </Card>
-          </Col>
-          <Col span={6}>
-            <Card>
-              <Statistic
-                title="服务状态"
-                value={status.status}
-                formatter={(value) => (
-                  <Badge 
-                    status={value === 'healthy' ? 'success' : 'error'} 
-                    text={value === 'healthy' ? '正常' : '异常'}
-                  />
-                )}
-              />
-            </Card>
-          </Col>
-          <Col span={6}>
-            <Card>
-              <Statistic
-                title="最后更新"
-                value={new Date(status.last_updated).toLocaleString()}
-                valueStyle={{ fontSize: 14 }}
-              />
-            </Card>
-          </Col>
-        </Row>
-      )}
+      {status && (() => {
+        // 判断是否为深色主题
+        const isDarkTheme = themeType === 'nightRain' || themeType === 'plumRain' ||
+                           themeType === 'deepSeaMoon' || themeType === 'greenMountain';
+
+        return (
+          <div
+            style={{
+              marginBottom: 24,
+              // 深色主题下增强背景对比度
+              background: isDarkTheme ? currentTheme.token?.colorBgContainer : undefined,
+              borderRadius: 8,
+              padding: isDarkTheme ? '12px' : undefined
+            }}
+          >
+            <StatisticCard.Group>
+              <ProCard
+                style={{
+                  // 深色主题下的卡片样式优化
+                  background: isDarkTheme ? currentTheme.token?.colorBgElevated : undefined,
+                  border: isDarkTheme ? `1px solid ${currentTheme.token?.colorBorder}` : undefined,
+                  // 统一卡片尺寸
+                  minWidth: '180px',
+                  minHeight: '100px'
+                }}
+                title={
+                  <span style={{
+                    color: currentTheme.token?.colorText || (isDarkTheme ? 'rgba(255, 255, 255, 0.85)' : 'rgba(0, 0, 0, 0.65)'),
+                    fontSize: '14px'
+                  }}>
+                    可用工具
+                  </span>
+                }
+              >
+                <div style={{
+                  color: currentTheme.token?.colorSuccess || (isDarkTheme ? '#73d13d' : '#52c41a'),
+                  fontWeight: 600,
+                  fontSize: '24px'
+                }}>
+                  {status.tools_count} / {status.total_tools}
+                </div>
+              </ProCard>
+              <ProCard
+                style={{
+                  background: isDarkTheme ? currentTheme.token?.colorBgElevated : undefined,
+                  border: isDarkTheme ? `1px solid ${currentTheme.token?.colorBorder}` : undefined,
+                  // 统一卡片尺寸
+                  minWidth: '180px',
+                  minHeight: '100px'
+                }}
+                title={
+                  <span style={{
+                    color: currentTheme.token?.colorText || (isDarkTheme ? 'rgba(255, 255, 255, 0.85)' : 'rgba(0, 0, 0, 0.65)'),
+                    fontSize: '14px'
+                  }}>
+                    工具分类
+                  </span>
+                }
+              >
+                <div style={{
+                  color: currentTheme.token?.colorPrimary || (isDarkTheme ? '#40a9ff' : '#1890ff'),
+                  fontWeight: 600,
+                  fontSize: '24px'
+                }}>
+                  {status.categories_count}
+                </div>
+              </ProCard>
+              <ProCard
+                style={{
+                  background: isDarkTheme ? currentTheme.token?.colorBgElevated : undefined,
+                  border: isDarkTheme ? `1px solid ${currentTheme.token?.colorBorder}` : undefined,
+                  // 统一卡片尺寸
+                  minWidth: '180px',
+                  minHeight: '100px'
+                }}
+                title={
+                  <span style={{
+                    color: currentTheme.token?.colorText || (isDarkTheme ? 'rgba(255, 255, 255, 0.85)' : 'rgba(0, 0, 0, 0.65)'),
+                    fontSize: '14px'
+                  }}>
+                    服务状态
+                  </span>
+                }
+              >
+                <div style={{
+                  color: status.status === 'healthy'
+                    ? (currentTheme.token?.colorSuccess || (isDarkTheme ? '#73d13d' : '#52c41a'))
+                    : (currentTheme.token?.colorError || (isDarkTheme ? '#ff7875' : '#ff4d4f')),
+                  fontWeight: 600,
+                  fontSize: '24px'
+                }}>
+                  {status.status === 'healthy' ? '正常' : '异常'}
+                </div>
+              </ProCard>
+              <ProCard
+                style={{
+                  background: isDarkTheme ? currentTheme.token?.colorBgElevated : undefined,
+                  border: isDarkTheme ? `1px solid ${currentTheme.token?.colorBorder}` : undefined,
+                  // 统一卡片尺寸
+                  minWidth: '180px',
+                  minHeight: '100px'
+                }}
+                title={
+                  <span style={{
+                    color: currentTheme.token?.colorText || (isDarkTheme ? 'rgba(255, 255, 255, 0.85)' : 'rgba(0, 0, 0, 0.65)'),
+                    fontSize: '14px'
+                  }}>
+                    最后更新
+                  </span>
+                }
+              >
+                <div style={{
+                  fontSize: '16px',
+                  color: currentTheme.token?.colorText || (isDarkTheme ? 'rgba(255, 255, 255, 0.85)' : 'rgba(0, 0, 0, 0.85)'),
+                  fontWeight: 500
+                }}>
+                  {new Date(status.last_updated).toLocaleString()}
+                </div>
+              </ProCard>
+            </StatisticCard.Group>
+          </div>
+        );
+      })()}
 
       {/* 工具筛选和操作栏 */}
-      <Card style={{ marginBottom: 16 }}>
+      <ProCard style={{ marginBottom: 16 }}>
         <Row justify="space-between" align="middle">
           <Col>
             <Space>
@@ -565,7 +643,7 @@ const MCPToolsManagement: React.FC = () => {
             </Button>
           </Col>
         </Row>
-      </Card>
+      </ProCard>
 
       {/* 工具分类展示 */}
       <Spin spinning={loading}>
@@ -618,6 +696,22 @@ const MCPToolsManagement: React.FC = () => {
                           </Button>
                         </Tooltip>
                       )}
+                      {category.id === 'time' && (
+                        <Tooltip title="时间工具配置">
+                          <Button
+                            size="small"
+                            icon={<FileTextOutlined />}
+                            onClick={() => setTimeToolsConfigModal(true)}
+                            style={{
+                              color: currentTheme.token?.colorWarning,
+                              borderColor: currentTheme.token?.colorWarning,
+                              backgroundColor: 'transparent'
+                            }}
+                          >
+                            配置
+                          </Button>
+                        </Tooltip>
+                      )}
                     </Space>
                     <div></div>
                   </div>
@@ -666,29 +760,23 @@ const MCPToolsManagement: React.FC = () => {
       >
         {toolDetailModal.tool && (
           <div>
-            <Descriptions column={2} bordered>
-              <Descriptions.Item label="工具名称">
-                {toolDetailModal.tool.name}
-              </Descriptions.Item>
-              <Descriptions.Item label="状态">
-                <Badge 
-                  status={toolDetailModal.tool.enabled ? 'success' : 'default'} 
-                  text={toolDetailModal.tool.enabled ? '启用' : '禁用'}
-                />
-              </Descriptions.Item>
-              <Descriptions.Item label="分类" span={2}>
-                {categories.find(c => c.id === toolDetailModal.tool!.category)?.name || toolDetailModal.tool.category}
-              </Descriptions.Item>
-              <Descriptions.Item label="描述" span={2}>
-                {toolDetailModal.tool.description}
-              </Descriptions.Item>
-              <Descriptions.Item label="实现类型">
-                {toolDetailModal.tool.implementation_type}
-              </Descriptions.Item>
-              <Descriptions.Item label="创建时间">
-                {new Date(toolDetailModal.tool.created_at).toLocaleString()}
-              </Descriptions.Item>
-            </Descriptions>
+            <ProDescriptions
+              column={2}
+              bordered
+              dataSource={{
+                '工具名称': toolDetailModal.tool.name,
+                '状态': (
+                  <Badge
+                    status={toolDetailModal.tool.enabled ? 'success' : 'default'}
+                    text={toolDetailModal.tool.enabled ? '启用' : '禁用'}
+                  />
+                ),
+                '分类': categories.find(c => c.id === toolDetailModal.tool!.category)?.name || toolDetailModal.tool.category,
+                '描述': toolDetailModal.tool.description,
+                '实现类型': toolDetailModal.tool.implementation_type,
+                '创建时间': new Date(toolDetailModal.tool.created_at).toLocaleString(),
+              }}
+            />
 
             <Divider />
 
@@ -804,6 +892,12 @@ const MCPToolsManagement: React.FC = () => {
       <FileToolsConfigModal
         visible={fileToolsConfigModal}
         onCancel={() => setFileToolsConfigModal(false)}
+      />
+
+      {/* 时间工具配置Modal */}
+      <TimeToolsConfigModal
+        visible={timeToolsConfigModal}
+        onCancel={() => setTimeToolsConfigModal(false)}
       />
     </div>
   );

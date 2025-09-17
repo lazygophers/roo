@@ -200,6 +200,9 @@ export interface FileSecurityInfo {
   max_file_size_mb: number;
   max_read_lines: number;
   strict_mode: boolean;
+  recycle_bin_enabled?: boolean;
+  recycle_bin_retention_days?: number;
+  recycle_bin_auto_cleanup_hours?: number;
   database_summary?: any;
 }
 
@@ -214,11 +217,66 @@ export interface UpdatePathsRequest {
 }
 
 export interface UpdateLimitsRequest {
-  limit_type: 'max_file_size' | 'max_read_lines' | 'strict_mode';
+  limit_type: 'max_file_size' | 'max_read_lines' | 'strict_mode' | 'recycle_bin_enabled' | 'recycle_bin_retention_days' | 'recycle_bin_auto_cleanup_hours';
   value: number | boolean;
 }
 
 export interface SecurityActionResponse {
+  status: string;
+  message?: string;
+  data?: any;
+}
+
+// Recycle Bin Types
+export enum RecycleBinItemType {
+  MODEL = "model",
+  COMMAND = "command",
+  RULE = "rule",
+  HOOK = "hook",
+  ROLE = "role",
+  CONFIGURATION = "configuration",
+  SECURITY_PATH = "security_path",
+  SECURITY_LIMIT = "security_limit",
+  MCP_TOOL = "mcp_tool",
+  MCP_CATEGORY = "mcp_category",
+  CACHE_FILE = "cache_file",
+  CACHE_METADATA = "cache_metadata"
+}
+
+export interface RecycleBinItem {
+  id: string;
+  original_id: string;
+  item_type: string;
+  original_table: string;
+  original_data: any;
+  deleted_by: string;
+  deleted_reason: string;
+  deleted_at: string;
+  expires_at: string;
+  is_expired: boolean;
+  remaining_days: number;
+  metadata?: any;
+}
+
+export interface SoftDeleteRequest {
+  table_name: string;
+  item_id: string;
+  item_type: RecycleBinItemType;
+  deleted_by?: string;
+  deleted_reason?: string;
+  retention_days?: number;
+}
+
+export interface RecycleBinStatsResponse {
+  total_items: number;
+  by_type: Record<string, number>;
+  expired_items: number;
+  expiring_soon: number;
+  oldest_item?: string;
+  newest_item?: string;
+}
+
+export interface RecycleBinResponse {
   status: string;
   message?: string;
   data?: any;
@@ -436,6 +494,94 @@ export const apiClient = {
   reloadFileSecurityConfig: async (): Promise<FileSecurityResponse> => {
     // 新的API架构下，配置会自动重新加载，所以只需要获取最新状态
     const response = await api.get('/file-security/status');
+    return response.data;
+  },
+
+  // Recycle Bin API methods
+  // 软删除项目
+  softDeleteItem: async (request: SoftDeleteRequest): Promise<RecycleBinResponse> => {
+    const response = await api.post('/recycle-bin/soft-delete', request);
+    return response.data;
+  },
+
+  // 获取回收站项目列表
+  getRecycleBinItems: async (options: {
+    item_type?: RecycleBinItemType;
+    include_expired?: boolean;
+    limit?: number;
+  } = {}): Promise<RecycleBinItem[]> => {
+    const params = new URLSearchParams();
+    if (options.item_type) params.append('item_type', options.item_type);
+    if (options.include_expired !== undefined) params.append('include_expired', String(options.include_expired));
+    if (options.limit) params.append('limit', String(options.limit));
+    
+    const response = await api.get(`/recycle-bin/items?${params}`);
+    return response.data;
+  },
+
+  // 获取单个回收站项目
+  getRecycleBinItem: async (recycleBinId: string): Promise<RecycleBinItem> => {
+    const response = await api.get(`/recycle-bin/items/${recycleBinId}`);
+    return response.data;
+  },
+
+  // 恢复回收站项目
+  restoreRecycleBinItem: async (recycleBinId: string): Promise<RecycleBinResponse> => {
+    const response = await api.post(`/recycle-bin/items/${recycleBinId}/restore`);
+    return response.data;
+  },
+
+  // 永久删除回收站项目
+  permanentDeleteRecycleBinItem: async (recycleBinId: string): Promise<RecycleBinResponse> => {
+    const response = await api.delete(`/recycle-bin/items/${recycleBinId}`);
+    return response.data;
+  },
+
+  // 批量恢复
+  batchRestoreRecycleBinItems: async (recycleBinIds: string[]): Promise<RecycleBinResponse> => {
+    const response = await api.post('/recycle-bin/batch-restore', recycleBinIds);
+    return response.data;
+  },
+
+  // 批量永久删除
+  batchDeleteRecycleBinItems: async (recycleBinIds: string[]): Promise<RecycleBinResponse> => {
+    const response = await api.post('/recycle-bin/batch-delete', recycleBinIds);
+    return response.data;
+  },
+
+  // 清空回收站
+  emptyRecycleBin: async (force: boolean = false): Promise<RecycleBinResponse> => {
+    const response = await api.post('/recycle-bin/empty', { force });
+    return response.data;
+  },
+
+  // 清理过期项目
+  cleanupExpiredItems: async (): Promise<RecycleBinResponse> => {
+    const response = await api.post('/recycle-bin/cleanup');
+    return response.data;
+  },
+
+  // 获取回收站统计
+  getRecycleBinStatistics: async (): Promise<RecycleBinStatsResponse> => {
+    const response = await api.get('/recycle-bin/statistics');
+    return response.data;
+  },
+
+  // 获取调度器状态
+  getRecycleBinSchedulerStatus: async (): Promise<RecycleBinResponse> => {
+    const response = await api.get('/recycle-bin/scheduler/status');
+    return response.data;
+  },
+
+  // 手动触发清理
+  triggerManualCleanup: async (): Promise<RecycleBinResponse> => {
+    const response = await api.post('/recycle-bin/scheduler/manual-cleanup');
+    return response.data;
+  },
+
+  // 获取调度器统计信息
+  getSchedulerStatistics: async (): Promise<RecycleBinResponse> => {
+    const response = await api.get('/recycle-bin/scheduler/statistics');
     return response.data;
   }
 };
