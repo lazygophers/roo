@@ -122,30 +122,6 @@ const MCPToolsManagement: React.FC = () => {
             metadata: { tags: ['系统', '监控', '性能'] }
           },
           {
-            id: '3',
-            name: 'list_available_modes',
-            description: '列出LazyAI Studio可用的AI模式和智能助手',
-            category: 'ai',
-            schema: { type: 'object', properties: { category: { type: 'string' }, include_description: { type: 'boolean' } } },
-            enabled: true,
-            implementation_type: 'builtin',
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-            metadata: { tags: ['AI', '模式', '助手'] }
-          },
-          {
-            id: '4',
-            name: 'get_project_stats',
-            description: '获取项目统计信息，包括文件数量、模型数量等',
-            category: 'data',
-            schema: { type: 'object', properties: { include_models: { type: 'boolean' }, include_files: { type: 'boolean' } } },
-            enabled: false,
-            implementation_type: 'builtin',
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-            metadata: { tags: ['统计', '项目', '数据'] }
-          },
-          {
             id: '5',
             name: 'health_check',
             description: '执行系统健康检查，验证各组件状态',
@@ -225,8 +201,6 @@ const MCPToolsManagement: React.FC = () => {
           tools_by_category: {
             system: 2,
             time: 1,
-            ai: 1,
-            data: 1,
             file: 4
           },
           endpoints: {},

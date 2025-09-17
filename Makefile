@@ -37,7 +37,7 @@ help:
 	@echo ""
 	@echo "⚡ 性能优化命令:"
 	@echo "  benchmark             运行性能基准测试对比"
-	@echo "  benchmark-original    测试原始服务性能"  
+	@echo "  benchmark-original    测试原始服务性能"
 	@echo "  benchmark-optimized   测试优化服务性能"
 	@echo "  benchmark-clean       清理性能测试进程"
 	@echo ""
@@ -57,7 +57,7 @@ backend-install:
 
 frontend-install:
 	@echo "📦 安装前端依赖..."
-	cd frontend && npm install
+	cd frontend && yarn install
 	@echo "✅ 前端依赖安装完成"
 
 # ========== 开发环境 ==========
@@ -66,10 +66,17 @@ run: build
 	@echo "💡 服务启动后，请查看控制台中的访问地址指引"
 	uv run uvicorn app.main:app --host 0.0.0.0 --port 8000
 
-dev: backend-dev
+dev:
+	@echo "🚀 启动完整开发环境 (前端 + 后端)..."
+	@echo "💡 将并行启动前端开发服务器 (3000端口) 和后端API服务器 (8000端口)"
+	@echo "🔗 前端: http://localhost:3000"
+	@echo "🔗 后端: http://localhost:8000"
+	@echo ""
+	@echo "⏱️  启动中，请稍等..."
+	$(MAKE) -j2 backend-dev frontend-dev
 
 backend-dev:
-	@echo "🚀 启动后端开发服务器 (集成前端)..."
+	@echo "🚀 启动后端开发服务器..."
 	@echo "💡 服务启动后，请查看控制台中的访问地址指引"
 	uv run uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 
@@ -86,7 +93,7 @@ frontend-dev:
 	@echo "🚀 启动前端开发服务器..."
 	@echo "💡 前端将在 http://localhost:3000 启动"
 	@echo "🔗 后端 API 代理到 http://localhost:8000"
-	cd frontend && npm start
+	cd frontend && yarn start
 
 frontend-dev-yarn:
 	@echo "🚀 启动前端开发服务器 (Yarn)..."
@@ -98,7 +105,7 @@ build: frontend-build
 
 frontend-build:
 	@echo "🏗️ 构建前端生产版本..."
-	cd frontend && npm run build
+	cd frontend && yarn run build
 	@echo "✅ 前端构建完成，静态文件位于 frontend/build/"
 
 frontend-build-yarn:
@@ -123,21 +130,21 @@ test-backend-integration:
 
 test-frontend:
 	@echo "🧪 运行前端测试..."
-	cd frontend && npm run test:ci
+	cd frontend && yarn run test:ci
 
 test-frontend-watch:
 	@echo "🧪 运行前端测试 (监听模式)..."
-	cd frontend && npm run test:watch
+	cd frontend && yarn run test:watch
 
 test-frontend-coverage:
 	@echo "🧪 运行前端测试 (覆盖率报告)..."
-	cd frontend && npm run test:coverage
+	cd frontend && yarn run test:coverage
 
 # 快速测试 (跳过慢速测试)
 test-fast:
 	@echo "⚡ 运行快速测试..."
 	uv run pytest tests/ -v -m "not slow" --tb=short
-	cd frontend && npm run test:ci
+	cd frontend && yarn run test:ci
 
 # 完整测试套件 (包含集成和慢速测试)
 test-full:
@@ -145,14 +152,14 @@ test-full:
 	@echo "📊 后端测试 (包含集成测试)..."
 	uv run pytest tests/ -v --cov=app --cov-report=html --cov-report=term-missing --cov-fail-under=80
 	@echo "📊 前端测试 (包含覆盖率)..."
-	cd frontend && npm run test:coverage
+	cd frontend && yarn run test:coverage
 	@echo "🎉 完整测试套件完成！"
 
 # 测试覆盖率报告
 test-coverage:
 	@echo "📊 生成测试覆盖率报告..."
 	uv run pytest tests/ --cov=app --cov-report=html --cov-report=term-missing --cov-report=xml
-	cd frontend && npm run test:coverage
+	cd frontend && yarn run test:coverage
 	@echo "📈 覆盖率报告已生成："
 	@echo "  - 后端: htmlcov/index.html"
 	@echo "  - 前端: frontend/coverage/lcov-report/index.html"
@@ -199,7 +206,7 @@ check:
 	@echo "🔍 检查系统环境..."
 	@command -v uv >/dev/null 2>&1 || { echo "❌ uv 未安装，请先安装 uv"; exit 1; }
 	@command -v node >/dev/null 2>&1 || { echo "❌ Node.js 未安装，请先安装 Node.js"; exit 1; }
-	@command -v npm >/dev/null 2>&1 || { echo "❌ npm 未安装，请先安装 npm"; exit 1; }
+	@command -v yarn >/dev/null 2>&1 || { echo "❌ yarn 未安装，请先安装 yarn"; exit 1; }
 	@echo "✅ 系统环境检查通过"
 
 # 显示项目信息

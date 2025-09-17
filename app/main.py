@@ -12,7 +12,7 @@ from app.core.mcp_tools_service import init_mcp_tools_service
 from app.core.mcp_server import init_mcp_server
 from app.core.recycle_bin_scheduler import startup_recycle_bin_scheduler, shutdown_recycle_bin_scheduler
 from app.core.time_tools_service import init_time_tools_service
-from app.core.cache_tools_service import init_cache_tools_service
+from app.core.cache_tools_service_v2 import init_cache_tools_service
 from app.routers import api_router
 
 # 设置日志

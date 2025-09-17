@@ -243,6 +243,7 @@ const TimeToolsConfigModal: React.FC<TimeToolsConfigModalProps> = ({visible, onC
                             },
                             placeholder: "请选择默认时区"
                         }}
+                        initialValue={'auto'}
                     />
                 </ProCard>
 

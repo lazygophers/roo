@@ -595,6 +595,110 @@ export const apiClient = {
   getSchedulerStatistics: async (): Promise<RecycleBinResponse> => {
     const response = await api.get('/recycle-bin/scheduler/statistics');
     return response.data;
+  },
+
+  // Cache API methods
+  // 获取缓存系统信息
+  getCacheInfo: async () => {
+    const response = await api.get('/cache/info');
+    return response.data;
+  },
+
+  // 获取可用存储后端
+  getCacheBackends: async () => {
+    const response = await api.get('/cache/backends');
+    return response.data;
+  },
+
+  // 切换存储后端
+  switchCacheBackend: async (backend_type: string, backend_config?: any) => {
+    const response = await api.post('/cache/switch-backend', {
+      backend_type,
+      backend_config
+    });
+    return response.data;
+  },
+
+  // 设置缓存值
+  setCacheValue: async (key: string, value: any, ttl?: number) => {
+    const response = await api.post('/cache/set', {
+      key,
+      value,
+      ttl
+    });
+    return response.data;
+  },
+
+  // 获取缓存值
+  getCacheValue: async (key: string) => {
+    const response = await api.post('/cache/get', {
+      key
+    });
+    return response.data;
+  },
+
+  // 删除缓存键
+  deleteCacheKey: async (key: string) => {
+    const response = await api.post('/cache/delete', {
+      key
+    });
+    return response.data;
+  },
+
+  // 检查缓存键是否存在
+  cacheKeyExists: async (key: string) => {
+    const response = await api.post('/cache/exists', {
+      key
+    });
+    return response.data;
+  },
+
+  // 获取缓存键的TTL
+  getCacheKeyTTL: async (key: string) => {
+    const response = await api.post('/cache/ttl', {
+      key
+    });
+    return response.data;
+  },
+
+  // 获取匹配模式的缓存键列表
+  getCacheKeys: async (pattern: string = '*') => {
+    const response = await api.post('/cache/keys', {
+      pattern
+    });
+    return response.data;
+  },
+
+  // 批量获取缓存值
+  getCacheMultiple: async (keys: string[]) => {
+    const response = await api.post('/cache/mget', {
+      keys
+    });
+    return response.data;
+  },
+
+  // 批量设置缓存值
+  setCacheMultiple: async (key_values: Record<string, any>, ttl?: number) => {
+    const response = await api.post('/cache/mset', {
+      key_values,
+      ttl
+    });
+    return response.data;
+  },
+
+  // 递增缓存值
+  incrementCacheValue: async (key: string, amount: number = 1) => {
+    const response = await api.post('/cache/incr', {
+      key,
+      amount
+    });
+    return response.data;
+  },
+
+  // 清空所有缓存
+  flushCache: async () => {
+    const response = await api.post('/cache/flush');
+    return response.data;
   }
 };
 

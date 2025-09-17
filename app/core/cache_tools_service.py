@@ -13,16 +13,14 @@ import json
 import time
 import threading
 from enum import Enum
-import hashlib
-import pickle
-import base64
+import logging
 
 from app.core.unified_database import get_unified_database, TableNames
 from app.core.secure_logging import sanitize_for_log
-from app.core.logging import setup_logging
+from app.core.cache_backends import create_cache_backend, CacheBackend
 from tinydb import Query
 
-logger = setup_logging()
+logger = logging.getLogger(__name__)
 
 class CacheDataType(str, Enum):
     """缓存数据类型"""
