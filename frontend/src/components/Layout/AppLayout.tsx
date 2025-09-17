@@ -7,12 +7,11 @@ import SystemMonitorMenuItem from '../SystemMonitor/SystemMonitorMenuItem';
 import LicenseInfo from '../License/LicenseInfo';
 import './AppLayout.css';
 
+const { Sider, Header, Content } = Layout;
 
 interface AppLayoutProps {
   children: React.ReactNode;
 }
-
-const { Header, Content, Sider } = Layout;
 
 const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   const {

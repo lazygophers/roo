@@ -3,11 +3,12 @@ MCP (Model Context Protocol) API 路由
 提供 SSE 和 Streamable HTTP 端点
 """
 
-from fastapi import APIRouter, Request, Response
+from fastapi import APIRouter, Request, Response, HTTPException
 from fastapi.responses import StreamingResponse
+from pydantic import BaseModel, Field, field_validator
 import json
 from datetime import datetime
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 from app.core.logging import setup_logging
 from app.core.secure_logging import sanitize_for_log
@@ -17,6 +18,46 @@ from app.core.mcp_server import get_mcp_server
 logger = setup_logging()
 
 router = APIRouter(prefix="/mcp", tags=["MCP"])
+
+# Pydantic 模型定义用于输入验证
+class MCPToolCallRequest(BaseModel):
+    """MCP 工具调用请求模型"""
+    name: str = Field(..., min_length=1, max_length=100, description="工具名称")
+    arguments: Dict[str, Any] = Field(default_factory=dict, description="工具参数")
+
+    @field_validator('name')
+    @classmethod
+    def validate_tool_name(cls, v):
+        # 只允许字母数字、下划线和连字符
+        import re
+        if not re.match(r'^[a-zA-Z0-9_-]+$', v):
+            raise ValueError('工具名称只能包含字母、数字、下划线和连字符')
+        return v
+
+    @field_validator('arguments')
+    @classmethod
+    def validate_arguments(cls, v):
+        # 限制参数字典的大小以防止DoS攻击
+        if len(str(v)) > 10000:  # 限制序列化后的大小
+            raise ValueError('工具参数过大，序列化后不能超过10000字符')
+
+        # 检查参数数量
+        if isinstance(v, dict) and len(v) > 50:
+            raise ValueError('工具参数数量不能超过50个')
+
+        # 检查嵌套深度
+        def check_depth(obj, depth=0):
+            if depth > 10:  # 限制嵌套深度
+                raise ValueError('工具参数嵌套深度不能超过10层')
+            if isinstance(obj, dict):
+                for value in obj.values():
+                    check_depth(value, depth + 1)
+            elif isinstance(obj, list):
+                for item in obj:
+                    check_depth(item, depth + 1)
+
+        check_depth(v)
+        return v
 
 @router.get("/tools")
 async def list_mcp_tools():
@@ -43,17 +84,13 @@ async def list_mcp_tools():
         }
 
 @router.post("/call-tool")
-async def call_mcp_tool(request: Dict[str, Any]):
+async def call_mcp_tool(request: MCPToolCallRequest):
     """调用 MCP 工具"""
     try:
-        tool_name = request.get("name")
-        arguments = request.get("arguments", {})
-        
-        if not tool_name:
-            return {
-                "success": False,
-                "message": "Tool name is required"
-            }
+        tool_name = request.name
+        arguments = request.arguments
+
+        # 输入验证已通过 Pydantic 模型完成
         
         # 获取MCP服务器实例并调用工具
         try:
@@ -273,15 +310,23 @@ async def list_mcp_categories():
 async def list_tools_by_category(category: str):
     """按分类列出 MCP 工具"""
     try:
+        # 输入验证：只允许安全的分类名称
+        import re
+        if not re.match(r'^[a-zA-Z0-9_-]+$', category) or len(category) > 50:
+            raise HTTPException(
+                status_code=400,
+                detail="无效的分类名称：只能包含字母、数字、下划线和连字符，长度不超过50字符"
+            )
+
         tools_service = get_mcp_tools_service()
-        
+
         # 验证分类是否存在
         category_info = tools_service.get_category(category)
         if not category_info:
-            return {
-                "success": False,
-                "message": f"Category '{sanitize_for_log(category)}' not found"
-            }
+            raise HTTPException(
+                status_code=404,
+                detail=f"分类 '{sanitize_for_log(category)}' 未找到"
+            )
         
         tools = tools_service.get_tools(category=category, enabled_only=True)
         

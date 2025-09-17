@@ -165,7 +165,6 @@ const FileSecurityStatus: React.FC<FileSecurityStatusProps> = ({
             <Button 
               size="small" 
               type="primary" 
-              icon={<SettingOutlined />}
               onClick={() => navigate('/file-security')}
             >
               配置
@@ -188,12 +187,10 @@ const FileSecurityStatus: React.FC<FileSecurityStatusProps> = ({
       extra={
         <Space>
           <Button 
-            icon={<ReloadOutlined />} 
             onClick={loadSecurityInfo}
             size="small"
           />
           <Button 
-            icon={<SettingOutlined />} 
             type="primary"
             onClick={() => navigate('/file-security')}
             size="small"

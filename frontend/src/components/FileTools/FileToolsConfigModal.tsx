@@ -305,7 +305,7 @@ const FileToolsConfigModal: React.FC<FileToolsConfigModalProps> = ({
                     title={<span style={{ color: currentTheme.token?.colorText }}>📖 可读取目录</span>}
                     size="small" 
                     extra={
-                      <Button type="text" size="small" icon={<EditOutlined />} 
+                      <Button type="text" size="small"  
                         onClick={() => handleEditPaths('readable')}>编辑</Button>
                     }
                     style={{
@@ -334,7 +334,7 @@ const FileToolsConfigModal: React.FC<FileToolsConfigModalProps> = ({
                     title={<span style={{ color: currentTheme.token?.colorText }}>✏️ 可写入目录</span>}
                     size="small" 
                     extra={
-                      <Button type="text" size="small" icon={<EditOutlined />} 
+                      <Button type="text" size="small"  
                         onClick={() => handleEditPaths('writable')}>编辑</Button>
                     }
                     style={{
@@ -366,7 +366,7 @@ const FileToolsConfigModal: React.FC<FileToolsConfigModalProps> = ({
                     title={<span style={{ color: currentTheme.token?.colorText }}>🗑️ 可删除目录</span>}
                     size="small" 
                     extra={
-                      <Button type="text" size="small" icon={<EditOutlined />} 
+                      <Button type="text" size="small"  
                         onClick={() => handleEditPaths('deletable')}>编辑</Button>
                     }
                     style={{
@@ -395,7 +395,7 @@ const FileToolsConfigModal: React.FC<FileToolsConfigModalProps> = ({
                     title={<span style={{ color: currentTheme.token?.colorText }}>🚫 禁止访问目录</span>}
                     size="small" 
                     extra={
-                      <Button type="text" size="small" icon={<EditOutlined />} 
+                      <Button type="text" size="small"  
                         onClick={() => handleEditPaths('forbidden')}>编辑</Button>
                     }
                     style={{
@@ -516,7 +516,6 @@ const FileToolsConfigModal: React.FC<FileToolsConfigModalProps> = ({
                           保存限制配置
                         </Button>
                         <Button onClick={reloadConfig} loading={loading}>
-                          <ReloadOutlined />
                           重新加载
                         </Button>
                       </Space>
@@ -567,7 +566,7 @@ const FileToolsConfigModal: React.FC<FileToolsConfigModalProps> = ({
 
       <div style={{ textAlign: 'right', paddingTop: 16, borderTop: '1px solid #f0f0f0' }}>
         <Space>
-          <Button icon={<ReloadOutlined />} onClick={reloadConfig} loading={loading}>
+          <Button onClick={reloadConfig} loading={loading}>
             重新加载配置
           </Button>
           <Button onClick={onCancel}>关闭</Button>
