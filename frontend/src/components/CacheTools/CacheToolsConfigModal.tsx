@@ -172,8 +172,7 @@ const CacheToolsConfigModal: React.FC<CacheToolsConfigModalProps> = ({
                 message="缓存工具配置"
                 description="配置Redis风格缓存工具的运行参数，包括默认TTL时间、内存限制和持久化选项。"
                 type="info"
-                icon={<InfoCircleOutlined/>}
-                showIcon
+                showIcon={false}
                 style={{marginBottom: 24}}
             />
 
