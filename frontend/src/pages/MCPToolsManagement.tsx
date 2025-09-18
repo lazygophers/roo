@@ -492,7 +492,7 @@ const MCPToolsManagement: React.FC = () => {
                     <Empty description="暂无工具分类"/>
                 ) : (
                     <Collapse
-                        defaultActiveKey={filteredCategories.map(c => c.id)}
+                        defaultActiveKey={[]}
                         ghost
                         items={filteredCategories.map(category => {
                             const categoryTools = toolsByCategory[category.id] || [];
