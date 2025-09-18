@@ -27,7 +27,8 @@ import {
     CheckCircleOutlined,
     ExclamationCircleOutlined,
     InfoCircleOutlined,
-    ReloadOutlined
+    ReloadOutlined,
+    SettingOutlined
 } from '@ant-design/icons';
 import {apiClient, MCPCategoryInfo, MCPToolInfo} from '../api';
 import {useTheme} from '../contexts/ThemeContext';
@@ -35,6 +36,7 @@ import FileToolsConfigModal from '../components/FileTools/FileToolsConfigModal';
 import TimeToolsConfigModal from '../components/TimeTools/TimeToolsConfigModal';
 import GitHubToolsConfigModal from '../components/GitHubTools/GitHubToolsConfigModal';
 import CacheToolsConfigModal from '../components/CacheTools/CacheToolsConfigModal';
+import MCPConfigModal from '../components/MCPConfig/MCPConfigModal';
 import './MCPToolsManagement.css';
 
 const {Title, Text, Paragraph} = Typography;
@@ -63,6 +65,7 @@ const MCPToolsManagement: React.FC = () => {
     const [timeToolsConfigModal, setTimeToolsConfigModal] = useState(false);
     const [githubToolsConfigModal, setGithubToolsConfigModal] = useState(false);
     const [cacheToolsConfigModal, setCacheToolsConfigModal] = useState(false);
+    const [mcpConfigModal, setMcpConfigModal] = useState(false);
     const [githubTokenValid, setGithubTokenValid] = useState<boolean | null>(null);
 
     const [form] = Form.useForm();
@@ -447,10 +450,10 @@ const MCPToolsManagement: React.FC = () => {
                         </Typography.Paragraph>
                         <div style={{marginTop: 8, display: 'flex', flexWrap: 'wrap', gap: 4}}>
                             {tool.metadata?.tags?.slice(0, 3).map((tag: string, index: number) => (
-                                <Tag key={index} color="geekblue" style={{fontSize: '11px'}}>{tag}</Tag>
+                                <Tag key={`${tool.id}-tag-${index}`} color="geekblue" style={{fontSize: '11px'}}>{tag}</Tag>
                             ))}
                             {tool.metadata?.tags?.length > 3 && (
-                                <Tag color="default" style={{fontSize: '11px'}}>+{tool.metadata.tags.length - 3}</Tag>
+                                <Tag key={`${tool.id}-tag-more`} color="default" style={{fontSize: '11px'}}>+{tool.metadata.tags.length - 3}</Tag>
                             )}
                         </div>
                     </div>
@@ -473,7 +476,20 @@ const MCPToolsManagement: React.FC = () => {
 
 
             {/* 操作栏 */}
-            <Row justify="end" style={{marginBottom: 16}}>
+            <Row justify="space-between" style={{marginBottom: 16}}>
+                <Col>
+                    <Button
+                        icon={<SettingOutlined/>}
+                        onClick={() => setMcpConfigModal(true)}
+                        style={{
+                            color: currentTheme.token?.colorPrimary,
+                            borderColor: currentTheme.token?.colorPrimary,
+                            backgroundColor: 'rgba(24, 144, 255, 0.06)',
+                        }}
+                    >
+                        全局配置
+                    </Button>
+                </Col>
                 <Col>
                     <Button
                         type="primary"
@@ -710,7 +726,7 @@ const MCPToolsManagement: React.FC = () => {
                                     />
                                 ) : (
                                     <Row gutter={[16, 16]} style={{marginTop: 16}}>
-                                        {categoryTools.map(renderToolCard)}
+                                        {categoryTools.map((tool) => renderToolCard(tool))}
                                     </Row>
                                 )
                             };
@@ -816,22 +832,22 @@ const MCPToolsManagement: React.FC = () => {
                         />
 
                         <Form form={form} layout="vertical">
-                            {testToolModal.tool.schema?.properties && Object.entries(testToolModal.tool.schema.properties).map(([key, prop]: [string, any]) => (
+                            {testToolModal.tool?.schema?.properties && Object.entries(testToolModal.tool.schema.properties).map(([key, prop]: [string, any]) => (
                                 <Form.Item
-                                    key={key}
+                                    key={`${testToolModal.tool?.id}-form-${key}`}
                                     label={key}
                                     name={key}
                                     help={prop.description}
                                 >
                                     {prop.type === 'boolean' ? (
                                         <Select placeholder={`选择 ${key}`}>
-                                            <Option value={true}>true</Option>
-                                            <Option value={false}>false</Option>
+                                            <Option key={`${testToolModal.tool?.id}-${key}-true`} value={true}>true</Option>
+                                            <Option key={`${testToolModal.tool?.id}-${key}-false`} value={false}>false</Option>
                                         </Select>
                                     ) : prop.enum ? (
                                         <Select placeholder={`选择 ${key}`}>
                                             {prop.enum.map((option: string) => (
-                                                <Option key={option} value={option}>{option}</Option>
+                                                <Option key={`${testToolModal.tool?.id}-${key}-${option}`} value={option}>{option}</Option>
                                             ))}
                                         </Select>
                                     ) : (
@@ -883,6 +899,15 @@ const MCPToolsManagement: React.FC = () => {
             <CacheToolsConfigModal
                 visible={cacheToolsConfigModal}
                 onCancel={() => setCacheToolsConfigModal(false)}
+                onSuccess={() => {
+                    loadData(); // 重新加载数据
+                }}
+            />
+
+            {/* MCP全局配置Modal */}
+            <MCPConfigModal
+                visible={mcpConfigModal}
+                onCancel={() => setMcpConfigModal(false)}
                 onSuccess={() => {
                     loadData(); // 重新加载数据
                 }}

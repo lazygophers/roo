@@ -10,36 +10,107 @@ import requests
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 from app.tools.registry import github_tool
+from app.core.mcp_tools_service import get_proxy_for_requests, get_mcp_config
 
 
 class GitHubAPIClient:
     """GitHub API客户端"""
 
     def __init__(self, token: Optional[str] = None):
-        self.token = token or os.getenv('GITHUB_TOKEN', '')
+        # 获取全局配置
+        try:
+            mcp_config = get_mcp_config()
+            self.mcp_config = mcp_config
+        except Exception:
+            # 如果获取配置失败，使用默认值
+            self.mcp_config = None
+
+        # Token配置：优先使用参数，其次环境变量，最后从MCP配置中获取
+        self.token = (
+            token or
+            os.getenv('GITHUB_TOKEN', '') or
+            (self.mcp_config.environment_variables.get('GITHUB_TOKEN', '') if self.mcp_config else '')
+        )
+
         self.base_url = "https://api.github.com"
         self.session = requests.Session()
 
-        # 配置重试策略
-        retry_strategy = Retry(
-            total=3,
-            status_forcelist=[429, 500, 502, 503, 504],
-            allowed_methods=["HEAD", "GET", "OPTIONS"]
-        )
+        # 从MCP配置获取网络设置
+        if self.mcp_config:
+            network_config = self.mcp_config.network
+            # 配置重试策略
+            retry_strategy = Retry(
+                total=network_config.retry_times,
+                status_forcelist=[429, 500, 502, 503, 504],
+                allowed_methods=["HEAD", "GET", "OPTIONS"]
+            )
+
+            # 设置请求头
+            self.session.headers.update({
+                "Accept": "application/vnd.github.v3+json",
+                "User-Agent": network_config.user_agent
+            })
+
+            # 配置代理
+            proxy_config = get_proxy_for_requests()
+            if proxy_config:
+                self.session.proxies.update(proxy_config)
+
+            # 配置SSL验证
+            self.session.verify = self.mcp_config.security.verify_ssl
+
+            # 配置超时
+            self.session.timeout = network_config.timeout
+        else:
+            # 默认配置
+            retry_strategy = Retry(
+                total=3,
+                status_forcelist=[429, 500, 502, 503, 504],
+                allowed_methods=["HEAD", "GET", "OPTIONS"]
+            )
+
+            self.session.headers.update({
+                "Accept": "application/vnd.github.v3+json",
+                "User-Agent": "LazyAI-Studio-GitHub-Tools/1.0"
+            })
+
+            self.session.timeout = 30
+
         adapter = HTTPAdapter(max_retries=retry_strategy)
         self.session.mount("http://", adapter)
         self.session.mount("https://", adapter)
-
-        # 设置请求头
-        self.session.headers.update({
-            "Accept": "application/vnd.github.v3+json",
-            "User-Agent": "LazyAI-Studio-GitHub-Tools/1.0"
-        })
 
         if self.token:
             self.session.headers.update({
                 "Authorization": f"token {self.token}"
             })
+
+    def reload_config(self):
+        """重新加载配置"""
+        try:
+            self.mcp_config = get_mcp_config()
+            # 重新配置session
+            if self.mcp_config:
+                # 更新代理配置
+                proxy_config = get_proxy_for_requests()
+                if proxy_config:
+                    self.session.proxies.clear()
+                    self.session.proxies.update(proxy_config)
+                else:
+                    self.session.proxies.clear()
+
+                # 更新SSL验证
+                self.session.verify = self.mcp_config.security.verify_ssl
+
+                # 更新超时
+                self.session.timeout = self.mcp_config.network.timeout
+
+                # 更新User-Agent
+                self.session.headers.update({
+                    "User-Agent": self.mcp_config.network.user_agent
+                })
+        except Exception:
+            pass  # 配置加载失败时不影响现有功能
 
     def get(self, endpoint: str, params: Optional[Dict] = None) -> Dict[str, Any]:
         """GET请求"""
@@ -104,6 +175,12 @@ class GitHubAPIClient:
 
 # 创建全局GitHub客户端实例
 github_client = GitHubAPIClient()
+
+
+def reload_github_client_config():
+    """重新加载GitHub客户端配置"""
+    global github_client
+    github_client.reload_config()
 
 
 @github_tool(

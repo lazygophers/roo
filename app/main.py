@@ -10,6 +10,7 @@ from app.core.unified_database import init_unified_database
 from app.core.database_service import init_database_service, get_database_service
 from app.tools.service import init_mcp_tools_service
 from app.tools.server import init_mcp_server
+from app.core.mcp_tools_service import init_mcp_config_service
 from app.core.recycle_bin_scheduler import startup_recycle_bin_scheduler, shutdown_recycle_bin_scheduler
 from app.core.time_tools_service import init_time_tools_service
 from app.core.cache_tools_service_v2 import init_cache_tools_service
@@ -35,7 +36,11 @@ async def lifespan(app: FastAPI):
         # 初始化数据库服务（使用统一数据库）
         db_service = init_database_service()
         logger.info("Database service initialized successfully")
-        
+
+        # 初始化MCP配置服务
+        mcp_config_service = init_mcp_config_service()
+        logger.info("MCP config service initialized successfully")
+
         # 初始化MCP工具服务（使用统一数据库）
         mcp_tools_service = init_mcp_tools_service(use_unified_db=True)
         logger.info("MCP tools service initialized successfully")
