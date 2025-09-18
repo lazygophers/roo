@@ -36,6 +36,7 @@ import FileToolsConfigModal from '../components/FileTools/FileToolsConfigModal';
 import TimeToolsConfigModal from '../components/TimeTools/TimeToolsConfigModal';
 import GitHubToolsConfigModal from '../components/GitHubTools/GitHubToolsConfigModal';
 import CacheToolsConfigModal from '../components/CacheTools/CacheToolsConfigModal';
+import WebScrapingConfigModal from '../components/WebScrapingTools/WebScrapingConfigModal';
 import MCPConfigModal from '../components/MCPConfig/MCPConfigModal';
 import './MCPToolsManagement.css';
 
@@ -65,6 +66,7 @@ const MCPToolsManagement: React.FC = () => {
     const [timeToolsConfigModal, setTimeToolsConfigModal] = useState(false);
     const [githubToolsConfigModal, setGithubToolsConfigModal] = useState(false);
     const [cacheToolsConfigModal, setCacheToolsConfigModal] = useState(false);
+    const [webScrapingConfigModal, setWebScrapingConfigModal] = useState(false);
     const [mcpConfigModal, setMcpConfigModal] = useState(false);
     const [githubTokenValid, setGithubTokenValid] = useState<boolean | null>(null);
 
@@ -787,6 +789,36 @@ const MCPToolsManagement: React.FC = () => {
                                                     </Tooltip>
                                                 </Space>
                                             )}
+                                            {category.id === 'web-scraping' && (
+                                                <Tooltip title="网络抓取工具配置">
+                                                    <Button
+                                                        type="text"
+                                                        size="small"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            setWebScrapingConfigModal(true);
+                                                        }}
+                                                        style={{
+                                                            color: currentTheme.token?.colorPrimary,
+                                                            borderColor: currentTheme.token?.colorPrimary,
+                                                            backgroundColor: 'rgba(24, 144, 255, 0.06)',
+                                                            borderRadius: 6,
+                                                            border: `1px solid ${currentTheme.token?.colorPrimary}20`,
+                                                            transition: 'all 0.2s ease'
+                                                        }}
+                                                        onMouseEnter={(e) => {
+                                                            e.currentTarget.style.backgroundColor = 'rgba(24, 144, 255, 0.12)';
+                                                            e.currentTarget.style.borderColor = currentTheme.token?.colorPrimary || '#1890ff';
+                                                        }}
+                                                        onMouseLeave={(e) => {
+                                                            e.currentTarget.style.backgroundColor = 'rgba(24, 144, 255, 0.06)';
+                                                            e.currentTarget.style.borderColor = `${currentTheme.token?.colorPrimary}20` || '#1890ff20';
+                                                        }}
+                                                    >
+                                                        工具配置
+                                                    </Button>
+                                                </Tooltip>
+                                            )}
                                         </Space>
                                     </div>
                                 ),
@@ -1016,6 +1048,15 @@ const MCPToolsManagement: React.FC = () => {
             <CacheToolsConfigModal
                 visible={cacheToolsConfigModal}
                 onCancel={() => setCacheToolsConfigModal(false)}
+                onSuccess={() => {
+                    loadData(); // 重新加载数据
+                }}
+            />
+
+            {/* 网络抓取工具配置Modal */}
+            <WebScrapingConfigModal
+                visible={webScrapingConfigModal}
+                onCancel={() => setWebScrapingConfigModal(false)}
                 onSuccess={() => {
                     loadData(); // 重新加载数据
                 }}

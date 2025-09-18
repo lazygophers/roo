@@ -34,13 +34,51 @@ logger = setup_logging()
     icon="🌐",
     sort_order=6,
     config={
+        # 基础配置
         "default_timeout": 30,
         "max_redirects": 5,
         "max_file_size_mb": 100,
         "enable_ssl_verification": True,
         "default_user_agent": "LazyAI-Studio-WebScraper/1.0",
-        "rate_limit_enabled": True,
-        "concurrent_requests_limit": 10,
+        "max_retries": 3,
+        "retry_delay": 1.0,
+
+        # 代理配置示例
+        "proxy_example": {
+            "enabled": False,
+            "http": "http://proxy.example.com:8080",
+            "https": "https://proxy.example.com:8080",
+            "username": None,
+            "password": None,
+            "bypass_domains": ["localhost", "127.0.0.1", "*.internal.com"]
+        },
+
+        # 请求头配置示例
+        "headers_example": {
+            "custom_headers": {
+                "X-Custom-Header": "CustomValue"
+            },
+            "accept_language": "zh-CN,zh;q=0.9,en;q=0.8",
+            "accept_encoding": "gzip, deflate, br"
+        },
+
+        # 网络配置示例
+        "network_example": {
+            "max_connections": 100,
+            "max_connections_per_host": 30,
+            "dns_cache_ttl": 300,
+            "keepalive_timeout": 30
+        },
+
+        # 速率限制配置示例
+        "rate_limit_example": {
+            "enabled": False,
+            "requests_per_second": 10,
+            "burst_size": 20,
+            "delay_between_requests": 0
+        },
+
+        # 内容类型验证
         "enable_content_type_validation": True,
         "allowed_content_types": [
             "text/html",
@@ -60,6 +98,7 @@ class WebScrapingConfig:
     """网络抓取工具配置类"""
 
     def __init__(self):
+        # 基础配置
         self.enabled = True
         self.user_agent = "LazyAI-Studio-WebScraper/1.0"
         self.timeout = 30
@@ -72,6 +111,31 @@ class WebScrapingConfig:
         ]
         self.follow_redirects = True
         self.verify_ssl = True
+
+        # 代理配置
+        self.proxy_enabled = False
+        self.proxy_http = None  # HTTP代理地址，如: http://proxy.example.com:8080
+        self.proxy_https = None  # HTTPS代理地址
+        self.proxy_username = None  # 代理认证用户名
+        self.proxy_password = None  # 代理认证密码
+        self.proxy_bypass_domains = []  # 不使用代理的域名列表
+
+        # 请求头配置
+        self.custom_headers = {}  # 自定义请求头
+        self.accept_language = "zh-CN,zh;q=0.9,en;q=0.8"
+        self.accept_encoding = "gzip, deflate, br"
+
+        # 高级网络配置
+        self.max_connections = 100  # 最大连接数
+        self.max_connections_per_host = 30  # 每个主机的最大连接数
+        self.dns_cache_ttl = 300  # DNS缓存TTL（秒）
+        self.keepalive_timeout = 30  # 连接保持超时
+
+        # 速率限制配置
+        self.rate_limit_enabled = False  # 是否启用速率限制
+        self.requests_per_second = 10  # 每秒最大请求数
+        self.burst_size = 20  # 突发请求数量
+        self.delay_between_requests = 0  # 请求间强制延迟（秒）
 
 
 class WebScrapingTools:
@@ -94,60 +158,146 @@ class WebScrapingTools:
             custom_config = fetch_config.get("custom_config", {})
 
             # 工具集配置优先级 > 全局配置
-            if "user_agent" in custom_config:
-                self.config.user_agent = custom_config["user_agent"]
-            elif self.mcp_config:
-                self.config.user_agent = self.mcp_config.network.user_agent
+            self._load_basic_config(custom_config)
+            self._load_proxy_config(custom_config)
+            self._load_headers_config(custom_config)
+            self._load_network_config(custom_config)
+            self._load_rate_limit_config(custom_config)
 
-            if "timeout" in custom_config:
-                self.config.timeout = custom_config["timeout"]
-            elif self.mcp_config:
-                self.config.timeout = self.mcp_config.network.timeout
-
-            if "max_retries" in custom_config:
-                self.config.max_retries = custom_config["max_retries"]
-            elif self.mcp_config:
-                self.config.max_retries = self.mcp_config.network.retry_times
-
-            if "retry_delay" in custom_config:
-                self.config.retry_delay = custom_config["retry_delay"]
-            elif self.mcp_config:
-                self.config.retry_delay = self.mcp_config.network.retry_delay
-
-            if "verify_ssl" in custom_config:
-                self.config.verify_ssl = custom_config["verify_ssl"]
-            elif self.mcp_config:
-                self.config.verify_ssl = self.mcp_config.security.verify_ssl
-
-            logger.info(f"Loaded web scraping tools config: UA={sanitize_for_log(self.config.user_agent)}")
+            logger.info(f"Loaded web scraping tools config: UA={sanitize_for_log(self.config.user_agent)}, Proxy={self.config.proxy_enabled}")
 
         except Exception as e:
             logger.warning(f"Failed to load MCP config, using defaults: {e}")
 
+    def _load_basic_config(self, custom_config: Dict[str, Any]):
+        """加载基础配置"""
+        if "user_agent" in custom_config:
+            self.config.user_agent = custom_config["user_agent"]
+        elif self.mcp_config:
+            self.config.user_agent = self.mcp_config.network.user_agent
+
+        if "timeout" in custom_config:
+            self.config.timeout = custom_config["timeout"]
+        elif self.mcp_config:
+            self.config.timeout = self.mcp_config.network.timeout
+
+        if "max_retries" in custom_config:
+            self.config.max_retries = custom_config["max_retries"]
+        elif self.mcp_config:
+            self.config.max_retries = self.mcp_config.network.retry_times
+
+        if "retry_delay" in custom_config:
+            self.config.retry_delay = custom_config["retry_delay"]
+        elif self.mcp_config:
+            self.config.retry_delay = self.mcp_config.network.retry_delay
+
+        if "verify_ssl" in custom_config:
+            self.config.verify_ssl = custom_config["verify_ssl"]
+        elif self.mcp_config:
+            self.config.verify_ssl = self.mcp_config.security.verify_ssl
+
+        if "follow_redirects" in custom_config:
+            self.config.follow_redirects = custom_config["follow_redirects"]
+
+        if "max_file_size" in custom_config:
+            self.config.max_file_size = custom_config["max_file_size"]
+
+    def _load_proxy_config(self, custom_config: Dict[str, Any]):
+        """加载代理配置"""
+        # 优先使用工具集代理配置
+        proxy_config = custom_config.get("proxy", {})
+
+        if proxy_config:
+            self.config.proxy_enabled = proxy_config.get("enabled", False)
+            self.config.proxy_http = proxy_config.get("http")
+            self.config.proxy_https = proxy_config.get("https")
+            self.config.proxy_username = proxy_config.get("username")
+            self.config.proxy_password = proxy_config.get("password")
+            self.config.proxy_bypass_domains = proxy_config.get("bypass_domains", [])
+        elif self.mcp_config and hasattr(self.mcp_config, 'proxy') and self.mcp_config.proxy.enabled:
+            # 回退到全局MCP代理配置
+            self.config.proxy_enabled = self.mcp_config.proxy.enabled
+            self.config.proxy_http = self.mcp_config.proxy.http_proxy
+            self.config.proxy_https = self.mcp_config.proxy.https_proxy
+            self.config.proxy_username = getattr(self.mcp_config.proxy, 'username', None)
+            self.config.proxy_password = getattr(self.mcp_config.proxy, 'password', None)
+
+    def _load_headers_config(self, custom_config: Dict[str, Any]):
+        """加载请求头配置"""
+        headers_config = custom_config.get("headers", {})
+
+        if "custom_headers" in headers_config:
+            self.config.custom_headers = headers_config["custom_headers"]
+
+        if "accept_language" in headers_config:
+            self.config.accept_language = headers_config["accept_language"]
+
+        if "accept_encoding" in headers_config:
+            self.config.accept_encoding = headers_config["accept_encoding"]
+
+    def _load_network_config(self, custom_config: Dict[str, Any]):
+        """加载网络配置"""
+        network_config = custom_config.get("network", {})
+
+        if "max_connections" in network_config:
+            self.config.max_connections = network_config["max_connections"]
+        elif self.mcp_config:
+            self.config.max_connections = getattr(self.mcp_config.network, 'max_connections', 100)
+
+        if "max_connections_per_host" in network_config:
+            self.config.max_connections_per_host = network_config["max_connections_per_host"]
+
+        if "dns_cache_ttl" in network_config:
+            self.config.dns_cache_ttl = network_config["dns_cache_ttl"]
+
+        if "keepalive_timeout" in network_config:
+            self.config.keepalive_timeout = network_config["keepalive_timeout"]
+
+    def _load_rate_limit_config(self, custom_config: Dict[str, Any]):
+        """加载速率限制配置"""
+        rate_limit_config = custom_config.get("rate_limit", {})
+
+        if "enabled" in rate_limit_config:
+            self.config.rate_limit_enabled = rate_limit_config["enabled"]
+
+        if "requests_per_second" in rate_limit_config:
+            self.config.requests_per_second = rate_limit_config["requests_per_second"]
+
+        if "burst_size" in rate_limit_config:
+            self.config.burst_size = rate_limit_config["burst_size"]
+
+        if "delay_between_requests" in rate_limit_config:
+            self.config.delay_between_requests = rate_limit_config["delay_between_requests"]
+
     async def _get_session(self) -> aiohttp.ClientSession:
         """获取HTTP会话，配置代理和其他参数"""
         if self.session is None or self.session.closed:
+            # 使用新的配置参数创建连接器
             connector = aiohttp.TCPConnector(
                 ssl=self.config.verify_ssl,
-                limit=self.mcp_config.network.max_connections if self.mcp_config else 100
+                limit=self.config.max_connections,
+                limit_per_host=self.config.max_connections_per_host,
+                ttl_dns_cache=self.config.dns_cache_ttl,
+                keepalive_timeout=self.config.keepalive_timeout
             )
 
+            # 配置超时
             timeout = aiohttp.ClientTimeout(total=self.config.timeout)
 
-            # 设置代理（使用全局MCP代理配置）
-            proxy_config = None
-            if self.mcp_config:
-                proxy_config = self.mcp_config.get_proxy_dict()
-
+            # 构建请求头
             headers = {
                 "User-Agent": self.config.user_agent,
                 "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
-                "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
-                "Accept-Encoding": "gzip, deflate, br",
+                "Accept-Language": self.config.accept_language,
+                "Accept-Encoding": self.config.accept_encoding,
                 "DNT": "1",
                 "Connection": "keep-alive",
                 "Upgrade-Insecure-Requests": "1"
             }
+
+            # 添加自定义请求头
+            if self.config.custom_headers:
+                headers.update(self.config.custom_headers)
 
             self.session = aiohttp.ClientSession(
                 connector=connector,
@@ -155,20 +305,51 @@ class WebScrapingTools:
                 headers=headers
             )
 
-            # 配置代理（如果有）
-            if proxy_config:
-                # aiohttp需要为每个请求单独设置proxy
-                pass
-
         return self.session
 
-    def _get_proxy_url(self) -> Optional[str]:
+    def _get_proxy_url(self, scheme: str = "http") -> Optional[str]:
         """获取代理URL"""
-        if self.mcp_config:
-            proxy_dict = self.mcp_config.get_proxy_dict()
-            if proxy_dict:
-                return proxy_dict.get("http") or proxy_dict.get("https")
-        return None
+        if not self.config.proxy_enabled:
+            return None
+
+        # 优先使用工具级别的代理配置
+        if scheme.lower() == "https" and self.config.proxy_https:
+            proxy_url = self.config.proxy_https
+        elif self.config.proxy_http:
+            proxy_url = self.config.proxy_http
+        else:
+            # 回退到全局MCP代理配置
+            if self.mcp_config:
+                proxy_dict = self.mcp_config.get_proxy_dict()
+                if proxy_dict:
+                    return proxy_dict.get("http") or proxy_dict.get("https")
+            return None
+
+        # 如果配置了代理认证，构建认证URL
+        if self.config.proxy_username and self.config.proxy_password:
+            from urllib.parse import urlparse, urlunparse
+            parsed = urlparse(proxy_url)
+            if not parsed.username:  # 只有在URL中没有用户名时才添加
+                netloc = f"{self.config.proxy_username}:{self.config.proxy_password}@{parsed.netloc}"
+                proxy_url = urlunparse(parsed._replace(netloc=netloc))
+
+        return proxy_url
+
+    def _should_use_proxy(self, url: str) -> bool:
+        """检查是否应该对此URL使用代理"""
+        if not self.config.proxy_enabled or not self.config.proxy_bypass_domains:
+            return self.config.proxy_enabled
+
+        from urllib.parse import urlparse
+        parsed = urlparse(url)
+        domain = parsed.netloc.lower()
+
+        # 检查是否在代理绕过列表中
+        for bypass_domain in self.config.proxy_bypass_domains:
+            if bypass_domain.lower() in domain:
+                return False
+
+        return True
 
     async def _make_request_with_retry(
         self,
@@ -178,16 +359,29 @@ class WebScrapingTools:
     ) -> aiohttp.ClientResponse:
         """带重试的HTTP请求"""
         session = await self._get_session()
-        proxy_url = self._get_proxy_url()
+
+        # 应用速率限制
+        if self.config.rate_limit_enabled or self.config.delay_between_requests > 0:
+            await self._apply_rate_limit()
+
+        # 获取代理配置
+        from urllib.parse import urlparse
+        parsed_url = urlparse(url)
+        use_proxy = self._should_use_proxy(url)
+        proxy_url = None
+        if use_proxy:
+            proxy_url = self._get_proxy_url(parsed_url.scheme)
 
         for attempt in range(self.config.max_retries + 1):
             try:
+                # 设置代理
                 if proxy_url:
                     kwargs["proxy"] = proxy_url
 
                 async with session.request(method, url, **kwargs) as response:
                     # 检查响应状态
                     if response.status < 400:
+                        logger.debug(f"Request successful: {method} {url} -> {response.status}")
                         return response
                     elif attempt < self.config.max_retries:
                         logger.warning(f"Request failed with status {response.status}, retrying ({attempt + 1}/{self.config.max_retries})")
@@ -202,6 +396,14 @@ class WebScrapingTools:
                     await asyncio.sleep(self.config.retry_delay)
                 else:
                     raise e
+
+    async def _apply_rate_limit(self):
+        """应用速率限制"""
+        if self.config.delay_between_requests > 0:
+            await asyncio.sleep(self.config.delay_between_requests)
+
+        # 这里可以扩展更复杂的速率限制逻辑（如令牌桶算法）
+        # 目前使用简单的延迟机制
 
     async def close(self):
         """关闭会话"""

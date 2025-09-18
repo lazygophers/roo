@@ -17,7 +17,8 @@ import {
     Divider,
     message,
     Tag,
-    Badge
+    Badge,
+    Select
 } from 'antd';
 import {
     GlobalOutlined,
@@ -76,12 +77,32 @@ const WebScrapingConfigModal: React.FC<WebScrapingConfigModalProps> = ({
     const [activeTab, setActiveTab] = useState('basic');
     const [config, setConfig] = useState<ConfigResponse | null>(null);
     const [testing, setTesting] = useState(false);
+    const [testUrls, setTestUrls] = useState<string[]>([
+        'https://www.baidu.com',
+        'https://www.google.com',
+        'https://www.taobao.com'
+    ]);
+    const [customTestUrl, setCustomTestUrl] = useState<string>('');
+
+    // 预设的测试网站选项
+    const defaultTestSites = [
+        { label: '百度 (baidu.com)', value: 'https://www.baidu.com' },
+        { label: 'Google (google.com)', value: 'https://www.google.com' },
+        { label: '淘宝 (taobao.com)', value: 'https://www.taobao.com' },
+        { label: '微信 (weixin.qq.com)', value: 'https://weixin.qq.com' },
+        { label: '京东 (jd.com)', value: 'https://www.jd.com' },
+        { label: '微博 (weibo.com)', value: 'https://weibo.com' },
+        { label: 'GitHub (github.com)', value: 'https://github.com' },
+        { label: 'Stack Overflow', value: 'https://stackoverflow.com' },
+        { label: 'Wikipedia', value: 'https://www.wikipedia.org' },
+        { label: 'YouTube', value: 'https://www.youtube.com' }
+    ];
 
     // 加载配置
     const loadConfig = async () => {
         try {
             setLoading(true);
-            const response = await fetch('/api/fetch/config');
+            const response = await fetch('/api/web-scraping/config');
             const data = await response.json();
 
             if (data.success) {
@@ -117,7 +138,7 @@ const WebScrapingConfigModal: React.FC<WebScrapingConfigModalProps> = ({
             delete configData.max_file_size_mb;
             delete configData.allowed_content_types;
 
-            const response = await fetch('/api/fetch/config', {
+            const response = await fetch('/api/web-scraping/config', {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(configData)
@@ -144,8 +165,12 @@ const WebScrapingConfigModal: React.FC<WebScrapingConfigModalProps> = ({
     const testConnection = async () => {
         try {
             setTesting(true);
-            const response = await fetch('/api/fetch/test-connection', {
-                method: 'POST'
+            const response = await fetch('/api/web-scraping/test-connection', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    test_urls: testUrls.filter(url => url.trim())
+                })
             });
             const data = await response.json();
 
@@ -384,13 +409,62 @@ text/javascript`}
 
                     <Divider />
 
+                    <Title level={5} style={{ marginBottom: 16 }}>
+                        <CloudServerOutlined /> 连接测试配置
+                    </Title>
+
+                    {/* 测试地址选择 */}
+                    <div style={{ marginBottom: 16 }}>
+                        <Text strong style={{ display: 'block', marginBottom: 8 }}>选择测试网站</Text>
+                        <Select
+                            mode="multiple"
+                            style={{ width: '100%', marginBottom: 8 }}
+                            placeholder="选择要测试的网站"
+                            value={testUrls}
+                            onChange={setTestUrls}
+                            options={defaultTestSites}
+                            maxTagCount={3}
+                            maxTagTextLength={15}
+                        />
+
+                        {/* 自定义测试URL */}
+                        <div style={{ display: 'flex', gap: 8 }}>
+                            <Input
+                                placeholder="输入自定义测试URL（如: https://example.com）"
+                                value={customTestUrl}
+                                onChange={(e) => setCustomTestUrl(e.target.value)}
+                                onPressEnter={() => {
+                                    if (customTestUrl.trim() && !testUrls.includes(customTestUrl.trim())) {
+                                        setTestUrls([...testUrls, customTestUrl.trim()]);
+                                        setCustomTestUrl('');
+                                    }
+                                }}
+                            />
+                            <Button
+                                type="dashed"
+                                onClick={() => {
+                                    if (customTestUrl.trim() && !testUrls.includes(customTestUrl.trim())) {
+                                        setTestUrls([...testUrls, customTestUrl.trim()]);
+                                        setCustomTestUrl('');
+                                    }
+                                }}
+                                disabled={!customTestUrl.trim() || testUrls.includes(customTestUrl.trim())}
+                            >
+                                添加
+                            </Button>
+                        </div>
+                    </div>
+
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <Text type="secondary">网络连接测试</Text>
+                        <Text type="secondary">
+                            将测试 {testUrls.length} 个网站的连接状态
+                        </Text>
                         <Button
                             type="default"
                             icon={<CloudServerOutlined />}
                             loading={testing}
                             onClick={testConnection}
+                            disabled={testUrls.length === 0}
                         >
                             测试连接
                         </Button>

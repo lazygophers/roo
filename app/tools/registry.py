@@ -323,4 +323,4 @@ def cache_tool(name: str, description: str, schema: Dict[str, Any], **kwargs):
 
 def fetch_tool(name: str, description: str, schema: Dict[str, Any], **kwargs):
     """网络抓取工具装饰器快捷方式"""
-    return mcp_tool(name, description, "fetch", schema, **kwargs)
+    return mcp_tool(name, description, "web-scraping", schema, **kwargs)

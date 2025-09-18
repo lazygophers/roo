@@ -92,6 +92,12 @@ class WebScrapingConfigRequest(BaseModel):
     follow_redirects: Optional[bool] = Field(None, description="跟随重定向")
 
 
+class TestConnectionRequest(BaseModel):
+    """测试连接请求模型"""
+    test_urls: Optional[List[str]] = Field(None, description="要测试的URL列表")
+    timeout: Optional[int] = Field(10, ge=1, le=60, description="单个请求超时（秒）")
+
+
 # API端点实现
 @router.post("/http-request", response_model=Dict[str, Any])
 async def make_http_request(request: HttpRequestRequest):
@@ -282,15 +288,19 @@ async def update_web_scraping_config(request: WebScrapingConfigRequest):
 
 
 @router.post("/test-connection", response_model=Dict[str, Any])
-async def test_connection():
+async def test_connection(request: Optional[TestConnectionRequest] = None):
     """测试网络连接（包括代理配置）"""
     try:
-        # 测试基本HTTP连接
-        test_urls = [
-            "https://httpbin.org/get",
-            "https://www.google.com",
-            "https://github.com"
-        ]
+        # 使用用户提供的测试URL或默认URL
+        if request and request.test_urls:
+            test_urls = request.test_urls
+        else:
+            test_urls = [
+                "https://www.baidu.com",
+                "https://www.google.com",
+                "https://www.taobao.com",
+                "https://github.com"
+            ]
 
         results = []
         for url in test_urls:
