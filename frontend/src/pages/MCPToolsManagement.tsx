@@ -35,7 +35,6 @@ import FileToolsConfigModal from '../components/FileTools/FileToolsConfigModal';
 import TimeToolsConfigModal from '../components/TimeTools/TimeToolsConfigModal';
 import GitHubToolsConfigModal from '../components/GitHubTools/GitHubToolsConfigModal';
 import CacheToolsConfigModal from '../components/CacheTools/CacheToolsConfigModal';
-import GitHubToolsConfigModal from '../components/GitHubTools/GitHubToolsConfigModal';
 import './MCPToolsManagement.css';
 
 const {Title, Text, Paragraph} = Typography;
@@ -62,11 +61,27 @@ const MCPToolsManagement: React.FC = () => {
     const [testResult, setTestResult] = useState<string>('');
     const [fileToolsConfigModal, setFileToolsConfigModal] = useState(false);
     const [timeToolsConfigModal, setTimeToolsConfigModal] = useState(false);
-    const [gitHubToolsConfigModal, setGitHubToolsConfigModal] = useState(false);
-    const [cacheToolsConfigModal, setCacheToolsConfigModal] = useState(false);
     const [githubToolsConfigModal, setGithubToolsConfigModal] = useState(false);
+    const [cacheToolsConfigModal, setCacheToolsConfigModal] = useState(false);
+    const [githubTokenValid, setGithubTokenValid] = useState<boolean | null>(null);
 
     const [form] = Form.useForm();
+
+    // 检查 GitHub Token 有效性
+    const checkGitHubToken = useCallback(async () => {
+        try {
+            const response = await fetch('/api/mcp/categories/github/token-status');
+            const data = await response.json();
+            if (data.success) {
+                setGithubTokenValid(data.data.valid);
+            } else {
+                setGithubTokenValid(false);
+            }
+        } catch (error) {
+            console.error('Check GitHub token error:', error);
+            setGithubTokenValid(false);
+        }
+    }, []);
 
     // 加载数据
     const loadData = useCallback(async () => {
@@ -78,7 +93,8 @@ const MCPToolsManagement: React.FC = () => {
                     success: false,
                     data: {categories: [], total_categories: 0}
                 })),
-                apiClient.getMCPTools().catch(e => ({success: false, data: {tools: [], server: '', organization: ''}}))
+                apiClient.getMCPTools().catch(e => ({success: false, data: {tools: [], server: '', organization: ''}})),
+                checkGitHubToken() // 检查GitHub Token状态
             ]);
 
             // if (statusRes.success && statusRes.data) {
@@ -573,36 +589,6 @@ const MCPToolsManagement: React.FC = () => {
                                                     </Button>
                                                 </Tooltip>
                                             )}
-                                            {category.id === 'github' && (
-                                                <Tooltip title="GitHub工具配置">
-                                                    <Button
-                                                        type="text"
-                                                        size="small"
-                                                        onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            setGitHubToolsConfigModal(true);
-                                                        }}
-                                                        style={{
-                                                            color: currentTheme.token?.colorPrimary,
-                                                            borderColor: currentTheme.token?.colorPrimary,
-                                                            backgroundColor: 'rgba(24, 144, 255, 0.06)',
-                                                            borderRadius: 6,
-                                                            border: `1px solid ${currentTheme.token?.colorPrimary}20`,
-                                                            transition: 'all 0.2s ease'
-                                                        }}
-                                                        onMouseEnter={(e) => {
-                                                            e.currentTarget.style.backgroundColor = 'rgba(24, 144, 255, 0.12)';
-                                                            e.currentTarget.style.borderColor = currentTheme.token?.colorPrimary || '#1890ff';
-                                                        }}
-                                                        onMouseLeave={(e) => {
-                                                            e.currentTarget.style.backgroundColor = 'rgba(24, 144, 255, 0.06)';
-                                                            e.currentTarget.style.borderColor = `${currentTheme.token?.colorPrimary}20` || '#1890ff20';
-                                                        }}
-                                                    >
-                                                        工具配置
-                                                    </Button>
-                                                </Tooltip>
-                                            )}
                                             {category.id === 'cache' && (
                                                 <Tooltip title="缓存工具配置">
                                                     <Button
@@ -634,34 +620,43 @@ const MCPToolsManagement: React.FC = () => {
                                                 </Tooltip>
                                             )}
                                             {category.id === 'github' && (
-                                                <Tooltip title="GitHub 工具配置">
-                                                    <Button
-                                                        type="text"
-                                                        size="small"
-                                                        onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            setGithubToolsConfigModal(true);
-                                                        }}
-                                                        style={{
-                                                            color: currentTheme.token?.colorPrimary,
-                                                            borderColor: currentTheme.token?.colorPrimary,
-                                                            backgroundColor: 'rgba(24, 144, 255, 0.06)',
-                                                            borderRadius: 6,
-                                                            border: `1px solid ${currentTheme.token?.colorPrimary}20`,
-                                                            transition: 'all 0.2s ease'
-                                                        }}
-                                                        onMouseEnter={(e) => {
-                                                            e.currentTarget.style.backgroundColor = 'rgba(24, 144, 255, 0.12)';
-                                                            e.currentTarget.style.borderColor = currentTheme.token?.colorPrimary || '#1890ff';
-                                                        }}
-                                                        onMouseLeave={(e) => {
-                                                            e.currentTarget.style.backgroundColor = 'rgba(24, 144, 255, 0.06)';
-                                                            e.currentTarget.style.borderColor = `${currentTheme.token?.colorPrimary}20` || '#1890ff20';
-                                                        }}
-                                                    >
-                                                        API配置
-                                                    </Button>
-                                                </Tooltip>
+                                                <Space>
+                                                    {githubTokenValid === false && (
+                                                        <Tooltip title="GitHub Token未配置或无效，工具集不可用">
+                                                            <Tag color="red" style={{margin: 0}}>
+                                                                <ExclamationCircleOutlined /> 不可用
+                                                            </Tag>
+                                                        </Tooltip>
+                                                    )}
+                                                    <Tooltip title="GitHub工具配置">
+                                                        <Button
+                                                            type="text"
+                                                            size="small"
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                setGithubToolsConfigModal(true);
+                                                            }}
+                                                            style={{
+                                                                color: currentTheme.token?.colorPrimary,
+                                                                borderColor: currentTheme.token?.colorPrimary,
+                                                                backgroundColor: 'rgba(24, 144, 255, 0.06)',
+                                                                borderRadius: 6,
+                                                                border: `1px solid ${currentTheme.token?.colorPrimary}20`,
+                                                                transition: 'all 0.2s ease'
+                                                            }}
+                                                            onMouseEnter={(e) => {
+                                                                e.currentTarget.style.backgroundColor = 'rgba(24, 144, 255, 0.12)';
+                                                                e.currentTarget.style.borderColor = currentTheme.token?.colorPrimary || '#1890ff';
+                                                            }}
+                                                            onMouseLeave={(e) => {
+                                                                e.currentTarget.style.backgroundColor = 'rgba(24, 144, 255, 0.06)';
+                                                                e.currentTarget.style.borderColor = `${currentTheme.token?.colorPrimary}20` || '#1890ff20';
+                                                            }}
+                                                        >
+                                                            工具配置
+                                                        </Button>
+                                                    </Tooltip>
+                                                </Space>
                                             )}
                                         </Space>
                                     </div>
@@ -678,6 +673,35 @@ const MCPToolsManagement: React.FC = () => {
                                         type="warning"
                                         showIcon
                                         style={{margin: '16px 0'}}
+                                    />
+                                ) : category.id === 'github' && githubTokenValid === false ? (
+                                    <Alert
+                                        message="GitHub工具集不可用"
+                                        description={
+                                            <div>
+                                                <p>GitHub工具集当前不可用，原因：GitHub Token未配置或无效。</p>
+                                                <p>
+                                                    请点击右侧的"工具配置"按钮配置有效的GitHub Token，或者联系管理员获取帮助。
+                                                </p>
+                                                <ul style={{marginTop: 8}}>
+                                                    <li>确保GitHub Token格式正确（以ghp_或github_pat_开头）</li>
+                                                    <li>确保Token具有适当的权限</li>
+                                                    <li>确保Token未过期</li>
+                                                </ul>
+                                            </div>
+                                        }
+                                        type="error"
+                                        showIcon
+                                        style={{margin: '16px 0'}}
+                                        action={
+                                            <Button
+                                                type="primary"
+                                                size="small"
+                                                onClick={() => setGithubToolsConfigModal(true)}
+                                            >
+                                                立即配置
+                                            </Button>
+                                        }
                                     />
                                 ) : categoryTools.length === 0 ? (
                                     <Empty
@@ -847,23 +871,18 @@ const MCPToolsManagement: React.FC = () => {
 
             {/* GitHub工具配置Modal */}
             <GitHubToolsConfigModal
-                visible={gitHubToolsConfigModal}
-                onCancel={() => setGitHubToolsConfigModal(false)}
+                visible={githubToolsConfigModal}
+                onCancel={() => setGithubToolsConfigModal(false)}
+                onSuccess={() => {
+                    loadData(); // 重新加载数据
+                    checkGitHubToken(); // 重新检查token状态
+                }}
             />
 
             {/* 缓存工具配置Modal */}
             <CacheToolsConfigModal
                 visible={cacheToolsConfigModal}
                 onCancel={() => setCacheToolsConfigModal(false)}
-                onSuccess={() => {
-                    loadData(); // 重新加载数据
-                }}
-            />
-
-            {/* GitHub工具配置Modal */}
-            <GitHubToolsConfigModal
-                visible={githubToolsConfigModal}
-                onCancel={() => setGithubToolsConfigModal(false)}
                 onSuccess={() => {
                     loadData(); // 重新加载数据
                 }}

@@ -1004,3 +1004,66 @@ async def update_category_config_item(category_id: str, config_key: str, request
             "message": "Failed to update category configuration item: Internal server error"
         }
 
+@router.get("/categories/github/token-status")
+async def check_github_token_status():
+    """检查GitHub Token状态"""
+    try:
+        tools_service = get_mcp_tools_service()
+
+        # 获取GitHub分类配置
+        github_config = tools_service.get_category_config('github')
+
+        if not github_config:
+            return {
+                "success": True,
+                "message": "GitHub token status checked",
+                "data": {
+                    "valid": False,
+                    "reason": "GitHub工具未配置"
+                }
+            }
+
+        # 检查token是否存在
+        github_token = github_config.get('github_token', '').strip()
+
+        if not github_token:
+            return {
+                "success": True,
+                "message": "GitHub token status checked",
+                "data": {
+                    "valid": False,
+                    "reason": "GitHub Token为空，请在工具配置中设置GitHub Token"
+                }
+            }
+
+        # 简单验证token格式
+        if not github_token.startswith(('ghp_', 'github_pat_')) or len(github_token) < 20:
+            return {
+                "success": True,
+                "message": "GitHub token status checked",
+                "data": {
+                    "valid": False,
+                    "reason": "GitHub Token格式无效，请检查token格式"
+                }
+            }
+
+        return {
+            "success": True,
+            "message": "GitHub token status checked",
+            "data": {
+                "valid": True,
+                "reason": "GitHub Token已配置"
+            }
+        }
+
+    except Exception as e:
+        logger.error(f"Failed to check GitHub token status: {sanitize_for_log(str(e))}")
+        return {
+            "success": False,
+            "message": "检查GitHub Token状态失败",
+            "data": {
+                "valid": False,
+                "reason": "系统错误，请稍后重试"
+            }
+        }
+

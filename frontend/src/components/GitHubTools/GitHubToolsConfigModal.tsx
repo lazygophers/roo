@@ -9,6 +9,7 @@ const {Text, Paragraph} = Typography;
 interface GitHubToolsConfigModalProps {
     visible: boolean;
     onCancel: () => void;
+    onSuccess?: () => void;
 }
 
 interface GitHubToolsConfig {
@@ -31,7 +32,7 @@ interface GitHubToolsConfig {
     enable_dependabot_integration: boolean;
 }
 
-const GitHubToolsConfigModal: React.FC<GitHubToolsConfigModalProps> = ({visible, onCancel}) => {
+const GitHubToolsConfigModal: React.FC<GitHubToolsConfigModalProps> = ({visible, onCancel, onSuccess}) => {
     const {currentTheme} = useTheme();
     const {message: messageApi} = App.useApp();
     const [loading, setLoading] = useState(false);
@@ -52,6 +53,7 @@ const GitHubToolsConfigModal: React.FC<GitHubToolsConfigModalProps> = ({visible,
 
             if (data.success) {
                 messageApi.success('GitHub工具配置已保存');
+                onSuccess?.(); // 调用成功回调
             } else {
                 messageApi.error(data.message || '保存配置失败');
             }
@@ -214,7 +216,13 @@ const GitHubToolsConfigModal: React.FC<GitHubToolsConfigModalProps> = ({visible,
                                 </Tooltip>
                             </Space>
                         }
-                        rules={[{required: false, message: '请输入GitHub Token'}]}
+                        rules={[
+                            {required: true, message: '请输入GitHub Token'},
+                            {
+                                pattern: /^(ghp_|github_pat_)[A-Za-z0-9_]{20,}$/,
+                                message: 'GitHub Token格式无效，必须以ghp_或github_pat_开头且长度足够'
+                            }
+                        ]}
                         placeholder="ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
                         fieldProps={{
                             visibilityToggle: true
@@ -511,7 +519,7 @@ const GitHubToolsConfigModal: React.FC<GitHubToolsConfigModalProps> = ({visible,
                                 • <Text strong>API基础URL</Text>: 企业版GitHub用户可以修改为自己的企业GitHub地址
                             </Paragraph>
                             <Paragraph style={{margin: '8px 0', fontSize: 13}}>
-                                • <Text strong>GitHub Token</Text>: 用于API认证的Personal Access Token，留空则使用公开API（有较低速率限制）
+                                • <Text strong>GitHub Token</Text>: <Text type="danger">必填</Text> - 用于API认证的Personal Access Token，必须以ghp_或github_pat_开头
                             </Paragraph>
                             <Paragraph style={{margin: '8px 0', fontSize: 13}}>
                                 • <Text strong>速率限制</Text>: 启用后会自动检查GitHub API配额，避免超出限制
