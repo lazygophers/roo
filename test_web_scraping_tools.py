@@ -12,8 +12,8 @@ import os
 # 添加项目根目录到Python路径
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from app.tools.web_scraping_tools import (
-    get_web_scraping_tools,
+from app.tools.fetch_tools import (
+    get_fetch_tools,
     http_request,
     fetch_webpage,
     api_call
@@ -84,7 +84,7 @@ async def test_config_integration():
         print("✅ MCP配置服务初始化成功")
 
         # 获取网络抓取工具实例
-        tools = get_web_scraping_tools()
+        tools = get_fetch_tools()
         print(f"✅ 网络抓取工具实例获取成功")
 
         # 检查配置加载

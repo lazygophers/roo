@@ -49,7 +49,7 @@ def mcp_category(
             icon="🌐",
             sort_order=6
         )
-        def register_web_scraping_category():
+        def register_fetch_category():
             pass
     """
     def decorator(func):
@@ -321,6 +321,6 @@ def cache_tool(name: str, description: str, schema: Dict[str, Any], **kwargs):
     return mcp_tool(name, description, "cache", schema, **kwargs)
 
 
-def web_scraping_tool(name: str, description: str, schema: Dict[str, Any], **kwargs):
+def fetch_tool(name: str, description: str, schema: Dict[str, Any], **kwargs):
     """网络抓取工具装饰器快捷方式"""
     return mcp_tool(name, description, "fetch", schema, **kwargs)

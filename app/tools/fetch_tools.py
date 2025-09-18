@@ -19,7 +19,7 @@ from app.core.logging import setup_logging
 from app.core.secure_logging import sanitize_for_log
 from app.core.mcp_tools_service import get_mcp_config_service
 from app.models.mcp_config import MCPGlobalConfig
-from app.tools.registry import web_scraping_tool, mcp_category
+from app.tools.registry import fetch_tool, mcp_category
 
 logger = setup_logging()
 
@@ -51,7 +51,7 @@ logger = setup_logging()
         ]
     }
 )
-def register_web_scraping_category():
+def register_fetch_category():
     """注册网络抓取工具分类"""
     pass
 
@@ -90,8 +90,8 @@ class WebScrapingTools:
             self.mcp_config = config_service.get_config()
 
             # 获取工具集专用配置
-            web_scraping_config = config_service.get_tool_category_config("web-scraping")
-            custom_config = web_scraping_config.get("custom_config", {})
+            fetch_config = config_service.get_tool_category_config("web-scraping")
+            custom_config = fetch_config.get("custom_config", {})
 
             # 工具集配置优先级 > 全局配置
             if "user_agent" in custom_config:
@@ -210,26 +210,26 @@ class WebScrapingTools:
 
 
 # 全局实例
-_web_scraping_tools: Optional[WebScrapingTools] = None
+_fetch_tools: Optional[WebScrapingTools] = None
 
 
-def get_web_scraping_tools() -> WebScrapingTools:
+def get_fetch_tools() -> WebScrapingTools:
     """获取网络抓取工具实例"""
-    global _web_scraping_tools
-    if _web_scraping_tools is None:
-        _web_scraping_tools = WebScrapingTools()
-    return _web_scraping_tools
+    global _fetch_tools
+    if _fetch_tools is None:
+        _fetch_tools = WebScrapingTools()
+    return _fetch_tools
 
 
-def reload_web_scraping_config():
+def reload_fetch_config():
     """重新加载配置（供MCP配置服务调用）"""
-    global _web_scraping_tools
-    if _web_scraping_tools is not None:
-        _web_scraping_tools._load_config()
+    global _fetch_tools
+    if _fetch_tools is not None:
+        _fetch_tools._load_config()
 
 
 # MCP工具定义
-@web_scraping_tool(
+@fetch_tool(
     name="http_request",
     description="执行HTTP请求（GET, POST, PUT, DELETE等）",
     schema={
@@ -321,7 +321,7 @@ async def http_request(
     Returns:
         包含响应信息的字典
     """
-    tools = get_web_scraping_tools()
+    tools = get_fetch_tools()
 
     try:
         logger.info(f"Making HTTP {method} request to {sanitize_for_log(url)}")
@@ -388,8 +388,8 @@ async def http_request(
         }
 
 
-@web_scraping_tool(
-    name="fetch_webpage",
+@fetch_tool(
+    name="webpage",
     description="抓取网页内容，支持提取文本、链接和图片，使用BeautifulSoup解析HTML",
     schema={
         "type": "object",
@@ -435,7 +435,7 @@ async def fetch_webpage(
     Returns:
         包含网页内容和解析结果的字典
     """
-    tools = get_web_scraping_tools()
+    tools = get_fetch_tools()
 
     try:
         logger.info(f"Fetching webpage: {sanitize_for_log(url)}")
@@ -539,7 +539,7 @@ async def fetch_webpage(
         }
 
 
-@web_scraping_tool(
+@fetch_tool(
     name="download_file",
     description="下载文件到指定路径，支持大文件下载和进度监控，可设置文件大小限制",
     schema={
@@ -583,7 +583,7 @@ async def download_file(
     Returns:
         包含下载结果的字典
     """
-    tools = get_web_scraping_tools()
+    tools = get_fetch_tools()
 
     try:
         logger.info(f"Downloading file from: {sanitize_for_log(url)}")
@@ -672,7 +672,7 @@ async def download_file(
         }
 
 
-@web_scraping_tool(
+@fetch_tool(
     name="api_call",
     description="执行API调用，自动处理认证头，支持JSON响应解析和错误处理",
     schema={
@@ -766,7 +766,7 @@ async def api_call(
         }
 
 
-@web_scraping_tool(
+@fetch_tool(
     name="batch_requests",
     description="批量执行HTTP请求，支持并发控制和请求间延迟，适合大量数据抓取",
     schema={
@@ -911,7 +911,7 @@ async def batch_requests(
         }
 
 
-@web_scraping_tool(
+@fetch_tool(
     name="parse_html",
     description="解析HTML内容，提取标题、段落、表格、链接等结构化数据",
     schema={
@@ -1113,7 +1113,7 @@ async def parse_html(
         }
 
 
-@web_scraping_tool(
+@fetch_tool(
     name="parse_markdown",
     description="解析Markdown内容，提取标题、代码块、表格等结构化数据",
     schema={
@@ -1280,7 +1280,7 @@ async def parse_markdown(
         }
 
 
-@web_scraping_tool(
+@fetch_tool(
     name="parse_xml",
     description="解析XML内容，提取元素、属性、文本等结构化数据",
     schema={
@@ -1409,7 +1409,7 @@ async def parse_xml(
         }
 
 
-@web_scraping_tool(
+@fetch_tool(
     name="parse_json",
     description="解析和处理JSON数据，支持JSONPath查询和数据转换",
     schema={
@@ -1609,7 +1609,7 @@ async def parse_json(
         }
 
 
-@web_scraping_tool(
+@fetch_tool(
     name="parse_rss",
     description="解析RSS/Atom订阅源，提取文章、标题、链接等信息",
     schema={
@@ -1795,7 +1795,7 @@ async def parse_rss(
         }
 
 
-@web_scraping_tool(
+@fetch_tool(
     name="extract_css_selector",
     description="使用CSS选择器从网页中提取特定内容，支持复杂选择器和批量提取",
     schema={
@@ -1976,7 +1976,7 @@ async def extract_css_selector(
         }
 
 
-@web_scraping_tool(
+@fetch_tool(
     name="smart_extract_and_parse",
     description="智能抓取并解析网页内容，根据内容类型自动选择最适合的解析方式（HTML/JSON/XML/RSS）",
     schema={
@@ -2248,7 +2248,7 @@ MCP_TOOLS = [
         }
     },
     {
-        "name": "fetch_webpage",
+        "name": "webpage",
         "description": "Fetch and parse webpage content with optional text, links, and images extraction",
         "inputSchema": {
             "type": "object",

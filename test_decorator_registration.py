@@ -25,7 +25,7 @@ def test_decorator_registration():
 
     # 导入网络抓取工具以触发装饰器注册
     try:
-        from app.tools.web_scraping_tools import (
+        from app.tools.fetch_tools import (
             http_request,
             fetch_webpage,
             download_file,
@@ -45,7 +45,7 @@ def test_decorator_registration():
     print(f"   - 分类详情: {stats['tools_by_category']}")
 
     # 检查fetch分类的工具
-    web_scraping_tools = get_tools_by_category("fetch")
+    fetch_tools = get_tools_by_category("fetch")
     print(f"\n📦 fetch分类工具:")
 
     expected_tools = [
@@ -56,7 +56,7 @@ def test_decorator_registration():
         "fetch_batch_requests"
     ]
 
-    found_tools = [tool.name for tool in web_scraping_tools]
+    found_tools = [tool.name for tool in fetch_tools]
     print(f"   已注册工具: {found_tools}")
 
     # 验证所有期望的工具都已注册
@@ -71,7 +71,7 @@ def test_decorator_registration():
 
     # 检查工具详细信息
     print(f"\n🔍 工具详细信息:")
-    for tool in web_scraping_tools:
+    for tool in fetch_tools:
         print(f"   {tool.name}:")
         print(f"     - 描述: {tool.description}")
         print(f"     - 分类: {tool.category}")
@@ -90,7 +90,7 @@ def test_auto_discovery():
     try:
         # 发现项目中的工具
         discovered_count = auto_discover_tools([
-            "/Users/luoxin/persons/knowledge/roo/app/tools/web_scraping_tools.py"
+            "/Users/luoxin/persons/knowledge/roo/app/tools/fetch_tools.py"
         ])
 
         print(f"✅ 自动发现了 {discovered_count} 个工具")
@@ -113,9 +113,9 @@ def test_schema_validation():
     print("\n📋 测试Schema验证...")
 
     try:
-        web_scraping_tools = get_tools_by_category("fetch")
+        fetch_tools = get_tools_by_category("fetch")
 
-        for tool in web_scraping_tools:
+        for tool in fetch_tools:
             # 检查schema基本结构
             schema = tool.schema
             if not isinstance(schema, dict):
@@ -150,7 +150,7 @@ async def test_function_calls():
     print("\n🚀 测试装饰器函数调用...")
 
     try:
-        from app.tools.web_scraping_tools import http_request
+        from app.tools.fetch_tools import http_request
 
         # 测试一个简单的HTTP请求
         result = await http_request("https://httpbin.org/get")

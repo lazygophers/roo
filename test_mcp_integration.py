@@ -31,18 +31,18 @@ def test_mcp_tools_service_integration():
         print(f"   总工具数: {len(all_tools)}")
 
         # 查找网络抓取工具
-        web_scraping_tools = [tool for tool in all_tools if tool.get('category') == 'fetch']
-        print(f"   网络抓取工具数: {len(web_scraping_tools)}")
+        fetch_tools = [tool for tool in all_tools if tool.get('category') == 'fetch']
+        print(f"   网络抓取工具数: {len(fetch_tools)}")
 
-        if web_scraping_tools:
+        if fetch_tools:
             print("🎯 发现的网络抓取工具:")
-            for tool in web_scraping_tools:
+            for tool in fetch_tools:
                 print(f"     - {tool['name']}: {tool['description']}")
         else:
             print("❌ 未发现网络抓取工具")
             return False
 
-        return len(web_scraping_tools) >= 5  # 期望至少5个工具
+        return len(fetch_tools) >= 5  # 期望至少5个工具
 
     except Exception as e:
         print(f"❌ MCP工具服务集成测试失败: {e}")
@@ -57,8 +57,8 @@ def test_category_filtering():
         tools_service = get_mcp_tools_service()
 
         # 获取fetch分类的工具
-        web_scraping_tools = tools_service.get_tools(category="fetch", enabled_only=False)
-        print(f"   fetch分类工具数: {len(web_scraping_tools)}")
+        fetch_tools = tools_service.get_tools(category="fetch", enabled_only=False)
+        print(f"   fetch分类工具数: {len(fetch_tools)}")
 
         expected_tools = [
             "fetch_http_request",
@@ -68,7 +68,7 @@ def test_category_filtering():
             "fetch_batch_requests"
         ]
 
-        found_tools = [tool['name'] for tool in web_scraping_tools]
+        found_tools = [tool['name'] for tool in fetch_tools]
 
         missing_tools = set(expected_tools) - set(found_tools)
         if missing_tools:
@@ -137,9 +137,9 @@ def test_tools_by_category():
 
         # 检查是否包含fetch分类
         if 'fetch' in tools_by_category:
-            web_scraping_count = len(tools_by_category['fetch'])
-            print(f"✅ fetch分类包含 {web_scraping_count} 个工具")
-            return web_scraping_count >= 5
+            fetch_count = len(tools_by_category['fetch'])
+            print(f"✅ fetch分类包含 {fetch_count} 个工具")
+            return fetch_count >= 5
         else:
             print("❌ 未找到fetch分类")
             return False
@@ -162,11 +162,11 @@ def test_db_sync():
 
         # 验证同步后的数据库状态
         db_tools = tools_service.tools_table.all()
-        web_scraping_db_tools = [tool for tool in db_tools if tool.get('category') == 'fetch']
+        fetch_db_tools = [tool for tool in db_tools if tool.get('category') == 'fetch']
 
-        print(f"   数据库中网络抓取工具数: {len(web_scraping_db_tools)}")
+        print(f"   数据库中网络抓取工具数: {len(fetch_db_tools)}")
 
-        if web_scraping_db_tools:
+        if fetch_db_tools:
             print("✅ 装饰器工具已成功同步到数据库")
             return True
         else:
