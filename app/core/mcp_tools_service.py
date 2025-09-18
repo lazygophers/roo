@@ -60,7 +60,7 @@ class MCPToolsService:
     def __init__(self, use_unified_db: bool = True):
         """初始化MCP工具服务"""
         self.use_unified_db = use_unified_db
-        
+
         if use_unified_db:
             self.unified_db = get_unified_database()
             self.db = self.unified_db.db
@@ -73,13 +73,61 @@ class MCPToolsService:
             self.db_path = db_path
             self.db = TinyDB(db_path)
             self.unified_db = None
-        
+
         # 使用统一表名
         self.tools_table = self.db.table(TableNames.MCP_TOOLS)
         self.categories_table = self.db.table(TableNames.MCP_CATEGORIES)
+
+        # 启动时自动清理数据库中的旧工具名称
+        self._cleanup_legacy_tools()
         
         logger.info(f"MCPToolsService initialized with unified db: {use_unified_db}")
-    
+
+    def _cleanup_legacy_tools(self):
+        """清理数据库中的旧工具名称和重复注册"""
+        try:
+            # 删除所有git_前缀的工具（它们应该是github_前缀）
+            git_tools_count = 0
+            all_tools = self.tools_table.all()
+
+            for tool in all_tools:
+                if tool['name'].startswith('git_'):
+                    self.tools_table.remove(doc_ids=[tool.doc_id])
+                    git_tools_count += 1
+
+            if git_tools_count > 0:
+                logger.info(f"Cleaned up {git_tools_count} legacy git_ prefixed tools")
+
+            # 清理重复的工具名称，只保留最新的
+            tool_names = {}
+            duplicates_count = 0
+
+            for tool in self.tools_table.all():
+                name = tool['name']
+                if name in tool_names:
+                    # 保留更新时间较新的
+                    existing_tool = tool_names[name]
+                    existing_time = existing_tool.get('updated_at', '')
+                    current_time = tool.get('updated_at', '')
+
+                    if current_time > existing_time:
+                        # 当前工具更新，删除旧的
+                        self.tools_table.remove(doc_ids=[existing_tool['doc_id']])
+                        tool_names[name] = tool
+                        duplicates_count += 1
+                    else:
+                        # 旧工具更新，删除当前的
+                        self.tools_table.remove(doc_ids=[tool.doc_id])
+                        duplicates_count += 1
+                else:
+                    tool_names[name] = tool
+
+            if duplicates_count > 0:
+                logger.info(f"Cleaned up {duplicates_count} duplicate tool registrations")
+
+        except Exception as e:
+            logger.error(f"Error during legacy tools cleanup: {e}")
+
     def register_builtin_categories(self):
         """注册内置工具分类到数据库（启动时覆盖）"""
         builtin_categories = [
@@ -271,7 +319,7 @@ class MCPToolsService:
         """注册内置MCP工具到数据库（启动时覆盖）"""
         builtin_tools = [
             MCPTool(
-                name="get_current_timestamp",
+                name="time_get_ts",
                 description="获取当前Unix时间戳（纯数字）",
                 category="time",
                 schema={
@@ -285,7 +333,7 @@ class MCPToolsService:
                 }
             ),
             MCPTool(
-                name="format_time",
+                name="time_format",
                 description="格式化时间输出，支持多种格式和时区",
                 category="time",
                 schema={
@@ -331,7 +379,7 @@ class MCPToolsService:
                 }
             ),
             MCPTool(
-                name="convert_timezone",
+                name="time_convert_tz",
                 description="时区转换工具，将时间从一个时区转换到另一个时区",
                 category="time",
                 schema={
@@ -368,7 +416,7 @@ class MCPToolsService:
                 }
             ),
             MCPTool(
-                name="parse_time",
+                name="time_parse",
                 description="解析和标准化时间字符串，支持多种格式识别",
                 category="time",
                 schema={
@@ -406,7 +454,7 @@ class MCPToolsService:
                 }
             ),
             MCPTool(
-                name="calculate_time_diff",
+                name="time_calc_diff",
                 description="计算两个时间之间的差值",
                 category="time",
                 schema={
@@ -452,7 +500,7 @@ class MCPToolsService:
                 }
             ),
             MCPTool(
-                name="get_timezone_info",
+                name="time_get_tz",
                 description="获取时区信息，包括当前时间、UTC偏移等",
                 category="time",
                 schema={
@@ -481,7 +529,7 @@ class MCPToolsService:
                 }
             ),
             MCPTool(
-                name="get_system_info",
+                name="sys_get_info",
                 description="获取LazyAI Studio系统信息，包括CPU、内存、操作系统等",
                 category="system",
                 schema={
@@ -509,7 +557,7 @@ class MCPToolsService:
                 }
             ),
             MCPTool(
-                name="read_file",
+                name="file_read",
                 description="读取指定路径的文件内容",
                 category="file",
                 schema={
@@ -544,7 +592,7 @@ class MCPToolsService:
                 }
             ),
             MCPTool(
-                name="write_file",
+                name="file_write",
                 description="写入内容到指定路径的文件",
                 category="file",
                 schema={
@@ -582,7 +630,7 @@ class MCPToolsService:
                 }
             ),
             MCPTool(
-                name="list_directory",
+                name="file_ls_dir",
                 description="列出指定目录下的文件和子目录",
                 category="file",
                 schema={
@@ -621,7 +669,7 @@ class MCPToolsService:
                 }
             ),
             MCPTool(
-                name="create_directory",
+                name="file_new_dir",
                 description="创建新目录（支持创建多级目录）",
                 category="file",
                 schema={
@@ -648,7 +696,7 @@ class MCPToolsService:
                 }
             ),
             MCPTool(
-                name="delete_file",
+                name="file_del",
                 description="删除指定的文件或空目录",
                 category="file",
                 schema={
@@ -675,7 +723,7 @@ class MCPToolsService:
                 }
             ),
             MCPTool(
-                name="file_info",
+                name="file_get_info",
                 description="获取文件或目录的详细信息",
                 category="file",
                 schema={
@@ -702,7 +750,7 @@ class MCPToolsService:
                 }
             ),
             MCPTool(
-                name="get_file_security_info",
+                name="sys_get_security",
                 description="获取文件工具安全配置信息，包括可访问的目录权限设置",
                 category="system",
                 schema={
@@ -716,7 +764,7 @@ class MCPToolsService:
                 }
             ),
             MCPTool(
-                name="update_file_security_paths",
+                name="sys_set_security_paths",
                 description="更新文件安全路径配置（可读取、可写入、可删除、禁止访问目录）",
                 category="system", 
                 schema={
@@ -744,7 +792,7 @@ class MCPToolsService:
                 }
             ),
             MCPTool(
-                name="update_file_security_limits", 
+                name="sys_set_security_limits", 
                 description="更新文件安全限制配置（最大文件大小、最大读取行数、严格模式）",
                 category="system",
                 schema={
@@ -771,7 +819,7 @@ class MCPToolsService:
                 }
             ),
             MCPTool(
-                name="reload_file_security_config",
+                name="sys_reload_security",
                 description="重新加载文件安全配置（从数据库刷新内存中的配置）",
                 category="system",
                 schema={
@@ -843,7 +891,7 @@ class MCPToolsService:
                 }
             ),
             MCPTool(
-                name="cache_delete",
+                name="cache_del",
                 description="删除缓存键",
                 category="cache",
                 schema={
@@ -885,7 +933,7 @@ class MCPToolsService:
                 }
             ),
             MCPTool(
-                name="cache_ttl",
+                name="cache_get_ttl",
                 description="获取缓存键的剩余生存时间",
                 category="cache",
                 schema={
@@ -906,7 +954,7 @@ class MCPToolsService:
                 }
             ),
             MCPTool(
-                name="cache_expire",
+                name="cache_set_ttl",
                 description="设置缓存键的过期时间",
                 category="cache",
                 schema={
@@ -932,7 +980,7 @@ class MCPToolsService:
                 }
             ),
             MCPTool(
-                name="cache_keys",
+                name="cache_ls_keys",
                 description="查找匹配模式的缓存键",
                 category="cache",
                 schema={
@@ -956,7 +1004,7 @@ class MCPToolsService:
                 }
             ),
             MCPTool(
-                name="cache_mset",
+                name="cache_set_multi",
                 description="批量设置多个缓存键值对",
                 category="cache",
                 schema={
@@ -983,7 +1031,7 @@ class MCPToolsService:
                 }
             ),
             MCPTool(
-                name="cache_mget",
+                name="cache_get_multi",
                 description="批量获取多个缓存键的值",
                 category="cache",
                 schema={
@@ -1032,7 +1080,7 @@ class MCPToolsService:
                 }
             ),
             MCPTool(
-                name="cache_info",
+                name="cache_get_info",
                 description="获取缓存系统信息和统计",
                 category="cache",
                 schema={
@@ -1046,7 +1094,7 @@ class MCPToolsService:
                 }
             ),
             MCPTool(
-                name="cache_flushall",
+                name="cache_flush_all",
                 description="清空所有缓存数据",
                 category="cache",
                 schema={
@@ -1061,7 +1109,7 @@ class MCPToolsService:
             ),
             # ============ GitHub API 工具 ============
             MCPTool(
-                name="github_get_repository",
+                name="github_get_repo",
                 description="获取 GitHub 仓库信息",
                 category="github",
                 schema={
@@ -1087,7 +1135,7 @@ class MCPToolsService:
                 }
             ),
             MCPTool(
-                name="github_list_repositories",
+                name="github_ls_repos",
                 description="列出用户或组织的仓库",
                 category="github",
                 schema={
@@ -1130,7 +1178,7 @@ class MCPToolsService:
                 }
             ),
             MCPTool(
-                name="github_create_repository",
+                name="github_new_repo",
                 description="创建新的 GitHub 仓库",
                 category="github",
                 schema={
@@ -1182,7 +1230,7 @@ class MCPToolsService:
                 }
             ),
             MCPTool(
-                name="github_list_issues",
+                name="github_ls_issues",
                 description="列出仓库的问题（Issues）",
                 category="github",
                 schema={
@@ -1274,7 +1322,7 @@ class MCPToolsService:
                 }
             ),
             MCPTool(
-                name="github_create_issue",
+                name="github_new_issue",
                 description="创建新的问题（Issue）",
                 category="github",
                 schema={
@@ -1323,7 +1371,7 @@ class MCPToolsService:
                 }
             ),
             MCPTool(
-                name="github_list_pull_requests",
+                name="github_ls_prs",
                 description="列出拉取请求（Pull Requests）",
                 category="github",
                 schema={
@@ -1390,7 +1438,7 @@ class MCPToolsService:
                 }
             ),
             MCPTool(
-                name="github_get_pull_request",
+                name="github_get_pr",
                 description="获取特定拉取请求的详情",
                 category="github",
                 schema={
@@ -1420,7 +1468,7 @@ class MCPToolsService:
                 }
             ),
             MCPTool(
-                name="github_create_pull_request",
+                name="github_new_pr",
                 description="创建新的拉取请求",
                 category="github",
                 schema={
@@ -1473,7 +1521,7 @@ class MCPToolsService:
                 }
             ),
             MCPTool(
-                name="github_search_repositories",
+                name="github_search_repos",
                 description="搜索 GitHub 仓库",
                 category="github",
                 schema={
@@ -1543,7 +1591,7 @@ class MCPToolsService:
                 }
             ),
             MCPTool(
-                name="github_list_branches",
+                name="github_ls_branches",
                 description="列出仓库分支",
                 category="github",
                 schema={
@@ -1602,7 +1650,7 @@ class MCPToolsService:
 
             # ============ GitHub 仓库内容工具 ============
             MCPTool(
-                name="get_repository_contents",
+                name="github_get_contents",
                 description="获取 GitHub 仓库内容（文件或目录）",
                 category="github",
                 schema={
@@ -1638,7 +1686,7 @@ class MCPToolsService:
                 }
             ),
             MCPTool(
-                name="get_file_content",
+                name="github_get_file",
                 description="获取 GitHub 仓库中单个文件的内容和元数据",
                 category="github",
                 schema={
@@ -1673,7 +1721,7 @@ class MCPToolsService:
                 }
             ),
             MCPTool(
-                name="get_repository_tree",
+                name="github_get_tree",
                 description="获取 GitHub 仓库目录树结构",
                 category="github",
                 schema={
@@ -1708,7 +1756,7 @@ class MCPToolsService:
                 }
             ),
             MCPTool(
-                name="get_repository_readme",
+                name="github_get_readme",
                 description="获取 GitHub 仓库的 README 文件",
                 category="github",
                 schema={
@@ -1739,7 +1787,7 @@ class MCPToolsService:
                 }
             ),
             MCPTool(
-                name="create_file",
+                name="github_new_file",
                 description="在 GitHub 仓库中创建新文件",
                 category="github",
                 schema={
@@ -1787,7 +1835,7 @@ class MCPToolsService:
                 }
             ),
             MCPTool(
-                name="update_file",
+                name="github_set_file",
                 description="更新 GitHub 仓库中的现有文件",
                 category="github",
                 schema={
@@ -1840,7 +1888,7 @@ class MCPToolsService:
                 }
             ),
             MCPTool(
-                name="delete_file",
+                name="github_del_file",
                 description="删除 GitHub 仓库中的文件",
                 category="github",
                 schema={
@@ -1888,7 +1936,7 @@ class MCPToolsService:
                 }
             ),
             MCPTool(
-                name="get_blob",
+                name="github_get_blob",
                 description="获取 GitHub 仓库中的 blob 对象（文件内容）",
                 category="github",
                 schema={
@@ -1923,7 +1971,7 @@ class MCPToolsService:
 
             # ============ GitHub Git 操作工具 ============
             MCPTool(
-                name="create_blob",
+                name="github_new_blob",
                 description="创建 GitHub 仓库中的 blob 对象",
                 category="github",
                 schema={
@@ -1963,7 +2011,7 @@ class MCPToolsService:
                 }
             ),
             MCPTool(
-                name="create_tree",
+                name="github_new_tree",
                 description="创建 GitHub 仓库中的目录树对象",
                 category="github",
                 schema={
@@ -2017,7 +2065,7 @@ class MCPToolsService:
                 }
             ),
             MCPTool(
-                name="create_commit",
+                name="github_new_commit",
                 description="创建 GitHub 仓库中的提交对象",
                 category="github",
                 schema={
@@ -2070,7 +2118,7 @@ class MCPToolsService:
                 }
             ),
             MCPTool(
-                name="create_reference",
+                name="github_new_ref",
                 description="创建 GitHub 仓库中的引用（分支/标签）",
                 category="github",
                 schema={
@@ -2108,7 +2156,7 @@ class MCPToolsService:
                 }
             ),
             MCPTool(
-                name="update_reference",
+                name="github_set_ref",
                 description="更新 GitHub 仓库中的引用",
                 category="github",
                 schema={
@@ -2152,7 +2200,7 @@ class MCPToolsService:
                 }
             ),
             MCPTool(
-                name="get_reference",
+                name="github_get_ref",
                 description="获取 GitHub 仓库中的引用信息",
                 category="github",
                 schema={
@@ -2185,7 +2233,7 @@ class MCPToolsService:
                 }
             ),
             MCPTool(
-                name="list_references",
+                name="github_ls_refs",
                 description="列出 GitHub 仓库中的引用",
                 category="github",
                 schema={
@@ -2219,7 +2267,7 @@ class MCPToolsService:
                 }
             ),
             MCPTool(
-                name="delete_reference",
+                name="github_del_ref",
                 description="删除 GitHub 仓库中的引用",
                 category="github",
                 schema={
@@ -2252,7 +2300,7 @@ class MCPToolsService:
                 }
             ),
             MCPTool(
-                name="create_tag",
+                name="github_new_tag",
                 description="创建 GitHub 仓库中的标签对象",
                 category="github",
                 schema={
@@ -2302,7 +2350,7 @@ class MCPToolsService:
                 }
             ),
             MCPTool(
-                name="get_tag",
+                name="github_get_tag",
                 description="获取 GitHub 仓库中的标签对象",
                 category="github",
                 schema={
@@ -2335,7 +2383,7 @@ class MCPToolsService:
                 }
             ),
             MCPTool(
-                name="compare_commits",
+                name="github_compare_commits",
                 description="比较 GitHub 仓库中的两个提交",
                 category="github",
                 schema={
@@ -2374,7 +2422,7 @@ class MCPToolsService:
             ),
             # Git Commits 工具
             MCPTool(
-                name="list_commits",
+                name="github_ls_commits",
                 description="列出 GitHub 仓库的提交历史",
                 category="github",
                 schema={
@@ -2451,7 +2499,7 @@ class MCPToolsService:
                 }
             ),
             MCPTool(
-                name="get_commit",
+                name="github_get_commit",
                 description="获取 GitHub 仓库中的单个提交详情",
                 category="github",
                 schema={
@@ -2484,7 +2532,7 @@ class MCPToolsService:
                 }
             ),
             MCPTool(
-                name="list_commit_comments",
+                name="github_ls_commit_comments",
                 description="列出 GitHub 仓库提交的评论",
                 category="github",
                 schema={
@@ -2530,7 +2578,7 @@ class MCPToolsService:
                 }
             ),
             MCPTool(
-                name="create_commit_comment",
+                name="github_new_commit_comment",
                 description="创建 GitHub 仓库提交评论",
                 category="github",
                 schema={
@@ -2581,7 +2629,7 @@ class MCPToolsService:
                 }
             ),
             MCPTool(
-                name="get_commit_status",
+                name="github_get_commit_status",
                 description="获取 GitHub 仓库提交的状态信息",
                 category="github",
                 schema={
@@ -2614,7 +2662,7 @@ class MCPToolsService:
                 }
             ),
             MCPTool(
-                name="list_commit_statuses",
+                name="github_ls_commit_statuses",
                 description="列出 GitHub 仓库提交的所有状态",
                 category="github",
                 schema={
@@ -2660,7 +2708,7 @@ class MCPToolsService:
                 }
             ),
             MCPTool(
-                name="create_commit_status",
+                name="github_new_commit_status",
                 description="创建 GitHub 仓库提交状态",
                 category="github",
                 schema={
@@ -2719,7 +2767,7 @@ class MCPToolsService:
 
             # 40. List issue comments
             MCPTool(
-                name="list_issue_comments",
+                name="github_ls_issue_comments",
                 description="列出 GitHub 问题的所有评论",
                 category="github",
                 schema={
@@ -2781,7 +2829,7 @@ class MCPToolsService:
 
             # 41. Get issue comment
             MCPTool(
-                name="get_issue_comment",
+                name="github_get_issue_comment",
                 description="获取 GitHub 问题的单个评论详情",
                 category="github",
                 schema={
@@ -2816,7 +2864,7 @@ class MCPToolsService:
 
             # 42. Create issue comment
             MCPTool(
-                name="create_issue_comment",
+                name="github_new_issue_comment",
                 description="为 GitHub 问题创建新评论",
                 category="github",
                 schema={
@@ -2856,7 +2904,7 @@ class MCPToolsService:
 
             # 43. Update issue comment
             MCPTool(
-                name="update_issue_comment",
+                name="github_set_issue_comment",
                 description="更新 GitHub 问题评论内容",
                 category="github",
                 schema={
@@ -2896,7 +2944,7 @@ class MCPToolsService:
 
             # 44. Delete issue comment
             MCPTool(
-                name="delete_issue_comment",
+                name="github_del_issue_comment",
                 description="删除 GitHub 问题评论",
                 category="github",
                 schema={
@@ -2931,7 +2979,7 @@ class MCPToolsService:
 
             # 45. List issue labels
             MCPTool(
-                name="list_issue_labels",
+                name="github_ls_issue_labels",
                 description="列出 GitHub 问题的所有标签",
                 category="github",
                 schema={
@@ -2966,7 +3014,7 @@ class MCPToolsService:
 
             # 46. Add labels to issue
             MCPTool(
-                name="add_labels_to_issue",
+                name="github_add_issue_labels",
                 description="为 GitHub 问题添加标签",
                 category="github",
                 schema={
@@ -3007,7 +3055,7 @@ class MCPToolsService:
 
             # 47. Remove label from issue
             MCPTool(
-                name="remove_label_from_issue",
+                name="github_del_issue_label",
                 description="从 GitHub 问题中移除指定标签",
                 category="github",
                 schema={
@@ -3047,7 +3095,7 @@ class MCPToolsService:
 
             # 48. Replace all labels
             MCPTool(
-                name="replace_all_issue_labels",
+                name="github_set_issue_labels",
                 description="替换 GitHub 问题的所有标签",
                 category="github",
                 schema={
@@ -3089,7 +3137,7 @@ class MCPToolsService:
 
             # 49. Lock issue
             MCPTool(
-                name="lock_issue",
+                name="github_lock_issue",
                 description="锁定 GitHub 问题，防止进一步讨论",
                 category="github",
                 schema={
@@ -3131,7 +3179,7 @@ class MCPToolsService:
 
             # 50. Unlock issue
             MCPTool(
-                name="unlock_issue",
+                name="github_unlock_issue",
                 description="解锁 GitHub 问题，允许继续讨论",
                 category="github",
                 schema={
@@ -3166,7 +3214,7 @@ class MCPToolsService:
 
             # 51. List issue events
             MCPTool(
-                name="list_issue_events",
+                name="github_ls_issue_events",
                 description="列出 GitHub 问题的所有事件（状态变更、标签变更等）",
                 category="github",
                 schema={
@@ -3214,7 +3262,7 @@ class MCPToolsService:
 
             # ============ GitHub Releases 管理工具 ============
             MCPTool(
-                name="list_releases",
+                name="github_ls_releases",
                 description="列出 GitHub 仓库的 releases",
                 category="github",
                 schema={
@@ -3255,7 +3303,7 @@ class MCPToolsService:
                 }
             ),
             MCPTool(
-                name="get_release",
+                name="github_get_release",
                 description="获取 GitHub 仓库中特定 release 的详情",
                 category="github",
                 schema={
@@ -3289,7 +3337,7 @@ class MCPToolsService:
                 }
             ),
             MCPTool(
-                name="get_latest_release",
+                name="github_get_latest_release",
                 description="获取 GitHub 仓库的最新 release",
                 category="github",
                 schema={
@@ -3317,7 +3365,7 @@ class MCPToolsService:
                 }
             ),
             MCPTool(
-                name="get_release_by_tag",
+                name="github_get_release_by_tag",
                 description="根据标签获取 GitHub 仓库的 release",
                 category="github",
                 schema={
@@ -3350,7 +3398,7 @@ class MCPToolsService:
                 }
             ),
             MCPTool(
-                name="create_release",
+                name="github_new_release",
                 description="创建 GitHub 仓库的新 release",
                 category="github",
                 schema={
@@ -3426,7 +3474,7 @@ class MCPToolsService:
                 }
             ),
             MCPTool(
-                name="update_release",
+                name="github_set_release",
                 description="更新 GitHub 仓库的 release",
                 category="github",
                 schema={
@@ -3500,7 +3548,7 @@ class MCPToolsService:
                 }
             ),
             MCPTool(
-                name="delete_release",
+                name="github_del_release",
                 description="删除 GitHub 仓库的 release",
                 category="github",
                 schema={
@@ -3534,7 +3582,7 @@ class MCPToolsService:
                 }
             ),
             MCPTool(
-                name="list_release_assets",
+                name="github_ls_release_assets",
                 description="列出 GitHub release 的资产文件",
                 category="github",
                 schema={
@@ -3581,7 +3629,7 @@ class MCPToolsService:
                 }
             ),
             MCPTool(
-                name="get_release_asset",
+                name="github_get_release_asset",
                 description="获取 GitHub release 资产文件的详情",
                 category="github",
                 schema={
@@ -3615,7 +3663,7 @@ class MCPToolsService:
                 }
             ),
             MCPTool(
-                name="update_release_asset",
+                name="github_set_release_asset",
                 description="更新 GitHub release 资产文件信息",
                 category="github",
                 schema={
@@ -3660,7 +3708,7 @@ class MCPToolsService:
                 }
             ),
             MCPTool(
-                name="delete_release_asset",
+                name="github_del_release_asset",
                 description="删除 GitHub release 资产文件",
                 category="github",
                 schema={
@@ -3694,7 +3742,7 @@ class MCPToolsService:
                 }
             ),
             MCPTool(
-                name="generate_release_notes",
+                name="github_gen_release_notes",
                 description="生成 GitHub release 说明",
                 category="github",
                 schema={
@@ -3747,7 +3795,7 @@ class MCPToolsService:
 
             # Code Scanning 代码扫描工具
             MCPTool(
-                name="list_code_scanning_alerts",
+                name="github_ls_code_alerts",
                 description="列出 GitHub 仓库的代码扫描警报",
                 category="github",
                 schema={
@@ -3817,7 +3865,7 @@ class MCPToolsService:
                 }
             ),
             MCPTool(
-                name="get_code_scanning_alert",
+                name="github_get_code_alert",
                 description="获取 GitHub 仓库特定代码扫描警报的详情",
                 category="github",
                 schema={
@@ -3851,7 +3899,7 @@ class MCPToolsService:
                 }
             ),
             MCPTool(
-                name="update_code_scanning_alert",
+                name="github_set_code_alert",
                 description="更新 GitHub 仓库代码扫描警报状态",
                 category="github",
                 schema={
@@ -3902,7 +3950,7 @@ class MCPToolsService:
                 }
             ),
             MCPTool(
-                name="list_code_scanning_analyses",
+                name="github_ls_code_analyses",
                 description="列出 GitHub 仓库的代码扫描分析",
                 category="github",
                 schema={
@@ -3954,7 +4002,7 @@ class MCPToolsService:
                 }
             ),
             MCPTool(
-                name="get_code_scanning_analysis",
+                name="github_get_code_analysis",
                 description="获取 GitHub 仓库特定代码扫描分析的详情",
                 category="github",
                 schema={
@@ -3988,7 +4036,7 @@ class MCPToolsService:
                 }
             ),
             MCPTool(
-                name="delete_code_scanning_analysis",
+                name="github_del_code_analysis",
                 description="删除 GitHub 仓库的代码扫描分析",
                 category="github",
                 schema={
@@ -4029,7 +4077,7 @@ class MCPToolsService:
 
             # Secret Scanning 密钥扫描工具
             MCPTool(
-                name="list_secret_scanning_alerts",
+                name="github_ls_secret_alerts",
                 description="列出 GitHub 仓库的密钥扫描警报",
                 category="github",
                 schema={
@@ -4100,7 +4148,7 @@ class MCPToolsService:
                 }
             ),
             MCPTool(
-                name="get_secret_scanning_alert",
+                name="github_get_secret_alert",
                 description="获取 GitHub 仓库特定密钥扫描警报的详情",
                 category="github",
                 schema={
@@ -4134,7 +4182,7 @@ class MCPToolsService:
                 }
             ),
             MCPTool(
-                name="update_secret_scanning_alert",
+                name="github_set_secret_alert",
                 description="更新 GitHub 仓库密钥扫描警报状态",
                 category="github",
                 schema={
@@ -4186,7 +4234,7 @@ class MCPToolsService:
                 }
             ),
             MCPTool(
-                name="list_secret_scanning_alert_locations",
+                name="github_ls_secret_locations",
                 description="列出 GitHub 仓库密钥扫描警报的位置信息",
                 category="github",
                 schema={
@@ -4235,7 +4283,7 @@ class MCPToolsService:
 
             # Dependabot 依赖项安全工具
             MCPTool(
-                name="list_dependabot_alerts",
+                name="github_ls_dependabot_alerts",
                 description="列出 GitHub 仓库的 Dependabot 安全警报",
                 category="github",
                 schema={
@@ -4318,7 +4366,7 @@ class MCPToolsService:
                 }
             ),
             MCPTool(
-                name="get_dependabot_alert",
+                name="github_get_dependabot_alert",
                 description="获取 GitHub 仓库特定 Dependabot 警报的详情",
                 category="github",
                 schema={
@@ -4352,7 +4400,7 @@ class MCPToolsService:
                 }
             ),
             MCPTool(
-                name="update_dependabot_alert",
+                name="github_set_dependabot_alert",
                 description="更新 GitHub 仓库 Dependabot 警报状态",
                 category="github",
                 schema={
@@ -4406,7 +4454,7 @@ class MCPToolsService:
 
             # Security Configuration 安全配置工具
             MCPTool(
-                name="get_security_configuration",
+                name="github_get_security_config",
                 description="获取 GitHub 仓库的安全配置",
                 category="github",
                 schema={
@@ -4434,7 +4482,7 @@ class MCPToolsService:
                 }
             ),
             MCPTool(
-                name="enable_automated_security_fixes",
+                name="github_on_auto_security",
                 description="启用 GitHub 仓库的自动安全修复",
                 category="github",
                 schema={
@@ -4462,7 +4510,7 @@ class MCPToolsService:
                 }
             ),
             MCPTool(
-                name="disable_automated_security_fixes",
+                name="github_off_auto_security",
                 description="禁用 GitHub 仓库的自动安全修复",
                 category="github",
                 schema={
@@ -4490,7 +4538,7 @@ class MCPToolsService:
                 }
             ),
             MCPTool(
-                name="get_vulnerability_alerts_status",
+                name="github_get_vuln_alerts",
                 description="获取 GitHub 仓库漏洞警报的启用状态",
                 category="github",
                 schema={
@@ -4518,7 +4566,7 @@ class MCPToolsService:
                 }
             ),
             MCPTool(
-                name="enable_vulnerability_alerts",
+                name="github_on_vuln_alerts",
                 description="启用 GitHub 仓库的漏洞警报",
                 category="github",
                 schema={
@@ -4546,7 +4594,7 @@ class MCPToolsService:
                 }
             ),
             MCPTool(
-                name="disable_vulnerability_alerts",
+                name="github_off_vuln_alerts",
                 description="禁用 GitHub 仓库的漏洞警报",
                 category="github",
                 schema={
