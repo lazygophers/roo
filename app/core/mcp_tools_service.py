@@ -89,7 +89,24 @@ class MCPToolsService:
                 'description': '系统信息和监控相关工具',
                 'icon': '🖥️',
                 'enabled': True,
-                'sort_order': 1
+                'sort_order': 1,
+                'config': {
+                    'enable_system_info': True,
+                    'show_detailed_info': False,
+                    'include_network_info': True,
+                    'include_disk_info': True,
+                    'include_process_info': False,
+                    'refresh_interval': 5,  # 秒
+                    'enable_monitoring': True,
+                    'alert_thresholds': {
+                        'cpu_usage': 80,  # 百分比
+                        'memory_usage': 85,  # 百分比
+                        'disk_usage': 90   # 百分比
+                    },
+                    'enable_security_features': True,
+                    'enable_config_management': True,
+                    'log_level': 'INFO'
+                }
             },
             {
                 'id': 'time',
@@ -116,7 +133,22 @@ class MCPToolsService:
                 'description': '文件读写、目录操作和文件管理相关工具',
                 'icon': '📁',
                 'enabled': True,
-                'sort_order': 3
+                'sort_order': 3,
+                'config': {
+                    'enable_path_validation': True,
+                    'max_file_size_mb': 100,
+                    'max_read_lines': 10000,
+                    'allowed_extensions': [],  # 空列表表示允许所有扩展名
+                    'blocked_extensions': ['.exe', '.bat', '.cmd', '.scr'],
+                    'enable_backup_on_write': False,
+                    'backup_directory': 'backups',
+                    'encoding_detection': True,
+                    'default_encoding': 'utf-8',
+                    'enable_symlink_follow': False,
+                    'enable_hidden_files': False,
+                    'enable_recursive_operations': True,
+                    'temp_directory': '/tmp'
+                }
             },
             {
                 'id': 'cache',
@@ -130,6 +162,36 @@ class MCPToolsService:
                     'persistence_enabled': True,
                     'compression_enabled': False,
                     'stats_enabled': True
+                }
+            },
+            {
+                'id': 'github',
+                'name': 'GitHub工具',
+                'description': 'GitHub API集成工具，包括仓库管理、issue处理、PR操作等',
+                'icon': '🐙',
+                'enabled': True,
+                'sort_order': 5,
+                'config': {
+                    'api_base_url': 'https://api.github.com',
+                    'default_per_page': 30,
+                    'enable_rate_limit_check': True,
+                    'enable_auto_retry': True,
+                    'max_retry_attempts': 3,
+                    'retry_delay_seconds': 1,
+                    'timeout_seconds': 30,
+                    'enable_request_logging': False,
+                    'cache_responses': True,
+                    'cache_ttl_seconds': 300,  # 5分钟缓存
+                    'default_branch': 'main',
+                    'enable_webhook_verification': True,
+                    'supported_events': [
+                        'push', 'pull_request', 'issues', 'releases',
+                        'deployment', 'repository', 'organization'
+                    ],
+                    'enable_enterprise_features': False,
+                    'enable_graphql_api': False,
+                    'enable_security_scanning': True,
+                    'enable_dependabot_integration': True
                 }
             }
         ]
