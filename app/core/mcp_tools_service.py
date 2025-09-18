@@ -20,10 +20,10 @@ logger = setup_logging("INFO")
 class MCPTool:
     """MCP工具数据模型"""
     
-    def __init__(self, name: str, description: str, category: str, 
-                 schema: Dict[str, Any], enabled: bool = True, 
+    def __init__(self, name: str, description: str, category: str,
+                 schema: Dict[str, Any], enabled: bool = True,
                  implementation_type: str = "builtin", **kwargs):
-        self.id = kwargs.get('id', str(uuid.uuid4()))
+        self.id = kwargs.get('id', name)  # 使用name作为id而非UUID
         self.name = name
         self.description = description
         self.category = category
