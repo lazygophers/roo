@@ -7,22 +7,22 @@ from app.core.mcp_tool_registry import file_tool
 
 @file_tool(
     name="read",
-    description="读取指定路径的文件内容",
+    description="Read file content from specified path",
     schema={
         "type": "object",
         "properties": {
             "file_path": {
                 "type": "string",
-                "description": "文件路径"
+                "description": "File path"
             },
             "encoding": {
                 "type": "string",
-                "description": "文件编码",
+                "description": "File encoding",
                 "default": "utf-8"
             },
             "max_lines": {
                 "type": "integer",
-                "description": "最大读取行数（0表示无限制）",
+                "description": "Maximum lines to read (0 means unlimited)",
                 "default": 0,
                 "minimum": 0
             }
@@ -30,7 +30,7 @@ from app.core.mcp_tool_registry import file_tool
         "required": ["file_path"]
     },
     metadata={
-        "tags": ["文件", "读取", "内容"],
+        "tags": ["file", "read", "content"],
         "examples": [
             {"file_path": "config.yaml"},
             {"file_path": "/etc/hosts", "encoding": "utf-8"},
@@ -39,45 +39,45 @@ from app.core.mcp_tool_registry import file_tool
     }
 )
 def read():
-    """读取指定路径的文件内容"""
+    """Read file content from specified path"""
     pass
 
 
 @file_tool(
     name="write",
-    description="写入内容到指定路径的文件",
+    description="Write content to file at specified path",
     schema={
         "type": "object",
         "properties": {
             "file_path": {
                 "type": "string",
-                "description": "文件路径"
+                "description": "File path"
             },
             "content": {
                 "type": "string",
-                "description": "要写入的内容"
+                "description": "Content to write"
             },
             "encoding": {
                 "type": "string",
-                "description": "文件编码",
+                "description": "File encoding",
                 "default": "utf-8"
             },
             "mode": {
                 "type": "string",
-                "description": "写入模式",
+                "description": "Write mode",
                 "enum": ["write", "append"],
                 "default": "write"
             },
             "create_dirs": {
                 "type": "boolean",
-                "description": "是否自动创建目录",
+                "description": "Auto create directories",
                 "default": True
             }
         },
         "required": ["file_path", "content"]
     },
     metadata={
-        "tags": ["文件", "写入", "创建"],
+        "tags": ["file", "write", "create"],
         "examples": [
             {"file_path": "output.txt", "content": "Hello World"},
             {"file_path": "log.txt", "content": "New entry\\n", "mode": "append"}
@@ -85,40 +85,40 @@ def read():
     }
 )
 def write():
-    """写入内容到指定路径的文件"""
+    """Write content to file at specified path"""
     pass
 
 
 @file_tool(
     name="ls_dir",
-    description="列出指定目录下的文件和子目录",
+    description="List files and subdirectories in specified directory",
     schema={
         "type": "object",
         "properties": {
             "directory_path": {
                 "type": "string",
-                "description": "目录路径"
+                "description": "Directory path"
             },
             "show_hidden": {
                 "type": "boolean",
-                "description": "是否显示隐藏文件",
+                "description": "Show hidden files",
                 "default": False
             },
             "recursive": {
                 "type": "boolean",
-                "description": "是否递归列出子目录",
+                "description": "Recursively list subdirectories",
                 "default": False
             },
             "file_info": {
                 "type": "boolean",
-                "description": "是否包含文件详细信息",
+                "description": "Include detailed file information",
                 "default": False
             }
         },
         "required": ["directory_path"]
     },
     metadata={
-        "tags": ["目录", "文件列表", "浏览"],
+        "tags": ["directory", "file_list", "browse"],
         "examples": [
             {"directory_path": "."},
             {"directory_path": "/home/user", "show_hidden": True},
@@ -127,30 +127,30 @@ def write():
     }
 )
 def ls_dir():
-    """列出指定目录下的文件和子目录"""
+    """List files and subdirectories in specified directory"""
     pass
 
 
 @file_tool(
     name="new_dir",
-    description="创建新目录（支持创建多级目录）",
+    description="Create new directory (supports creating nested directories)",
     schema={
         "type": "object",
         "properties": {
             "directory_path": {
                 "type": "string",
-                "description": "要创建的目录路径"
+                "description": "Directory path to create"
             },
             "parents": {
                 "type": "boolean",
-                "description": "是否创建父目录",
+                "description": "Create parent directories",
                 "default": True
             }
         },
         "required": ["directory_path"]
     },
     metadata={
-        "tags": ["目录", "创建", "文件夹"],
+        "tags": ["directory", "create", "folder"],
         "examples": [
             {"directory_path": "new_folder"},
             {"directory_path": "path/to/deep/folder", "parents": True}
@@ -158,30 +158,30 @@ def ls_dir():
     }
 )
 def new_dir():
-    """创建新目录（支持创建多级目录）"""
+    """Create new directory (supports creating nested directories)"""
     pass
 
 
 @file_tool(
     name="del_file",
-    description="删除指定的文件或空目录",
+    description="Delete specified file or empty directory",
     schema={
         "type": "object",
         "properties": {
             "file_path": {
                 "type": "string",
-                "description": "要删除的文件或目录路径"
+                "description": "Path to file or directory to delete"
             },
             "force": {
                 "type": "boolean",
-                "description": "强制删除（包括非空目录）",
+                "description": "Force delete (including non-empty directories)",
                 "default": False
             }
         },
         "required": ["file_path"]
     },
     metadata={
-        "tags": ["删除", "文件", "目录"],
+        "tags": ["delete", "file", "directory"],
         "examples": [
             {"file_path": "temp.txt"},
             {"file_path": "temp_folder", "force": True}
@@ -189,30 +189,30 @@ def new_dir():
     }
 )
 def del_file():
-    """删除指定的文件或空目录"""
+    """Delete specified file or empty directory"""
     pass
 
 
 @file_tool(
     name="info",
-    description="获取文件或目录的详细信息",
+    description="Get detailed information of file or directory",
     schema={
         "type": "object",
         "properties": {
             "file_path": {
                 "type": "string",
-                "description": "文件或目录路径"
+                "description": "File or directory path"
             },
             "checksum": {
                 "type": "boolean",
-                "description": "是否计算文件校验和",
+                "description": "Calculate file checksum",
                 "default": False
             }
         },
         "required": ["file_path"]
     },
     metadata={
-        "tags": ["文件信息", "属性", "状态"],
+        "tags": ["file_info", "properties", "status"],
         "examples": [
             {"file_path": "document.pdf"},
             {"file_path": "important.txt", "checksum": True}
@@ -220,33 +220,33 @@ def del_file():
     }
 )
 def info():
-    """获取文件或目录的详细信息"""
+    """Get detailed information of file or directory"""
     pass
 
 
 @file_tool(
     name="get_sec_info",
-    description="获取文件工具安全配置信息，包括可访问的目录权限设置",
+    description="Get file tool security configuration, including accessible directory permissions",
     schema={
         "type": "object",
         "properties": {
             "config_type": {
                 "type": "string",
-                "description": "配置类型",
+                "description": "Configuration type",
                 "enum": ["readable", "writable", "forbidden", "limits"],
                 "default": "readable"
             },
             "paths": {
                 "type": "array",
                 "items": {"type": "string"},
-                "description": "要查询的路径列表（为空时返回所有配置）",
+                "description": "Paths to query (empty returns all configurations)",
                 "default": []
             }
         },
         "required": []
     },
     metadata={
-        "tags": ["安全", "配置", "权限", "目录管理"],
+        "tags": ["security", "config", "permissions", "directory_management"],
         "examples": [
             {"config_type": "readable", "paths": ["/home/user", "/tmp"]},
             {"config_type": "forbidden", "paths": ["/etc", "/bin"]}
@@ -254,29 +254,29 @@ def info():
     }
 )
 def get_sec_info():
-    """获取文件工具安全配置信息，包括可访问的目录权限设置"""
+    """Get file tool security configuration, including accessible directory permissions"""
     pass
 
 
 @file_tool(
     name="update_sec_limits",
-    description="更新文件安全限制配置（最大文件大小、最大读取行数、严格模式）",
+    description="Update file security limit configuration (max file size, max read lines, strict mode)",
     schema={
         "type": "object",
         "properties": {
             "limit_type": {
                 "type": "string",
-                "description": "限制类型",
+                "description": "Limit type",
                 "enum": ["max_file_size", "max_read_lines", "strict_mode"]
             },
             "value": {
-                "description": "限制值（大小为字节数，行数为整数，严格模式为布尔值）"
+                "description": "Limit value (size in bytes, lines as integer, strict mode as boolean)"
             }
         },
         "required": ["limit_type", "value"]
     },
     metadata={
-        "tags": ["安全", "配置", "限制", "参数设置"],
+        "tags": ["security", "config", "limits", "parameter_setting"],
         "examples": [
             {"limit_type": "max_file_size", "value": 104857600},
             {"limit_type": "max_read_lines", "value": 5000},
@@ -285,23 +285,23 @@ def get_sec_info():
     }
 )
 def update_sec_limits():
-    """更新文件安全限制配置（最大文件大小、最大读取行数、严格模式）"""
+    """Update file security limit configuration (max file size, max read lines, strict mode)"""
     pass
 
 
 @file_tool(
     name="reload_sec_config",
-    description="重新加载文件安全配置（从数据库刷新内存中的配置）",
+    description="Reload file security configuration (refresh in-memory config from database)",
     schema={
         "type": "object",
         "properties": {},
         "required": []
     },
     metadata={
-        "tags": ["安全", "配置", "重载"],
+        "tags": ["security", "config", "reload"],
         "examples": [{}]
     }
 )
 def reload_sec_config():
-    """重新加载文件安全配置（从数据库刷新内存中的配置）"""
+    """Reload file security configuration (refresh in-memory config from database)"""
     pass

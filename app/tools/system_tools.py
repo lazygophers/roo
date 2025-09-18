@@ -7,25 +7,25 @@ from app.core.mcp_tool_registry import system_tool
 
 @system_tool(
     name="get_info",
-    description="获取LazyAI Studio系统信息，包括CPU、内存、操作系统等",
+    description="Get LazyAI Studio system information including CPU, memory, OS, etc.",
     schema={
         "type": "object",
         "properties": {
             "detailed": {
                 "type": "boolean",
-                "description": "是否返回详细信息",
+                "description": "Return detailed information",
                 "default": True
             },
             "include_performance": {
                 "type": "boolean",
-                "description": "是否包含性能指标",
+                "description": "Include performance metrics",
                 "default": False
             }
         },
         "required": []
     },
     metadata={
-        "tags": ["系统", "监控", "性能", "LazyGophers"],
+        "tags": ["system", "monitoring", "performance", "LazyGophers"],
         "examples": [
             {"detailed": False},
             {"detailed": True, "include_performance": True}
@@ -33,5 +33,5 @@ from app.core.mcp_tool_registry import system_tool
     }
 )
 def get_info():
-    """获取LazyAI Studio系统信息，包括CPU、内存、操作系统等"""
+    """Get LazyAI Studio system information including CPU, memory, OS, etc."""
     pass
