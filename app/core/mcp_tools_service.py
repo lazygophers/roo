@@ -137,7 +137,21 @@ class MCPToolsService:
                 'description': '系统信息和监控相关工具',
                 'icon': '🖥️',
                 'enabled': True,
-                'sort_order': 1
+                'sort_order': 1,
+                'config': {
+                    'enable_system_info': True,
+                    'show_detailed_info': False,
+                    'include_network_info': True,
+                    'include_disk_info': True,
+                    'include_process_info': False,
+                    'refresh_interval': 5,  # 秒
+                    'enable_monitoring': True,
+                    'alert_thresholds': {
+                        'cpu_usage': 80,  # 百分比
+                        'memory_usage': 85,  # 百分比
+                        'disk_usage': 90   # 百分比
+                    }
+                }
             },
             {
                 'id': 'time',
@@ -164,7 +178,20 @@ class MCPToolsService:
                 'description': '文件读写、目录操作和文件管理相关工具',
                 'icon': '📁',
                 'enabled': True,
-                'sort_order': 3
+                'sort_order': 3,
+                'config': {
+                    'allowed_paths': [],  # 空数组表示允许所有路径
+                    'blocked_paths': ['/etc/passwd', '/etc/shadow'],  # 安全敏感路径
+                    'max_file_size': 10485760,  # 10MB
+                    'enable_backup': True,
+                    'backup_suffix': '.bak',
+                    'enable_encryption': False,
+                    'encoding': 'utf-8',
+                    'line_endings': 'auto',  # auto, lf, crlf
+                    'enable_file_watching': False,
+                    'watch_recursive': False,
+                    'ignore_patterns': ['.git', '__pycache__', '*.pyc', '.DS_Store']
+                }
             },
             {
                 'id': 'cache',
