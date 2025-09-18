@@ -35,6 +35,7 @@ import FileToolsConfigModal from '../components/FileTools/FileToolsConfigModal';
 import TimeToolsConfigModal from '../components/TimeTools/TimeToolsConfigModal';
 import GitHubToolsConfigModal from '../components/GitHubTools/GitHubToolsConfigModal';
 import CacheToolsConfigModal from '../components/CacheTools/CacheToolsConfigModal';
+import GitHubToolsConfigModal from '../components/GitHubTools/GitHubToolsConfigModal';
 import './MCPToolsManagement.css';
 
 const {Title, Text, Paragraph} = Typography;
@@ -63,6 +64,7 @@ const MCPToolsManagement: React.FC = () => {
     const [timeToolsConfigModal, setTimeToolsConfigModal] = useState(false);
     const [gitHubToolsConfigModal, setGitHubToolsConfigModal] = useState(false);
     const [cacheToolsConfigModal, setCacheToolsConfigModal] = useState(false);
+    const [githubToolsConfigModal, setGithubToolsConfigModal] = useState(false);
 
     const [form] = Form.useForm();
 
@@ -631,6 +633,36 @@ const MCPToolsManagement: React.FC = () => {
                                                     </Button>
                                                 </Tooltip>
                                             )}
+                                            {category.id === 'github' && (
+                                                <Tooltip title="GitHub 工具配置">
+                                                    <Button
+                                                        type="text"
+                                                        size="small"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            setGithubToolsConfigModal(true);
+                                                        }}
+                                                        style={{
+                                                            color: currentTheme.token?.colorPrimary,
+                                                            borderColor: currentTheme.token?.colorPrimary,
+                                                            backgroundColor: 'rgba(24, 144, 255, 0.06)',
+                                                            borderRadius: 6,
+                                                            border: `1px solid ${currentTheme.token?.colorPrimary}20`,
+                                                            transition: 'all 0.2s ease'
+                                                        }}
+                                                        onMouseEnter={(e) => {
+                                                            e.currentTarget.style.backgroundColor = 'rgba(24, 144, 255, 0.12)';
+                                                            e.currentTarget.style.borderColor = currentTheme.token?.colorPrimary || '#1890ff';
+                                                        }}
+                                                        onMouseLeave={(e) => {
+                                                            e.currentTarget.style.backgroundColor = 'rgba(24, 144, 255, 0.06)';
+                                                            e.currentTarget.style.borderColor = `${currentTheme.token?.colorPrimary}20` || '#1890ff20';
+                                                        }}
+                                                    >
+                                                        API配置
+                                                    </Button>
+                                                </Tooltip>
+                                            )}
                                         </Space>
                                     </div>
                                 ),
@@ -823,6 +855,15 @@ const MCPToolsManagement: React.FC = () => {
             <CacheToolsConfigModal
                 visible={cacheToolsConfigModal}
                 onCancel={() => setCacheToolsConfigModal(false)}
+                onSuccess={() => {
+                    loadData(); // 重新加载数据
+                }}
+            />
+
+            {/* GitHub工具配置Modal */}
+            <GitHubToolsConfigModal
+                visible={githubToolsConfigModal}
+                onCancel={() => setGithubToolsConfigModal(false)}
                 onSuccess={() => {
                     loadData(); // 重新加载数据
                 }}

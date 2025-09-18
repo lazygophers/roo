@@ -54,7 +54,7 @@ class LazyAIMCPServer:
         tool_schema = tool_data['schema']
         
         # 创建工具实现函数
-        if tool_name == "get_current_timestamp":
+        if tool_name == "time_get_ts":
             @self.mcp.tool(name=tool_name, description=tool_description)
             def get_current_timestamp_impl() -> str:
                 """获取当前Unix时间戳（纯数字）"""
@@ -65,7 +65,7 @@ class LazyAIMCPServer:
                     logger.error(f"Error in get_current_timestamp: {str(e)}")
                     return str(int(datetime.now().timestamp()))
                     
-        elif tool_name == "format_time":
+        elif tool_name == "time_format":
             @self.mcp.tool(name=tool_name, description=tool_description)
             def format_time_impl(timestamp: Optional[Union[int, float, str]] = None, 
                                 format: str = 'formatted',
@@ -145,7 +145,7 @@ class LazyAIMCPServer:
                     logger.error(f"Error in format_time: {str(e)}")
                     return f"格式化时间失败: {str(e)}"
                     
-        elif tool_name == "convert_timezone":
+        elif tool_name == "time_convert_tz":
             @self.mcp.tool(name=tool_name, description=tool_description)
             def convert_timezone_impl(time_input: str, to_timezone: str, 
                                     from_timezone: str = "local", 
@@ -202,7 +202,7 @@ class LazyAIMCPServer:
                     logger.error(f"Error in convert_timezone: {str(e)}")
                     return f"时区转换失败: {str(e)}"
                     
-        elif tool_name == "parse_time":
+        elif tool_name == "time_parse":
             @self.mcp.tool(name=tool_name, description=tool_description)
             def parse_time_impl(time_string: str, 
                               input_format: Optional[str] = None,
@@ -250,7 +250,7 @@ class LazyAIMCPServer:
                     logger.error(f"Error in parse_time: {str(e)}")
                     return f"时间解析失败: {str(e)}"
                     
-        elif tool_name == "calculate_time_diff":
+        elif tool_name == "time_calc_diff":
             @self.mcp.tool(name=tool_name, description=tool_description)
             def calculate_time_diff_impl(start_time: str, 
                                        end_time: Optional[str] = None,
@@ -347,7 +347,7 @@ class LazyAIMCPServer:
                     logger.error(f"Error in calculate_time_diff: {str(e)}")
                     return f"时间差值计算失败: {str(e)}"
                     
-        elif tool_name == "get_timezone_info":
+        elif tool_name == "time_get_tz":
             @self.mcp.tool(name=tool_name, description=tool_description)
             def get_timezone_info_impl(timezone: str = "local", include_dst_info: bool = True) -> str:
                 """获取时区信息实现"""
@@ -391,7 +391,7 @@ class LazyAIMCPServer:
                     logger.error(f"Error in get_timezone_info: {str(e)}")
                     return f"获取时区信息失败: {str(e)}"
                     
-        elif tool_name == "get_system_info":
+        elif tool_name == "sys_get_info":
             @self.mcp.tool(name=tool_name, description=tool_description) 
             def get_system_info_impl(detailed: bool = False, include_performance: bool = True) -> str:
                 """获取系统信息实现"""
@@ -540,7 +540,7 @@ class LazyAIMCPServer:
                     return "健康检查执行失败，请稍后重试"
         
         # 文件操作工具实现
-        elif tool_name == "read_file":
+        elif tool_name == "file_read":
             @self.mcp.tool(name=tool_name, description=tool_description)
             def read_file_impl(file_path: str, encoding: str = 'utf-8', max_lines: int = 0) -> str:
                 """读取文件内容实现"""
@@ -592,7 +592,7 @@ class LazyAIMCPServer:
                     logger.error(f"Read file failed: {sanitize_for_log(str(e))}")
                     return f"❌ 读取文件失败: {str(e)}"
         
-        elif tool_name == "write_file":
+        elif tool_name == "file_write":
             @self.mcp.tool(name=tool_name, description=tool_description)
             def write_file_impl(file_path: str, content: str, encoding: str = 'utf-8', mode: str = 'write') -> str:
                 """写入文件内容实现"""
@@ -621,7 +621,7 @@ class LazyAIMCPServer:
                     logger.error(f"Write file failed: {sanitize_for_log(str(e))}")
                     return f"❌ 写入文件失败: {str(e)}"
         
-        elif tool_name == "list_directory":
+        elif tool_name == "file_ls_dir":
             @self.mcp.tool(name=tool_name, description=tool_description)
             def list_directory_impl(directory_path: str = '.', show_hidden: bool = False, recursive: bool = False, file_info: bool = True) -> str:
                 """列出目录内容实现"""
@@ -696,7 +696,7 @@ class LazyAIMCPServer:
                     logger.error(f"List directory failed: {sanitize_for_log(str(e))}")
                     return f"❌ 列出目录失败: {str(e)}"
         
-        elif tool_name == "create_directory":
+        elif tool_name == "file_new_dir":
             @self.mcp.tool(name=tool_name, description=tool_description)
             def create_directory_impl(directory_path: str, parents: bool = True) -> str:
                 """创建目录实现"""
@@ -721,7 +721,7 @@ class LazyAIMCPServer:
                     logger.error(f"Create directory failed: {sanitize_for_log(str(e))}")
                     return f"❌ 创建目录失败: {str(e)}"
         
-        elif tool_name == "delete_file":
+        elif tool_name == "github_del_file":
             @self.mcp.tool(name=tool_name, description=tool_description)
             def delete_file_impl(file_path: str, force: bool = False) -> str:
                 """删除文件或目录实现"""
@@ -756,7 +756,7 @@ class LazyAIMCPServer:
                     logger.error(f"Delete file failed: {sanitize_for_log(str(e))}")
                     return f"❌ 删除失败: {str(e)}"
         
-        elif tool_name == "file_info":
+        elif tool_name == "file_get_info":
             @self.mcp.tool(name=tool_name, description=tool_description)
             def file_info_impl(file_path: str, checksum: bool = False) -> str:
                 """获取文件信息实现"""
@@ -819,7 +819,7 @@ class LazyAIMCPServer:
                     logger.error(f"File info failed: {sanitize_for_log(str(e))}")
                     return f"❌ 获取文件信息失败: {str(e)}"
         
-        elif tool_name == "get_file_security_info":
+        elif tool_name == "sys_get_security":
             @self.mcp.tool(name=tool_name, description=tool_description)
             def get_file_security_info_impl() -> str:
                 """获取文件安全配置信息实现"""
@@ -867,7 +867,7 @@ class LazyAIMCPServer:
                     logger.error(f"Get file security info failed: {sanitize_for_log(str(e))}")
                     return f"❌ 获取安全配置信息失败: {str(e)}"
 
-        elif tool_name == "update_file_security_paths":
+        elif tool_name == "sys_set_security_paths":
             @self.mcp.tool(name=tool_name, description=tool_description)
             def update_file_security_paths_impl(config_type: str, paths: List[str]) -> str:
                 """更新文件安全路径配置实现"""
@@ -897,7 +897,7 @@ class LazyAIMCPServer:
                     logger.error(f"Update file security paths failed: {sanitize_for_log(str(e))}")
                     return f"❌ 更新路径配置失败: {str(e)}"
 
-        elif tool_name == "update_file_security_limits":
+        elif tool_name == "sys_set_security_limits":
             @self.mcp.tool(name=tool_name, description=tool_description)
             def update_file_security_limits_impl(limit_type: str, value) -> str:
                 """更新文件安全限制配置实现"""
@@ -940,7 +940,7 @@ class LazyAIMCPServer:
                     logger.error(f"Update file security limits failed: {sanitize_for_log(str(e))}")
                     return f"❌ 更新限制配置失败: {str(e)}"
 
-        elif tool_name == "reload_file_security_config":
+        elif tool_name == "sys_reload_security":
             @self.mcp.tool(name=tool_name, description=tool_description)
             def reload_file_security_config_impl() -> str:
                 """重新加载文件安全配置实现"""
@@ -986,11 +986,11 @@ class LazyAIMCPServer:
             # 需要通过MCP协议调用已注册的工具
             # 这里我们需要直接调用对应的实现函数
             
-            if tool_name == "get_current_timestamp":
+            if tool_name == "time_get_ts":
                 now = datetime.now()
                 return str(int(now.timestamp()))
                 
-            elif tool_name == "format_time":
+            elif tool_name == "time_format":
                 from app.core.time_tools_service import get_time_tools_service
                 import pytz
                 
