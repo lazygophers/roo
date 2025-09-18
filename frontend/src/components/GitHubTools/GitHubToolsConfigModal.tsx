@@ -1,363 +1,538 @@
-/**
- * GitHub API 工具配置模态框
- * 支持配置 GitHub Token、API 端点、请求超时等参数
- */
+import React, {useState} from 'react';
+import {Alert, App, Col, Row, Space, Tooltip, Typography} from 'antd';
+import {ModalForm, ProCard, ProFormDigit, ProFormSelect, ProFormSwitch, ProFormText} from '@ant-design/pro-components';
+import {GithubOutlined, InfoCircleOutlined, SettingOutlined, ApiOutlined} from '@ant-design/icons';
+import {useTheme} from '../../contexts/ThemeContext';
 
-import React, { useState } from 'react';
-import { Alert, Space, Tooltip, Typography, Input } from 'antd';
-import { ModalForm, ProCard, ProFormDigit, ProFormText, ProFormSwitch, ProFormTextArea } from '@ant-design/pro-components';
-import { GithubOutlined, KeyOutlined, GlobalOutlined, InfoCircleOutlined, SettingOutlined, ApiOutlined } from '@ant-design/icons';
-import { apiClient } from '../../api';
-import { useTheme } from '../../contexts/ThemeContext';
-
-const { Text, Paragraph } = Typography;
-
-export interface GitHubToolsConfig {
-    token: string;
-    base_url: string;
-    request_timeout: number;
-    enable_rate_limit_handling: boolean;
-    default_per_page: number;
-    user_agent: string;
-    verify_ssl: boolean;
-    auto_retry: boolean;
-    max_retries: number;
-}
+const {Text, Paragraph} = Typography;
 
 interface GitHubToolsConfigModalProps {
     visible: boolean;
     onCancel: () => void;
-    onSuccess?: () => void;
 }
 
-const GitHubToolsConfigModal: React.FC<GitHubToolsConfigModalProps> = ({
-    visible,
-    onCancel,
-    onSuccess
-}) => {
-    const { currentTheme } = useTheme();
+interface GitHubToolsConfig {
+    api_base_url: string;
+    github_token: string;
+    default_per_page: number;
+    enable_rate_limit_check: boolean;
+    enable_auto_retry: boolean;
+    max_retry_attempts: number;
+    retry_delay_seconds: number;
+    timeout_seconds: number;
+    enable_request_logging: boolean;
+    cache_responses: boolean;
+    cache_ttl_seconds: number;
+    default_branch: string;
+    enable_webhook_verification: boolean;
+    enable_enterprise_features: boolean;
+    enable_graphql_api: boolean;
+    enable_security_scanning: boolean;
+    enable_dependabot_integration: boolean;
+}
+
+const GitHubToolsConfigModal: React.FC<GitHubToolsConfigModalProps> = ({visible, onCancel}) => {
+    const {currentTheme} = useTheme();
+    const {message: messageApi} = App.useApp();
     const [loading, setLoading] = useState(false);
 
-    // 请求初始配置数据
-    const handleRequest = async () => {
-        try {
-            const response = await apiClient.getCategoryConfig('github');
-            if (response.success && response.data) {
-                return response.data;
-            }
-            return {
-                token: '',
-                base_url: 'https://api.github.com',
-                request_timeout: 30,
-                enable_rate_limit_handling: true,
-                default_per_page: 30,
-                user_agent: 'LazyAI-Studio-GitHub-Tools/1.0',
-                verify_ssl: true,
-                auto_retry: true,
-                max_retries: 3
-            };
-        } catch (error) {
-            console.error('Failed to load GitHub config:', error);
-            return {
-                token: '',
-                base_url: 'https://api.github.com',
-                request_timeout: 30,
-                enable_rate_limit_handling: true,
-                default_per_page: 30,
-                user_agent: 'LazyAI-Studio-GitHub-Tools/1.0',
-                verify_ssl: true,
-                auto_retry: true,
-                max_retries: 3
-            };
-        }
-    };
-
     // 保存配置
-    const handleSave = async (values: GitHubToolsConfig) => {
+    const saveConfig = async (values: GitHubToolsConfig) => {
         try {
             setLoading(true);
+            const response = await fetch('/api/mcp/categories/github/config', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({config: values}),
+            });
 
-            const response = await apiClient.updateCategoryConfigs('github', values);
-            if (!response.success) {
-                throw new Error(response.message || '保存GitHub配置失败');
+            const data = await response.json();
+
+            if (data.success) {
+                messageApi.success('GitHub工具配置已保存');
+            } else {
+                messageApi.error(data.message || '保存配置失败');
             }
-
-            onSuccess?.();
-            onCancel();
-            return true;
         } catch (error) {
-            console.error('Failed to save GitHub config:', error);
-            throw error;
+            messageApi.error('保存配置时发生错误');
+            console.error('Save GitHub tools config error:', error);
         } finally {
             setLoading(false);
         }
     };
 
+    // 处理表单提交
+    const handleFinish = async (values: GitHubToolsConfig) => {
+        await saveConfig(values);
+        return true; // 提交成功后关闭Modal
+    };
+
     return (
-        <ModalForm<GitHubToolsConfig>
-            title={
-                <Space>
-                    <GithubOutlined style={{ color: currentTheme.token?.colorPrimary }} />
-                    <Text strong style={{ color: currentTheme.token?.colorText, fontSize: 16 }}>
-                        GitHub 工具配置
-                    </Text>
-                </Space>
-            }
-            open={visible}
-            onOpenChange={(open) => !open && onCancel()}
-            modalProps={{
-                destroyOnHidden: true,
-                width: 800
-            }}
-            submitter={{
-                searchConfig: {
-                    submitText: '保存配置',
-                    resetText: '取消'
-                },
-                submitButtonProps: {
-                    loading
-                }
-            }}
-            request={handleRequest}
-            onFinish={handleSave}
-        >
-            <Alert
-                message="GitHub 工具配置"
-                description="配置 GitHub API 访问凭证和请求参数，确保工具能正常访问 GitHub 服务。"
-                type="info"
-                showIcon={false}
-                style={{ marginBottom: 24 }}
-            />
-
-            {/* 认证配置 */}
-            <ProCard
+        <div id="github-tools-modal-container" style={{position: 'relative', zIndex: 'auto'}}>
+            <ModalForm<GitHubToolsConfig>
                 title={
                     <Space>
-                        <KeyOutlined />
-                        <Text strong>认证配置</Text>
+                        <GithubOutlined style={{color: currentTheme.token?.colorPrimary}}/>
+                        <Text strong style={{color: currentTheme.token?.colorText, fontSize: 16}}>
+                            GitHub工具配置
+                        </Text>
                     </Space>
                 }
-                size="small"
-                style={{ marginBottom: 16 }}
-            >
-                <ProFormText
-                    name="token"
-                    label={
-                        <Space>
-                            <KeyOutlined />
-                            GitHub Token
-                            <Tooltip title="GitHub Personal Access Token 或 App Token，用于 API 认证">
-                                <InfoCircleOutlined />
-                            </Tooltip>
-                        </Space>
+                open={visible}
+                onOpenChange={(open) => {
+                    if (!open) {
+                        onCancel();
                     }
-                    placeholder="ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-                    fieldProps={{
-                        type: 'password',
-                        autoComplete: 'new-password'
-                    }}
-                    rules={[
-                        { required: true, message: '请输入 GitHub Token' },
-                        {
-                            pattern: /^(ghp_|github_pat_)[a-zA-Z0-9_]{36,}$/,
-                            message: '请输入有效的 GitHub Token 格式'
+                }}
+                onFinish={handleFinish}
+                request={async () => {
+                    try {
+                        const response = await fetch('/api/mcp/categories/github/config');
+                        const data = await response.json();
+                        if (data.success) {
+                            return data.data.config;
+                        } else {
+                            // 返回默认配置
+                            return {
+                                api_base_url: 'https://api.github.com',
+                                github_token: '',
+                                default_per_page: 30,
+                                enable_rate_limit_check: true,
+                                enable_auto_retry: true,
+                                max_retry_attempts: 3,
+                                retry_delay_seconds: 1,
+                                timeout_seconds: 30,
+                                enable_request_logging: false,
+                                cache_responses: true,
+                                cache_ttl_seconds: 300,
+                                default_branch: 'master',
+                                enable_webhook_verification: true,
+                                enable_enterprise_features: false,
+                                enable_graphql_api: false,
+                                enable_security_scanning: true,
+                                enable_dependabot_integration: true
+                            };
                         }
-                    ]}
-                    extra="获取方法：GitHub Settings > Developer settings > Personal access tokens"
-                />
-
-                <ProFormText
-                    name="user_agent"
-                    label={
-                        <Space>
-                            <ApiOutlined />
-                            User Agent
-                            <Tooltip title="HTTP 请求头中的 User Agent 标识">
-                                <InfoCircleOutlined />
-                            </Tooltip>
-                        </Space>
+                    } catch (error) {
+                        console.error('Load GitHub tools config error:', error);
+                        // 返回默认配置
+                        return {
+                            api_base_url: 'https://api.github.com',
+                            github_token: '',
+                            default_per_page: 30,
+                            enable_rate_limit_check: true,
+                            enable_auto_retry: true,
+                            max_retry_attempts: 3,
+                            retry_delay_seconds: 1,
+                            timeout_seconds: 30,
+                            enable_request_logging: false,
+                            cache_responses: true,
+                            cache_ttl_seconds: 300,
+                            default_branch: 'master',
+                            enable_webhook_verification: true,
+                            enable_enterprise_features: false,
+                            enable_graphql_api: false,
+                            enable_security_scanning: true,
+                            enable_dependabot_integration: true
+                        };
                     }
-                    placeholder="LazyAI-Studio-GitHub-Tools/1.0"
-                    rules={[
-                        { required: true, message: '请输入 User Agent' }
-                    ]}
-                    extra="用于标识应用程序，建议包含应用名和版本号"
-                />
-            </ProCard>
-
-            {/* API 端点配置 */}
-            <ProCard
-                title={
-                    <Space>
-                        <GlobalOutlined />
-                        <Text strong>API 端点配置</Text>
-                    </Space>
-                }
-                size="small"
-                style={{ marginBottom: 16 }}
+                }}
+                width={900}
+                layout="horizontal"
+                labelCol={{span: 8}}
+                wrapperCol={{span: 16}}
+                submitter={{
+                    searchConfig: {
+                        resetText: '重置',
+                        submitText: '保存配置'
+                    },
+                    submitButtonProps: {
+                        loading: loading
+                    }
+                }}
+                modalProps={{
+                    destroyOnHidden: true,
+                    maskClosable: false,
+                    zIndex: 1000,
+                    styles: {
+                        body: {
+                            position: 'relative',
+                            zIndex: 1,
+                            overflow: 'visible',
+                            maxHeight: '80vh',
+                            overflowY: 'auto',
+                            overflowX: 'visible'
+                        }
+                    },
+                    style: {
+                        top: 50
+                    }
+                }}
             >
-                <ProFormText
-                    name="base_url"
-                    label={
-                        <Space>
-                            <GlobalOutlined />
-                            API 基础 URL
-                            <Tooltip title="GitHub API 服务器地址，Enterprise 用户可自定义">
-                                <InfoCircleOutlined />
-                            </Tooltip>
-                        </Space>
-                    }
-                    placeholder="https://api.github.com"
-                    rules={[
-                        { required: true, message: '请输入 API 基础 URL' },
-                        { type: 'url', message: '请输入有效的 URL 格式' }
-                    ]}
-                    extra="公共 GitHub 使用默认值，企业版 GitHub 需要修改为对应地址"
+                <Alert
+                    message="GitHub工具配置"
+                    description="配置GitHub工具集的全局参数，这些设置将应用于所有GitHub API相关工具的默认行为。"
+                    type="info"
+                    showIcon
+                    style={{marginBottom: 24}}
                 />
 
-                <ProFormDigit
-                    name="request_timeout"
-                    label={
+                {/* API基础配置 */}
+                <ProCard
+                    title={
                         <Space>
-                            <SettingOutlined />
-                            请求超时时间（秒）
-                            <Tooltip title="API 请求的最大等待时间">
-                                <InfoCircleOutlined />
-                            </Tooltip>
+                            <ApiOutlined/>
+                            <Text strong>API基础配置</Text>
                         </Space>
                     }
-                    min={5}
-                    max={300}
-                    fieldProps={{ precision: 0 }}
-                    rules={[
-                        { required: true, message: '请设置请求超时时间' }
-                    ]}
-                    extra="建议设置为 30 秒，避免网络问题导致请求卡死"
-                />
+                    size="small"
+                    style={{marginBottom: 16}}
+                >
+                    <ProFormText
+                        name="api_base_url"
+                        label={
+                            <Space>
+                                <Text>API基础URL</Text>
+                                <Tooltip title="GitHub API的基础URL，企业版GitHub可以修改此设置">
+                                    <InfoCircleOutlined/>
+                                </Tooltip>
+                            </Space>
+                        }
+                        rules={[{required: true, message: '请输入API基础URL'}]}
+                        placeholder="https://api.github.com"
+                    />
 
-                <ProFormDigit
-                    name="default_per_page"
-                    label={
+                    <ProFormText.Password
+                        name="github_token"
+                        label={
+                            <Space>
+                                <Text>GitHub Token</Text>
+                                <Tooltip title="GitHub Personal Access Token或GitHub App Token，用于API认证">
+                                    <InfoCircleOutlined/>
+                                </Tooltip>
+                            </Space>
+                        }
+                        rules={[{required: false, message: '请输入GitHub Token'}]}
+                        placeholder="ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+                        fieldProps={{
+                            visibilityToggle: true
+                        }}
+                    />
+
+                    <Row gutter={16}>
+                        <Col span={12}>
+                            <ProFormDigit
+                                name="default_per_page"
+                                label={
+                                    <Space>
+                                        <Text>默认分页大小</Text>
+                                        <Tooltip title="API请求返回结果的默认每页数量">
+                                            <InfoCircleOutlined/>
+                                        </Tooltip>
+                                    </Space>
+                                }
+                                min={1}
+                                max={100}
+                                fieldProps={{precision: 0}}
+                                rules={[{required: true, message: '请输入分页大小'}]}
+                            />
+                        </Col>
+                        <Col span={12}>
+                            <ProFormSelect
+                                name="default_branch"
+                                label={
+                                    <Space>
+                                        <Text>默认分支</Text>
+                                        <Tooltip title="仓库操作的默认分支名称">
+                                            <InfoCircleOutlined/>
+                                        </Tooltip>
+                                    </Space>
+                                }
+                                options={[
+                                    {label: 'master', value: 'master'},
+                                    {label: 'main', value: 'main'},
+                                    {label: 'develop', value: 'develop'},
+                                    {label: 'dev', value: 'dev'}
+                                ]}
+                                rules={[{required: true, message: '请选择默认分支'}]}
+                            />
+                        </Col>
+                    </Row>
+                </ProCard>
+
+                {/* 重试和错误处理 */}
+                <ProCard
+                    title={
                         <Space>
-                            <SettingOutlined />
-                            默认分页大小
-                            <Tooltip title="列表 API 的默认返回条目数量">
-                                <InfoCircleOutlined />
-                            </Tooltip>
+                            <SettingOutlined/>
+                            <Text strong>重试和错误处理</Text>
                         </Space>
                     }
-                    min={1}
-                    max={100}
-                    fieldProps={{ precision: 0 }}
-                    rules={[
-                        { required: true, message: '请设置默认分页大小' }
-                    ]}
-                    extra="GitHub API 最大支持每页 100 条记录"
-                />
-            </ProCard>
+                    size="small"
+                    style={{marginBottom: 16}}
+                    collapsible
+                    defaultCollapsed={false}
+                >
+                    <Row gutter={16}>
+                        <Col span={12}>
+                            <ProFormSwitch
+                                name="enable_rate_limit_check"
+                                label={
+                                    <Space>
+                                        <Text>启用速率限制检查</Text>
+                                        <Tooltip title="自动检查GitHub API速率限制并在必要时等待">
+                                            <InfoCircleOutlined/>
+                                        </Tooltip>
+                                    </Space>
+                                }
+                            />
+                        </Col>
+                        <Col span={12}>
+                            <ProFormSwitch
+                                name="enable_auto_retry"
+                                label={
+                                    <Space>
+                                        <Text>启用自动重试</Text>
+                                        <Tooltip title="API请求失败时自动重试">
+                                            <InfoCircleOutlined/>
+                                        </Tooltip>
+                                    </Space>
+                                }
+                            />
+                        </Col>
+                    </Row>
 
-            {/* 高级选项 */}
-            <ProCard
-                title={
-                    <Space>
-                        <SettingOutlined />
-                        <Text strong>高级选项</Text>
-                    </Space>
-                }
-                size="small"
-                style={{ marginBottom: 16 }}
-                collapsible
-                defaultCollapsed={false}
-            >
-                <ProFormSwitch
-                    name="enable_rate_limit_handling"
-                    label={
+                    <Row gutter={16}>
+                        <Col span={8}>
+                            <ProFormDigit
+                                name="max_retry_attempts"
+                                label={
+                                    <Space>
+                                        <Text>最大重试次数</Text>
+                                        <Tooltip title="API请求失败时的最大重试次数">
+                                            <InfoCircleOutlined/>
+                                        </Tooltip>
+                                    </Space>
+                                }
+                                min={1}
+                                max={10}
+                                fieldProps={{precision: 0}}
+                            />
+                        </Col>
+                        <Col span={8}>
+                            <ProFormDigit
+                                name="retry_delay_seconds"
+                                label={
+                                    <Space>
+                                        <Text>重试延迟（秒）</Text>
+                                        <Tooltip title="重试请求之间的延迟时间">
+                                            <InfoCircleOutlined/>
+                                        </Tooltip>
+                                    </Space>
+                                }
+                                min={0.1}
+                                max={60}
+                                fieldProps={{precision: 1}}
+                            />
+                        </Col>
+                        <Col span={8}>
+                            <ProFormDigit
+                                name="timeout_seconds"
+                                label={
+                                    <Space>
+                                        <Text>请求超时（秒）</Text>
+                                        <Tooltip title="API请求的超时时间">
+                                            <InfoCircleOutlined/>
+                                        </Tooltip>
+                                    </Space>
+                                }
+                                min={5}
+                                max={120}
+                                fieldProps={{precision: 0}}
+                            />
+                        </Col>
+                    </Row>
+                </ProCard>
+
+                {/* 缓存和性能 */}
+                <ProCard
+                    title={
                         <Space>
-                            <SettingOutlined />
-                            启用速率限制处理
-                            <Tooltip title="自动处理 GitHub API 速率限制，避免请求被拒绝">
-                                <InfoCircleOutlined />
-                            </Tooltip>
+                            <SettingOutlined/>
+                            <Text strong>缓存和性能</Text>
                         </Space>
                     }
-                    extra="当达到速率限制时，会自动等待直到重置时间"
-                    checkedChildren="开启"
-                    unCheckedChildren="关闭"
-                />
+                    size="small"
+                    style={{marginBottom: 16}}
+                    collapsible
+                    defaultCollapsed={false}
+                >
+                    <Row gutter={16}>
+                        <Col span={12}>
+                            <ProFormSwitch
+                                name="cache_responses"
+                                label={
+                                    <Space>
+                                        <Text>启用响应缓存</Text>
+                                        <Tooltip title="缓存API响应以提高性能">
+                                            <InfoCircleOutlined/>
+                                        </Tooltip>
+                                    </Space>
+                                }
+                            />
+                        </Col>
+                        <Col span={12}>
+                            <ProFormDigit
+                                name="cache_ttl_seconds"
+                                label={
+                                    <Space>
+                                        <Text>缓存过期时间（秒）</Text>
+                                        <Tooltip title="缓存数据的生存时间">
+                                            <InfoCircleOutlined/>
+                                        </Tooltip>
+                                    </Space>
+                                }
+                                min={60}
+                                max={3600}
+                                fieldProps={{precision: 0}}
+                            />
+                        </Col>
+                    </Row>
+                </ProCard>
 
-                <ProFormSwitch
-                    name="verify_ssl"
-                    label={
+                {/* 高级功能 */}
+                <ProCard
+                    title={
                         <Space>
-                            <KeyOutlined />
-                            启用 SSL 证书验证
-                            <Tooltip title="验证 HTTPS 连接的 SSL 证书有效性">
-                                <InfoCircleOutlined />
-                            </Tooltip>
+                            <SettingOutlined/>
+                            <Text strong>高级功能</Text>
                         </Space>
                     }
-                    extra="建议保持开启，确保连接安全性"
-                    checkedChildren="验证"
-                    unCheckedChildren="跳过"
-                />
+                    size="small"
+                    style={{marginBottom: 16}}
+                    collapsible
+                    defaultCollapsed={true}
+                >
+                    <Row gutter={16}>
+                        <Col span={12}>
+                            <ProFormSwitch
+                                name="enable_request_logging"
+                                label={
+                                    <Space>
+                                        <Text>启用请求日志</Text>
+                                        <Tooltip title="记录所有API请求的详细日志">
+                                            <InfoCircleOutlined/>
+                                        </Tooltip>
+                                    </Space>
+                                }
+                            />
+                        </Col>
+                        <Col span={12}>
+                            <ProFormSwitch
+                                name="enable_webhook_verification"
+                                label={
+                                    <Space>
+                                        <Text>启用Webhook验证</Text>
+                                        <Tooltip title="验证来自GitHub的Webhook请求">
+                                            <InfoCircleOutlined/>
+                                        </Tooltip>
+                                    </Space>
+                                }
+                            />
+                        </Col>
+                    </Row>
 
-                <ProFormSwitch
-                    name="auto_retry"
-                    label={
-                        <Space>
-                            <SettingOutlined />
-                            启用自动重试
-                            <Tooltip title="网络错误或临时故障时自动重试请求">
-                                <InfoCircleOutlined />
-                            </Tooltip>
-                        </Space>
+                    <Row gutter={16}>
+                        <Col span={12}>
+                            <ProFormSwitch
+                                name="enable_enterprise_features"
+                                label={
+                                    <Space>
+                                        <Text>启用企业功能</Text>
+                                        <Tooltip title="启用GitHub Enterprise相关功能">
+                                            <InfoCircleOutlined/>
+                                        </Tooltip>
+                                    </Space>
+                                }
+                            />
+                        </Col>
+                        <Col span={12}>
+                            <ProFormSwitch
+                                name="enable_graphql_api"
+                                label={
+                                    <Space>
+                                        <Text>启用GraphQL API</Text>
+                                        <Tooltip title="使用GitHub GraphQL API替代REST API">
+                                            <InfoCircleOutlined/>
+                                        </Tooltip>
+                                    </Space>
+                                }
+                            />
+                        </Col>
+                    </Row>
+
+                    <Row gutter={16}>
+                        <Col span={12}>
+                            <ProFormSwitch
+                                name="enable_security_scanning"
+                                label={
+                                    <Space>
+                                        <Text>启用安全扫描</Text>
+                                        <Tooltip title="启用代码安全扫描功能">
+                                            <InfoCircleOutlined/>
+                                        </Tooltip>
+                                    </Space>
+                                }
+                            />
+                        </Col>
+                        <Col span={12}>
+                            <ProFormSwitch
+                                name="enable_dependabot_integration"
+                                label={
+                                    <Space>
+                                        <Text>启用Dependabot集成</Text>
+                                        <Tooltip title="启用Dependabot依赖项管理功能">
+                                            <InfoCircleOutlined/>
+                                        </Tooltip>
+                                    </Space>
+                                }
+                            />
+                        </Col>
+                    </Row>
+                </ProCard>
+
+                <Alert
+                    message="配置说明"
+                    description={
+                        <div>
+                            <Paragraph style={{margin: '8px 0', fontSize: 13}}>
+                                • <Text strong>API基础URL</Text>: 企业版GitHub用户可以修改为自己的企业GitHub地址
+                            </Paragraph>
+                            <Paragraph style={{margin: '8px 0', fontSize: 13}}>
+                                • <Text strong>GitHub Token</Text>: 用于API认证的Personal Access Token，留空则使用公开API（有较低速率限制）
+                            </Paragraph>
+                            <Paragraph style={{margin: '8px 0', fontSize: 13}}>
+                                • <Text strong>速率限制</Text>: 启用后会自动检查GitHub API配额，避免超出限制
+                            </Paragraph>
+                            <Paragraph style={{margin: '8px 0', fontSize: 13}}>
+                                • <Text strong>自动重试</Text>: 网络错误或临时故障时自动重试请求
+                            </Paragraph>
+                            <Paragraph style={{margin: '8px 0', fontSize: 13}}>
+                                • <Text strong>响应缓存</Text>: 缓存API响应可以显著提高频繁操作的性能
+                            </Paragraph>
+                            <Paragraph style={{margin: '8px 0', fontSize: 13}}>
+                                • <Text strong>高级功能</Text>: 包括企业功能、GraphQL API、安全扫描等可选功能
+                            </Paragraph>
+                        </div>
                     }
-                    extra="遇到网络错误或服务器错误时会自动重试"
-                    checkedChildren="开启"
-                    unCheckedChildren="关闭"
+                    type="info"
+                    showIcon
+                    style={{fontSize: 12, marginTop: 16}}
                 />
-
-                <ProFormDigit
-                    name="max_retries"
-                    label={
-                        <Space>
-                            <SettingOutlined />
-                            最大重试次数
-                            <Tooltip title="自动重试的最大次数">
-                                <InfoCircleOutlined />
-                            </Tooltip>
-                        </Space>
-                    }
-                    min={1}
-                    max={10}
-                    fieldProps={{ precision: 0 }}
-                    extra="建议设置为 3 次，避免过多重试"
-                />
-            </ProCard>
-
-            <Alert
-                message="使用说明"
-                description={
-                    <div>
-                        <Paragraph style={{ margin: '8px 0', fontSize: 13 }}>
-                            • <Text strong>GitHub Token</Text>: 必须配置有效的 Token 才能使用 GitHub API 功能
-                        </Paragraph>
-                        <Paragraph style={{ margin: '8px 0', fontSize: 13 }}>
-                            • <Text strong>Token 权限</Text>: 根据需要的功能设置对应的权限范围（repo, issues, pull requests 等）
-                        </Paragraph>
-                        <Paragraph style={{ margin: '8px 0', fontSize: 13 }}>
-                            • <Text strong>速率限制</Text>: GitHub API 有请求频率限制，建议开启自动处理避免被拒绝
-                        </Paragraph>
-                        <Paragraph style={{ margin: '8px 0', fontSize: 13 }}>
-                            • <Text strong>企业版</Text>: 如使用 GitHub Enterprise，请修改 API 基础 URL 为对应地址
-                        </Paragraph>
-                    </div>
-                }
-                type="info"
-                showIcon
-                style={{ fontSize: 12, marginTop: 16 }}
-            />
-        </ModalForm>
+            </ModalForm>
+        </div>
     );
 };
 

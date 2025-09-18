@@ -33,6 +33,7 @@ import {apiClient, MCPCategoryInfo, MCPToolInfo} from '../api';
 import {useTheme} from '../contexts/ThemeContext';
 import FileToolsConfigModal from '../components/FileTools/FileToolsConfigModal';
 import TimeToolsConfigModal from '../components/TimeTools/TimeToolsConfigModal';
+import GitHubToolsConfigModal from '../components/GitHubTools/GitHubToolsConfigModal';
 import CacheToolsConfigModal from '../components/CacheTools/CacheToolsConfigModal';
 import GitHubToolsConfigModal from '../components/GitHubTools/GitHubToolsConfigModal';
 import './MCPToolsManagement.css';
@@ -61,6 +62,7 @@ const MCPToolsManagement: React.FC = () => {
     const [testResult, setTestResult] = useState<string>('');
     const [fileToolsConfigModal, setFileToolsConfigModal] = useState(false);
     const [timeToolsConfigModal, setTimeToolsConfigModal] = useState(false);
+    const [gitHubToolsConfigModal, setGitHubToolsConfigModal] = useState(false);
     const [cacheToolsConfigModal, setCacheToolsConfigModal] = useState(false);
     const [githubToolsConfigModal, setGithubToolsConfigModal] = useState(false);
 
@@ -211,6 +213,7 @@ const MCPToolsManagement: React.FC = () => {
                     {id: 'system', name: '系统工具', description: '系统信息和监控相关工具', icon: '🖥️', enabled: true},
                     {id: 'time', name: '时间工具', description: '时间戳和日期相关工具', icon: '⏰', enabled: true},
                     {id: 'file', name: '文件工具', description: '文件和目录操作相关工具', icon: '📁', enabled: true},
+                    {id: 'github', name: 'GitHub工具', description: 'GitHub API集成工具，包括仓库管理、issue处理、PR操作等', icon: '🐙', enabled: true},
                     {
                         id: 'cache',
                         name: '缓存工具',
@@ -570,6 +573,36 @@ const MCPToolsManagement: React.FC = () => {
                                                     </Button>
                                                 </Tooltip>
                                             )}
+                                            {category.id === 'github' && (
+                                                <Tooltip title="GitHub工具配置">
+                                                    <Button
+                                                        type="text"
+                                                        size="small"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            setGitHubToolsConfigModal(true);
+                                                        }}
+                                                        style={{
+                                                            color: currentTheme.token?.colorPrimary,
+                                                            borderColor: currentTheme.token?.colorPrimary,
+                                                            backgroundColor: 'rgba(24, 144, 255, 0.06)',
+                                                            borderRadius: 6,
+                                                            border: `1px solid ${currentTheme.token?.colorPrimary}20`,
+                                                            transition: 'all 0.2s ease'
+                                                        }}
+                                                        onMouseEnter={(e) => {
+                                                            e.currentTarget.style.backgroundColor = 'rgba(24, 144, 255, 0.12)';
+                                                            e.currentTarget.style.borderColor = currentTheme.token?.colorPrimary || '#1890ff';
+                                                        }}
+                                                        onMouseLeave={(e) => {
+                                                            e.currentTarget.style.backgroundColor = 'rgba(24, 144, 255, 0.06)';
+                                                            e.currentTarget.style.borderColor = `${currentTheme.token?.colorPrimary}20` || '#1890ff20';
+                                                        }}
+                                                    >
+                                                        工具配置
+                                                    </Button>
+                                                </Tooltip>
+                                            )}
                                             {category.id === 'cache' && (
                                                 <Tooltip title="缓存工具配置">
                                                     <Button
@@ -810,6 +843,12 @@ const MCPToolsManagement: React.FC = () => {
             <TimeToolsConfigModal
                 visible={timeToolsConfigModal}
                 onCancel={() => setTimeToolsConfigModal(false)}
+            />
+
+            {/* GitHub工具配置Modal */}
+            <GitHubToolsConfigModal
+                visible={gitHubToolsConfigModal}
+                onCancel={() => setGitHubToolsConfigModal(false)}
             />
 
             {/* 缓存工具配置Modal */}
