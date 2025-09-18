@@ -51,6 +51,12 @@ cd frontend && npm test -- --testNamePattern="App renders"
 
 # Integration test
 uv run pytest tests/test_integration_comprehensive.py -v
+
+# Run specific test categories using markers
+uv run pytest tests/ -m "unit" -v          # Unit tests only
+uv run pytest tests/ -m "integration" -v   # Integration tests only
+uv run pytest tests/ -m "api" -v           # API tests only
+uv run pytest tests/ -m "not slow" -v      # Exclude slow tests
 ```
 
 ## Architecture
@@ -94,6 +100,17 @@ LazyAI Studio
    - Log injection prevention (CWE-117)
    - Input sanitization utilities
    - Safe key-value logging formatters
+
+4. **MCP Tools Service** (`app/core/mcp_tools_service.py`)
+   - Model Context Protocol (MCP) tools integration
+   - Dynamic tool registration and management
+   - Supports GitHub API, web scraping, file operations
+
+5. **Advanced Tool Chain** (`app/tools/`)
+   - **GitHub Tools** (`github_tools.py`): Complete GitHub API integration with 34+ tools
+   - **Web Scraping Tools** (`fetch_tools.py`): Content extraction and web scraping
+   - **File Tools** (`file_tools.py`): Advanced file manipulation utilities
+   - **Cache Tools** (`cache_tools.py`): Performance optimization caching
 
 ### Frontend Architecture
 
@@ -147,14 +164,25 @@ npm audit        # Security audit
 ### Technology Stack
 - **Python**: 3.12+ with UV package manager
 - **Backend**: FastAPI, TinyDB, Uvicorn, PyYAML
-- **Performance**: psutil, orjson, uvloop for optimization  
+- **Performance**: psutil, orjson, uvloop for optimization
 - **Frontend**: React 19, TypeScript, Ant Design 5
 - **Security**: Input sanitization, log injection prevention
 - **Testing**: pytest (backend), Jest (frontend)
 - **Development**: Hot reload, file watching, auto-testing
+- **MCP Integration**: Model Context Protocol tools (mcp, fastmcp)
+- **Web Tools**: aiohttp, aiofiles, beautifulsoup4 for web scraping
 
 ### Code Structure Conventions
 - Backend follows FastAPI patterns with dependency injection
 - Frontend uses React functional components with hooks
 - Shared TypeScript interfaces between frontend/backend
 - Modular component architecture with clear separation of concerns
+
+### MCP Tools Integration
+The project includes comprehensive MCP (Model Context Protocol) tools integration:
+- **GitHub API Tools**: 34+ tools for repository management, issues, PRs, releases
+- **Web Scraping Tools**: Content extraction, URL fetching, data processing
+- **File Operation Tools**: Advanced file manipulation and processing
+- **Cache Management**: Performance optimization through intelligent caching
+
+Access MCP tools through the API endpoints or direct service integration in `app/core/mcp_tools_service.py`

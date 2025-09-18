@@ -253,12 +253,23 @@ class MCPConfigService:
             # 重新加载GitHub工具客户端配置
             from app.tools.github_tools import reload_github_client_config
             reload_github_client_config()
-            logger.debug("Reloaded tool clients configuration")
+            logger.debug("Reloaded GitHub tools configuration")
         except ImportError:
-            # GitHub工具模块未安装或未导入
             logger.debug("GitHub tools module not available, skipping client reload")
         except Exception as e:
-            logger.error(f"Failed to reload tool clients: {e}")
+            logger.error(f"Failed to reload GitHub tools: {e}")
+
+        try:
+            # 重新加载网络抓取工具配置
+            from app.tools.web_scraping_tools import reload_web_scraping_config
+            reload_web_scraping_config()
+            logger.debug("Reloaded web scraping tools configuration")
+        except ImportError:
+            logger.debug("Web scraping tools module not available, skipping reload")
+        except Exception as e:
+            logger.error(f"Failed to reload web scraping tools: {e}")
+
+        logger.debug("Reloaded all available tool clients configuration")
 
 
 # 全局配置服务实例
