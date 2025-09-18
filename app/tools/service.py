@@ -79,7 +79,36 @@ class MCPToolsService:
         self.categories_table = self.db.table(TableNames.MCP_CATEGORIES)
         
         logger.info(f"MCPToolsService initialized with unified db: {use_unified_db}")
-    
+
+        # 自动发现装饰器注册的工具
+        logger.info("Starting registry tools discovery...")
+        self._discover_registry_tools()
+        logger.info("Registry tools discovery completed.")
+
+    def _discover_registry_tools(self):
+        """自动发现并导入装饰器注册的工具"""
+        try:
+            from app.tools.registry import auto_discover_tools
+            # 发现网络抓取工具模块中的装饰器工具
+            tools_discovered = auto_discover_tools([
+                "app.tools.web_scraping_tools"
+            ])
+            if tools_discovered > 0:
+                logger.info(f"Auto-discovered {tools_discovered} decorator-registered tools")
+
+            # 同步装饰器注册的分类到数据库
+            sync_result = self.sync_registry_categories_to_db()
+            if sync_result['synced'] > 0 or sync_result['updated'] > 0 or sync_result['removed'] > 0:
+                logger.info(f"Category sync complete: {sync_result['synced']} added, {sync_result['updated']} updated, {sync_result['removed']} removed")
+
+            # 同步装饰器注册的工具到数据库
+            tool_sync_result = self.sync_registry_tools_to_db()
+            if tool_sync_result['synced'] > 0 or tool_sync_result['updated'] > 0 or tool_sync_result['removed'] > 0:
+                logger.info(f"Tool sync complete: {tool_sync_result['synced']} added, {tool_sync_result['updated']} updated, {tool_sync_result['removed']} removed")
+
+        except Exception as e:
+            logger.debug(f"Failed to auto-discover decorator tools: {e}")
+
     def register_builtin_categories(self):
         """注册内置工具分类到数据库（启动时覆盖）"""
         builtin_categories = [
@@ -239,11 +268,26 @@ class MCPToolsService:
         return {"registered": registered_count, "updated": updated_count}
     
     def get_categories(self, enabled_only: bool = True) -> List[Dict[str, Any]]:
-        """获取工具分类"""
-        categories = self.categories_table.all()
+        """获取工具分类（包括装饰器注册的工具分类）"""
+        # 从数据库获取分类
+        db_categories = self.categories_table.all()
         if enabled_only:
-            categories = [cat for cat in categories if cat.get('enabled', True)]
-        
+            db_categories = [cat for cat in db_categories if cat.get('enabled', True)]
+
+        # 获取装饰器注册工具的分类
+        registry_categories = self._get_registry_categories(enabled_only)
+
+        # 合并分类列表（避免重复）
+        categories_dict = {}
+        for cat in db_categories:
+            categories_dict[cat['id']] = cat
+
+        for cat in registry_categories:
+            if cat['id'] not in categories_dict:
+                categories_dict[cat['id']] = cat
+
+        categories = list(categories_dict.values())
+
         # 按sort_order排序
         return sorted(categories, key=lambda x: x.get('sort_order', 999))
     
@@ -425,9 +469,14 @@ class MCPToolsService:
                     added_count += 1
                     logger.info(f"Added new tool: {sanitize_for_log(tool.name)}")
 
-            # 2. 移除不存在的内置工具
+            # 2. 移除不存在的内置工具（但保留装饰器注册的工具）
             for db_tool in db_tools:
                 if db_tool['name'] not in builtin_tool_names:
+                    # 检查是否是装饰器注册的工具，如果是则跳过删除
+                    if self._is_decorator_registered_tool(db_tool):
+                        logger.debug(f"Skipping decorator-registered tool: {sanitize_for_log(db_tool['name'])}")
+                        continue
+
                     self.tools_table.remove(Query_obj.name == db_tool['name'])
                     removed_count += 1
                     logger.info(f"Removed obsolete tool: {sanitize_for_log(db_tool['name'])}")
@@ -447,20 +496,319 @@ class MCPToolsService:
             return {"error": str(e), "added": 0, "updated": 0, "removed": 0}
     
     def get_tools(self, category: str = None, enabled_only: bool = True) -> List[Dict[str, Any]]:
-        """获取工具清单"""
+        """获取工具清单（包括装饰器注册的工具）"""
         Query_obj = Query()
-        
+
+        # 从数据库获取工具
         if category and enabled_only:
-            tools = self.tools_table.search((Query_obj.category == category) & (Query_obj.enabled == True))
+            db_tools = self.tools_table.search((Query_obj.category == category) & (Query_obj.enabled == True))
         elif category:
-            tools = self.tools_table.search(Query_obj.category == category)
+            db_tools = self.tools_table.search(Query_obj.category == category)
         elif enabled_only:
-            tools = self.tools_table.search(Query_obj.enabled == True)
+            db_tools = self.tools_table.search(Query_obj.enabled == True)
         else:
-            tools = self.tools_table.all()
-        
-        return tools
-    
+            db_tools = self.tools_table.all()
+
+        # 从装饰器注册表获取工具
+        registry_tools = self._get_registry_tools(enabled_only)
+
+        # 如果指定了分类，过滤装饰器注册的工具
+        if category:
+            registry_tools = [tool for tool in registry_tools if tool.get('category') == category]
+
+        # 合并工具列表（避免重复）
+        merged_tools = {}
+
+        # 先添加数据库中的工具
+        for tool in db_tools:
+            merged_tools[tool['name']] = tool
+
+        # 添加装饰器注册的工具（如果不存在的话）
+        for tool in registry_tools:
+            if tool['name'] not in merged_tools:
+                merged_tools[tool['name']] = tool
+
+        return list(merged_tools.values())
+
+    def _get_registry_tools(self, category: str = None, enabled_only: bool = True) -> List[Dict[str, Any]]:
+        """从装饰器注册表获取工具"""
+        try:
+            from app.tools.registry import get_registered_tools, get_tools_by_category
+
+            # 获取装饰器注册的工具
+            if category:
+                registry_tools = get_tools_by_category(category)
+            else:
+                registry_tools = get_registered_tools()
+
+            # 转换为与数据库兼容的格式
+            converted_tools = []
+            for tool in registry_tools:
+                tool_dict = {
+                    'id': f"registry_{tool.name}",
+                    'name': tool.name,
+                    'description': tool.description,
+                    'category': tool.category,
+                    'schema': tool.schema,
+                    'enabled': tool.enabled,
+                    'implementation_type': tool.implementation_type,
+                    'created_at': tool.metadata.get('created_at', datetime.now().isoformat()),
+                    'updated_at': tool.metadata.get('updated_at', datetime.now().isoformat()),
+                    'metadata': tool.metadata,
+                    'returns': getattr(tool, 'returns', None)  # 添加返回值schema
+                }
+
+                # 应用过滤条件
+                if enabled_only and not tool.enabled:
+                    continue
+
+                converted_tools.append(tool_dict)
+
+            return converted_tools
+
+        except ImportError:
+            logger.debug("Registry module not available, skipping registry tools")
+            return []
+        except Exception as e:
+            logger.error(f"Failed to get registry tools: {e}")
+            return []
+
+    def sync_registry_tools_to_db(self):
+        """将装饰器注册的工具同步到数据库"""
+        try:
+            registry_tools = self._get_registry_tools(enabled_only=False)
+            synced_count = 0
+
+            for tool in registry_tools:
+                # 检查是否已存在
+                Query_obj = Query()
+                existing = self.tools_table.get(Query_obj.name == tool['name'])
+
+                if not existing:
+                    # 添加新工具
+                    self.tools_table.insert(tool)
+                    synced_count += 1
+                    logger.debug(f"Synced registry tool to DB: {tool['name']}")
+
+            if synced_count > 0:
+                logger.info(f"Synced {synced_count} registry tools to database")
+
+            return synced_count
+
+        except Exception as e:
+            logger.error(f"Failed to sync registry tools to database: {e}")
+            return 0
+
+    def _get_registry_categories(self, enabled_only: bool = True) -> List[Dict[str, Any]]:
+        """从装饰器注册表获取分类定义"""
+        try:
+            from app.tools.registry import get_registered_categories
+
+            # 获取装饰器注册的分类
+            registry_categories = get_registered_categories()
+
+            # 应用过滤条件
+            if enabled_only:
+                registry_categories = [cat for cat in registry_categories if cat.get('enabled', True)]
+
+            return registry_categories
+
+        except ImportError:
+            logger.debug("Registry module not available, skipping registry categories")
+            return []
+        except Exception as e:
+            logger.error(f"Failed to get registry categories: {e}")
+            return []
+
+    def _get_registry_tools(self, enabled_only: bool = True) -> List[Dict[str, Any]]:
+        """从装饰器注册表获取工具定义"""
+        try:
+            from app.tools.registry import get_registered_tools
+            registry_tools = []
+
+            for tool in get_registered_tools():
+                tool_dict = tool.to_dict()
+                if enabled_only and not tool_dict.get('enabled', True):
+                    continue
+                registry_tools.append(tool_dict)
+
+            return registry_tools
+        except ImportError:
+            logger.debug("Registry module not available, skipping registry tools")
+            return []
+        except Exception as e:
+            logger.error(f"Failed to get registry tools: {e}")
+            return []
+
+    def sync_registry_categories_to_db(self):
+        """将装饰器注册的分类同步到数据库（如果不存在则添加，如果数据库存在但未注册则移除）"""
+        try:
+            registry_categories = self._get_registry_categories(enabled_only=False)
+            registry_category_ids = {cat['id'] for cat in registry_categories}
+
+            synced_count = 0
+            updated_count = 0
+            removed_count = 0
+
+            # 添加或更新装饰器注册的分类
+            for category in registry_categories:
+                Query_obj = Query()
+                existing = self.categories_table.get(Query_obj.id == category['id'])
+
+                if not existing:
+                    # 添加新分类
+                    self.categories_table.insert(category)
+                    synced_count += 1
+                    logger.debug(f"Synced registry category to DB: {category['id']}")
+                else:
+                    # 更新现有分类（保留数据库中的配置但更新基本信息）
+                    update_data = {
+                        'name': category['name'],
+                        'description': category['description'],
+                        'icon': category['icon'],
+                        'sort_order': category['sort_order'],
+                        'updated_at': category['updated_at']
+                    }
+                    # 合并配置（保留数据库中的自定义配置，但添加新的默认配置项）
+                    if 'config' in category:
+                        existing_config = existing.get('config', {})
+                        for key, value in category['config'].items():
+                            if key not in existing_config:
+                                existing_config[key] = value
+                        update_data['config'] = existing_config
+
+                    self.categories_table.update(update_data, Query_obj.id == category['id'])
+                    updated_count += 1
+
+            # 移除数据库中存在但未在装饰器中注册的分类（仅移除装饰器注册类型的分类）
+            all_db_categories = self.categories_table.all()
+            for db_category in all_db_categories:
+                # 只移除通过装饰器注册但现在不在注册表中的分类
+                # 检查分类是否有实现类型标记或者是否在已知的装饰器注册分类中
+                if (db_category['id'] not in registry_category_ids and
+                    self._is_decorator_registered_category(db_category)):
+                    Query_obj = Query()
+                    self.categories_table.remove(Query_obj.id == db_category['id'])
+                    removed_count += 1
+                    logger.debug(f"Removed unregistered category from DB: {db_category['id']}")
+
+            if synced_count > 0 or updated_count > 0 or removed_count > 0:
+                logger.info(f"Category sync: {synced_count} added, {updated_count} updated, {removed_count} removed")
+
+            return {"synced": synced_count, "updated": updated_count, "removed": removed_count}
+
+        except Exception as e:
+            logger.error(f"Failed to sync registry categories to database: {e}")
+            return {"synced": 0, "updated": 0, "removed": 0}
+
+    def _is_decorator_registered_category(self, category: Dict[str, Any]) -> bool:
+        """检查分类是否是通过装饰器注册的分类"""
+        # 通过装饰器注册的分类会有特定的标识或者格式
+        # 目前主要通过分类ID和实现类型来判断
+        category_id = category.get('id', '')
+
+        # 已知的装饰器注册分类ID（可以根据需要扩展）
+        decorator_category_ids = {
+            'web-scraping',  # 网络抓取工具分类
+            # 可以在这里添加其他装饰器注册的分类
+        }
+
+        # 检查是否在已知的装饰器分类列表中
+        if category_id in decorator_category_ids:
+            return True
+
+        # 检查是否有装饰器注册的特征（比如特定的配置结构）
+        config = category.get('config', {})
+        if any(key in config for key in ['default_timeout', 'max_redirects', 'rate_limit_enabled']):
+            return True
+
+        return False
+
+    def sync_registry_tools_to_db(self):
+        """将装饰器注册的工具同步到数据库（如果不存在则添加，如果数据库存在但未注册则移除）"""
+        try:
+            registry_tools = self._get_registry_tools(enabled_only=False)
+            registry_tool_names = {tool['name'] for tool in registry_tools}
+
+            synced_count = 0
+            updated_count = 0
+            removed_count = 0
+
+            # 添加或更新装饰器注册的工具
+            for tool in registry_tools:
+                Query_obj = Query()
+                existing = self.tools_table.get(Query_obj.name == tool['name'])
+
+                if not existing:
+                    # 添加新工具
+                    self.tools_table.insert(tool)
+                    synced_count += 1
+                    logger.debug(f"Synced registry tool to DB: {tool['name']}")
+                else:
+                    # 更新现有工具（保留数据库中的启用状态但更新其他信息）
+                    update_data = {
+                        'description': tool['description'],
+                        'schema': tool['schema'],
+                        'returns': tool.get('returns'),
+                        'metadata': tool.get('metadata', {}),
+                        'implementation_type': tool.get('implementation_type', 'builtin'),
+                        'updated_at': tool.get('updated_at', datetime.now().isoformat())
+                    }
+                    # 保留数据库中的启用状态
+                    if 'enabled' not in update_data:
+                        update_data['enabled'] = existing.get('enabled', True)
+
+                    self.tools_table.update(update_data, Query_obj.name == tool['name'])
+                    updated_count += 1
+
+            # 移除数据库中存在但未在装饰器中注册的工具（仅移除装饰器注册类型的工具）
+            all_db_tools = self.tools_table.all()
+            for db_tool in all_db_tools:
+                # 只移除通过装饰器注册但现在不在注册表中的工具
+                if (db_tool['name'] not in registry_tool_names and
+                    self._is_decorator_registered_tool(db_tool)):
+                    Query_obj = Query()
+                    self.tools_table.remove(Query_obj.name == db_tool['name'])
+                    removed_count += 1
+                    logger.debug(f"Removed unregistered tool from DB: {db_tool['name']}")
+
+            if synced_count > 0 or updated_count > 0 or removed_count > 0:
+                logger.info(f"Tool sync: {synced_count} added, {updated_count} updated, {removed_count} removed")
+
+            return {"synced": synced_count, "updated": updated_count, "removed": removed_count}
+
+        except Exception as e:
+            logger.error(f"Failed to sync registry tools to database: {e}")
+            return {"synced": 0, "updated": 0, "removed": 0}
+
+    def _is_decorator_registered_tool(self, tool: Dict[str, Any]) -> bool:
+        """检查工具是否是通过装饰器注册的工具"""
+        # 通过装饰器注册的工具会有特定的标识或者格式
+        tool_name = tool.get('name', '')
+        implementation_type = tool.get('implementation_type', '')
+        category = tool.get('category', '')
+
+        # 检查是否有装饰器注册的特征（比如特定的前缀或元数据）
+        if tool_name.startswith('web-scraping_'):  # 修正为正确的前缀格式
+            return True
+
+        # 检查是否属于装饰器注册的分类
+        if category == 'web-scraping':
+            return True
+
+        # 检查元数据中是否有装饰器注册的标记
+        metadata = tool.get('metadata', {})
+        if 'tags' in metadata and isinstance(metadata['tags'], list):
+            decorator_tags = {'http', 'network', 'request', 'webpage', 'scraping', 'download', 'api', 'batch'}
+            if any(tag in decorator_tags for tag in metadata['tags']):
+                return True
+
+        # 注意：不能简单地通过 implementation_type == 'builtin' 来判断
+        # 因为内置工具和装饰器注册工具都可能使用 'builtin' 类型
+        # 需要更具体的判断逻辑
+
+        return False
+
     def get_tool(self, name: str) -> Optional[Dict[str, Any]]:
         """根据名称获取单个工具"""
         Query_obj = Query()

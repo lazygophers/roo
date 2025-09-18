@@ -109,8 +109,16 @@ const MCPToolsManagement: React.FC = () => {
             }
 
             if (toolsRes.success && toolsRes.data && Array.isArray((toolsRes.data as any).tools)) {
+                console.log('API调用成功，获取到工具数量:', (toolsRes.data as any).tools.length);
+                console.log('工具分类:', Array.from(new Set((toolsRes.data as any).tools.map((tool: any) => tool.category))));
                 setTools((toolsRes.data as any).tools);
             } else {
+                console.log('API调用失败或数据格式不正确:', {
+                    success: toolsRes.success,
+                    hasData: !!toolsRes.data,
+                    isArray: Array.isArray((toolsRes.data as any)?.tools),
+                    data: toolsRes.data
+                });
                 // 如果API不可用，使用模拟数据
                 const mockTools: MCPToolInfo[] = [
                     {
@@ -225,6 +233,106 @@ const MCPToolsManagement: React.FC = () => {
                         created_at: new Date().toISOString(),
                         updated_at: new Date().toISOString(),
                         metadata: {tags: ['文件信息', '元数据', '校验']}
+                    },
+                    {
+                        id: '10',
+                        name: 'fetch_http_request',
+                        description: '执行HTTP请求，支持GET、POST等方法，可设置请求头、参数、认证等',
+                        category: 'fetch',
+                        schema: {
+                            type: 'object',
+                            properties: {
+                                url: {type: 'string', description: '请求URL'},
+                                method: {type: 'string', enum: ['GET', 'POST', 'PUT', 'DELETE'], description: 'HTTP方法'},
+                                headers: {type: 'object', description: '请求头'}
+                            },
+                            required: ['url']
+                        },
+                        enabled: true,
+                        implementation_type: 'builtin',
+                        created_at: new Date().toISOString(),
+                        updated_at: new Date().toISOString(),
+                        metadata: {tags: ['http', 'request', 'api']}
+                    },
+                    {
+                        id: '11',
+                        name: 'fetch_fetch_webpage',
+                        description: '抓取网页内容，支持提取文本、链接和图片，使用BeautifulSoup解析HTML',
+                        category: 'fetch',
+                        schema: {
+                            type: 'object',
+                            properties: {
+                                url: {type: 'string', description: '网页URL'},
+                                extract_links: {type: 'boolean', description: '是否提取链接'},
+                                extract_images: {type: 'boolean', description: '是否提取图片'}
+                            },
+                            required: ['url']
+                        },
+                        enabled: true,
+                        implementation_type: 'builtin',
+                        created_at: new Date().toISOString(),
+                        updated_at: new Date().toISOString(),
+                        metadata: {tags: ['scraping', 'html', 'beautifulsoup']}
+                    },
+                    {
+                        id: '12',
+                        name: 'fetch_download_file',
+                        description: '下载文件到指定路径，支持大文件下载和进度监控，可设置文件大小限制',
+                        category: 'fetch',
+                        schema: {
+                            type: 'object',
+                            properties: {
+                                url: {type: 'string', description: '文件URL'},
+                                save_path: {type: 'string', description: '保存路径'},
+                                max_size_mb: {type: 'number', description: '最大文件大小(MB)'}
+                            },
+                            required: ['url', 'save_path']
+                        },
+                        enabled: true,
+                        implementation_type: 'builtin',
+                        created_at: new Date().toISOString(),
+                        updated_at: new Date().toISOString(),
+                        metadata: {tags: ['download', 'file', 'stream']}
+                    },
+                    {
+                        id: '13',
+                        name: 'fetch_api_call',
+                        description: '执行API调用，自动处理认证头，支持JSON响应解析和错误处理',
+                        category: 'fetch',
+                        schema: {
+                            type: 'object',
+                            properties: {
+                                url: {type: 'string', description: 'API URL'},
+                                method: {type: 'string', enum: ['GET', 'POST', 'PUT', 'DELETE'], description: 'HTTP方法'},
+                                api_key: {type: 'string', description: 'API密钥'}
+                            },
+                            required: ['url']
+                        },
+                        enabled: true,
+                        implementation_type: 'builtin',
+                        created_at: new Date().toISOString(),
+                        updated_at: new Date().toISOString(),
+                        metadata: {tags: ['api', 'json', 'authentication']}
+                    },
+                    {
+                        id: '14',
+                        name: 'fetch_batch_requests',
+                        description: '批量执行HTTP请求，支持并发控制和请求间延迟，适合大量数据抓取',
+                        category: 'fetch',
+                        schema: {
+                            type: 'object',
+                            properties: {
+                                urls: {type: 'array', items: {type: 'string'}, description: 'URL列表'},
+                                concurrent: {type: 'number', description: '并发数量'},
+                                delay: {type: 'number', description: '请求间延迟(秒)'}
+                            },
+                            required: ['urls']
+                        },
+                        enabled: true,
+                        implementation_type: 'builtin',
+                        created_at: new Date().toISOString(),
+                        updated_at: new Date().toISOString(),
+                        metadata: {tags: ['batch', 'concurrent', 'bulk']}
                     }
                 ];
 
@@ -238,6 +346,13 @@ const MCPToolsManagement: React.FC = () => {
                         name: '缓存工具',
                         description: '缓存操作相关工具',
                         icon: '🗄️',
+                        enabled: true
+                    },
+                    {
+                        id: 'fetch',
+                        name: '网络抓取工具',
+                        description: '网页抓取、HTTP请求、API调用等网络数据获取工具',
+                        icon: '🌐',
                         enabled: true
                     }
                 ];
@@ -389,8 +504,7 @@ const MCPToolsManagement: React.FC = () => {
             (isDarkTheme ? 'rgba(255, 255, 255, 0.65)' : 'rgba(0, 0, 0, 0.65)');
 
         return (
-            <Col xs={24} sm={12} lg={8} xl={6} key={tool.id}>
-                <ProCard
+            <ProCard
                     size="small"
                     hoverable
                     className={`tool-card ${!tool.enabled ? 'disabled' : ''}`}
@@ -458,7 +572,6 @@ const MCPToolsManagement: React.FC = () => {
                         </div>
                     </div>
                 </ProCard>
-            </Col>
         );
     };
 
@@ -726,7 +839,11 @@ const MCPToolsManagement: React.FC = () => {
                                     />
                                 ) : (
                                     <Row gutter={[16, 16]} style={{marginTop: 16}}>
-                                        {categoryTools.map((tool) => renderToolCard(tool))}
+                                        {categoryTools.map((tool) => (
+                                            <Col key={tool.id || tool.name} xs={24} sm={12} md={8} lg={6} xl={6}>
+                                                {renderToolCard(tool)}
+                                            </Col>
+                                        ))}
                                     </Row>
                                 )
                             };

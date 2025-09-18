@@ -16,6 +16,66 @@ logger = setup_logging()
 _TOOL_REGISTRY: Dict[str, MCPTool] = {}
 _CATEGORY_REGISTRY: Dict[str, List[str]] = {}
 
+# 分类定义注册表（存储分类的元数据）
+_CATEGORY_DEFINITIONS: Dict[str, Dict[str, Any]] = {}
+
+
+def mcp_category(
+    category_id: str,
+    name: str,
+    description: str,
+    icon: str = "📦",
+    enabled: bool = True,
+    sort_order: int = 999,
+    config: Optional[Dict[str, Any]] = None
+):
+    """
+    MCP工具分类注册装饰器
+
+    Args:
+        category_id: 分类ID（唯一标识符）
+        name: 分类名称
+        description: 分类描述
+        icon: 分类图标
+        enabled: 是否默认启用
+        sort_order: 排序顺序（数字越小越靠前）
+        config: 分类配置
+
+    Usage:
+        @mcp_category(
+            category_id="fetch",
+            name="网络抓取工具",
+            description="网页抓取、HTTP请求、API调用等网络数据获取工具",
+            icon="🌐",
+            sort_order=6
+        )
+        def register_web_scraping_category():
+            pass
+    """
+    def decorator(func):
+        from datetime import datetime
+
+        # 构建分类定义
+        category_def = {
+            "id": category_id,
+            "name": name,
+            "description": description,
+            "icon": icon,
+            "enabled": enabled,
+            "sort_order": sort_order,
+            "config": config or {},
+            "created_at": datetime.now().isoformat(),
+            "updated_at": datetime.now().isoformat()
+        }
+
+        # 注册到分类定义表
+        _CATEGORY_DEFINITIONS[category_id] = category_def
+        logger.debug(f"Registered MCP category: {category_id} - {name}")
+
+        return func
+
+    return decorator
+
 
 def mcp_tool(
     name: str,
@@ -133,9 +193,10 @@ def get_tool_by_name(name: str) -> Optional[MCPTool]:
 
 def clear_registry():
     """清空注册表（主要用于测试）"""
-    global _TOOL_REGISTRY, _CATEGORY_REGISTRY
+    global _TOOL_REGISTRY, _CATEGORY_REGISTRY, _CATEGORY_DEFINITIONS
     _TOOL_REGISTRY.clear()
     _CATEGORY_REGISTRY.clear()
+    _CATEGORY_DEFINITIONS.clear()
 
 
 def auto_discover_tools(module_paths: List[str]) -> int:
@@ -214,12 +275,24 @@ def get_registry_stats() -> Dict[str, Any]:
     return {
         "total_tools": len(_TOOL_REGISTRY),
         "categories": len(_CATEGORY_REGISTRY),
+        "category_definitions": len(_CATEGORY_DEFINITIONS),
         "tools_by_category": {
             category: len(tools)
             for category, tools in _CATEGORY_REGISTRY.items()
         },
-        "registered_tools": list(_TOOL_REGISTRY.keys())
+        "registered_tools": list(_TOOL_REGISTRY.keys()),
+        "registered_categories": list(_CATEGORY_DEFINITIONS.keys())
     }
+
+
+def get_registered_categories() -> List[Dict[str, Any]]:
+    """获取所有已注册的分类定义"""
+    return list(_CATEGORY_DEFINITIONS.values())
+
+
+def get_category_definition(category_id: str) -> Optional[Dict[str, Any]]:
+    """获取指定分类的定义"""
+    return _CATEGORY_DEFINITIONS.get(category_id)
 
 
 # 便捷的分类装饰器
@@ -246,3 +319,8 @@ def system_tool(name: str, description: str, schema: Dict[str, Any], **kwargs):
 def cache_tool(name: str, description: str, schema: Dict[str, Any], **kwargs):
     """缓存工具装饰器快捷方式"""
     return mcp_tool(name, description, "cache", schema, **kwargs)
+
+
+def web_scraping_tool(name: str, description: str, schema: Dict[str, Any], **kwargs):
+    """网络抓取工具装饰器快捷方式"""
+    return mcp_tool(name, description, "fetch", schema, **kwargs)
