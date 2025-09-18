@@ -2,7 +2,68 @@
 缓存工具集
 使用装饰器自动注册缓存相关的MCP工具
 """
-from app.core.mcp_tool_registry import cache_tool
+import time
+import threading
+from typing import Dict, Any, Optional
+from app.tools.registry import cache_tool
+
+# Simple in-memory cache implementation
+class SimpleCache:
+    def __init__(self):
+        self._cache: Dict[str, Dict[str, Any]] = {}
+        self._lock = threading.Lock()
+
+    def set(self, key: str, value: Any, ttl: int = 0):
+        with self._lock:
+            expire_time = time.time() + ttl if ttl > 0 else None
+            self._cache[key] = {"value": value, "expire_time": expire_time}
+
+    def get(self, key: str) -> Optional[Any]:
+        with self._lock:
+            if key not in self._cache:
+                return None
+            entry = self._cache[key]
+            if entry["expire_time"] and time.time() > entry["expire_time"]:
+                del self._cache[key]
+                return None
+            return entry["value"]
+
+    def delete(self, key: str) -> bool:
+        with self._lock:
+            if key in self._cache:
+                del self._cache[key]
+                return True
+            return False
+
+    def exists(self, key: str) -> bool:
+        return self.get(key) is not None
+
+    def keys(self, pattern: str = "*") -> list:
+        with self._lock:
+            if pattern == "*":
+                return [k for k in self._cache.keys() if self._is_valid(k)]
+            # Simple pattern matching
+            return [k for k in self._cache.keys() if self._match_pattern(k, pattern) and self._is_valid(k)]
+
+    def _is_valid(self, key: str) -> bool:
+        entry = self._cache.get(key)
+        if not entry:
+            return False
+        if entry["expire_time"] and time.time() > entry["expire_time"]:
+            del self._cache[key]
+            return False
+        return True
+
+    def _match_pattern(self, key: str, pattern: str) -> bool:
+        # Simple wildcard matching
+        return pattern.replace("*", "") in key
+
+    def clear(self):
+        with self._lock:
+            self._cache.clear()
+
+# Global cache instance
+_cache = SimpleCache()
 
 
 @cache_tool(
@@ -35,9 +96,13 @@ from app.core.mcp_tool_registry import cache_tool
         ]
     }
 )
-def cache_set():
+def cache_set(key: str, value: Any, ttl: int = 0):
     """Set cache value"""
-    pass
+    try:
+        _cache.set(key, value, ttl)
+        return {"success": True, "key": key, "message": "Value set successfully"}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
 
 
 @cache_tool(
@@ -71,9 +136,19 @@ def cache_set():
         ]
     }
 )
-def cache_get():
+def cache_get(key: str):
     """Get cache value"""
-    pass
+    try:
+        value = _cache.get(key)
+        exists = value is not None
+        return {
+            "success": True,
+            "key": key,
+            "value": value,
+            "exists": exists
+        }
+    except Exception as e:
+        return {"success": False, "key": key, "exists": False, "error": str(e)}
 
 
 @cache_tool(
@@ -96,9 +171,13 @@ def cache_get():
         ]
     }
 )
-def cache_delete():
+def cache_delete(key: str):
     """Delete cache key"""
-    pass
+    try:
+        deleted = _cache.delete(key)
+        return {"success": True, "key": key, "deleted": deleted}
+    except Exception as e:
+        return {"success": False, "key": key, "error": str(e)}
 
 
 @cache_tool(
@@ -121,9 +200,13 @@ def cache_delete():
         ]
     }
 )
-def cache_exists():
+def cache_exists(key: str):
     """Check if cache key exists"""
-    pass
+    try:
+        exists = _cache.exists(key)
+        return {"success": True, "key": key, "exists": exists}
+    except Exception as e:
+        return {"success": False, "key": key, "error": str(e)}
 
 
 @cache_tool(
@@ -204,9 +287,13 @@ def cache_expire():
         ]
     }
 )
-def cache_keys():
+def cache_keys(pattern: str = "*"):
     """Find cache keys matching pattern"""
-    pass
+    try:
+        keys = _cache.keys(pattern)
+        return {"success": True, "pattern": pattern, "keys": keys}
+    except Exception as e:
+        return {"success": False, "pattern": pattern, "error": str(e)}
 
 
 @cache_tool(
@@ -331,4 +418,8 @@ def cache_info():
 )
 def cache_flushall():
     """Clear all cache data"""
-    pass
+    try:
+        _cache.clear()
+        return {"success": True, "message": "All cache data cleared"}
+    except Exception as e:
+        return {"success": False, "error": str(e)}

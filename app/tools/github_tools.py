@@ -2,7 +2,7 @@
 GitHub工具集
 使用装饰器自动注册GitHub相关的MCP工具，所有工具名称以github_开头
 """
-from app.core.mcp_tool_registry import github_tool
+from app.tools.registry import github_tool
 
 
 @github_tool(

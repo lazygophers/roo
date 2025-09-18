@@ -12,8 +12,8 @@ from typing import Any, Dict, Optional
 
 from app.core.logging import setup_logging
 from app.core.secure_logging import sanitize_for_log
-from app.core.mcp_tools_service import get_mcp_tools_service
-from app.core.mcp_server import get_mcp_server
+from app.tools.service import get_mcp_tools_service
+from app.tools.server import get_mcp_server
 
 logger = setup_logging()
 
@@ -94,7 +94,7 @@ async def call_mcp_tool(request: MCPToolCallRequest):
         
         # 获取MCP服务器实例并调用工具
         try:
-            from app.core.mcp_server import get_mcp_server
+            from app.tools.server import get_mcp_server
             mcp_server = get_mcp_server()
             
             # 检查工具是否存在
@@ -379,13 +379,13 @@ async def refresh_mcp_tools():
     try:
         tools_service = get_mcp_tools_service()
         mcp_server = get_mcp_server()
-        
+
         # 重新注册内置工具
         result = tools_service.register_builtin_tools()
-        
+
         # 刷新MCP服务器工具
         mcp_result = mcp_server.refresh_tools()
-        
+
         return {
             "success": True,
             "message": "MCP tools refreshed successfully",
@@ -400,6 +400,37 @@ async def refresh_mcp_tools():
         return {
             "success": False,
             "message": "Failed to refresh tools: Internal server error"
+        }
+
+@router.post("/tools/sync")
+async def sync_mcp_tools():
+    """同步 MCP 工具数据库：自动添加新工具，移除不存在的工具"""
+    try:
+        tools_service = get_mcp_tools_service()
+
+        # 同步工具数据库
+        result = tools_service.sync_tools_database()
+
+        if 'error' in result:
+            return {
+                "success": False,
+                "message": f"Failed to sync tools database: {result['error']}",
+                "data": result
+            }
+
+        return {
+            "success": True,
+            "message": "MCP tools database synced successfully",
+            "data": {
+                "sync_result": result,
+                "timestamp": datetime.now().isoformat()
+            }
+        }
+    except Exception as e:
+        logger.error(f"Failed to sync MCP tools database: {sanitize_for_log(str(e))}")
+        return {
+            "success": False,
+            "message": "Failed to sync tools database: Internal server error"
         }
 
 # SSE 端点 - 集成到主应用中
@@ -496,7 +527,7 @@ async def mcp_streamable_endpoint(request: Dict[str, Any]):
             
             # 获取MCP服务器实例并调用工具
             try:
-                from app.core.mcp_server import get_mcp_server
+                from app.tools.server import get_mcp_server
                 mcp_server = get_mcp_server()
                 
                 # 检查工具是否存在

@@ -18,7 +18,7 @@ from typing import Any, Dict, List, Optional, Union
 from fastmcp import FastMCP
 from mcp import types
 
-from app.core.mcp_tools_service import get_mcp_tools_service
+from app.tools.service import get_mcp_tools_service
 from app.core.database_service import get_database_service
 from app.core.logging import setup_logging
 from app.core.secure_logging import sanitize_for_log

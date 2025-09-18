@@ -2,7 +2,7 @@
 文件工具集
 使用装饰器自动注册文件相关的MCP工具
 """
-from app.core.mcp_tool_registry import file_tool
+from app.tools.registry import file_tool
 
 
 @file_tool(

@@ -8,8 +8,8 @@ from app.core.config import API_PREFIX, DEBUG, LOG_LEVEL, PROJECT_ROOT
 from app.core.logging import setup_logging, log_error
 from app.core.unified_database import init_unified_database
 from app.core.database_service import init_database_service, get_database_service
-from app.core.mcp_tools_service import init_mcp_tools_service
-from app.core.mcp_server import init_mcp_server
+from app.tools.service import init_mcp_tools_service
+from app.tools.server import init_mcp_server
 from app.core.recycle_bin_scheduler import startup_recycle_bin_scheduler, shutdown_recycle_bin_scheduler
 from app.core.time_tools_service import init_time_tools_service
 from app.core.cache_tools_service_v2 import init_cache_tools_service
@@ -39,6 +39,14 @@ async def lifespan(app: FastAPI):
         # 初始化MCP工具服务（使用统一数据库）
         mcp_tools_service = init_mcp_tools_service(use_unified_db=True)
         logger.info("MCP tools service initialized successfully")
+
+        # 自动同步MCP工具数据库
+        logger.info("Syncing MCP tools database...")
+        sync_result = mcp_tools_service.sync_tools_database()
+        if 'error' in sync_result:
+            logger.error(f"MCP tools database sync failed: {sync_result['error']}")
+        else:
+            logger.info(f"MCP tools database sync completed: {sync_result['added']} added, {sync_result['updated']} updated, {sync_result['removed']} removed")
         
         # 初始化MCP服务器（使用统一数据库）
         mcp_server = init_mcp_server(use_unified_db=True)
