@@ -3,7 +3,8 @@ import { Layout, Button, Space, Menu, theme } from 'antd';
 import { HomeOutlined, SettingOutlined, GithubOutlined, ApiOutlined } from '@ant-design/icons';
 import { useNavigate, useLocation } from 'react-router-dom';
 import ThemeToggle from '../Theme/ThemeToggle';
-import SystemMonitorMenuItem from '../SystemMonitor/SystemMonitorMenuItem';
+// import SystemMonitorMenuItem from '../SystemMonitor/SystemMonitorMenuItem';
+import SystemMonitorPolling from '../SystemMonitor/SystemMonitorPolling';
 import LicenseInfo from '../License/LicenseInfo';
 import './AppLayout.css';
 
@@ -103,7 +104,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
           right: 0
         }}>
           {/* 系统监控组件 */}
-          <SystemMonitorMenuItem />
+          <SystemMonitorPolling />
           {/* 开源协议信息 */}
           <LicenseInfo />
         </div>

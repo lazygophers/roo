@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Typography, Progress, Tooltip, theme } from 'antd';
 import { 
   MonitorOutlined,
@@ -55,33 +55,74 @@ const SystemMonitorMenuItem: React.FC = () => {
   const [monitorData, setMonitorData] = useState<SystemMonitorData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [connectionStatus, setConnectionStatus] = useState<'connected' | 'disconnected' | 'error'>('disconnected');
 
-  const fetchMonitorData = async () => {
-    try {
-      const response = await fetch('/api/system/monitor');
-      const data: MonitorResponse = await response.json();
-      
-      if (data.success) {
-        setMonitorData(data.data);
-        setError(null);
-      } else {
-        setError(data.error || '获取监控数据失败');
-      }
-    } catch (err) {
-      setError('网络请求失败');
-      console.error('Monitor data fetch error:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const eventSourceRef = useRef<EventSource | null>(null);
 
   useEffect(() => {
-    fetchMonitorData();
-    
-    // 每5秒更新一次数据
-    const interval = setInterval(fetchMonitorData, 5000);
-    
-    return () => clearInterval(interval);
+    let isMounted = true;
+    console.log('SystemMonitorMenuItem: Starting SSE connection...');
+
+    // 防止快速重连，添加小延迟
+    const connectTimer = setTimeout(() => {
+      if (!isMounted) return;
+
+      // 创建SSE连接
+      const eventSource = new EventSource('/api/system/monitor/stream');
+      eventSourceRef.current = eventSource;
+
+      eventSource.onopen = () => {
+        if (!isMounted) return;
+        console.log('SystemMonitorMenuItem: SSE connection opened');
+        setConnectionStatus('connected');
+        setError(null);
+      };
+
+      eventSource.onmessage = (event) => {
+        if (!isMounted) return;
+        try {
+          const data: MonitorResponse = JSON.parse(event.data);
+
+          if (data.success && data.data) {
+            setMonitorData(data.data);
+            setError(null);
+            setLoading(false);
+            console.log('SystemMonitorMenuItem: Data updated');
+          } else {
+            console.error('SystemMonitorMenuItem: Server error:', data.error);
+            setError(data.error || '获取监控数据失败');
+          }
+        } catch (parseError) {
+          console.error('SystemMonitorMenuItem: Parse error:', parseError);
+          setError('数据解析失败');
+        }
+      };
+
+      eventSource.onerror = (event) => {
+        if (!isMounted) return;
+        console.error('SystemMonitorMenuItem: SSE error:', event);
+        console.log('SystemMonitorMenuItem: EventSource readyState:', eventSource.readyState);
+
+        // 检查错误类型
+        if (eventSource.readyState === EventSource.CLOSED) {
+          console.log('SystemMonitorMenuItem: Connection was closed');
+          setConnectionStatus('disconnected');
+        } else {
+          setConnectionStatus('error');
+        }
+        setError('实时连接异常');
+      };
+    }, 100); // 100ms延迟防止快速重连
+
+    return () => {
+      isMounted = false;
+      clearTimeout(connectTimer);
+      console.log('SystemMonitorMenuItem: Cleaning up SSE connection');
+      if (eventSourceRef.current) {
+        eventSourceRef.current.close();
+        eventSourceRef.current = null;
+      }
+    };
   }, []);
 
   const getCPUColor = (percent: number): string => {
