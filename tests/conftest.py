@@ -79,6 +79,7 @@ def mock_database_service():
         service.is_ready = True
         service.get_models.return_value = []
         service.get_model_by_slug.return_value = None
+        service.get_cached_data.return_value = []
         mock.return_value = service
         yield service
 
