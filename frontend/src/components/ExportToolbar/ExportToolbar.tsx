@@ -187,10 +187,16 @@ const ExportToolbar: React.FC<ExportToolbarProps> = ({
       const result = await response.json();
 
       if (result.success) {
-        // 获取下载链接并触发下载
+        // 创建隐藏的下载链接并触发点击
         const downloadUrl = result.data.download_url;
-        window.open(downloadUrl, '_blank');
-        message.success(`${result.data.filename} 已准备下载`);
+        const link = document.createElement('a');
+        link.href = downloadUrl;
+        link.download = result.data.filename;
+        link.style.display = 'none';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        message.success(`${result.data.filename} 下载已开始`);
       } else {
         message.error('生成配置文件失败：' + result.message);
       }
