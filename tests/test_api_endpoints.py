@@ -90,7 +90,7 @@ class TestAPIEndpoints:
         assert "detail" in data
         assert "not found" in data["detail"].lower()
 
-    def test_models_categories_endpoint(self, client, mock_database_service):
+    def test_models_categories_endpoint(self, client):
         """Test models categories endpoint"""
         # Mock cached data format that get_cached_data returns
         mock_cached_data = [
@@ -107,18 +107,28 @@ class TestAPIEndpoints:
                 "file_path": "/resources/models/model3.yaml"
             }
         ]
-        mock_database_service.get_cached_data.return_value = mock_cached_data
 
-        response = client.post("/api/models/categories/list")
-        assert response.status_code == 200
-        data = response.json()
-        assert data["success"] is True
+        # Patch the function where it's used, not where it's defined
+        with patch('app.routers.api_models.get_database_service') as mock_get_service:
+            mock_service = Mock()
+            mock_service.get_cached_data.return_value = mock_cached_data
+            mock_get_service.return_value = mock_service
 
-        categories = data["data"]
-        assert "core" in categories
-        assert "coder" in categories
-        assert len(categories["core"]) >= 1
-        assert len(categories["coder"]) >= 1
+            response = client.post("/api/models/categories/list")
+            assert response.status_code == 200
+            data = response.json()
+            assert data["success"] is True
+
+            categories = data["data"]
+            # Debug output to see what we actually got
+            print(f"\nDEBUG: categories = {categories}")
+            print(f"DEBUG: core count = {len(categories.get('core', []))}")
+            print(f"DEBUG: coder count = {len(categories.get('coder', []))}")
+
+            assert "core" in categories
+            assert "coder" in categories
+            assert len(categories["core"]) >= 1, f"Expected at least 1 core model, got {len(categories['core'])} - categories: {categories}"
+            assert len(categories["coder"]) >= 1, f"Expected at least 1 coder model, got {len(categories['coder'])} - categories: {categories}"
 
     def test_hooks_endpoints(self, client):
         """Test hooks endpoints"""
