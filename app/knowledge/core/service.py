@@ -18,129 +18,11 @@ import markdownify
 
 from app.core.config import PROJECT_ROOT
 from app.core.logging import setup_logging
+from ..processors.document_processor import DocumentProcessor
+from ..processors.text_chunker import TextChunker
 
 logger = setup_logging()
 
-class DocumentProcessor:
-    """文档处理器，支持多种文件格式"""
-
-    @staticmethod
-    async def extract_text_from_file(file_path: str) -> str:
-        """从文件中提取文本内容"""
-        file_path = Path(file_path)
-        extension = file_path.suffix.lower()
-
-        try:
-            if extension == '.txt':
-                return await DocumentProcessor._process_txt(file_path)
-            elif extension == '.md':
-                return await DocumentProcessor._process_markdown(file_path)
-            elif extension == '.pdf':
-                return await DocumentProcessor._process_pdf(file_path)
-            elif extension in ['.doc', '.docx']:
-                return await DocumentProcessor._process_docx(file_path)
-            elif extension == '.html':
-                return await DocumentProcessor._process_html(file_path)
-            else:
-                logger.warning(f"Unsupported file format: {extension}")
-                return ""
-        except Exception as e:
-            logger.error(f"Error processing file {file_path}: {e}")
-            return ""
-
-    @staticmethod
-    async def _process_txt(file_path: Path) -> str:
-        """处理文本文件"""
-        async with aiofiles.open(file_path, 'r', encoding='utf-8') as f:
-            return await f.read()
-
-    @staticmethod
-    async def _process_markdown(file_path: Path) -> str:
-        """处理Markdown文件"""
-        async with aiofiles.open(file_path, 'r', encoding='utf-8') as f:
-            return await f.read()
-
-    @staticmethod
-    async def _process_pdf(file_path: Path) -> str:
-        """处理PDF文件"""
-        text = ""
-        try:
-            with open(file_path, 'rb') as f:
-                reader = PyPDF2.PdfReader(f)
-                for page in reader.pages:
-                    text += page.extract_text() + "\n"
-        except Exception as e:
-            logger.error(f"Error processing PDF {file_path}: {e}")
-        return text
-
-    @staticmethod
-    async def _process_docx(file_path: Path) -> str:
-        """处理Word文档"""
-        try:
-            doc = Document(file_path)
-            text = ""
-            for paragraph in doc.paragraphs:
-                text += paragraph.text + "\n"
-            return text
-        except Exception as e:
-            logger.error(f"Error processing DOCX {file_path}: {e}")
-            return ""
-
-    @staticmethod
-    async def _process_html(file_path: Path) -> str:
-        """处理HTML文件"""
-        try:
-            async with aiofiles.open(file_path, 'r', encoding='utf-8') as f:
-                html_content = await f.read()
-                return markdownify.markdownify(html_content)
-        except Exception as e:
-            logger.error(f"Error processing HTML {file_path}: {e}")
-            return ""
-
-class TextChunker:
-    """文本分块器"""
-
-    def __init__(self, chunk_size: int = 1000, chunk_overlap: int = 200):
-        self.chunk_size = chunk_size
-        self.chunk_overlap = chunk_overlap
-
-    def chunk_text(self, text: str, metadata: Dict[str, Any] = None) -> List[Dict[str, Any]]:
-        """将文本分割成块"""
-        if not text.strip():
-            return []
-
-        chunks = []
-        start = 0
-
-        while start < len(text):
-            end = start + self.chunk_size
-
-            # 如果不是最后一块，尝试在句号、换行符处分割
-            if end < len(text):
-                # 向后查找合适的分割点
-                for i in range(end, max(start + self.chunk_size // 2, end - 100), -1):
-                    if text[i] in '.!?\n':
-                        end = i + 1
-                        break
-
-            chunk_text = text[start:end].strip()
-            if chunk_text:
-                chunk_metadata = metadata.copy() if metadata else {}
-                chunk_metadata.update({
-                    'chunk_index': len(chunks),
-                    'chunk_start': start,
-                    'chunk_end': end,
-                    'chunk_size': len(chunk_text)
-                })
-
-                chunks.append({
-                    'text': chunk_text,
-                    'metadata': chunk_metadata
-                })
-
-            start = end - self.chunk_overlap
-
-        return chunks
 
 class KnowledgeBaseService:
     """知识库服务"""
@@ -372,8 +254,10 @@ class KnowledgeBaseService:
         """获取支持的文件格式"""
         return list(self.supported_extensions)
 
+
 # 全局知识库服务实例
 _knowledge_base_service = None
+
 
 def init_knowledge_base_service() -> KnowledgeBaseService:
     """初始化知识库服务"""
@@ -381,6 +265,7 @@ def init_knowledge_base_service() -> KnowledgeBaseService:
     if _knowledge_base_service is None:
         _knowledge_base_service = KnowledgeBaseService()
     return _knowledge_base_service
+
 
 def get_knowledge_base_service() -> KnowledgeBaseService:
     """获取知识库服务实例"""

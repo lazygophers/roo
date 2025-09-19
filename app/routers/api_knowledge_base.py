@@ -6,8 +6,8 @@ from typing import List, Optional
 from fastapi import APIRouter, HTTPException, status
 from fastapi.responses import JSONResponse
 
-from app.core.hierarchical_knowledge_base_service import get_hierarchical_knowledge_base_service
-from app.models.knowledge_base_models import (
+from app.knowledge.core.hierarchical_service import get_hierarchical_knowledge_base_service
+from app.knowledge.models.base import (
     KnowledgeBase, KnowledgeFolder, KnowledgeFile,
     CreateKnowledgeBaseRequest, UpdateKnowledgeBaseRequest,
     CreateFolderRequest, AddFileRequest,
