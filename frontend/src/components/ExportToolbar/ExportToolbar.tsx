@@ -130,16 +130,76 @@ const ExportToolbar: React.FC<ExportToolbarProps> = ({
     loadDeployTargets();
   }, []);
 
-  const handleExport = () => {
+  const handleExport = async () => {
+    // 检查是否选择了指令
+    const hasCommands = selectedItems.some(item => item.type === 'command');
+
+    if (!hasCommands) {
+      // 未选择指令时，自动下载 custom_modes.yaml
+      await handleDownloadCustomModes();
+      return;
+    }
+
     if (totalCount === 0) {
       message.warning('请先选择要导出的项目');
       return;
     }
-    
+
     // 这里暂不实现具体的导出逻辑，只显示提示
     message.info(`准备导出 ${totalCount} 个项目（模拟功能）`);
     onExport();
   };
+
+  const handleDownloadCustomModes = async () => {
+    try {
+      setLoading(true);
+
+      // 构建部署请求，和部署功能使用相同的逻辑
+      const roleItem = selectedItems.find(item => item.type === 'role');
+
+      const deployRequest = {
+        selected_models: selectedItems
+          .filter(item => item.type === 'model')
+          .map(item => item.id),
+        selected_commands: [], // 指令为空
+        selected_rules: selectedItems
+          .filter(item => item.type === 'rule')
+          .map(item => item.id),
+        model_rule_bindings: modelRuleBindings,
+        selected_role: roleItem?.id
+      };
+
+      // 调用导出 API
+      const response = await fetch('/api/deploy/export', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(deployRequest),
+      });
+
+      if (!response.ok) {
+        throw new Error('生成配置文件失败');
+      }
+
+      const result = await response.json();
+
+      if (result.success) {
+        // 获取下载链接并触发下载
+        const downloadUrl = result.data.download_url;
+        window.open(downloadUrl, '_blank');
+        message.success(`${result.data.filename} 已准备下载`);
+      } else {
+        message.error('生成配置文件失败：' + result.message);
+      }
+    } catch (error) {
+      console.error('Export error:', error);
+      message.error('导出失败：' + (error instanceof Error ? error.message : '未知错误'));
+    } finally {
+      setLoading(false);
+    }
+  };
+
 
   const handleDeploy = () => {
     if (totalCount === 0) {
@@ -451,15 +511,24 @@ const ExportToolbar: React.FC<ExportToolbarProps> = ({
               </Button>
             </Tooltip>
             
-            <Button
-              size="small"
-              type="primary"
-              icon={<DownloadOutlined />}
-              onClick={handleExport}
-              disabled={totalCount === 0}
-            >
-              导出 ({totalCount})
-            </Button>
+            <Tooltip title={
+              selectedItems.some(item => item.type === 'command')
+                ? '导出选中的配置项目'
+                : '下载 custom_modes.yaml 文件'
+            }>
+              <Button
+                size="small"
+                type="primary"
+                icon={<DownloadOutlined />}
+                onClick={handleExport}
+                loading={loading}
+              >
+                {selectedItems.some(item => item.type === 'command')
+                  ? `导出 (${totalCount})`
+                  : '导出 YAML'
+                }
+              </Button>
+            </Tooltip>
           </Space>
         </Col>
       </Row>

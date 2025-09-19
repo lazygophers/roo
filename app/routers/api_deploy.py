@@ -1,4 +1,5 @@
 from fastapi import APIRouter, HTTPException
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from typing import List, Optional, Dict, Any
 import yaml
@@ -307,6 +308,63 @@ async def get_deploy_targets():
     return targets
 
 @router.post(
+    "/export",
+    response_model=Dict[str, Any],
+    summary="导出custom_modes.yaml",
+    description="生成custom_modes.yaml并返回临时下载链接"
+)
+async def export_custom_modes(request: DeployRequest):
+    """导出custom_modes.yaml文件并返回下载链接"""
+    try:
+        # 1. 生成YAML数据
+        yaml_data = generate_custom_modes_yaml(
+            request.selected_models,
+            request.selected_commands,
+            request.selected_rules,
+            request.model_rule_bindings,
+            request.selected_role
+        )
+
+        # 2. 生成YAML字符串（使用自定义dumper支持多行字符串）
+        yaml_content = yaml.dump(yaml_data, Dumper=CustomDumper, allow_unicode=True, default_flow_style=False, sort_keys=False)
+
+        # 3. 生成唯一文件名
+        import uuid
+        from datetime import datetime
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        unique_id = str(uuid.uuid4())[:8]
+        filename = f"custom_modes_{timestamp}_{unique_id}.yaml"
+
+        # 4. 保存到临时目录
+        temp_dir = Path(__file__).parent.parent.parent / "temp"
+        temp_dir.mkdir(exist_ok=True)
+        temp_file_path = temp_dir / filename
+
+        with open(temp_file_path, 'w', encoding='utf-8') as f:
+            f.write(yaml_content)
+
+        # 5. 返回下载信息
+        download_url = f"/api/deploy/download/{filename}"
+
+        return {
+            "success": True,
+            "message": "导出文件已生成",
+            "data": {
+                "download_url": download_url,
+                "filename": filename,
+                "file_size": len(yaml_content.encode('utf-8'))
+            }
+        }
+
+    except Exception as e:
+        logger.error(f"Error during export: {sanitize_for_log(str(e))}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"导出失败: {str(e)}"
+        )
+
+
+@router.post(
     "/generate",
     response_model=Dict[str, Any],
     summary="生成custom_modes.yaml",
@@ -567,4 +625,46 @@ async def cleanup_configurations(request: CleanupRequest):
             message=f"Cleanup failed: {str(e)}",
             cleaned_items=cleaned_items,
             errors=errors + [str(e)]
+        )
+
+
+@router.get(
+    "/download/{filename}",
+    summary="下载导出文件",
+    description="下载临时生成的custom_modes.yaml文件"
+)
+async def download_export_file(filename: str):
+    """下载导出的文件"""
+    try:
+        # 验证文件名格式，防止路径遍历攻击
+        if not filename.startswith("custom_modes_") or not filename.endswith(".yaml"):
+            raise HTTPException(status_code=400, detail="无效的文件名")
+
+        # 检查文件名中是否包含危险字符
+        if any(char in filename for char in ['/', '\\', '..', '~']):
+            raise HTTPException(status_code=400, detail="文件名包含非法字符")
+
+        # 构建文件路径
+        temp_dir = Path(__file__).parent.parent.parent / "temp"
+        file_path = temp_dir / filename
+
+        # 检查文件是否存在
+        if not file_path.exists():
+            raise HTTPException(status_code=404, detail="文件不存在或已过期")
+
+        # 返回文件响应
+        return FileResponse(
+            path=str(file_path),
+            filename=filename,
+            media_type='text/yaml',
+            headers={"Content-Disposition": f"attachment; filename={filename}"}
+        )
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error downloading file: {sanitize_for_log(str(e))}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"下载失败: {str(e)}"
         )
