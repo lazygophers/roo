@@ -16,6 +16,7 @@ from .api_cache import router as cache_router
 from .mcp import router as mcp_router
 from .api_mcp_config import router as mcp_config_router
 from .api_web_scraping import router as web_scraping_router
+from .api_knowledge_base import router as knowledge_base_router
 
 # 创建主路由
 api_router = APIRouter()
@@ -38,3 +39,4 @@ api_router.include_router(cache_router, tags=["cache"])
 api_router.include_router(mcp_router, tags=["mcp"])
 api_router.include_router(mcp_config_router, tags=["mcp-config"])
 api_router.include_router(web_scraping_router, tags=["web-scraping"])
+api_router.include_router(knowledge_base_router, prefix="/knowledge-base", tags=["knowledge-base"])
