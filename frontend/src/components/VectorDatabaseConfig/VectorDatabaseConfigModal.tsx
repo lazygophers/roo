@@ -3,7 +3,7 @@
  * 支持配置不同的向量数据库类型和嵌入模型
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Alert, Space, Tooltip, Typography } from 'antd';
 import {
   ModalForm,
@@ -20,7 +20,7 @@ import {
   SettingOutlined,
   ThunderboltOutlined
 } from '@ant-design/icons';
-import { apiClient } from '../../api';
+import { apiClient, VectorDatabaseInfo } from '../../api';
 import { useTheme } from '../../contexts/ThemeContext';
 
 const { Text, Paragraph } = Typography;
@@ -117,6 +117,53 @@ const VectorDatabaseConfigModal: React.FC<VectorDatabaseConfigModalProps> = ({
   const [loading, setLoading] = useState(false);
   const [databaseType, setDatabaseType] = useState<string>('lancedb');
   const [embeddingProvider, setEmbeddingProvider] = useState<string>('local');
+  const [availableDatabases, setAvailableDatabases] = useState<VectorDatabaseInfo[]>([]);
+  const [loadingDatabases, setLoadingDatabases] = useState(false);
+
+  // 加载支持的向量数据库列表
+  const loadSupportedDatabases = async () => {
+    try {
+      setLoadingDatabases(true);
+      const response = await apiClient.getSupportedVectorDatabases();
+      if (response.success && response.data) {
+        setAvailableDatabases(response.data);
+      }
+    } catch (error) {
+      console.error('Failed to load supported vector databases:', error);
+      // 使用默认数据库列表作为fallback
+      setAvailableDatabases([
+        {
+          type: 'lancedb',
+          name: 'LanceDB',
+          description: '高性能向量数据库，适合本地部署',
+          default_config: { type: 'lancedb', path: './data/lancedb' }
+        }
+      ]);
+    } finally {
+      setLoadingDatabases(false);
+    }
+  };
+
+  // 组件加载时获取数据库列表
+  useEffect(() => {
+    if (visible) {
+      loadSupportedDatabases();
+    }
+  }, [visible]);
+
+  // 根据数据库信息生成选项
+  const generateDatabaseOptions = () => {
+    return availableDatabases.map(db => ({
+      label: (
+        <Space>
+          {db.type === 'lancedb' ? <ThunderboltOutlined /> : <DatabaseOutlined />}
+          <span>{db.name}</span>
+          <Text type="secondary">（{db.description}）</Text>
+        </Space>
+      ),
+      value: db.type,
+    }));
+  };
 
   // 请求初始配置数据
   const handleRequest = async () => {
@@ -674,90 +721,10 @@ const VectorDatabaseConfigModal: React.FC<VectorDatabaseConfigModalProps> = ({
           label="数据库类型"
           tooltip="选择向量数据库类型"
           placeholder="请选择数据库类型"
-          options={[
-            {
-              label: (
-                <Space>
-                  <ThunderboltOutlined />
-                  <span>LanceDB</span>
-                  <Text type="secondary">（推荐，本地文件）</Text>
-                </Space>
-              ),
-              value: 'lancedb',
-            },
-            {
-              label: (
-                <Space>
-                  <DatabaseOutlined />
-                  <span>ChromaDB</span>
-                  <Text type="secondary">（开源向量数据库）</Text>
-                </Space>
-              ),
-              value: 'chroma',
-            },
-            {
-              label: (
-                <Space>
-                  <DatabaseOutlined />
-                  <span>Qdrant</span>
-                  <Text type="secondary">（高性能云服务）</Text>
-                </Space>
-              ),
-              value: 'qdrant',
-            },
-            {
-              label: (
-                <Space>
-                  <DatabaseOutlined />
-                  <span>Milvus Lite</span>
-                  <Text type="secondary">（轻量级向量数据库）</Text>
-                </Space>
-              ),
-              value: 'milvus',
-            },
-            {
-              label: (
-                <Space>
-                  <DatabaseOutlined />
-                  <span>FAISS</span>
-                  <Text type="secondary">（Facebook AI 向量搜索）</Text>
-                </Space>
-              ),
-              value: 'faiss',
-            },
-            {
-              label: (
-                <Space>
-                  <DatabaseOutlined />
-                  <span>HNSWLIB</span>
-                  <Text type="secondary">（高效近似最近邻）</Text>
-                </Space>
-              ),
-              value: 'hnswlib',
-            },
-            {
-              label: (
-                <Space>
-                  <DatabaseOutlined />
-                  <span>VectorDB</span>
-                  <Text type="secondary">（云原生向量数据库）</Text>
-                </Space>
-              ),
-              value: 'vectordb',
-            },
-            {
-              label: (
-                <Space>
-                  <DatabaseOutlined />
-                  <span>Redis Vector</span>
-                  <Text type="secondary">（Redis 向量搜索）</Text>
-                </Space>
-              ),
-              value: 'redis',
-            },
-          ]}
+          options={generateDatabaseOptions()}
           rules={[{ required: true, message: '请选择数据库类型' }]}
           fieldProps={{
+            loading: loadingDatabases,
             onChange: (value: string) => setDatabaseType(value),
           }}
         />

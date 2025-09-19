@@ -282,6 +282,25 @@ export interface RecycleBinResponse {
   data?: any;
 }
 
+// Vector Database types
+export interface VectorDatabaseConfig {
+  type: string;
+  [key: string]: any;
+}
+
+export interface VectorDatabaseInfo {
+  type: string;
+  name: string;
+  description: string;
+  default_config: VectorDatabaseConfig;
+}
+
+export interface VectorDatabasesResponse {
+  success: boolean;
+  message?: string;
+  data: VectorDatabaseInfo[];
+}
+
 // API 方法
 export const apiClient = {
   // 获取所有模型
@@ -698,6 +717,12 @@ export const apiClient = {
   // 清空所有缓存
   flushCache: async () => {
     const response = await api.post('/cache/flush');
+    return response.data;
+  },
+
+  // 获取支持的向量数据库列表
+  getSupportedVectorDatabases: async () => {
+    const response = await api.get<VectorDatabasesResponse>('/knowledge-base/vector-databases');
     return response.data;
   }
 };

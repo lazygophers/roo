@@ -7,6 +7,7 @@ from fastapi import APIRouter, HTTPException, status
 from fastapi.responses import JSONResponse
 
 from app.knowledge.core.hierarchical_service import get_hierarchical_knowledge_base_service
+from app.knowledge.core.vector_interface import VectorDatabaseFactory
 from app.knowledge.models.base import (
     KnowledgeBase, KnowledgeFolder, KnowledgeFile,
     CreateKnowledgeBaseRequest, UpdateKnowledgeBaseRequest,
@@ -38,6 +39,26 @@ async def test_service():
         )
     except Exception as e:
         logger.error(f"Knowledge base service test failed: {e}")
+        return JSONResponse(
+            status_code=500,
+            content={"success": False, "message": str(e)}
+        )
+
+
+@router.get("/vector-databases")
+async def get_supported_vector_databases():
+    """获取支持的向量数据库列表"""
+    try:
+        databases = VectorDatabaseFactory.get_supported_databases()
+        return JSONResponse(
+            status_code=200,
+            content={
+                "success": True,
+                "data": databases
+            }
+        )
+    except Exception as e:
+        logger.error(f"Failed to get supported vector databases: {e}")
         return JSONResponse(
             status_code=500,
             content={"success": False, "message": str(e)}
