@@ -49,8 +49,9 @@ class TestCacheToolsServiceComprehensive:
         """创建缓存服务实例"""
         with patch('app.core.cache_tools_service.get_unified_database', return_value=mock_unified_db):
             with patch.object(CacheToolsService, '_start_background_tasks'):
-                service = CacheToolsService(use_unified_db=True)
-                return service
+                with patch.object(CacheToolsService, '_initialize_default_config'):
+                    service = CacheToolsService(use_unified_db=True)
+                    return service
 
     # ==== CacheItem 数据模型测试 ====
 
@@ -385,9 +386,9 @@ class TestCacheToolsServiceComprehensive:
 
     def test_cleanup_expired_items_exception(self, cache_service):
         """测试清理过期项异常处理"""
-        # 模拟异常情况
-        with patch.object(cache_service._cache_lock, '__enter__', side_effect=Exception("Lock error")):
-            # 不应该抛出异常
+        # 模拟异常情况 - 使用all()方法抛出异常
+        with patch.object(cache_service.cache_table, 'all', side_effect=Exception("Database error")):
+            # 不应该抛出异常，应该被捕获并记录日志
             cache_service._cleanup_expired_items()
 
     # ==== 数据类型枚举测试 ====
