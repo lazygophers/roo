@@ -10,8 +10,24 @@ from app.models.schemas import (
     DeleteConfigurationRequest
 )
 from app.core.database_service import get_database_service
+from app.core.mcp_tools_service import get_mcp_config_service
+import functools
 
 router = APIRouter()
+
+
+def require_config_edit_permission(func):
+    """装饰器：要求配置编辑权限"""
+    @functools.wraps(func)
+    async def wrapper(*args, **kwargs):
+        config_service = get_mcp_config_service()
+        if not config_service.is_tool_edit_allowed():
+            return {
+                "success": False,
+                "message": "在远程环境中，配置保存和管理功能被禁用。请在本地环境中使用此功能。"
+            }
+        return await func(*args, **kwargs)
+    return wrapper
 
 @router.post(
     "/config/save",
@@ -19,6 +35,7 @@ router = APIRouter()
     summary="保存配置",
     description="保存用户选择的配置信息，支持覆盖保存"
 )
+@require_config_edit_permission
 async def save_configuration(request: SaveConfigurationRequest) -> ConfigurationResponse:
     """保存配置信息到数据库"""
     try:
@@ -117,6 +134,7 @@ async def get_configurations() -> ConfigurationListResponse:
     summary="删除配置",
     description="删除指定名称的配置"
 )
+@require_config_edit_permission
 async def delete_configuration(request: DeleteConfigurationRequest) -> ConfigurationResponse:
     """删除配置"""
     try:

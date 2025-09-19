@@ -22,6 +22,9 @@ DEBUG = os.getenv("DEBUG", "false").lower() == "true"
 # 日志配置
 LOG_LEVEL = "INFO" if not DEBUG else "DEBUG"
 
+# 环境配置
+ENVIRONMENT = os.getenv("ENVIRONMENT", "local")  # local 或 remote
+
 # 文件工具安全配置
 FILE_TOOLS_CONFIG = {
     # 可读取的目录列表 - 默认允许项目根目录及其子目录

@@ -8,9 +8,10 @@ import threading
 from typing import Dict, Any, Optional
 from pathlib import Path
 
-from app.models.mcp_config import MCPGlobalConfig
+from app.models.mcp_config import MCPGlobalConfig, EnvironmentType
 from app.core.logging import setup_logging
 from app.core.secure_logging import sanitize_for_log
+from app.core.config import ENVIRONMENT
 
 logger = setup_logging()
 
@@ -218,6 +219,30 @@ class MCPConfigService:
     def is_host_blocked(self, host: str) -> bool:
         """检查主机是否被阻止访问"""
         return host in self._config.security.blocked_hosts
+
+    def is_tool_call_allowed(self) -> bool:
+        """检查是否允许调用MCP工具"""
+        # 如果是远程环境，不允许调用工具
+        if self._config.is_remote_environment():
+            return False
+        # 也可以从环境变量检查
+        if ENVIRONMENT == "remote":
+            return False
+        return True
+
+    def is_tool_edit_allowed(self) -> bool:
+        """检查是否允许编辑MCP工具配置"""
+        # 如果是远程环境，不允许编辑
+        if self._config.is_remote_environment():
+            return False
+        # 也可以从环境变量检查
+        if ENVIRONMENT == "remote":
+            return False
+        return True
+
+    def get_environment_type(self) -> str:
+        """获取当前环境类型"""
+        return self._config.environment.value
 
     def reset_to_defaults(self) -> MCPGlobalConfig:
         """重置为默认配置"""

@@ -282,6 +282,22 @@ export interface RecycleBinResponse {
   data?: any;
 }
 
+// 环境信息类型
+export interface EnvironmentInfo {
+  environment: 'local' | 'remote';
+  is_local: boolean;
+  is_remote: boolean;
+  tool_call_allowed: boolean;
+  tool_edit_allowed: boolean;
+}
+
+export interface EnvironmentResponse {
+  success: boolean;
+  message: string;
+  data: EnvironmentInfo;
+}
+
+
 // API 方法
 export const apiClient = {
   // 获取所有模型
@@ -699,7 +715,14 @@ export const apiClient = {
   flushCache: async () => {
     const response = await api.post('/cache/flush');
     return response.data;
-  }
+  },
+
+  // 获取环境信息
+  getEnvironmentInfo: async () => {
+    const response = await api.get('/mcp/environment');
+    return response.data;
+  },
+
 };
 
 export default api;

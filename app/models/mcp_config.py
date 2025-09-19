@@ -4,6 +4,13 @@ MCP全局配置模型定义
 from typing import Dict, Any, Optional
 from dataclasses import dataclass, field
 from datetime import datetime
+from enum import Enum
+
+
+class EnvironmentType(str, Enum):
+    """环境类型枚举"""
+    LOCAL = "local"  # 本地环境：所有功能可用
+    REMOTE = "remote"  # 远程环境：仅可查看，不可编辑和调用
 
 
 @dataclass
@@ -137,6 +144,9 @@ class MCPGlobalConfig:
     debug_mode: bool = False
     log_level: str = "INFO"
 
+    # 环境配置
+    environment: EnvironmentType = EnvironmentType.LOCAL
+
     # 网络配置
     proxy: ProxyConfig = field(default_factory=ProxyConfig)
     network: NetworkConfig = field(default_factory=NetworkConfig)
@@ -159,12 +169,21 @@ class MCPGlobalConfig:
             self.created_at = datetime.now().isoformat()
         self.updated_at = datetime.now().isoformat()
 
+    def is_remote_environment(self) -> bool:
+        """检查是否为远程环境"""
+        return self.environment == EnvironmentType.REMOTE
+
+    def is_local_environment(self) -> bool:
+        """检查是否为本地环境"""
+        return self.environment == EnvironmentType.LOCAL
+
     def to_dict(self) -> Dict[str, Any]:
         """转换为字典格式"""
         return {
             "enabled": self.enabled,
             "debug_mode": self.debug_mode,
             "log_level": self.log_level,
+            "environment": self.environment.value,
             "proxy": self.proxy.to_dict(),
             "network": self.network.to_dict(),
             "security": self.security.to_dict(),
@@ -181,10 +200,15 @@ class MCPGlobalConfig:
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> 'MCPGlobalConfig':
         """从字典创建实例"""
+        # 解析环境类型
+        environment_str = data.get("environment", "local")
+        environment = EnvironmentType.LOCAL if environment_str == "local" else EnvironmentType.REMOTE
+
         config = cls(
             enabled=data.get("enabled", True),
             debug_mode=data.get("debug_mode", False),
             log_level=data.get("log_level", "INFO"),
+            environment=environment,
             environment_variables=data.get("environment_variables", {}),
             version=data.get("version", "1.0"),
             created_at=data.get("created_at"),

@@ -72,6 +72,18 @@ wheels = [
 ]
 
 [[package]]
+name = "aiohttp-cors"
+version = "0.8.1"
+source = { registry = "https://mirrors.bfsu.edu.cn/pypi/web/simple" }
+dependencies = [
+    { name = "aiohttp" },
+]
+sdist = { url = "https://mirrors.bfsu.edu.cn/pypi/web/packages/6f/6d/d89e846a5444b3d5eb8985a6ddb0daef3774928e1bfbce8e84ec97b0ffa7/aiohttp_cors-0.8.1.tar.gz", hash = "sha256:ccacf9cb84b64939ea15f859a146af1f662a6b1d68175754a07315e305fb1403", size = 38626, upload-time = "2025-03-31T14:16:20.048Z" }
+wheels = [
+    { url = "https://mirrors.bfsu.edu.cn/pypi/web/packages/98/3b/40a68de458904bcc143622015fff2352b6461cd92fd66d3527bf1c6f5716/aiohttp_cors-0.8.1-py3-none-any.whl", hash = "sha256:3180cf304c5c712d626b9162b195b1db7ddf976a2a25172b35bb2448b890a80d", size = 25231, upload-time = "2025-03-31T14:16:18.478Z" },
+]
+
+[[package]]
 name = "aiosignal"
 version = "1.4.0"
 source = { registry = "https://mirrors.bfsu.edu.cn/pypi/web/simple" }
@@ -860,16 +872,19 @@ source = { virtual = "." }
 dependencies = [
     { name = "aiofiles" },
     { name = "aiohttp" },
+    { name = "aiohttp-cors" },
     { name = "beautifulsoup4" },
     { name = "fastapi" },
     { name = "fastmcp" },
     { name = "flask" },
     { name = "httpx" },
     { name = "lancedb" },
+    { name = "lxml" },
     { name = "markdownify" },
     { name = "mcp" },
     { name = "orjson" },
     { name = "pandas" },
+    { name = "pillow" },
     { name = "psutil" },
     { name = "pypdf2" },
     { name = "pytest" },
@@ -880,6 +895,7 @@ dependencies = [
     { name = "python-multipart" },
     { name = "pytz" },
     { name = "pyyaml" },
+    { name = "redis" },
     { name = "requests" },
     { name = "rich" },
     { name = "ruamel-yaml" },
@@ -894,16 +910,19 @@ dependencies = [
 requires-dist = [
     { name = "aiofiles", specifier = ">=24.1.0" },
     { name = "aiohttp", specifier = ">=3.10.11" },
+    { name = "aiohttp-cors", specifier = ">=0.8.1" },
     { name = "beautifulsoup4", specifier = ">=4.12.3" },
     { name = "fastapi", specifier = ">=0.116.1" },
     { name = "fastmcp", specifier = ">=2.12.2" },
     { name = "flask", specifier = ">=3.1.2" },
     { name = "httpx", specifier = ">=0.27.2" },
     { name = "lancedb", specifier = ">=0.17.0" },
+    { name = "lxml", specifier = ">=6.0.1" },
     { name = "markdownify", specifier = ">=0.13.1" },
     { name = "mcp", specifier = ">=1.13.1" },
     { name = "orjson", specifier = ">=3.10.12" },
     { name = "pandas", specifier = ">=2.3.2" },
+    { name = "pillow", specifier = ">=11.3.0" },
     { name = "psutil", specifier = ">=6.1.0" },
     { name = "pypdf2", specifier = ">=3.0.1" },
     { name = "pytest", specifier = ">=8.3.3" },
@@ -914,6 +933,7 @@ requires-dist = [
     { name = "python-multipart", specifier = ">=0.0.20" },
     { name = "pytz", specifier = ">=2025.2" },
     { name = "pyyaml", specifier = ">=6.0.2" },
+    { name = "redis", specifier = ">=6.4.0" },
     { name = "requests", specifier = ">=2.32.5" },
     { name = "rich", specifier = ">=14.1.0" },
     { name = "ruamel-yaml", specifier = ">=0.18.15" },
@@ -1976,6 +1996,15 @@ wheels = [
     { url = "https://mirrors.bfsu.edu.cn/pypi/web/packages/fe/0f/25911a9f080464c59fab9027482f822b86bf0608957a5fcc6eaac85aa515/PyYAML-6.0.2-cp313-cp313-musllinux_1_1_x86_64.whl", hash = "sha256:68ccc6023a3400877818152ad9a1033e3db8625d899c72eacb5a668902e4d652" },
     { url = "https://mirrors.bfsu.edu.cn/pypi/web/packages/14/0d/e2c3b43bbce3cf6bd97c840b46088a3031085179e596d4929729d8d68270/PyYAML-6.0.2-cp313-cp313-win32.whl", hash = "sha256:bc2fa7c6b47d6bc618dd7fb02ef6fdedb1090ec036abab80d4681424b84c1183" },
     { url = "https://mirrors.bfsu.edu.cn/pypi/web/packages/fa/de/02b54f42487e3d3c6efb3f89428677074ca7bf43aae402517bc7cca949f3/PyYAML-6.0.2-cp313-cp313-win_amd64.whl", hash = "sha256:8388ee1976c416731879ac16da0aff3f63b286ffdd57cdeb95f3f2e085687563" },
+]
+
+[[package]]
+name = "redis"
+version = "6.4.0"
+source = { registry = "https://mirrors.bfsu.edu.cn/pypi/web/simple" }
+sdist = { url = "https://mirrors.bfsu.edu.cn/pypi/web/packages/0d/d6/e8b92798a5bd67d659d51a18170e91c16ac3b59738d91894651ee255ed49/redis-6.4.0.tar.gz", hash = "sha256:b01bc7282b8444e28ec36b261df5375183bb47a07eb9c603f284e89cbc5ef010", size = 4647399, upload-time = "2025-08-07T08:10:11.441Z" }
+wheels = [
+    { url = "https://mirrors.bfsu.edu.cn/pypi/web/packages/e8/02/89e2ed7e85db6c93dfa9e8f691c5087df4e3551ab39081a4d7c6d1f90e05/redis-6.4.0-py3-none-any.whl", hash = "sha256:f0544fa9604264e9464cdf4814e7d4830f74b165d52f2a330a760a88dd248b7f", size = 279847, upload-time = "2025-08-07T08:10:09.84Z" },
 ]
 
 [[package]]

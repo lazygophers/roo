@@ -35,4 +35,8 @@ dependencies = [
     "python-docx>=1.1.2",
     "markdownify>=0.13.1",
     "pandas>=2.3.2",
+    "redis>=6.4.0",
+    "aiohttp-cors>=0.8.1",
+    "pillow>=11.3.0",
+    "lxml>=6.0.1",
 ]

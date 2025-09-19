@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Row, Col, Tabs, TabsProps, theme } from 'antd';
 import { CodeOutlined, FileTextOutlined, BookOutlined, UserOutlined } from '@ant-design/icons';
 import ModesListWithSelection from '../components/ConfigTabs/ModesListWithSelection';
@@ -8,7 +8,7 @@ import RolesListWithSelection from '../components/ConfigTabs/RolesListWithSelect
 import SelectionPreviewPanel from '../components/Preview/SelectionPreviewPanel';
 import ExportToolbar from '../components/ExportToolbar/ExportToolbar';
 import { SelectedItem, ModelRuleBinding } from '../types/selection';
-import { FileMetadata } from '../api';
+import { FileMetadata, EnvironmentInfo, apiClient } from '../api';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
 import './ConfigManagement.css';
 
@@ -20,6 +20,23 @@ const ConfigManagementWithSelection: React.FC = () => {
   const [selectedItems, setSelectedItems] = useState<SelectedItem[]>([]);
   const [modelRuleBindings, setModelRuleBindings] = useState<ModelRuleBinding[]>([]);
   const [modelRules, setModelRules] = useState<Record<string, FileMetadata[]>>({});
+  const [environmentInfo, setEnvironmentInfo] = useState<EnvironmentInfo | null>(null);
+
+  // 获取环境信息
+  const fetchEnvironmentInfo = useCallback(async () => {
+    try {
+      const response = await apiClient.getEnvironmentInfo();
+      if (response.success) {
+        setEnvironmentInfo(response.data);
+      }
+    } catch (error) {
+      console.error('Failed to fetch environment info:', error);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchEnvironmentInfo();
+  }, [fetchEnvironmentInfo]);
 
   const handleTabChange = (key: string) => {
     // 切换 tab 时不清空选中项，保持预览状态
@@ -232,6 +249,7 @@ const ConfigManagementWithSelection: React.FC = () => {
         modelRuleBindings={modelRuleBindings}
         modelRules={modelRules}
         onLoadConfiguration={handleLoadConfiguration}
+        environmentInfo={environmentInfo}
       />
 
       <Row gutter={16} style={{ height: 'calc(100% - 80px)' }}>

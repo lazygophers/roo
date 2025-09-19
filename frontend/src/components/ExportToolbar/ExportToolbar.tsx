@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Card, 
-  Button, 
-  Space, 
-  Typography, 
-  Tag, 
-  Divider, 
-  Row, 
-  Col, 
-  message,
+import {
+  Card,
+  Button,
+  Space,
+  Typography,
+  Tag,
+  Divider,
+  Row,
+  Col,
   Modal,
   Form,
   Input,
@@ -17,7 +16,8 @@ import {
   theme,
   Select,
   Tooltip,
-  Popconfirm
+  Popconfirm,
+  App
 } from 'antd';
 import { 
   DownloadOutlined, 
@@ -34,7 +34,7 @@ import {
   FolderOutlined
 } from '@ant-design/icons';
 import { SelectedItem, ModelRuleBinding } from '../../types/selection';
-import { apiClient, FileMetadata, DeployTarget, DeployRequest } from '../../api';
+import { apiClient, FileMetadata, DeployTarget, DeployRequest, EnvironmentInfo } from '../../api';
 
 const { Text } = Typography;
 const { Option } = Select;
@@ -56,6 +56,7 @@ interface ExportToolbarProps {
   modelRuleBindings: ModelRuleBinding[];
   modelRules: Record<string, FileMetadata[]>;
   onLoadConfiguration?: (config: ConfigurationData) => void;
+  environmentInfo?: EnvironmentInfo | null;
 }
 
 const ExportToolbar: React.FC<ExportToolbarProps> = ({
@@ -64,9 +65,11 @@ const ExportToolbar: React.FC<ExportToolbarProps> = ({
   onExport,
   modelRuleBindings,
   modelRules,
-  onLoadConfiguration
+  onLoadConfiguration,
+  environmentInfo
 }) => {
   const { token } = theme.useToken();
+  const { message } = App.useApp();
   const [saveModalVisible, setSaveModalVisible] = useState(false);
   const [configManageModalVisible, setConfigManageModalVisible] = useState(false);
   const [deployModalVisible, setDeployModalVisible] = useState(false);
@@ -78,6 +81,7 @@ const ExportToolbar: React.FC<ExportToolbarProps> = ({
   const [configurationsLoading, setConfigurationsLoading] = useState(false);
   const [selectedConfigName, setSelectedConfigName] = useState<string | null>(null);
   const [cleanupLoading, setCleanupLoading] = useState(false);
+  const [exportLoading, setExportLoading] = useState(false);
   const [form] = Form.useForm();
   const [deployForm] = Form.useForm();
   const modelCount = selectedItems.filter(item => item.type === 'model').length;
@@ -128,16 +132,105 @@ const ExportToolbar: React.FC<ExportToolbarProps> = ({
     loadDeployTargets();
   }, []);
 
-  const handleExport = () => {
+  const handleExport = async () => {
     if (totalCount === 0) {
       message.warning('请先选择要导出的项目');
       return;
     }
-    
-    // 这里暂不实现具体的导出逻辑，只显示提示
-    message.info(`准备导出 ${totalCount} 个项目（模拟功能）`);
-    onExport();
+
+    // 无论是否选择了指令，都调用 handleDownloadCustomModes
+    // 后端会根据 selected_commands 自动决定导出 YAML 还是压缩包
+    await handleDownloadCustomModes();
   };
+
+  const handleDownloadCustomModes = async () => {
+    try {
+      setExportLoading(true);
+
+      // 构建部署请求，和部署功能使用相同的逻辑
+      const roleItem = selectedItems.find(item => item.type === 'role');
+
+      const deployRequest = {
+        selected_models: selectedItems
+          .filter(item => item.type === 'model')
+          .map(item => item.id),
+        selected_commands: selectedItems
+          .filter(item => item.type === 'command')
+          .map(item => item.id),
+        selected_rules: selectedItems
+          .filter(item => item.type === 'rule')
+          .map(item => item.id),
+        model_rule_bindings: modelRuleBindings,
+        selected_role: roleItem?.id,
+        deploy_targets: ['vscode'] // 默认导出到 vscode 目标
+      };
+
+      // 调用导出 API
+      const response = await fetch('/api/deploy/export', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(deployRequest),
+      });
+
+      if (!response.ok) {
+        throw new Error('生成配置文件失败');
+      }
+
+      const result = await response.json();
+
+      if (result.success) {
+        // 处理不同类型文件的下载
+        const downloadUrl = result.data.download_url;
+        const filename = result.data.filename;
+        const isCompressed = filename.endsWith('.tar.gz');
+
+        if (isCompressed) {
+          // 对于压缩文件，使用 fetch + blob 来确保正确下载
+          try {
+            const downloadResponse = await fetch(downloadUrl);
+            if (!downloadResponse.ok) {
+              throw new Error('下载失败');
+            }
+            const blob = await downloadResponse.blob();
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = filename;
+            link.style.display = 'none';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(url);
+          } catch (downloadError) {
+            console.error('Download error:', downloadError);
+            throw new Error('压缩包下载失败');
+          }
+        } else {
+          // 对于普通文件，使用编程式下载
+          const link = document.createElement('a');
+          link.href = downloadUrl;
+          link.download = filename;
+          link.style.display = 'none';
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        }
+
+        const fileType = isCompressed ? '配置压缩包' : 'YAML文件';
+        message.success(`${fileType} ${filename} 下载已开始`);
+      } else {
+        message.error('生成配置文件失败：' + result.message);
+      }
+    } catch (error) {
+      console.error('Export error:', error);
+      message.error('导出失败：' + (error instanceof Error ? error.message : '未知错误'));
+    } finally {
+      setExportLoading(false);
+    }
+  };
+
 
   const handleDeploy = () => {
     if (totalCount === 0) {
@@ -406,43 +499,67 @@ const ExportToolbar: React.FC<ExportToolbarProps> = ({
               清空选择
             </Button>
             
-            <Button
-              size="small"
-              icon={<SaveOutlined />}
-              onClick={handleSaveConfiguration}
-              disabled={totalCount === 0}
-            >
-              保存配置
-            </Button>
+            <Tooltip title={
+              !environmentInfo?.tool_edit_allowed ? '远程环境下配置保存功能被禁用' :
+              totalCount === 0 ? '请先选择要保存的项目' : '保存当前配置'
+            }>
+              <Button
+                size="small"
+                icon={<SaveOutlined />}
+                onClick={handleSaveConfiguration}
+                disabled={totalCount === 0 || !environmentInfo?.tool_edit_allowed}
+              >
+                保存配置
+              </Button>
+            </Tooltip>
             
-            <Button
-              size="small"
-              icon={<RocketOutlined />}
-              onClick={handleDeploy}
-              disabled={totalCount === 0}
-              type="primary"
-              style={{ background: '#722ed1' }}
-            >
-              部署配置
-            </Button>
+            <Tooltip title={
+              !environmentInfo?.tool_edit_allowed ? '远程环境下VS Code扩展部署功能被禁用' :
+              totalCount === 0 ? '请先选择要部署的项目' : '部署配置到VS Code扩展'
+            }>
+              <Button
+                size="small"
+                icon={<RocketOutlined />}
+                onClick={handleDeploy}
+                disabled={totalCount === 0 || !environmentInfo?.tool_edit_allowed}
+                type="primary"
+                style={{ background: '#722ed1' }}
+              >
+                部署配置
+              </Button>
+            </Tooltip>
             
-            <Button
-              size="small"
-              icon={<SettingOutlined />}
-              onClick={handleConfigManage}
-            >
-              配置管理
-            </Button>
+            <Tooltip title={
+              !environmentInfo?.tool_edit_allowed ? '远程环境下配置管理功能被禁用' : '管理已保存的配置'
+            }>
+              <Button
+                size="small"
+                icon={<SettingOutlined />}
+                onClick={handleConfigManage}
+                disabled={!environmentInfo?.tool_edit_allowed}
+              >
+                配置管理
+              </Button>
+            </Tooltip>
             
-            <Button
-              size="small"
-              type="primary"
-              icon={<DownloadOutlined />}
-              onClick={handleExport}
-              disabled={totalCount === 0}
-            >
-              导出 ({totalCount})
-            </Button>
+            <Tooltip title={
+              selectedItems.some(item => item.type === 'command')
+                ? '导出配置压缩包（包含 custom_modes.yaml 和 .roo/commands/ 目录）'
+                : '下载 custom_modes.yaml 文件'
+            }>
+              <Button
+                size="small"
+                type="primary"
+                icon={<DownloadOutlined />}
+                onClick={handleExport}
+                loading={exportLoading}
+              >
+                {selectedItems.some(item => item.type === 'command')
+                  ? `导出 (${totalCount})`
+                  : '导出 YAML'
+                }
+              </Button>
+            </Tooltip>
           </Space>
         </Col>
       </Row>
@@ -663,7 +780,7 @@ const ExportToolbar: React.FC<ExportToolbarProps> = ({
                 }
                 extra={
                   <Space>
-                    <Tooltip title="加载配置到当前选择">
+                    <Tooltip title={!environmentInfo?.tool_edit_allowed ? '远程环境下配置加载功能被禁用' : '加载配置到当前选择'}>
                       <Button
                         size="small"
                         type="primary"
@@ -673,6 +790,7 @@ const ExportToolbar: React.FC<ExportToolbarProps> = ({
                           handleLoadConfiguration(config.name);
                           setConfigManageModalVisible(false);
                         }}
+                        disabled={!environmentInfo?.tool_edit_allowed}
                       >
                         加载
                       </Button>
@@ -683,12 +801,14 @@ const ExportToolbar: React.FC<ExportToolbarProps> = ({
                       onConfirm={() => handleDeleteConfiguration(config.name)}
                       okText="确定"
                       cancelText="取消"
+                      disabled={!environmentInfo?.tool_edit_allowed}
                     >
-                      <Tooltip title="删除配置">
+                      <Tooltip title={!environmentInfo?.tool_edit_allowed ? '远程环境下配置删除功能被禁用' : '删除配置'}>
                         <Button
                           size="small"
                           danger
                           icon={<DeleteOutlined />}
+                          disabled={!environmentInfo?.tool_edit_allowed}
                         >
                           删除
                         </Button>
@@ -757,15 +877,18 @@ const ExportToolbar: React.FC<ExportToolbarProps> = ({
             onConfirm={handleCleanupModels}
             okText="确定"
             cancelText="取消"
-            disabled={cleanupLoading}
+            disabled={cleanupLoading || !environmentInfo?.tool_edit_allowed}
           >
-            <Button
-              icon={<RestOutlined />}
-              loading={cleanupLoading}
-              danger
-            >
-              清空模型
-            </Button>
+            <Tooltip title={!environmentInfo?.tool_edit_allowed ? '远程环境下清空功能被禁用' : '清空模型配置'}>
+              <Button
+                icon={<RestOutlined />}
+                loading={cleanupLoading}
+                danger
+                disabled={!environmentInfo?.tool_edit_allowed}
+              >
+                清空模型
+              </Button>
+            </Tooltip>
           </Popconfirm>,
           <Popconfirm
             key="cleanup-directories"
@@ -774,27 +897,33 @@ const ExportToolbar: React.FC<ExportToolbarProps> = ({
             onConfirm={handleCleanupDirectories}
             okText="确定"
             cancelText="取消"
-            disabled={cleanupLoading}
+            disabled={cleanupLoading || !environmentInfo?.tool_edit_allowed}
           >
-            <Button
-              icon={<FolderOutlined />}
-              loading={cleanupLoading}
-              danger
-            >
-              清空目录
-            </Button>
+            <Tooltip title={!environmentInfo?.tool_edit_allowed ? '远程环境下清空功能被禁用' : '清空所有配置和目录'}>
+              <Button
+                icon={<FolderOutlined />}
+                loading={cleanupLoading}
+                danger
+                disabled={!environmentInfo?.tool_edit_allowed}
+              >
+                清空目录
+              </Button>
+            </Tooltip>
           </Popconfirm>,
           <Button key="cancel" onClick={() => setDeployModalVisible(false)}>
             取消
           </Button>,
-          <Button
-            key="deploy"
-            type="primary"
-            loading={deployLoading}
-            onClick={handleDeployConfirm}
-          >
-            确认部署
-          </Button>
+          <Tooltip title={!environmentInfo?.tool_edit_allowed ? '远程环境下部署功能被禁用' : '确认部署到VS Code扩展'}>
+            <Button
+              key="deploy"
+              type="primary"
+              loading={deployLoading}
+              onClick={handleDeployConfirm}
+              disabled={!environmentInfo?.tool_edit_allowed}
+            >
+              确认部署
+            </Button>
+          </Tooltip>
         ]}
       >
         <div style={{ marginBottom: 16 }}>
