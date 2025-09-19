@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Card, 
-  Button, 
-  Space, 
-  Typography, 
-  Tag, 
-  Divider, 
-  Row, 
-  Col, 
-  message,
+import {
+  Card,
+  Button,
+  Space,
+  Typography,
+  Tag,
+  Divider,
+  Row,
+  Col,
   Modal,
   Form,
   Input,
@@ -17,7 +16,8 @@ import {
   theme,
   Select,
   Tooltip,
-  Popconfirm
+  Popconfirm,
+  App
 } from 'antd';
 import { 
   DownloadOutlined, 
@@ -69,6 +69,7 @@ const ExportToolbar: React.FC<ExportToolbarProps> = ({
   environmentInfo
 }) => {
   const { token } = theme.useToken();
+  const { message } = App.useApp();
   const [saveModalVisible, setSaveModalVisible] = useState(false);
   const [configManageModalVisible, setConfigManageModalVisible] = useState(false);
   const [deployModalVisible, setDeployModalVisible] = useState(false);
@@ -196,7 +197,9 @@ const ExportToolbar: React.FC<ExportToolbarProps> = ({
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-        message.success(`${result.data.filename} 下载已开始`);
+        const isCompressed = result.data.filename.endsWith('.tar.gz');
+        const fileType = isCompressed ? '配置压缩包' : 'YAML文件';
+        message.success(`${fileType} ${result.data.filename} 下载已开始`);
       } else {
         message.error('生成配置文件失败：' + result.message);
       }
@@ -521,7 +524,7 @@ const ExportToolbar: React.FC<ExportToolbarProps> = ({
             
             <Tooltip title={
               selectedItems.some(item => item.type === 'command')
-                ? '导出选中的配置项目'
+                ? '导出配置压缩包（包含 custom_modes.yaml 和 .roo/commands/ 目录）'
                 : '下载 custom_modes.yaml 文件'
             }>
               <Button

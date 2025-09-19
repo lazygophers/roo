@@ -6,6 +6,8 @@ import yaml
 import os
 import shutil
 import logging
+import tarfile
+import tempfile
 from pathlib import Path
 
 # 自定义 YAML 表示器，用于多行字符串
@@ -314,45 +316,102 @@ async def get_deploy_targets():
     description="生成custom_modes.yaml并返回临时下载链接"
 )
 async def export_custom_modes(request: DeployRequest):
-    """导出custom_modes.yaml文件并返回下载链接"""
+    """导出配置文件并返回下载链接"""
     try:
-        # 1. 生成YAML数据
-        yaml_data = generate_custom_modes_yaml(
-            request.selected_models,
-            request.selected_commands,
-            request.selected_rules,
-            request.model_rule_bindings,
-            request.selected_role
-        )
-
-        # 2. 生成YAML字符串（使用自定义dumper支持多行字符串）
-        yaml_content = yaml.dump(yaml_data, Dumper=CustomDumper, allow_unicode=True, default_flow_style=False, sort_keys=False)
-
-        # 3. 生成唯一文件名
         import uuid
         from datetime import datetime
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         unique_id = str(uuid.uuid4())[:8]
-        filename = f"custom_modes_{timestamp}_{unique_id}.yaml"
 
-        # 4. 保存到临时目录
         temp_dir = Path(__file__).parent.parent.parent / "temp"
         temp_dir.mkdir(exist_ok=True)
-        temp_file_path = temp_dir / filename
 
-        with open(temp_file_path, 'w', encoding='utf-8') as f:
-            f.write(yaml_content)
+        # 检查是否选择了指令
+        has_commands = len(request.selected_commands) > 0
 
-        # 5. 返回下载信息
+        if has_commands:
+            # 有指令时，导出压缩包
+            filename = f"roo_config_{timestamp}_{unique_id}.tar.gz"
+            temp_file_path = temp_dir / filename
+
+            # 创建临时目录用于构建压缩包内容
+            with tempfile.TemporaryDirectory() as temp_build_dir:
+                build_path = Path(temp_build_dir)
+
+                # 1. 生成并保存 custom_modes.yaml
+                yaml_data = generate_custom_modes_yaml(
+                    request.selected_models,
+                    request.selected_commands,
+                    request.selected_rules,
+                    request.model_rule_bindings,
+                    request.selected_role
+                )
+                yaml_content = yaml.dump(yaml_data, Dumper=CustomDumper, allow_unicode=True, default_flow_style=False, sort_keys=False)
+
+                yaml_file_path = build_path / "custom_modes.yaml"
+                with open(yaml_file_path, 'w', encoding='utf-8') as f:
+                    f.write(yaml_content)
+
+                # 2. 创建 .roo/commands/ 目录并复制指令文件
+                roo_dir = build_path / ".roo"
+                commands_dir = roo_dir / "commands"
+                commands_dir.mkdir(parents=True, exist_ok=True)
+
+                # 从资源目录复制指令文件
+                resources_dir = Path(__file__).parent.parent.parent / "resources"
+
+                # 根据选择的指令复制对应文件
+                for command_path in request.selected_commands:
+                    command_file = resources_dir / command_path
+                    if command_file.exists():
+                        # 保持原始的目录结构
+                        relative_path = Path(command_path).relative_to(Path(command_path).parts[0]) if len(Path(command_path).parts) > 1 else Path(command_path).name
+                        dest_file = commands_dir / relative_path
+                        dest_file.parent.mkdir(parents=True, exist_ok=True)
+                        shutil.copy2(command_file, dest_file)
+
+                # 3. 创建压缩包
+                with tarfile.open(temp_file_path, "w:gz") as tar:
+                    tar.add(yaml_file_path, arcname="custom_modes.yaml")
+                    tar.add(roo_dir, arcname=".roo")
+
+            file_size = temp_file_path.stat().st_size
+            message = "导出压缩包已生成"
+
+        else:
+            # 无指令时，只导出 YAML 文件
+            filename = f"custom_modes_{timestamp}_{unique_id}.yaml"
+            temp_file_path = temp_dir / filename
+
+            # 1. 生成YAML数据
+            yaml_data = generate_custom_modes_yaml(
+                request.selected_models,
+                request.selected_commands,
+                request.selected_rules,
+                request.model_rule_bindings,
+                request.selected_role
+            )
+
+            # 2. 生成YAML字符串
+            yaml_content = yaml.dump(yaml_data, Dumper=CustomDumper, allow_unicode=True, default_flow_style=False, sort_keys=False)
+
+            # 3. 保存文件
+            with open(temp_file_path, 'w', encoding='utf-8') as f:
+                f.write(yaml_content)
+
+            file_size = len(yaml_content.encode('utf-8'))
+            message = "导出文件已生成"
+
+        # 返回下载信息
         download_url = f"/api/deploy/download/{filename}"
 
         return {
             "success": True,
-            "message": "导出文件已生成",
+            "message": message,
             "data": {
                 "download_url": download_url,
                 "filename": filename,
-                "file_size": len(yaml_content.encode('utf-8'))
+                "file_size": file_size
             }
         }
 
@@ -637,7 +696,10 @@ async def download_export_file(filename: str):
     """下载导出的文件"""
     try:
         # 验证文件名格式，防止路径遍历攻击
-        if not filename.startswith("custom_modes_") or not filename.endswith(".yaml"):
+        valid_yaml = filename.startswith("custom_modes_") and filename.endswith(".yaml")
+        valid_tar = filename.startswith("roo_config_") and filename.endswith(".tar.gz")
+
+        if not (valid_yaml or valid_tar):
             raise HTTPException(status_code=400, detail="无效的文件名")
 
         # 检查文件名中是否包含危险字符
@@ -652,11 +714,17 @@ async def download_export_file(filename: str):
         if not file_path.exists():
             raise HTTPException(status_code=404, detail="文件不存在或已过期")
 
+        # 根据文件类型设置正确的媒体类型
+        if filename.endswith(".tar.gz"):
+            media_type = 'application/gzip'
+        else:
+            media_type = 'text/yaml'
+
         # 返回文件响应
         return FileResponse(
             path=str(file_path),
             filename=filename,
-            media_type='text/yaml',
+            media_type=media_type,
             headers={"Content-Disposition": f"attachment; filename={filename}"}
         )
 
