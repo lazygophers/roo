@@ -1,42 +1,18 @@
 changelog:
   exclude:
-    labels:
-      - ignore-for-release
-      - dependencies
+    labels: [ignore-for-release, dependencies]
   categories:
     - title: 🚀 新功能
-      labels:
-        - enhancement
-        - feature
+      labels: [enhancement, feature]
     - title: 🐛 修复
-      labels:
-        - bug
-        - fix
+      labels: [bug, fix]
     - title: 📚 文档
-      labels:
-        - documentation
-        - docs
+      labels: [documentation, docs]
     - title: 🔧 CI/CD
-      labels:
-        - ci
-        - cicd
-        - github-actions
-    - title: 🐳 Docker
-      labels:
-        - docker
-        - deployment
+      labels: [ci, cicd, github-actions, docker, deployment]
     - title: ⚡ 性能优化
-      labels:
-        - performance
-        - optimization
+      labels: [performance, optimization]
     - title: 🧹 代码清理
-      labels:
-        - refactor
-        - cleanup
-    - title: 🧪 测试
-      labels:
-        - test
-        - testing
+      labels: [refactor, cleanup, test, testing]
     - title: 其他更改
-      labels:
-        - "*"
+      labels: ["*"]

@@ -1,31 +1,19 @@
-version: '3.8'
-
 services:
   lazyai-studio:
-    image: ghcr.io/luoxin/roo:latest
-    container_name: lazyai-studio-prod
+    image: ghcr.io/lazygophers/roo:latest
+    container_name: lazyai-studio
     restart: unless-stopped
     ports:
       - "8000:8000"
     environment:
-      - NODE_ENV=production
-      - PYTHONUNBUFFERED=1
+      NODE_ENV: production
+      PYTHONUNBUFFERED: 1
     volumes:
       - ./data:/app/data
       - ./logs:/app/logs
-    networks:
-      - lazyai-network
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/api/health"]
+      test: ["CMD-SHELL", "curl -f http://localhost:8000/api/health || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 40s
-
-networks:
-  lazyai-network:
-    driver: bridge
-
-volumes:
-  data:
-  logs:
