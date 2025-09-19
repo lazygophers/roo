@@ -14,6 +14,7 @@ from app.core.logging import setup_logging
 from app.core.secure_logging import sanitize_for_log
 from app.tools.service import get_mcp_tools_service
 from app.tools.server import get_mcp_server
+from app.core.mcp_tools_service import get_mcp_config_service
 
 logger = setup_logging()
 
@@ -87,6 +88,14 @@ async def list_mcp_tools():
 async def call_mcp_tool(request: MCPToolCallRequest):
     """调用 MCP 工具"""
     try:
+        # 检查环境权限
+        config_service = get_mcp_config_service()
+        if not config_service.is_tool_call_allowed():
+            return {
+                "success": False,
+                "message": "在远程环境中，MCP工具调用被禁用。请在本地环境中使用此功能。"
+            }
+
         tool_name = request.name
         arguments = request.arguments
 
@@ -236,6 +245,31 @@ LazyGophers - 让你做个聪明的懒人！ 🛋️"""
         return {
             "success": False,
             "message": "Tool execution failed: Internal server error"
+        }
+
+@router.get("/environment")
+async def get_environment_info():
+    """获取环境信息"""
+    try:
+        config_service = get_mcp_config_service()
+        environment_type = config_service.get_environment_type()
+
+        return {
+            "success": True,
+            "message": "Environment information retrieved successfully",
+            "data": {
+                "environment": environment_type,
+                "is_local": environment_type == "local",
+                "is_remote": environment_type == "remote",
+                "tool_call_allowed": config_service.is_tool_call_allowed(),
+                "tool_edit_allowed": config_service.is_tool_edit_allowed()
+            }
+        }
+    except Exception as e:
+        logger.error(f"Failed to get environment info: {sanitize_for_log(str(e))}")
+        return {
+            "success": False,
+            "message": "Failed to get environment information: Internal server error"
         }
 
 @router.get("/status")
@@ -702,6 +736,14 @@ async def mcp_streamable_endpoint(request: Dict[str, Any]):
 async def enable_mcp_tool(request: Dict[str, Any]):
     """启用MCP工具"""
     try:
+        # 检查编辑权限
+        config_service = get_mcp_config_service()
+        if not config_service.is_tool_edit_allowed():
+            return {
+                "success": False,
+                "message": "在远程环境中，MCP工具编辑被禁用。请在本地环境中使用此功能。"
+            }
+
         tool_name = request.get("name")
         if not tool_name:
             return {
@@ -733,6 +775,14 @@ async def enable_mcp_tool(request: Dict[str, Any]):
 async def disable_mcp_tool(request: Dict[str, Any]):
     """禁用MCP工具"""
     try:
+        # 检查编辑权限
+        config_service = get_mcp_config_service()
+        if not config_service.is_tool_edit_allowed():
+            return {
+                "success": False,
+                "message": "在远程环境中，MCP工具编辑被禁用。请在本地环境中使用此功能。"
+            }
+
         tool_name = request.get("name")
         if not tool_name:
             return {
@@ -764,6 +814,14 @@ async def disable_mcp_tool(request: Dict[str, Any]):
 async def remove_mcp_tool(request: Dict[str, Any]):
     """从数据库中删除MCP工具"""
     try:
+        # 检查编辑权限
+        config_service = get_mcp_config_service()
+        if not config_service.is_tool_edit_allowed():
+            return {
+                "success": False,
+                "message": "在远程环境中，MCP工具编辑被禁用。请在本地环境中使用此功能。"
+            }
+
         tool_name = request.get("name")
         if not tool_name:
             return {
@@ -795,6 +853,14 @@ async def remove_mcp_tool(request: Dict[str, Any]):
 async def enable_mcp_category(request: Dict[str, Any]):
     """启用MCP工具分类"""
     try:
+        # 检查编辑权限
+        config_service = get_mcp_config_service()
+        if not config_service.is_tool_edit_allowed():
+            return {
+                "success": False,
+                "message": "在远程环境中，MCP工具编辑被禁用。请在本地环境中使用此功能。"
+            }
+
         category_id = request.get("id")
         if not category_id:
             return {
@@ -826,6 +892,14 @@ async def enable_mcp_category(request: Dict[str, Any]):
 async def disable_mcp_category(request: Dict[str, Any]):
     """禁用MCP工具分类"""
     try:
+        # 检查编辑权限
+        config_service = get_mcp_config_service()
+        if not config_service.is_tool_edit_allowed():
+            return {
+                "success": False,
+                "message": "在远程环境中，MCP工具编辑被禁用。请在本地环境中使用此功能。"
+            }
+
         category_id = request.get("id")
         if not category_id:
             return {
@@ -966,6 +1040,14 @@ async def get_category_config(category_id: str):
 async def update_category_config(category_id: str, request: Dict[str, Any]):
     """更新MCP工具分类的配置"""
     try:
+        # 检查编辑权限
+        config_service = get_mcp_config_service()
+        if not config_service.is_tool_edit_allowed():
+            return {
+                "success": False,
+                "message": "在远程环境中，MCP工具编辑被禁用。请在本地环境中使用此功能。"
+            }
+
         config_data = request.get("config", {})
         if not config_data:
             return {
@@ -1002,6 +1084,14 @@ async def update_category_config(category_id: str, request: Dict[str, Any]):
 async def update_category_config_item(category_id: str, config_key: str, request: Dict[str, Any]):
     """更新MCP工具分类配置的单个项目"""
     try:
+        # 检查编辑权限
+        config_service = get_mcp_config_service()
+        if not config_service.is_tool_edit_allowed():
+            return {
+                "success": False,
+                "message": "在远程环境中，MCP工具编辑被禁用。请在本地环境中使用此功能。"
+            }
+
         config_value = request.get("value")
         if config_value is None:
             return {

@@ -20,9 +20,25 @@ CustomDumper.add_representer(str, CustomDumper.represent_str)
 # BaseResponse不存在，直接使用内置响应模型
 from app.core.database_service import get_database_service
 from app.core.secure_logging import sanitize_for_log
+from app.core.mcp_tools_service import get_mcp_config_service
+import functools
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
+
+
+def require_deploy_permission(func):
+    """装饰器：要求部署权限"""
+    @functools.wraps(func)
+    async def wrapper(*args, **kwargs):
+        config_service = get_mcp_config_service()
+        if not config_service.is_tool_edit_allowed():
+            return {
+                "success": False,
+                "message": "在远程环境中，VS Code扩展部署功能被禁用。请在本地环境中使用此功能。"
+            }
+        return await func(*args, **kwargs)
+    return wrapper
 
 class DeployTarget(BaseModel):
     """部署目标配置"""
@@ -274,9 +290,10 @@ def generate_custom_modes_yaml(
 @router.get(
     "/targets",
     response_model=Dict[str, DeployTarget],
-    summary="获取部署目标列表", 
+    summary="获取部署目标列表",
     description="获取所有可用的部署目标配置"
 )
+@require_deploy_permission
 async def get_deploy_targets():
     """获取部署目标列表"""
     targets = {}
@@ -320,11 +337,12 @@ async def generate_custom_modes(request: DeployRequest):
         )
 
 @router.post(
-    "/deploy", 
+    "/deploy",
     response_model=DeployResponse,
     summary="部署配置文件",
     description="生成并部署custom_modes.yaml到指定目标"
 )
+@require_deploy_permission
 async def deploy_custom_modes(request: DeployRequest):
     """部署custom_modes.yaml到指定目标"""
     deployed_files = []
@@ -450,6 +468,7 @@ async def deploy_custom_modes(request: DeployRequest):
     summary="清空配置",
     description="清空指定目标的模型配置文件或目录"
 )
+@require_deploy_permission
 async def cleanup_configurations(request: CleanupRequest):
     """清空配置文件或目录"""
     cleaned_items = []

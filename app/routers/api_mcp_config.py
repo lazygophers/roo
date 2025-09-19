@@ -12,10 +12,25 @@ from app.core.logging import setup_logging
 from app.core.secure_logging import sanitize_for_log
 from app.core.mcp_tools_service import get_mcp_config_service
 from app.models.mcp_config import MCPGlobalConfig
+import functools
 
 logger = setup_logging()
 
 router = APIRouter(prefix="/mcp/config", tags=["MCP配置"])
+
+
+def require_edit_permission(func):
+    """装饰器：要求编辑权限"""
+    @functools.wraps(func)
+    async def wrapper(*args, **kwargs):
+        config_service = get_mcp_config_service()
+        if not config_service.is_tool_edit_allowed():
+            return {
+                "success": False,
+                "message": "在远程环境中，MCP配置编辑被禁用。请在本地环境中使用此功能。"
+            }
+        return await func(*args, **kwargs)
+    return wrapper
 
 # Pydantic 模型定义
 class ProxyConfigRequest(BaseModel):
@@ -78,6 +93,7 @@ async def get_config():
 
 
 @router.put("/", response_model=Dict[str, Any])
+@require_edit_permission
 async def update_global_config(request: GlobalConfigRequest):
     """更新全局配置"""
     try:
@@ -105,6 +121,7 @@ async def get_proxy_config():
 
 
 @router.put("/proxy", response_model=Dict[str, Any])
+@require_edit_permission
 async def update_proxy_config(request: ProxyConfigRequest):
     """更新代理配置"""
     try:
@@ -132,6 +149,7 @@ async def get_network_config():
 
 
 @router.put("/network", response_model=Dict[str, Any])
+@require_edit_permission
 async def update_network_config(request: NetworkConfigRequest):
     """更新网络配置"""
     try:
@@ -159,6 +177,7 @@ async def get_security_config():
 
 
 @router.put("/security", response_model=Dict[str, Any])
+@require_edit_permission
 async def update_security_config(request: SecurityConfigRequest):
     """更新安全配置"""
     try:
@@ -205,6 +224,7 @@ async def get_tool_category_config(category: str):
 
 
 @router.put("/tool-categories/{category}", response_model=Dict[str, Any])
+@require_edit_permission
 async def update_tool_category_config(category: str, request: ToolCategoryConfigRequest):
     """更新工具分类配置"""
     try:
@@ -233,6 +253,7 @@ async def get_environment_variables():
 
 
 @router.put("/environment-variables", response_model=Dict[str, Any])
+@require_edit_permission
 async def update_environment_variables(request: EnvironmentVariablesRequest):
     """更新环境变量配置"""
     try:
@@ -248,6 +269,7 @@ async def update_environment_variables(request: EnvironmentVariablesRequest):
 
 
 @router.post("/reset", response_model=Dict[str, Any])
+@require_edit_permission
 async def reset_config():
     """重置配置为默认值"""
     try:
@@ -276,6 +298,7 @@ async def export_config():
 
 
 @router.post("/import", response_model=Dict[str, Any])
+@require_edit_permission
 async def import_config(config_data: Dict[str, Any]):
     """导入配置"""
     try:
