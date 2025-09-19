@@ -2224,7 +2224,7 @@
 
 "@testing-library/user-event@^13.5.0":
   version "13.5.0"
-  resolved "https://registry.npmmirror.com/@testing-library/user-event/-/user-event-13.5.0.tgz"
+  resolved "https://registry.npmmirror.com/@testing-library/user-event/-/user-event-13.5.0.tgz#69d77007f1e124d55314a2b73fd204b333b13295"
   integrity sha512-5Kwtbo3Y/NowpkbRuSepbyMFkZmHgD+vPzYB/RJ4oxt5Gj/avFFBYjhw27cqSVPVw/3a67NK1PbiIr9k4Gwmdg==
   dependencies:
     "@babel/runtime" "^7.12.5"
@@ -10405,7 +10405,7 @@ wbuf@^1.1.0, wbuf@^1.7.3:
 
 web-vitals@^2.1.4:
   version "2.1.4"
-  resolved "https://registry.npmmirror.com/web-vitals/-/web-vitals-2.1.4.tgz"
+  resolved "https://registry.npmmirror.com/web-vitals/-/web-vitals-2.1.4.tgz#76563175a475a5e835264d373704f9dde718290c"
   integrity sha512-sVWcwhU5mX6crfI5Vd2dC4qchyTqxV8URinzt25XqVh+bHEPGH4C3NPrNionCP7Obx59wrYEbNlw4Z8sjALzZg==
 
 webidl-conversions@^4.0.2:
