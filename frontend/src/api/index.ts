@@ -282,39 +282,6 @@ export interface RecycleBinResponse {
   data?: any;
 }
 
-// Vector Database types
-export interface VectorDatabaseConfig {
-  type: string;
-  [key: string]: any;
-}
-
-export interface VectorDatabaseInfo {
-  type: string;
-  name: string;
-  description: string;
-  default_config: VectorDatabaseConfig;
-}
-
-export interface VectorDatabasesResponse {
-  success: boolean;
-  message?: string;
-  data: VectorDatabaseInfo[];
-}
-
-// Embedding Provider types
-export interface EmbeddingProvider {
-  provider: string;
-  name: string;
-  description: string;
-  requires_api_key: boolean;
-  default_models: string[];
-}
-
-export interface EmbeddingProvidersResponse {
-  success: boolean;
-  message?: string;
-  data: EmbeddingProvider[];
-}
 
 // API 方法
 export const apiClient = {
@@ -735,17 +702,6 @@ export const apiClient = {
     return response.data;
   },
 
-  // 获取支持的向量数据库列表
-  getSupportedVectorDatabases: async () => {
-    const response = await api.get<VectorDatabasesResponse>('/knowledge-base/vector-databases');
-    return response.data;
-  },
-
-  // 获取支持的嵌入模型提供商列表
-  getSupportedEmbeddingProviders: async () => {
-    const response = await api.get<EmbeddingProvidersResponse>('/knowledge-base/embedding-providers');
-    return response.data;
-  }
 };
 
 export default api;
