@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  lazyai-studio:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - PYTHONUNBUFFERED=1
+      - LOG_LEVEL=INFO
+    volumes:
+      # 挂载数据目录（持久化配置和数据）
+      - ./data:/app/data
+      # 挂载临时目录（可选，用于缓存等）
+      - ./temp:/app/temp
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          # 限制资源使用，降低资源消耗
+          memory: 512M
+          cpus: '0.5'
+        reservations:
+          memory: 256M
+          cpus: '0.25'
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - lazyai-network
+
+networks:
+  lazyai-network:
+    driver: bridge
