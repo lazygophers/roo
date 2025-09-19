@@ -1,6 +1,6 @@
 # 多阶段构建 Dockerfile - 完全自包含的前端+后端构建
 # 第一阶段：前端构建 - 使用轻量级alpine镜像但增加足够内存
-FROM node:18-alpine AS frontend-builder
+FROM node:  22.19.0 AS frontend-builder
 
 # 设置环境变量进行内存优化
 ENV NODE_ENV=production

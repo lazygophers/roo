@@ -1,6 +1,6 @@
 """
 缓存存储后端实现
-支持多种存储方案：TinyDB、Redis、DiskCache、Memcached、LMDB
+支持多种存储方案：TinyDB、DiskCache、Memcached、LMDB
 """
 
 import os
@@ -344,164 +344,6 @@ class TinyDBCacheBackend(CacheBackend):
 
             return len(expired_keys)
 
-
-class RedisCacheBackend(CacheBackend):
-    """Redis缓存后端"""
-
-    def __init__(self, config: Dict[str, Any]):
-        super().__init__(config)
-        try:
-            import redis
-            self.redis_client = redis.Redis(
-                host=config.get('host', 'localhost'),
-                port=config.get('port', 6379),
-                db=config.get('db', 0),
-                password=config.get('password'),
-                decode_responses=True,
-                socket_timeout=config.get('timeout', 5)
-            )
-            # 测试连接
-            self.redis_client.ping()
-            logger.info("Redis cache backend initialized")
-        except Exception as e:
-            logger.error(f"Failed to initialize Redis backend: {sanitize_for_log(str(e))}")
-            raise
-
-    def _serialize_value(self, value: Any) -> str:
-        """序列化值"""
-        if isinstance(value, (str, int, float)):
-            return str(value)
-        return json.dumps(value, ensure_ascii=False)
-
-    def _deserialize_value(self, value_str: str) -> Any:
-        """反序列化值"""
-        try:
-            return json.loads(value_str)
-        except (json.JSONDecodeError, TypeError):
-            return value_str
-
-    def get(self, key: str) -> Optional[Any]:
-        try:
-            value = self.redis_client.get(key)
-            if value is None:
-                return None
-            return self._deserialize_value(value)
-        except Exception as e:
-            logger.error(f"Redis GET error for key {key}: {sanitize_for_log(str(e))}")
-            return None
-
-    def set(self, key: str, value: Any, ttl: Optional[int] = None) -> bool:
-        try:
-            serialized_value = self._serialize_value(value)
-            ex = ttl or self.config.get('default_ttl', 3600)
-            return self.redis_client.set(key, serialized_value, ex=ex)
-        except Exception as e:
-            logger.error(f"Redis SET error for key {key}: {sanitize_for_log(str(e))}")
-            return False
-
-    def delete(self, key: str) -> bool:
-        try:
-            return self.redis_client.delete(key) > 0
-        except Exception as e:
-            logger.error(f"Redis DELETE error for key {key}: {sanitize_for_log(str(e))}")
-            return False
-
-    def exists(self, key: str) -> bool:
-        try:
-            return self.redis_client.exists(key) > 0
-        except Exception as e:
-            logger.error(f"Redis EXISTS error for key {key}: {sanitize_for_log(str(e))}")
-            return False
-
-    def ttl(self, key: str) -> int:
-        try:
-            return self.redis_client.ttl(key)
-        except Exception as e:
-            logger.error(f"Redis TTL error for key {key}: {sanitize_for_log(str(e))}")
-            return -2
-
-    def expire(self, key: str, ttl: int) -> bool:
-        try:
-            return self.redis_client.expire(key, ttl)
-        except Exception as e:
-            logger.error(f"Redis EXPIRE error for key {key}: {sanitize_for_log(str(e))}")
-            return False
-
-    def keys(self, pattern: str = "*") -> List[str]:
-        try:
-            return self.redis_client.keys(pattern)
-        except Exception as e:
-            logger.error(f"Redis KEYS error for pattern {pattern}: {sanitize_for_log(str(e))}")
-            return []
-
-    def mget(self, keys: List[str]) -> Dict[str, Any]:
-        try:
-            values = self.redis_client.mget(keys)
-            result = {}
-            for key, value in zip(keys, values):
-                if value is not None:
-                    result[key] = self._deserialize_value(value)
-            return result
-        except Exception as e:
-            logger.error(f"Redis MGET error: {sanitize_for_log(str(e))}")
-            return {}
-
-    def mset(self, key_values: Dict[str, Any], ttl: Optional[int] = None) -> bool:
-        try:
-            # 序列化所有值
-            serialized_kv = {k: self._serialize_value(v) for k, v in key_values.items()}
-
-            # 使用pipeline提高性能
-            pipe = self.redis_client.pipeline()
-            pipe.mset(serialized_kv)
-
-            # 如果有TTL，为每个键设置过期时间
-            if ttl:
-                for key in key_values.keys():
-                    pipe.expire(key, ttl)
-
-            pipe.execute()
-            return True
-        except Exception as e:
-            logger.error(f"Redis MSET error: {sanitize_for_log(str(e))}")
-            return False
-
-    def incr(self, key: str, amount: int = 1) -> int:
-        try:
-            return self.redis_client.incr(key, amount)
-        except Exception as e:
-            logger.error(f"Redis INCR error for key {key}: {sanitize_for_log(str(e))}")
-            raise
-
-    def flush_all(self) -> bool:
-        try:
-            return self.redis_client.flushdb()
-        except Exception as e:
-            logger.error(f"Redis FLUSHALL error: {sanitize_for_log(str(e))}")
-            return False
-
-    def get_info(self) -> Dict[str, Any]:
-        try:
-            info = self.redis_client.info()
-            dbsize = self.redis_client.dbsize()
-
-            return {
-                "backend": "redis",
-                "status": "active",
-                "total_items": dbsize,
-                "memory_items": dbsize,  # Redis中所有项都在内存中
-                "persistent_items": 0,
-                "memory_usage": info.get('used_memory', 0),
-                "connected_clients": info.get('connected_clients', 0),
-                "last_updated": datetime.now().isoformat()
-            }
-        except Exception as e:
-            logger.error(f"Redis INFO error: {sanitize_for_log(str(e))}")
-            return {"backend": "redis", "status": "error", "error": str(e)}
-
-    def cleanup_expired(self) -> int:
-        # Redis自动处理过期键，无需手动清理
-        return 0
 
 
 class DiskCacheBackend(CacheBackend):
@@ -1074,7 +916,6 @@ def create_cache_backend(backend_type: str, config: Dict[str, Any]) -> CacheBack
     """创建缓存后端实例"""
     backend_map = {
         'tinydb': TinyDBCacheBackend,
-        'redis': RedisCacheBackend,
         'diskcache': DiskCacheBackend,
         'memcached': MemcachedBackend,
         'lmdb': LMDBBackend
