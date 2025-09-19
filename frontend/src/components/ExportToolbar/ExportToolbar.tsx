@@ -133,23 +133,14 @@ const ExportToolbar: React.FC<ExportToolbarProps> = ({
   }, []);
 
   const handleExport = async () => {
-    // 检查是否选择了指令
-    const hasCommands = selectedItems.some(item => item.type === 'command');
-
-    if (!hasCommands) {
-      // 未选择指令时，自动下载 custom_modes.yaml
-      await handleDownloadCustomModes();
-      return;
-    }
-
     if (totalCount === 0) {
       message.warning('请先选择要导出的项目');
       return;
     }
 
-    // 这里暂不实现具体的导出逻辑，只显示提示
-    message.info(`准备导出 ${totalCount} 个项目（模拟功能）`);
-    onExport();
+    // 无论是否选择了指令，都调用 handleDownloadCustomModes
+    // 后端会根据 selected_commands 自动决定导出 YAML 还是压缩包
+    await handleDownloadCustomModes();
   };
 
   const handleDownloadCustomModes = async () => {
@@ -163,7 +154,9 @@ const ExportToolbar: React.FC<ExportToolbarProps> = ({
         selected_models: selectedItems
           .filter(item => item.type === 'model')
           .map(item => item.id),
-        selected_commands: [], // 指令为空
+        selected_commands: selectedItems
+          .filter(item => item.type === 'command')
+          .map(item => item.id),
         selected_rules: selectedItems
           .filter(item => item.type === 'rule')
           .map(item => item.id),
