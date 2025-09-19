@@ -1,9 +1,10 @@
 import React from 'react';
 import { Layout, Button, Space, Menu, theme } from 'antd';
-import { HomeOutlined, SettingOutlined, GithubOutlined, ApiOutlined } from '@ant-design/icons';
+import { HomeOutlined, SettingOutlined, GithubOutlined, ApiOutlined, BookOutlined, DatabaseOutlined } from '@ant-design/icons';
 import { useNavigate, useLocation } from 'react-router-dom';
 import ThemeToggle from '../Theme/ThemeToggle';
-import SystemMonitorMenuItem from '../SystemMonitor/SystemMonitorMenuItem';
+// import SystemMonitorMenuItem from '../SystemMonitor/SystemMonitorMenuItem';
+import SystemMonitorPolling from '../SystemMonitor/SystemMonitorPolling';
 import LicenseInfo from '../License/LicenseInfo';
 import './AppLayout.css';
 
@@ -37,6 +38,11 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
       key: '/mcp-tools',
       icon: <ApiOutlined />,
       label: 'MCP 工具',
+    },
+    {
+      key: '/knowledge-base',
+      icon: <DatabaseOutlined />,
+      label: '知识库',
     },
   ];
 
@@ -103,7 +109,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
           right: 0
         }}>
           {/* 系统监控组件 */}
-          <SystemMonitorMenuItem />
+          <SystemMonitorPolling />
           {/* 开源协议信息 */}
           <LicenseInfo />
         </div>

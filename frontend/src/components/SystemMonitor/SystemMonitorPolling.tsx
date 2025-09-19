@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Typography, Progress, Tooltip, theme } from 'antd';
-import { 
+import {
   MonitorOutlined,
-  ThunderboltOutlined, 
+  ThunderboltOutlined,
   DatabaseOutlined,
   WifiOutlined
 } from '@ant-design/icons';
@@ -41,86 +41,68 @@ interface MonitorResponse {
   error?: string;
 }
 
-const SystemMonitorMenuItem: React.FC = () => {
+const SystemMonitorPolling: React.FC = () => {
   const {
-    token: { 
-      colorBorderSecondary, 
+    token: {
+      colorBorderSecondary,
       colorText,
       colorTextSecondary,
       colorTextTertiary,
       colorBgLayout
     },
   } = theme.useToken();
-  
+
   const [monitorData, setMonitorData] = useState<SystemMonitorData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [connectionStatus, setConnectionStatus] = useState<'connected' | 'disconnected' | 'error'>('disconnected');
+  const [lastUpdate, setLastUpdate] = useState<number>(0);
 
-  const eventSourceRef = useRef<EventSource | null>(null);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const mountedRef = useRef(true);
+
+  const fetchMonitorData = async () => {
+    if (!mountedRef.current) return;
+
+    try {
+      const response = await fetch('/api/system/monitor');
+      const data: MonitorResponse = await response.json();
+
+      if (!mountedRef.current) return;
+
+      if (data.success && data.data) {
+        setMonitorData(data.data);
+        setError(null);
+        setLoading(false);
+        setConnectionStatus('connected');
+        setLastUpdate(Date.now());
+      } else {
+        console.error('SystemMonitorPolling: Server error:', data.error);
+        setError(data.error || '获取监控数据失败');
+        setConnectionStatus('error');
+      }
+    } catch (err) {
+      if (!mountedRef.current) return;
+      console.error('SystemMonitorPolling: Fetch error:', err);
+      setError('网络请求失败');
+      setConnectionStatus('error');
+    }
+  };
 
   useEffect(() => {
-    let isMounted = true;
-    console.log('SystemMonitorMenuItem: Starting SSE connection...');
+    mountedRef.current = true;
 
-    // 防止快速重连，添加小延迟
-    const connectTimer = setTimeout(() => {
-      if (!isMounted) return;
+    // 立即获取一次数据
+    fetchMonitorData();
 
-      // 创建SSE连接
-      const eventSource = new EventSource('/api/system/monitor/stream');
-      eventSourceRef.current = eventSource;
-
-      eventSource.onopen = () => {
-        if (!isMounted) return;
-        console.log('SystemMonitorMenuItem: SSE connection opened');
-        setConnectionStatus('connected');
-        setError(null);
-      };
-
-      eventSource.onmessage = (event) => {
-        if (!isMounted) return;
-        try {
-          const data: MonitorResponse = JSON.parse(event.data);
-
-          if (data.success && data.data) {
-            setMonitorData(data.data);
-            setError(null);
-            setLoading(false);
-            console.log('SystemMonitorMenuItem: Data updated');
-          } else {
-            console.error('SystemMonitorMenuItem: Server error:', data.error);
-            setError(data.error || '获取监控数据失败');
-          }
-        } catch (parseError) {
-          console.error('SystemMonitorMenuItem: Parse error:', parseError);
-          setError('数据解析失败');
-        }
-      };
-
-      eventSource.onerror = (event) => {
-        if (!isMounted) return;
-        console.error('SystemMonitorMenuItem: SSE error:', event);
-        console.log('SystemMonitorMenuItem: EventSource readyState:', eventSource.readyState);
-
-        // 检查错误类型
-        if (eventSource.readyState === EventSource.CLOSED) {
-          console.log('SystemMonitorMenuItem: Connection was closed');
-          setConnectionStatus('disconnected');
-        } else {
-          setConnectionStatus('error');
-        }
-        setError('实时连接异常');
-      };
-    }, 100); // 100ms延迟防止快速重连
+    // 每2秒轮询一次（与SSE频率相同）
+    intervalRef.current = setInterval(fetchMonitorData, 2000);
 
     return () => {
-      isMounted = false;
-      clearTimeout(connectTimer);
-      console.log('SystemMonitorMenuItem: Cleaning up SSE connection');
-      if (eventSourceRef.current) {
-        eventSourceRef.current.close();
-        eventSourceRef.current = null;
+      mountedRef.current = false;
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
       }
     };
   }, []);
@@ -143,9 +125,31 @@ const SystemMonitorMenuItem: React.FC = () => {
     return '#f5222d'; // 红色
   };
 
+  const getConnectionStatusColor = () => {
+    switch (connectionStatus) {
+      case 'connected': return '#52c41a';
+      case 'disconnected': return '#d9d9d9';
+      case 'error': return '#f5222d';
+      default: return '#d9d9d9';
+    }
+  };
+
+  const getConnectionStatusText = () => {
+    const timeSinceUpdate = Date.now() - lastUpdate;
+    if (connectionStatus === 'connected' && timeSinceUpdate < 5000) {
+      return '实时';
+    }
+    switch (connectionStatus) {
+      case 'connected': return '已连接';
+      case 'disconnected': return '已断开';
+      case 'error': return '错误';
+      default: return '未知';
+    }
+  };
+
   if (loading) {
     return (
-      <div style={{ 
+      <div style={{
         padding: '12px 24px',
         minHeight: '48px',
         display: 'flex',
@@ -159,9 +163,9 @@ const SystemMonitorMenuItem: React.FC = () => {
     );
   }
 
-  if (error) {
+  if (error && !monitorData) {
     return (
-      <div style={{ 
+      <div style={{
         padding: '12px 24px',
         minHeight: '48px',
         display: 'flex',
@@ -180,36 +184,46 @@ const SystemMonitorMenuItem: React.FC = () => {
   }
 
   return (
-    <div style={{ 
+    <div style={{
       padding: '8px 24px',
       borderTop: `1px solid ${colorBorderSecondary}`,
       backgroundColor: colorBgLayout
     }}>
       {/* 标题行 */}
-      <div style={{ 
-        display: 'flex', 
-        alignItems: 'center', 
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
         marginBottom: '8px',
         fontSize: '12px',
         fontWeight: 500
       }}>
         <MonitorOutlined style={{ marginRight: '6px', color: '#1890ff' }} />
         <Text style={{ fontSize: '12px', color: colorTextSecondary }}>系统监控</Text>
-        <Text style={{ 
-          fontSize: '11px', 
+        <Text style={{
+          fontSize: '11px',
           color: colorTextTertiary,
           marginLeft: 'auto'
         }}>
           {monitorData.uptime.formatted}
         </Text>
+        <Tooltip title={`连接状态: ${getConnectionStatusText()}`}>
+          <div style={{
+            display: 'inline-block',
+            width: '6px',
+            height: '6px',
+            borderRadius: '50%',
+            backgroundColor: getConnectionStatusColor(),
+            marginLeft: '8px'
+          }} />
+        </Tooltip>
       </div>
 
       {/* 监控指标 */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
         {/* CPU 使用率 */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <ThunderboltOutlined style={{ 
-            fontSize: '10px', 
+          <ThunderboltOutlined style={{
+            fontSize: '10px',
             color: getCPUColor(monitorData.cpu.percent),
             minWidth: '10px'
           }} />
@@ -232,8 +246,8 @@ const SystemMonitorMenuItem: React.FC = () => {
 
         {/* 内存使用 */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <DatabaseOutlined style={{ 
-            fontSize: '10px', 
+          <DatabaseOutlined style={{
+            fontSize: '10px',
             color: getMemoryColor(monitorData.memory.percent),
             minWidth: '10px'
           }} />
@@ -244,10 +258,10 @@ const SystemMonitorMenuItem: React.FC = () => {
                 {monitorData.memory.used_mb.toFixed(1)}MB
               </Text>
             </div>
-            <div style={{ 
-              height: '4px', 
-              backgroundColor: colorBorderSecondary, 
-              borderRadius: '2px', 
+            <div style={{
+              height: '4px',
+              backgroundColor: colorBorderSecondary,
+              borderRadius: '2px',
               overflow: 'hidden',
               position: 'relative'
             }}>
@@ -262,21 +276,21 @@ const SystemMonitorMenuItem: React.FC = () => {
         </div>
 
         {/* 响应时间 */}
-        <div style={{ 
-          display: 'flex', 
-          justifyContent: 'space-between', 
+        <div style={{
+          display: 'flex',
+          justifyContent: 'space-between',
           alignItems: 'center',
           marginTop: '2px'
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <WifiOutlined style={{ 
-              fontSize: '10px', 
+            <WifiOutlined style={{
+              fontSize: '10px',
               color: getResponseTimeColor(monitorData.response_time.ms)
             }} />
             <Text style={{ fontSize: '11px', color: colorTextSecondary }}>响应</Text>
           </div>
-          <Text style={{ 
-            fontSize: '11px', 
+          <Text style={{
+            fontSize: '11px',
             color: getResponseTimeColor(monitorData.response_time.ms),
             fontWeight: 500
           }}>
@@ -286,9 +300,9 @@ const SystemMonitorMenuItem: React.FC = () => {
 
         {/* 进程信息 */}
         <Tooltip title={`PID: ${monitorData.process.pid} | 线程: ${monitorData.process.num_threads} | 状态: ${monitorData.process.status}`}>
-          <div style={{ 
-            display: 'flex', 
-            justifyContent: 'space-between', 
+          <div style={{
+            display: 'flex',
+            justifyContent: 'space-between',
             alignItems: 'center',
             marginTop: '2px'
           }}>
@@ -305,4 +319,4 @@ const SystemMonitorMenuItem: React.FC = () => {
   );
 };
 
-export default SystemMonitorMenuItem;
+export default SystemMonitorPolling;

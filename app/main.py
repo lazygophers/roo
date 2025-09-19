@@ -14,6 +14,7 @@ from app.core.mcp_tools_service import init_mcp_config_service
 from app.core.recycle_bin_scheduler import startup_recycle_bin_scheduler, shutdown_recycle_bin_scheduler
 from app.core.time_tools_service import init_time_tools_service
 from app.core.cache_tools_service_v2 import init_cache_tools_service
+from app.core.knowledge_base_service import init_knowledge_base_service
 from app.routers import api_router
 
 # 设置日志
@@ -68,6 +69,11 @@ async def lifespan(app: FastAPI):
         # 初始化缓存工具服务
         cache_service = init_cache_tools_service(use_unified_db=True)
         logger.info("Cache tools service initialized successfully")
+
+        # 初始化知识库服务
+        knowledge_service = init_knowledge_base_service()
+        await knowledge_service.initialize()
+        logger.info("Knowledge base service initialized successfully")
         
         # 打印启动信息和访问地址
         import socket

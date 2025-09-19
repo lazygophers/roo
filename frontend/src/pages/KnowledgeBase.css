@@ -1,0 +1,188 @@
+.knowledge-base-container {
+  padding: 24px;
+  min-height: calc(100vh - 64px);
+}
+
+.knowledge-base-header {
+  margin-bottom: 32px;
+  text-align: center;
+}
+
+.knowledge-base-header h2 {
+  margin-bottom: 8px;
+}
+
+.knowledge-base-stats {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.knowledge-base-stats .ant-card {
+  flex: 1;
+  text-align: center;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.knowledge-base-stats .ant-card:hover {
+  transform: translateY(-1px);
+}
+
+.knowledge-base-actions {
+  margin-bottom: 24px;
+}
+
+.search-result-content {
+  max-width: 500px;
+}
+
+.document-detail-modal .ant-descriptions-item-label {
+  font-weight: 600;
+}
+
+.file-icon {
+  margin-right: 8px;
+  font-size: 16px;
+}
+
+.upload-help-text {
+  font-size: 12px;
+  margin-top: 8px;
+  opacity: 0.65;
+}
+
+.search-highlight {
+  padding: 2px 4px;
+  border-radius: 2px;
+  background-color: var(--ant-color-warning-bg);
+  color: var(--ant-color-warning-text);
+}
+
+.stats-card {
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.stats-card:hover {
+  transform: translateY(-2px);
+}
+
+.document-table .ant-table-tbody > tr:hover > td {
+  background: var(--ant-color-fill-quaternary) !important;
+}
+
+.search-modal .ant-table-tbody > tr {
+  cursor: pointer;
+}
+
+.search-modal .ant-table-tbody > tr:hover > td {
+  background: var(--ant-color-primary-bg) !important;
+}
+
+.metadata-json {
+  font-family: 'Courier New', monospace;
+  background: var(--ant-color-fill-secondary);
+  border-radius: 4px;
+  padding: 8px;
+}
+
+.file-type-tag {
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+.chunk-count-tag {
+  background: var(--ant-color-primary);
+  border: none;
+  color: white;
+}
+
+.similarity-score {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.similarity-bar {
+  flex: 1;
+  height: 6px;
+  background: var(--ant-color-fill-tertiary);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.similarity-fill {
+  height: 100%;
+  background: linear-gradient(to right, var(--ant-color-error), var(--ant-color-warning), var(--ant-color-success));
+  transition: width 0.3s ease;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .knowledge-base-container {
+    padding: 16px;
+  }
+
+  .knowledge-base-stats {
+    flex-direction: column;
+  }
+
+  .knowledge-base-actions .ant-space {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .knowledge-base-actions .ant-space > div {
+    width: 100%;
+  }
+
+  .knowledge-base-actions .ant-input-search {
+    width: 100% !important;
+  }
+}
+
+/* 添加更多主题集成样式 */
+.knowledge-base-container .ant-card {
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.knowledge-base-container .ant-card:hover {
+  transform: translateY(-1px);
+}
+
+.knowledge-base-container .ant-btn {
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.knowledge-base-container .ant-btn:hover {
+  transform: translateY(-1px);
+}
+
+.knowledge-base-container .ant-input,
+.knowledge-base-container .ant-input-group-addon,
+.knowledge-base-container .ant-input-search > .ant-input-group > .ant-input-group-addon:last-child .ant-input-search-button {
+  border-radius: 6px;
+}
+
+.knowledge-base-container .ant-tag {
+  border-radius: 4px;
+  font-size: 11px;
+  line-height: 1.4;
+  margin: 2px;
+}
+
+.knowledge-base-container .ant-modal-content {
+  border-radius: 8px;
+}
+
+.knowledge-base-container .ant-progress-line {
+  border-radius: 4px;
+}
+
+/* 暗色主题特定优化 */
+[data-theme='dark'] .knowledge-base-container .ant-card:hover {
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.05);
+}

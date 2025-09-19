@@ -1,0 +1,254 @@
+/* 分层知识库页面样式 */
+.hierarchical-knowledge-base-container {
+  padding: 24px;
+  min-height: calc(100vh - 64px);
+}
+
+.hierarchical-knowledge-base-header {
+  margin-bottom: 32px;
+  text-align: center;
+}
+
+.hierarchical-knowledge-base-header h2 {
+  margin-bottom: 8px;
+}
+
+/* 知识库网格布局 */
+.knowledge-bases-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+}
+
+.knowledge-base-card {
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.knowledge-base-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.knowledge-base-card .ant-card-meta-description {
+  height: 120px;
+  overflow: hidden;
+}
+
+/* 文件夹卡片样式 */
+.folder-card {
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  height: 160px;
+}
+
+.folder-card:hover {
+  transform: translateY(-1px);
+}
+
+.folder-card .ant-card-meta-title {
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+
+.folder-card .ant-card-meta-description {
+  font-size: 12px;
+}
+
+.folder-card .ant-card-actions {
+  background: transparent;
+  border-top: 1px solid var(--ant-color-border);
+}
+
+.folder-card .ant-card-actions > li {
+  margin: 8px 0;
+}
+
+/* 状态样式 */
+.processing-status {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* 标签样式 */
+.folder-card .ant-tag {
+  margin: 1px;
+  font-size: 10px;
+  padding: 0 4px;
+  line-height: 16px;
+  border-radius: 2px;
+}
+
+/* 统计信息样式 */
+.knowledge-base-card .ant-statistic {
+  text-align: center;
+}
+
+.knowledge-base-card .ant-statistic-title {
+  font-size: 11px;
+  margin-bottom: 2px;
+}
+
+.knowledge-base-card .ant-statistic-content {
+  font-size: 14px;
+  line-height: 1.2;
+}
+
+/* 模态框样式 */
+.ant-modal-content {
+  border-radius: 8px;
+}
+
+.ant-form-item-label > label {
+  font-weight: 500;
+}
+
+/* 数据源类型选择样式 */
+.ant-select-selection-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* 响应式设计 */
+@media (max-width: 1200px) {
+  .knowledge-bases-grid {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .hierarchical-knowledge-base-container {
+    padding: 16px;
+  }
+
+  .knowledge-bases-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .folder-card {
+    height: auto;
+    min-height: 140px;
+  }
+
+  .hierarchical-knowledge-base-header {
+    margin-bottom: 24px;
+  }
+}
+
+/* 主题集成样式 */
+.hierarchical-knowledge-base-container .ant-card {
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.hierarchical-knowledge-base-container .ant-card:hover {
+  transform: translateY(-1px);
+}
+
+.hierarchical-knowledge-base-container .ant-btn {
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.hierarchical-knowledge-base-container .ant-btn:hover {
+  transform: translateY(-1px);
+}
+
+.hierarchical-knowledge-base-container .ant-input,
+.hierarchical-knowledge-base-container .ant-select-selector,
+.hierarchical-knowledge-base-container .ant-input-group-addon {
+  border-radius: 6px;
+}
+
+.hierarchical-knowledge-base-container .ant-tag {
+  border-radius: 4px;
+  font-size: 11px;
+  line-height: 1.4;
+  margin: 2px;
+}
+
+.hierarchical-knowledge-base-container .ant-modal-content {
+  border-radius: 8px;
+}
+
+/* 暗色主题特定优化 */
+[data-theme='dark'] .hierarchical-knowledge-base-container .ant-card:hover {
+  box-shadow: 0 4px 16px rgba(255, 255, 255, 0.05);
+}
+
+[data-theme='dark'] .knowledge-base-card:hover {
+  box-shadow: 0 4px 16px rgba(255, 255, 255, 0.08);
+}
+
+/* 知识库选中状态 */
+.knowledge-base-card.selected {
+  border-color: var(--ant-color-primary);
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.1);
+}
+
+/* 文件夹状态指示器 */
+.folder-status-indicator {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.folder-status-indicator.completed {
+  background-color: #52c41a;
+}
+
+.folder-status-indicator.processing {
+  background-color: #1890ff;
+  animation: pulse 2s infinite;
+}
+
+.folder-status-indicator.failed {
+  background-color: #ff4d4f;
+}
+
+.folder-status-indicator.pending {
+  background-color: #faad14;
+}
+
+/* 空状态样式 */
+.hierarchical-knowledge-base-container .ant-empty {
+  margin: 40px 0;
+}
+
+.hierarchical-knowledge-base-container .ant-empty-description {
+  color: var(--ant-color-text-secondary);
+}
+
+/* 加载状态 */
+.hierarchical-knowledge-base-container .ant-spin-container {
+  padding: 40px;
+}
+
+/* 头像和图标样式 */
+.hierarchical-knowledge-base-container .ant-avatar {
+  border-radius: 6px;
+}
+
+.hierarchical-knowledge-base-container .anticon {
+  transition: all 0.2s ease;
+}
+
+.hierarchical-knowledge-base-container .ant-card-actions .anticon:hover {
+  transform: scale(1.1);
+}

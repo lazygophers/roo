@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ConfigProvider, App as AntdApp } from 'antd';
 import zhCN from 'antd/locale/zh_CN';
 import { ThemeProvider, useTheme } from './contexts/ThemeContext';
@@ -8,6 +8,7 @@ import ErrorBoundary from './components/ErrorBoundary';
 import Home from './pages/Home';
 import ConfigManagementWithSelection from './pages/ConfigManagementWithSelection';
 import MCPToolsManagement from './pages/MCPToolsManagement';
+import KnowledgeBase from './pages/KnowledgeBase';
 import './App.css';
 import './styles/theme.css';
 
@@ -26,6 +27,8 @@ const AppContent: React.FC = () => {
               <Route path="/" element={<Home />} />
               <Route path="/config" element={<ConfigManagementWithSelection />} />
               <Route path="/mcp-tools" element={<MCPToolsManagement />} />
+              <Route path="/knowledge-base" element={<KnowledgeBase />} />
+              <Route path="/hierarchical-knowledge-base" element={<Navigate to="/knowledge-base" replace />} />
             </Routes>
           </AppLayout>
         </Router>
