@@ -181,18 +181,45 @@ const ExportToolbar: React.FC<ExportToolbarProps> = ({
       const result = await response.json();
 
       if (result.success) {
-        // 创建隐藏的下载链接并触发点击
+        // 处理不同类型文件的下载
         const downloadUrl = result.data.download_url;
-        const link = document.createElement('a');
-        link.href = downloadUrl;
-        link.download = result.data.filename;
-        link.style.display = 'none';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        const isCompressed = result.data.filename.endsWith('.tar.gz');
+        const filename = result.data.filename;
+        const isCompressed = filename.endsWith('.tar.gz');
+
+        if (isCompressed) {
+          // 对于压缩文件，使用 fetch + blob 来确保正确下载
+          try {
+            const downloadResponse = await fetch(downloadUrl);
+            if (!downloadResponse.ok) {
+              throw new Error('下载失败');
+            }
+            const blob = await downloadResponse.blob();
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = filename;
+            link.style.display = 'none';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(url);
+          } catch (downloadError) {
+            console.error('Download error:', downloadError);
+            throw new Error('压缩包下载失败');
+          }
+        } else {
+          // 对于普通文件，使用编程式下载
+          const link = document.createElement('a');
+          link.href = downloadUrl;
+          link.download = filename;
+          link.style.display = 'none';
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        }
+
         const fileType = isCompressed ? '配置压缩包' : 'YAML文件';
-        message.success(`${fileType} ${result.data.filename} 下载已开始`);
+        message.success(`${fileType} ${filename} 下载已开始`);
       } else {
         message.error('生成配置文件失败：' + result.message);
       }

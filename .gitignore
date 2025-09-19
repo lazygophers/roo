@@ -13,3 +13,4 @@ logs/
 .claude/
 .claude*
 .gitignore
+temp/

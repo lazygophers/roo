@@ -24,6 +24,7 @@ CustomDumper.add_representer(str, CustomDumper.represent_str)
 from app.core.database_service import get_database_service
 from app.core.secure_logging import sanitize_for_log
 from app.core.mcp_tools_service import get_mcp_config_service
+from app.core.export_cache_manager import get_export_cache_manager
 import functools
 
 logger = logging.getLogger(__name__)
@@ -316,8 +317,49 @@ async def get_deploy_targets():
     description="生成custom_modes.yaml并返回临时下载链接"
 )
 async def export_custom_modes(request: DeployRequest):
-    """导出配置文件并返回下载链接"""
+    """导出配置文件并返回下载链接（支持缓存机制）"""
     try:
+        # 获取缓存管理器
+        cache_manager = get_export_cache_manager()
+
+        # 将请求转换为配置数据字典用于缓存键生成
+        config_data = {
+            'selected_models': request.selected_models,
+            'selected_commands': request.selected_commands,
+            'selected_rules': request.selected_rules,
+            'selected_role': request.selected_role,
+            'deploy_targets': request.deploy_targets,
+            'model_rule_bindings': request.model_rule_bindings
+        }
+
+        # 检查缓存
+        cached_filename = cache_manager.get_cached_file(config_data)
+        if cached_filename:
+            # 找到缓存文件，直接返回
+            temp_dir = Path(__file__).parent.parent.parent / "temp"
+            cached_file_path = temp_dir / cached_filename
+
+            if cached_file_path.exists():
+                file_size = cached_file_path.stat().st_size
+                download_url = f"/api/deploy/download/{cached_filename}"
+
+                is_compressed = cached_filename.endswith('.tar.gz')
+                message = "使用缓存的压缩包" if is_compressed else "使用缓存的YAML文件"
+
+                logger.info(f"返回缓存文件: {sanitize_for_log(cached_filename)}")
+
+                return {
+                    "success": True,
+                    "message": message,
+                    "data": {
+                        "download_url": download_url,
+                        "filename": cached_filename,
+                        "file_size": file_size,
+                        "cached": True
+                    }
+                }
+
+        # 没有缓存，生成新文件
         import uuid
         from datetime import datetime
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -360,15 +402,17 @@ async def export_custom_modes(request: DeployRequest):
                 # 从资源目录复制指令文件
                 resources_dir = Path(__file__).parent.parent.parent / "resources"
 
-                # 根据选择的指令复制对应文件
+                # 根据选择的指令复制对应文件（直接放在 .roo/commands/ 目录下）
                 for command_path in request.selected_commands:
                     command_file = resources_dir / command_path
                     if command_file.exists():
-                        # 保持原始的目录结构
-                        relative_path = Path(command_path).relative_to(Path(command_path).parts[0]) if len(Path(command_path).parts) > 1 else Path(command_path).name
-                        dest_file = commands_dir / relative_path
-                        dest_file.parent.mkdir(parents=True, exist_ok=True)
+                        # 只使用文件名，不保留原始目录结构
+                        command_filename = Path(command_path).name
+                        dest_file = commands_dir / command_filename
                         shutil.copy2(command_file, dest_file)
+                        logger.info(f"复制命令文件: {sanitize_for_log(command_path)} -> .roo/commands/{sanitize_for_log(command_filename)}")
+                    else:
+                        logger.warning(f"命令文件不存在: {sanitize_for_log(command_path)}")
 
                 # 3. 创建压缩包
                 with tarfile.open(temp_file_path, "w:gz") as tar:
@@ -376,7 +420,7 @@ async def export_custom_modes(request: DeployRequest):
                     tar.add(roo_dir, arcname=".roo")
 
             file_size = temp_file_path.stat().st_size
-            message = "导出压缩包已生成"
+            message = "新生成压缩包"
 
         else:
             # 无指令时，只导出 YAML 文件
@@ -400,7 +444,11 @@ async def export_custom_modes(request: DeployRequest):
                 f.write(yaml_content)
 
             file_size = len(yaml_content.encode('utf-8'))
-            message = "导出文件已生成"
+            message = "新生成YAML文件"
+
+        # 将新生成的文件加入缓存
+        cache_manager.cache_file(config_data, filename)
+        logger.info(f"文件已加入缓存: {sanitize_for_log(filename)}")
 
         # 返回下载信息
         download_url = f"/api/deploy/download/{filename}"
@@ -411,7 +459,8 @@ async def export_custom_modes(request: DeployRequest):
             "data": {
                 "download_url": download_url,
                 "filename": filename,
-                "file_size": file_size
+                "file_size": file_size,
+                "cached": False
             }
         }
 
@@ -714,18 +763,27 @@ async def download_export_file(filename: str):
         if not file_path.exists():
             raise HTTPException(status_code=404, detail="文件不存在或已过期")
 
-        # 根据文件类型设置正确的媒体类型
+        # 根据文件类型设置正确的媒体类型和响应头
         if filename.endswith(".tar.gz"):
-            media_type = 'application/gzip'
+            media_type = 'application/octet-stream'
+            headers = {
+                "Content-Disposition": f"attachment; filename={filename}",
+                "Content-Type": "application/octet-stream",
+                "Cache-Control": "no-cache"
+            }
         else:
             media_type = 'text/yaml'
+            headers = {
+                "Content-Disposition": f"attachment; filename={filename}",
+                "Content-Type": "text/yaml; charset=utf-8"
+            }
 
         # 返回文件响应
         return FileResponse(
             path=str(file_path),
             filename=filename,
             media_type=media_type,
-            headers={"Content-Disposition": f"attachment; filename={filename}"}
+            headers=headers
         )
 
     except HTTPException:
@@ -735,4 +793,70 @@ async def download_export_file(filename: str):
         raise HTTPException(
             status_code=500,
             detail=f"下载失败: {str(e)}"
+        )
+
+
+@router.get(
+    "/cache/stats",
+    response_model=Dict[str, Any],
+    summary="获取缓存统计信息",
+    description="获取导出文件缓存的统计信息"
+)
+async def get_cache_stats():
+    """获取缓存统计信息"""
+    try:
+        cache_manager = get_export_cache_manager()
+        stats = cache_manager.get_cache_stats()
+
+        return {
+            "success": True,
+            "message": "缓存统计信息获取成功",
+            "data": stats
+        }
+
+    except Exception as e:
+        logger.error(f"Error getting cache stats: {sanitize_for_log(str(e))}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"获取缓存统计失败: {str(e)}"
+        )
+
+
+@router.post(
+    "/cache/cleanup",
+    response_model=Dict[str, Any],
+    summary="清理过期缓存",
+    description="手动清理所有过期的缓存文件"
+)
+async def cleanup_expired_cache():
+    """手动清理过期缓存"""
+    try:
+        cache_manager = get_export_cache_manager()
+
+        # 获取清理前的统计信息
+        stats_before = cache_manager.get_cache_stats()
+
+        # 执行清理
+        cache_manager.cleanup_expired_files()
+
+        # 获取清理后的统计信息
+        stats_after = cache_manager.get_cache_stats()
+
+        cleaned_files = stats_before['total_cached_files'] - stats_after['total_cached_files']
+
+        return {
+            "success": True,
+            "message": f"缓存清理完成，共清理 {cleaned_files} 个过期文件",
+            "data": {
+                "cleaned_files": cleaned_files,
+                "stats_before": stats_before,
+                "stats_after": stats_after
+            }
+        }
+
+    except Exception as e:
+        logger.error(f"Error cleaning cache: {sanitize_for_log(str(e))}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"缓存清理失败: {str(e)}"
         )
