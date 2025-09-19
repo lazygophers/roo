@@ -80,6 +80,7 @@ const ExportToolbar: React.FC<ExportToolbarProps> = ({
   const [configurationsLoading, setConfigurationsLoading] = useState(false);
   const [selectedConfigName, setSelectedConfigName] = useState<string | null>(null);
   const [cleanupLoading, setCleanupLoading] = useState(false);
+  const [exportLoading, setExportLoading] = useState(false);
   const [form] = Form.useForm();
   const [deployForm] = Form.useForm();
   const modelCount = selectedItems.filter(item => item.type === 'model').length;
@@ -152,7 +153,7 @@ const ExportToolbar: React.FC<ExportToolbarProps> = ({
 
   const handleDownloadCustomModes = async () => {
     try {
-      setLoading(true);
+      setExportLoading(true);
 
       // 构建部署请求，和部署功能使用相同的逻辑
       const roleItem = selectedItems.find(item => item.type === 'role');
@@ -166,7 +167,8 @@ const ExportToolbar: React.FC<ExportToolbarProps> = ({
           .filter(item => item.type === 'rule')
           .map(item => item.id),
         model_rule_bindings: modelRuleBindings,
-        selected_role: roleItem?.id
+        selected_role: roleItem?.id,
+        deploy_targets: ['vscode'] // 默认导出到 vscode 目标
       };
 
       // 调用导出 API
@@ -196,7 +198,7 @@ const ExportToolbar: React.FC<ExportToolbarProps> = ({
       console.error('Export error:', error);
       message.error('导出失败：' + (error instanceof Error ? error.message : '未知错误'));
     } finally {
-      setLoading(false);
+      setExportLoading(false);
     }
   };
 
@@ -521,7 +523,7 @@ const ExportToolbar: React.FC<ExportToolbarProps> = ({
                 type="primary"
                 icon={<DownloadOutlined />}
                 onClick={handleExport}
-                loading={loading}
+                loading={exportLoading}
               >
                 {selectedItems.some(item => item.type === 'command')
                   ? `导出 (${totalCount})`
