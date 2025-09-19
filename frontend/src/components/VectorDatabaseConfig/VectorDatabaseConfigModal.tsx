@@ -20,7 +20,7 @@ import {
   SettingOutlined,
   ThunderboltOutlined
 } from '@ant-design/icons';
-import { apiClient, VectorDatabaseInfo } from '../../api';
+import { apiClient, VectorDatabaseInfo, EmbeddingProvider } from '../../api';
 import { useTheme } from '../../contexts/ThemeContext';
 
 const { Text, Paragraph } = Typography;
@@ -117,8 +117,11 @@ const VectorDatabaseConfigModal: React.FC<VectorDatabaseConfigModalProps> = ({
   const [loading, setLoading] = useState(false);
   const [databaseType, setDatabaseType] = useState<string>('lancedb');
   const [embeddingProvider, setEmbeddingProvider] = useState<string>('local');
+  const [embeddingModel, setEmbeddingModel] = useState<string>('all-MiniLM-L6-v2');
   const [availableDatabases, setAvailableDatabases] = useState<VectorDatabaseInfo[]>([]);
   const [loadingDatabases, setLoadingDatabases] = useState(false);
+  const [availableProviders, setAvailableProviders] = useState<EmbeddingProvider[]>([]);
+  const [loadingProviders, setLoadingProviders] = useState(false);
 
   // 加载支持的向量数据库列表
   const loadSupportedDatabases = async () => {
@@ -144,10 +147,36 @@ const VectorDatabaseConfigModal: React.FC<VectorDatabaseConfigModalProps> = ({
     }
   };
 
-  // 组件加载时获取数据库列表
+  // 加载支持的嵌入模型提供商列表
+  const loadSupportedProviders = async () => {
+    try {
+      setLoadingProviders(true);
+      const response = await apiClient.getSupportedEmbeddingProviders();
+      if (response.success && response.data) {
+        setAvailableProviders(response.data);
+      }
+    } catch (error) {
+      console.error('Failed to load supported embedding providers:', error);
+      // 使用默认提供商列表作为fallback
+      setAvailableProviders([
+        {
+          provider: 'local',
+          name: '本地模型',
+          description: '使用SentenceTransformers本地运行',
+          requires_api_key: false,
+          default_models: ['all-MiniLM-L6-v2', 'all-mpnet-base-v2']
+        }
+      ]);
+    } finally {
+      setLoadingProviders(false);
+    }
+  };
+
+  // 组件加载时获取数据库列表和提供商列表
   useEffect(() => {
     if (visible) {
       loadSupportedDatabases();
+      loadSupportedProviders();
     }
   }, [visible]);
 
@@ -163,6 +192,32 @@ const VectorDatabaseConfigModal: React.FC<VectorDatabaseConfigModalProps> = ({
       ),
       value: db.type,
     }));
+  };
+
+  // 根据提供商信息生成选项
+  const generateProviderOptions = () => {
+    return availableProviders.map(provider => ({
+      label: (
+        <Space>
+          <SettingOutlined />
+          <span>{provider.name}</span>
+          <Text type="secondary">（{provider.description}）</Text>
+        </Space>
+      ),
+      value: provider.provider,
+    }));
+  };
+
+  // 获取当前选中提供商的模型列表
+  const getCurrentProviderModels = () => {
+    const currentProvider = availableProviders.find(p => p.provider === embeddingProvider);
+    return currentProvider?.default_models || [];
+  };
+
+  // 检查当前提供商是否需要API密钥
+  const currentProviderRequiresApiKey = () => {
+    const currentProvider = availableProviders.find(p => p.provider === embeddingProvider);
+    return currentProvider?.requires_api_key || false;
   };
 
   // 请求初始配置数据
@@ -734,61 +789,18 @@ const VectorDatabaseConfigModal: React.FC<VectorDatabaseConfigModalProps> = ({
           label="嵌入服务提供商"
           tooltip="选择嵌入服务提供商"
           placeholder="请选择嵌入服务提供商"
-          options={[
-            {
-              label: (
-                <Space>
-                  <DatabaseOutlined />
-                  <span>本地模式</span>
-                  <Text type="secondary">（项目内置，无需外部服务）</Text>
-                </Space>
-              ),
-              value: 'local',
-            },
-            {
-              label: (
-                <Space>
-                  <ThunderboltOutlined />
-                  <span>Ollama</span>
-                  <Text type="secondary">（本地 LLM 服务）</Text>
-                </Space>
-              ),
-              value: 'ollama',
-            },
-            {
-              label: (
-                <Space>
-                  <InfoCircleOutlined />
-                  <span>OpenAI</span>
-                  <Text type="secondary">（商业 API 服务）</Text>
-                </Space>
-              ),
-              value: 'openai',
-            },
-            {
-              label: (
-                <Space>
-                  <InfoCircleOutlined />
-                  <span>Google Gemini</span>
-                  <Text type="secondary">（谷歌 AI 服务）</Text>
-                </Space>
-              ),
-              value: 'gemini',
-            },
-            {
-              label: (
-                <Space>
-                  <InfoCircleOutlined />
-                  <span>HuggingFace</span>
-                  <Text type="secondary">（开源模型平台）</Text>
-                </Space>
-              ),
-              value: 'huggingface',
-            },
-          ]}
+          options={generateProviderOptions()}
           rules={[{ required: true, message: '请选择嵌入服务提供商' }]}
           fieldProps={{
-            onChange: (value: string) => setEmbeddingProvider(value),
+            loading: loadingProviders,
+            onChange: (value: string) => {
+              setEmbeddingProvider(value);
+              // 当提供商改变时，重置模型选择
+              const providerModels = availableProviders.find(p => p.provider === value)?.default_models || [];
+              if (providerModels.length > 0) {
+                setEmbeddingModel(providerModels[0]);
+              }
+            },
           }}
         />
 
@@ -799,10 +811,16 @@ const VectorDatabaseConfigModal: React.FC<VectorDatabaseConfigModalProps> = ({
           tooltip="选择文本向量化模型，或选择'自定义模型'输入模型名称"
           placeholder="请选择嵌入模型"
           options={[
-            ...getEmbeddingModelOptions(embeddingProvider),
+            ...getCurrentProviderModels().map(model => ({
+              label: model,
+              value: model
+            })),
             ...(embeddingProvider !== 'local' ? [{ label: '自定义模型...', value: '__custom__' }] : [])
           ]}
           rules={[{ required: true, message: '请选择嵌入模型' }]}
+          fieldProps={{
+            onChange: (value: string) => setEmbeddingModel(value),
+          }}
         />
 
         {/* 自定义模型输入 - 仅非本地模式显示 */}
@@ -815,13 +833,9 @@ const VectorDatabaseConfigModal: React.FC<VectorDatabaseConfigModalProps> = ({
                     name="custom_embedding_model"
                     label="自定义模型名称"
                     tooltip="输入自定义的嵌入模型名称"
-                    placeholder={getCustomModelPlaceholder(embeddingProvider)}
+                    placeholder={`请输入${availableProviders.find(p => p.provider === embeddingProvider)?.name || ''}模型名称`}
                     rules={[
-                      { required: true, message: '请输入自定义模型名称' },
-                      {
-                        pattern: getModelNamePattern(embeddingProvider),
-                        message: getModelNamePatternMessage(embeddingProvider)
-                      }
+                      { required: true, message: '请输入自定义模型名称' }
                     ]}
                   />
                 );
@@ -829,6 +843,29 @@ const VectorDatabaseConfigModal: React.FC<VectorDatabaseConfigModalProps> = ({
               return null;
             }}
           </ProFormDependency>
+        )}
+
+        {/* API密钥配置 - 需要API密钥的提供商显示 */}
+        {currentProviderRequiresApiKey() && (
+          <ProFormText.Password
+            name="api_key"
+            label="API 密钥"
+            tooltip={`${availableProviders.find(p => p.provider === embeddingProvider)?.name || ''} 服务的API密钥`}
+            placeholder="请输入API密钥"
+            rules={[{ required: true, message: '请输入API密钥' }]}
+          />
+        )}
+
+        {/* 自定义API地址 - 非本地模式显示 */}
+        {embeddingProvider !== 'local' && (
+          <ProFormText
+            name="base_url"
+            label="API 地址 (可选)"
+            tooltip="自定义API服务地址，留空使用默认地址"
+            placeholder={embeddingProvider === 'openai' ? 'https://api.openai.com/v1' :
+                       embeddingProvider === 'azure' ? 'https://your-resource.openai.azure.com' :
+                       embeddingProvider === 'huggingface' ? 'https://api-inference.huggingface.co' : ''}
+          />
         )}
       </ProCard>
 

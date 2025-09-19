@@ -301,6 +301,21 @@ export interface VectorDatabasesResponse {
   data: VectorDatabaseInfo[];
 }
 
+// Embedding Provider types
+export interface EmbeddingProvider {
+  provider: string;
+  name: string;
+  description: string;
+  requires_api_key: boolean;
+  default_models: string[];
+}
+
+export interface EmbeddingProvidersResponse {
+  success: boolean;
+  message?: string;
+  data: EmbeddingProvider[];
+}
+
 // API 方法
 export const apiClient = {
   // 获取所有模型
@@ -723,6 +738,12 @@ export const apiClient = {
   // 获取支持的向量数据库列表
   getSupportedVectorDatabases: async () => {
     const response = await api.get<VectorDatabasesResponse>('/knowledge-base/vector-databases');
+    return response.data;
+  },
+
+  // 获取支持的嵌入模型提供商列表
+  getSupportedEmbeddingProviders: async () => {
+    const response = await api.get<EmbeddingProvidersResponse>('/knowledge-base/embedding-providers');
     return response.data;
   }
 };

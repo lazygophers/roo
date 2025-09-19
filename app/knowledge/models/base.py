@@ -34,11 +34,20 @@ class ProcessStatus(str, Enum):
     FAILED = "failed"        # 处理失败
 
 
+class EmbeddingConfig(BaseModel):
+    """嵌入模型配置"""
+    provider: str = "local"  # 提供商：local, openai, azure, huggingface等
+    model: str = "all-MiniLM-L6-v2"  # 模型名称
+    api_key: Optional[str] = None  # API密钥（云服务需要）
+    base_url: Optional[str] = None  # 自定义API地址
+    config: Dict[str, Any] = {}  # 额外配置参数
+
+
 class VectorDatabaseConfig(BaseModel):
     """向量数据库配置模型"""
     type: str = "lancedb"  # 数据库类型：lancedb, chroma, qdrant等
     config: Dict[str, Any] = {}  # 具体配置参数
-    embedding_model: str = "all-MiniLM-L6-v2"  # 嵌入模型
+    embedding: EmbeddingConfig = EmbeddingConfig()  # 嵌入模型配置
 
 
 class KnowledgeBase(BaseModel):

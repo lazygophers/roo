@@ -8,6 +8,7 @@ from fastapi.responses import JSONResponse
 
 from app.knowledge.core.hierarchical_service import get_hierarchical_knowledge_base_service
 from app.knowledge.core.vector_interface import VectorDatabaseFactory
+from app.knowledge.core.embedding_interface import EmbeddingFactory
 from app.knowledge.models.base import (
     KnowledgeBase, KnowledgeFolder, KnowledgeFile,
     CreateKnowledgeBaseRequest, UpdateKnowledgeBaseRequest,
@@ -59,6 +60,26 @@ async def get_supported_vector_databases():
         )
     except Exception as e:
         logger.error(f"Failed to get supported vector databases: {e}")
+        return JSONResponse(
+            status_code=500,
+            content={"success": False, "message": str(e)}
+        )
+
+
+@router.get("/embedding-providers")
+async def get_supported_embedding_providers():
+    """获取支持的嵌入模型提供商列表"""
+    try:
+        providers = EmbeddingFactory.get_supported_providers()
+        return JSONResponse(
+            status_code=200,
+            content={
+                "success": True,
+                "data": providers
+            }
+        )
+    except Exception as e:
+        logger.error(f"Failed to get supported embedding providers: {e}")
         return JSONResponse(
             status_code=500,
             content={"success": False, "message": str(e)}
