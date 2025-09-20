@@ -704,9 +704,6 @@ const ModesListWithSelection: React.FC<ModesListProps> = ({
                                 <Text type="secondary" style={{ fontSize: 10 }}>
                                   📏 {model.file_size ? `${(model.file_size / 1024).toFixed(1)}KB` : 'N/A'}
                                 </Text>
-                                <Text type="secondary" style={{ fontSize: 10 }}>
-                                  📅 {model.last_modified ? new Date(model.last_modified * 1000).toLocaleString() : 'N/A'}
-                                </Text>
                               </Space>
                             </div>
                           </div>
@@ -890,9 +887,6 @@ const ModesListWithSelection: React.FC<ModesListProps> = ({
                                       </Text>
                                       <Text type="secondary" style={{ fontSize: 9 }}>
                                         📏 {rule.file_size ? `${(rule.file_size / 1024).toFixed(1)}KB` : 'N/A'}
-                                      </Text>
-                                      <Text type="secondary" style={{ fontSize: 9 }}>
-                                        📅 {rule.last_modified ? new Date(rule.last_modified).toLocaleDateString() : 'N/A'}
                                       </Text>
                                     </Space>
                                   </div>

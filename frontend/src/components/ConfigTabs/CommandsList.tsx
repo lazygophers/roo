@@ -11,7 +11,6 @@ import {
 } from 'antd';
 import { 
   FileTextOutlined, 
-  ClockCircleOutlined,
   FolderOutlined
 } from '@ant-design/icons';
 import { apiClient, FileMetadata } from '../../api';
@@ -51,9 +50,6 @@ const CommandsList: React.FC<CommandsListProps> = ({ onSelectCommand }) => {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   };
 
-  const formatDate = (timestamp: number): string => {
-    return new Date(timestamp * 1000).toLocaleString('zh-CN');
-  };
 
   if (commands.length === 0 && !loading) {
     return (
@@ -150,12 +146,6 @@ const CommandsList: React.FC<CommandsListProps> = ({ onSelectCommand }) => {
                             <FolderOutlined />
                             <Text type="secondary">
                               {formatFileSize(command.file_size)}
-                            </Text>
-                          </Space>
-                          <Space>
-                            <ClockCircleOutlined />
-                            <Text type="secondary">
-                              {formatDate(command.last_modified)}
                             </Text>
                           </Space>
                         </Space>

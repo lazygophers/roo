@@ -11,7 +11,6 @@ import {
 } from 'antd';
 import { 
   BookOutlined, 
-  ClockCircleOutlined,
   FolderOutlined
 } from '@ant-design/icons';
 import { apiClient, FileMetadata } from '../../api';
@@ -65,9 +64,6 @@ const RulesList: React.FC<RulesListProps> = ({ onSelectRule }) => {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   };
 
-  const formatDate = (timestamp: number): string => {
-    return new Date(timestamp * 1000).toLocaleString('zh-CN');
-  };
 
   const getFileExtension = (filePath: string): string => {
     return filePath.split('.').pop()?.toUpperCase() || 'FILE';
@@ -212,12 +208,6 @@ const RulesList: React.FC<RulesListProps> = ({ onSelectRule }) => {
                             <FolderOutlined />
                             <Text type="secondary">
                               {formatFileSize(rule.file_size)}
-                            </Text>
-                          </Space>
-                          <Space>
-                            <ClockCircleOutlined />
-                            <Text type="secondary">
-                              {formatDate(rule.last_modified)}
                             </Text>
                           </Space>
                         </Space>
