@@ -1,9 +1,10 @@
-name: Docker Build and Push (Master Only)
+name: Docker Build and Push (Master + Dev)
 
 on:
   push:
     branches:
       - master
+      - dev
     tags:
       - "v*"
 
@@ -95,7 +96,8 @@ jobs:
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
             type=semver,pattern={{major}}
-            type=raw,value=latest,enable={{is_default_branch}}
+            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/master' }}
+            type=raw,value=dev,enable=${{ github.ref == 'refs/heads/dev' }}
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v5

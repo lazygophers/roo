@@ -186,6 +186,15 @@ app = FastAPI(
     openapi_url="/openapi.json" if DEBUG else None,
 )
 
+# 禁用缓存中间件
+@app.middleware("http")
+async def disable_cache_middleware(request: Request, call_next):
+    response = await call_next(request)
+    response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    response.headers["Pragma"] = "no-cache"
+    response.headers["Expires"] = "0"
+    return response
+
 # 最简异常处理
 @app.exception_handler(Exception)
 async def handle_error(request: Request, exc: Exception):
