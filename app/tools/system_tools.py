@@ -7,7 +7,21 @@ import platform
 import psutil
 import time
 from typing import Dict, Any
-from app.tools.registry import system_tool
+from app.tools.registry import system_tool, mcp_category
+
+
+# 注册系统工具分类
+@mcp_category(
+    category_id="system",
+    name="系统监控工具",
+    description="系统信息获取、性能监控、资源管理等系统级工具",
+    icon="💻",
+    enabled=True,
+    sort_order=2
+)
+def register_system_category():
+    """注册系统工具分类"""
+    pass
 
 
 @system_tool(

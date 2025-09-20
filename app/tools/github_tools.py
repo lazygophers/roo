@@ -9,8 +9,22 @@ from typing import Dict, Any, List, Optional, Union
 import requests
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
-from app.tools.registry import github_tool
+from app.tools.registry import github_tool, mcp_category
 from app.core.mcp_tools_service import get_proxy_for_requests, get_mcp_config
+
+
+# 注册GitHub工具分类
+@mcp_category(
+    category_id="github",
+    name="GitHub API 工具",
+    description="GitHub 仓库管理、Issues、Pull Requests、Releases 等完整 API 工具集",
+    icon="🐙",
+    enabled=True,
+    sort_order=1
+)
+def register_github_category():
+    """注册GitHub工具分类"""
+    pass
 
 
 class GitHubAPIClient:

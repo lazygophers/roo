@@ -5,7 +5,21 @@
 import time
 import threading
 from typing import Dict, Any, Optional
-from app.tools.registry import cache_tool
+from app.tools.registry import cache_tool, mcp_category
+
+
+# 注册缓存工具分类
+@mcp_category(
+    category_id="cache",
+    name="缓存管理工具",
+    description="内存缓存操作、缓存策略管理、性能优化工具",
+    icon="🚀",
+    enabled=True,
+    sort_order=5
+)
+def register_cache_category():
+    """注册缓存工具分类"""
+    pass
 
 # Simple in-memory cache implementation
 class SimpleCache:

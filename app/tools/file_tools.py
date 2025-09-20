@@ -2,7 +2,21 @@
 文件工具集
 使用装饰器自动注册文件相关的MCP工具
 """
-from app.tools.registry import file_tool
+from app.tools.registry import file_tool, mcp_category
+
+
+# 注册文件工具分类
+@mcp_category(
+    category_id="file",
+    name="文件操作工具",
+    description="文件读写、路径处理、文件管理等文件系统操作工具",
+    icon="📁",
+    enabled=True,
+    sort_order=3
+)
+def register_file_category():
+    """注册文件工具分类"""
+    pass
 
 
 @file_tool(

@@ -126,6 +126,9 @@ async def lifespan(app: FastAPI):
             get_logger().error(f"Failed to refresh resources: {e}")
             print(f"⚠️  Resource refresh failed: {e}", flush=True)
 
+        # 初始化MCP工具和工具集（由现有服务自动处理）
+        print("🔧 MCP tools will be automatically initialized by the service layer...", flush=True)
+
         # 启动后重新启用GC并优化
         gc.enable()
         gc.collect()
