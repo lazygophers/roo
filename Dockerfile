@@ -18,12 +18,10 @@ COPY frontend/ ./
 
 # 安装前端依赖（使用缓存挂载）
 RUN --mount=type=cache,target=/usr/local/share/.cache/yarn \
-    --mount=type=cache,target=/app/frontend/node_modules \
     yarn install --frozen-lockfile --production=false
 
 # 构建前端生产版本（使用缓存挂载）
-RUN --mount=type=cache,target=/app/frontend/node_modules \
-    --mount=type=cache,target=/app/frontend/.next/cache \
+RUN --mount=type=cache,target=/app/frontend/.next/cache \
     yarn build
 
 # ========== 后端构建阶段 ==========
