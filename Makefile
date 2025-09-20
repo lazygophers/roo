@@ -293,7 +293,7 @@ docker-build:
 	@echo "💡 这将自动构建前端并打包到后端服务中"
 	@echo "🏷️ 镜像标签: ghcr.io/lazygophers/roo:latest"
 	@echo "🏗️ 架构: linux/amd64"
-	docker buildx build --platform linux/amd64 -t ghcr.io/lazygophers/roo:latest .
+	docker buildx build -t ghcr.io/lazygophers/roo:latest .
 	@echo "✅ Docker 镜像构建完成"
 
 # 推送 Docker 镜像到远程仓库（单架构）
