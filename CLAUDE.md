@@ -272,7 +272,7 @@ Automated Docker image building and publishing with GitHub Actions:
   - **Shamefully hoist**: Compatible with React Scripts ecosystem
   - **Content-addressable storage**: Eliminates duplicate downloads
 - **Performance optimizations**: Latest BuildKit v0.12.4, disabled SBOM/Provenance for speed
-- **Multi-platform builds**: linux/amd64, linux/arm64 in single optimized job
+- **Single-platform builds**: linux/amd64 optimized for reliability
 - **Container registry**: Uses GitHub Container Registry (ghcr.io) for GitHub Packages
 - **Tag-based builds**: Force builds on version tags regardless of file changes
 - **Build skipping**: Intelligent skip notifications for documentation-only changes

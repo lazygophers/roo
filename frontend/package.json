@@ -59,12 +59,14 @@
   },
   "proxy": "http://localhost:8000",
   "overrides": {
-    "webpack-dev-server": "4.15.2",
+    "webpack-dev-server": ">=5.2.1",
     "postcss": ">=8.4.31",
     "nth-check": ">=2.0.1"
   },
   "resolutions": {
-    "webpack-dev-server": "4.15.2"
+    "webpack-dev-server": ">=5.2.1",
+    "postcss": ">=8.4.31",
+    "nth-check": ">=2.0.1"
   },
   "devDependencies": {
     "@types/react-router-dom": "^5.3.3"
