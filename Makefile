@@ -50,6 +50,10 @@ help:
 	@echo "  docker-clean     清理 Docker 资源"
 	@echo "  docker-deploy    一键 Docker 部署（构建+启动）"
 	@echo ""
+	@echo "📦 GitHub Actions:"
+	@echo "  github-check     检查 GitHub Actions 工作流"
+	@echo "  github-release   创建新版本发布"
+	@echo ""
 	@echo "🧹 清理命令:"
 	@echo "  clean            清理所有构建文件"
 	@echo "  clean-frontend   清理前端构建文件"
@@ -321,6 +325,25 @@ docker-deploy: docker-build docker-up
 docker-status:
 	@echo "📊 Docker 容器状态:"
 	docker-compose ps
+
+# ========== GitHub Actions ==========
+# 检查 GitHub Actions 工作流
+github-check:
+	@echo "🔍 检查 GitHub Actions 工作流..."
+	@command -v gh >/dev/null 2>&1 || { echo "❌ gh CLI 未安装，请先安装 GitHub CLI"; exit 1; }
+	@echo "📋 工作流列表:"
+	gh workflow list
+	@echo ""
+	@echo "📊 最近的工作流运行:"
+	gh run list --limit 5
+
+# 创建新版本发布
+github-release:
+	@echo "🚀 创建新版本发布..."
+	@command -v gh >/dev/null 2>&1 || { echo "❌ gh CLI 未安装，请先安装 GitHub CLI"; exit 1; }
+	@echo "💡 当前版本: $(shell grep 'version = ' pyproject.toml | cut -d'"' -f2)"
+	@echo "📝 请手动创建发布版本："
+	@echo "   gh release create v$(shell grep 'version = ' pyproject.toml | cut -d'"' -f2) --generate-notes"
 
 # ========== 额外命令 ==========
 # 显示版本信息

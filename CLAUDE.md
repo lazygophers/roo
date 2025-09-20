@@ -199,6 +199,16 @@ The project includes complete Docker containerization with separated build and r
 - **Virtual environment**: Runtime uses `.venv/bin/python` directly without uv dependency
 - **Production ready**: Optimized backend with `main_optimized.py` for minimal resource usage
 
+### CI/CD Pipeline
+Automated Docker image building and publishing with GitHub Actions:
+- **GitHub Actions workflow**: `.github/workflows/docker-build.yml`
+- **Multi-platform builds**: Supports linux/amd64 and linux/arm64 architectures
+- **Container registry**: Uses GitHub Container Registry (ghcr.io)
+- **Automated triggers**: Builds on push to master/develop branches and version tags
+- **Version management**: Automatic semantic versioning from git tags
+- **Cache optimization**: Uses GitHub Actions cache for faster builds
+- **Make targets**: `github-check`, `github-release` for CI/CD management
+
 # important-instruction-reminders
 Do what has been asked; nothing more, nothing less.
 NEVER create files unless they're absolutely necessary for achieving your goal.
