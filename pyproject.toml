@@ -6,12 +6,9 @@ readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "fastapi>=0.116.1",
-    "flask>=3.1.2",
     "python-multipart>=0.0.20",
     "pyyaml>=6.0.2",
     "requests>=2.32.5",
-    "rich>=14.1.0",
-    "ruamel-yaml>=0.18.15",
     "tinydb>=4.8.2",
     "uvicorn>=0.35.0",
     "pytest>=8.3.3",
@@ -29,14 +26,5 @@ dependencies = [
     "aiohttp>=3.10.11",
     "aiofiles>=24.1.0",
     "beautifulsoup4>=4.12.3",
-    "lancedb>=0.17.0",
-    "sentence-transformers>=3.3.1",
-    "pypdf2>=3.0.1",
-    "python-docx>=1.1.2",
-    "markdownify>=0.13.1",
-    "pandas>=2.3.2",
-    "redis>=6.4.0",
     "aiohttp-cors>=0.8.1",
-    "pillow>=11.3.0",
-    "lxml>=6.0.1",
 ]

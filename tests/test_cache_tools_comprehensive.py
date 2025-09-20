@@ -44,7 +44,8 @@ class TestCacheToolsComprehensive:
     def test_simple_cache_init(self, fresh_cache):
         """测试SimpleCache初始化"""
         assert fresh_cache._cache == {}
-        assert isinstance(fresh_cache._lock, threading.Lock)
+        # 检查锁是否是锁类型的实例（兼容不同的锁实现）
+        assert hasattr(fresh_cache._lock, 'acquire') and hasattr(fresh_cache._lock, 'release')
 
     def test_simple_cache_set_without_ttl(self, fresh_cache):
         """测试设置缓存无过期时间"""

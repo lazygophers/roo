@@ -204,11 +204,13 @@ class CacheToolsService:
                     current_time = time.time()
                     Query_obj = Query()
 
-                    # 查找过期项
-                    expired_items = self.cache_table.search(
-                        (Query_obj.ttl != None) &
-                        (Query_obj.created_at + Query_obj.ttl < current_time)
-                    )
+                    # 查找过期项 - 手动检查每个项目是否过期
+                    all_items = self.cache_table.all()
+                    expired_items = []
+                    for item in all_items:
+                        if item.get('ttl') is not None and item.get('created_at') is not None:
+                            if item['created_at'] + item['ttl'] < current_time:
+                                expired_items.append(item)
 
                     for item in expired_items:
                         self.cache_table.remove(Query_obj.key == item['key'])

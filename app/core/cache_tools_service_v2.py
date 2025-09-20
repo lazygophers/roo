@@ -2,7 +2,7 @@
 缓存工具集服务 v2
 Cache Tools Service v2
 
-支持多种存储后端：TinyDB、Redis、DiskCache、Memcached、LMDB
+支持多种存储后端：TinyDB、DiskCache、Memcached、LMDB
 """
 
 from typing import Dict, Any, Optional, List, Union
@@ -61,11 +61,7 @@ class CacheToolsService:
             }
 
             # 为不同后端设置特定默认值
-            if self.backend_type == 'redis':
-                config.setdefault('host', 'localhost')
-                config.setdefault('port', 6379)
-                config.setdefault('db', 0)
-            elif self.backend_type == 'diskcache':
+            if self.backend_type == 'diskcache':
                 config.setdefault('directory', './cache')
                 config.setdefault('size_limit', 1024**3)  # 1GB
             elif self.backend_type == 'memcached':
@@ -446,13 +442,6 @@ def get_available_backends() -> Dict[str, Dict[str, Any]]:
             "persistent": True,
             "requires_external_service": False,
             "config_fields": []
-        },
-        "redis": {
-            "name": "Redis",
-            "description": "高性能内存数据库",
-            "persistent": False,
-            "requires_external_service": True,
-            "config_fields": ["host", "port", "db", "password"]
         },
         "diskcache": {
             "name": "DiskCache",

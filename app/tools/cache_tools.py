@@ -40,10 +40,12 @@ class SimpleCache:
 
     def keys(self, pattern: str = "*") -> list:
         with self._lock:
+            # 先获取所有键的列表副本，避免在遍历时修改字典
+            all_keys = list(self._cache.keys())
             if pattern == "*":
-                return [k for k in self._cache.keys() if self._is_valid(k)]
+                return [k for k in all_keys if self._is_valid(k)]
             # Simple pattern matching
-            return [k for k in self._cache.keys() if self._match_pattern(k, pattern) and self._is_valid(k)]
+            return [k for k in all_keys if self._match_pattern(k, pattern) and self._is_valid(k)]
 
     def _is_valid(self, key: str) -> bool:
         entry = self._cache.get(key)

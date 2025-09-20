@@ -1,0 +1,202 @@
+name: Docker Build and Push (Master Only)
+
+on:
+  push:
+    branches:
+      - master
+    tags:
+      - 'v*'
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  # 检测变更文件，决定是否需要构建
+  detect-changes:
+    runs-on: ubuntu-24.04
+    outputs:
+      frontend-changed: ${{ steps.changes.outputs.frontend }}
+      backend-changed: ${{ steps.changes.outputs.backend }}
+      docker-changed: ${{ steps.changes.outputs.docker }}
+      resources-changed: ${{ steps.changes.outputs.resources }}
+      should-build: ${{ steps.should-build.outputs.result }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Check for changes
+        uses: dorny/paths-filter@v3
+        id: changes
+        with:
+          filters: |
+            frontend:
+              - 'frontend/**'
+              - 'frontend/package*.json'
+              - 'frontend/yarn.lock'
+              - 'frontend/pnpm-lock.yaml'
+            backend:
+              - 'app/**'
+              - 'pyproject.toml'
+              - 'uv.lock'
+            docker:
+              - 'Dockerfile'
+              - 'docker-compose*.yml'
+              - '.dockerignore'
+            resources:
+              - 'resources/**'
+
+      - name: Determine if build is needed
+        id: should-build
+        run: |
+          if [[ "${{ github.event_name }}" == "push" && "${{ contains(github.ref, 'refs/tags/') }}" == "true" ]]; then
+            echo "result=true" >> $GITHUB_OUTPUT
+            echo "🏷️ Tag推送，强制构建"
+          elif [[ "${{ steps.changes.outputs.frontend }}" == "true" || "${{ steps.changes.outputs.backend }}" == "true" || "${{ steps.changes.outputs.docker }}" == "true" || "${{ steps.changes.outputs.resources }}" == "true" ]]; then
+            echo "result=true" >> $GITHUB_OUTPUT
+            echo "📦 检测到相关文件变更，需要构建"
+          else
+            echo "result=false" >> $GITHUB_OUTPUT
+            echo "⏭️ 无相关文件变更，跳过构建"
+          fi
+
+  # 优化的构建和推送
+  build-and-push:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.should-build == 'true'
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js for frontend cache
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Cache frontend dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            frontend/node_modules
+            frontend/.next/cache
+          key: ${{ runner.os }}-frontend-${{ hashFiles('frontend/package*.json', 'frontend/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-frontend-
+
+      - name: Setup Python for backend cache
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Cache Python dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/uv
+            .venv
+          key: ${{ runner.os }}-python-${{ hashFiles('pyproject.toml', 'uv.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-python-
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        with:
+          driver-opts: |
+            network=host
+            image=moby/buildkit:v0.12.4
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=ref,event=branch
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{major}}
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: |
+            type=gha,scope=buildkit-cache
+            type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:cache
+          cache-to: |
+            type=gha,mode=max,scope=buildkit-cache
+            type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:cache,mode=max
+          build-args: |
+            BUILDKIT_INLINE_CACHE=1
+            BUILDKIT_CACHE_MOUNT=true
+          provenance: false
+          sbom: false
+
+      - name: Generate build summary
+        run: |
+          echo "## Docker Build Summary 🐳" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Image:** \`${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Tags:**" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          echo "${{ steps.meta.outputs.tags }}" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Platforms:** linux/amd64, linux/arm64" >> $GITHUB_STEP_SUMMARY
+          echo "**Registry:** GitHub Container Registry" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Changes detected:**" >> $GITHUB_STEP_SUMMARY
+          echo "- Frontend: ${{ needs.detect-changes.outputs.frontend-changed }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Backend: ${{ needs.detect-changes.outputs.backend-changed }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Docker: ${{ needs.detect-changes.outputs.docker-changed }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Resources: ${{ needs.detect-changes.outputs.resources-changed }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "⚡ **Performance optimizations applied:**" >> $GITHUB_STEP_SUMMARY
+          echo "- Smart change detection" >> $GITHUB_STEP_SUMMARY
+          echo "- Multi-level caching (GHA + Registry + BuildKit)" >> $GITHUB_STEP_SUMMARY
+          echo "- Frontend dependency caching (Node.js + npm)" >> $GITHUB_STEP_SUMMARY
+          echo "- Backend dependency caching (Python + uv)" >> $GITHUB_STEP_SUMMARY
+          echo "- Docker layer caching with mount cache" >> $GITHUB_STEP_SUMMARY
+          echo "- Latest BuildKit version" >> $GITHUB_STEP_SUMMARY
+          echo "- Disabled SBOM/Provenance for speed" >> $GITHUB_STEP_SUMMARY
+
+  # 仅在文档或非构建文件变更时运行的快速作业
+  skip-notification:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.should-build == 'false'
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Skip build notification
+        run: |
+          echo "## Build Skipped ⏭️" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "构建已跳过，因为没有检测到相关文件变更。" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**检查的路径:**" >> $GITHUB_STEP_SUMMARY
+          echo "- Frontend: \`frontend/**\`" >> $GITHUB_STEP_SUMMARY
+          echo "- Backend: \`app/**\`, \`pyproject.toml\`, \`uv.lock\`" >> $GITHUB_STEP_SUMMARY
+          echo "- Docker: \`Dockerfile\`, \`docker-compose*.yml\`" >> $GITHUB_STEP_SUMMARY
+          echo "- Resources: \`resources/**\`" >> $GITHUB_STEP_SUMMARY

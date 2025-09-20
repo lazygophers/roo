@@ -90,26 +90,45 @@ class TestAPIEndpoints:
         assert "detail" in data
         assert "not found" in data["detail"].lower()
 
-    def test_models_categories_endpoint(self, client, mock_database_service):
+    def test_models_categories_endpoint(self, client):
         """Test models categories endpoint"""
-        # Mock models with different groups
-        mock_models = [
-            {"slug": "model1", "groups": ["core"], "name": "Model 1"},
-            {"slug": "model2", "groups": ["coder"], "name": "Model 2"},
-            {"slug": "model3", "groups": ["core", "coder"], "name": "Model 3"}
+        # Mock cached data format that get_cached_data returns
+        mock_cached_data = [
+            {
+                "content": {"slug": "model1", "groups": ["core"], "name": "Model 1", "description": "Core model"},
+                "file_path": "/resources/models/model1.yaml"
+            },
+            {
+                "content": {"slug": "model2", "groups": ["coder"], "name": "Model 2", "description": "Coder model"},
+                "file_path": "/resources/models/coder/model2.yaml"
+            },
+            {
+                "content": {"slug": "model3", "groups": ["core", "coder"], "name": "Model 3", "description": "Mixed model"},
+                "file_path": "/resources/models/model3.yaml"
+            }
         ]
-        mock_database_service.get_models.return_value = mock_models
-        
-        response = client.post("/api/models/categories/list")
-        assert response.status_code == 200
-        data = response.json()
-        assert data["success"] is True
-        
-        categories = data["data"]
-        assert "core" in categories
-        assert "coder" in categories
-        assert len(categories["core"]) >= 1
-        assert len(categories["coder"]) >= 1
+
+        # Patch the function where it's used, not where it's defined
+        with patch('app.routers.api_models.get_database_service') as mock_get_service:
+            mock_service = Mock()
+            mock_service.get_cached_data.return_value = mock_cached_data
+            mock_get_service.return_value = mock_service
+
+            response = client.post("/api/models/categories/list")
+            assert response.status_code == 200
+            data = response.json()
+            assert data["success"] is True
+
+            categories = data["data"]
+            # Debug output to see what we actually got
+            print(f"\nDEBUG: categories = {categories}")
+            print(f"DEBUG: core count = {len(categories.get('core', []))}")
+            print(f"DEBUG: coder count = {len(categories.get('coder', []))}")
+
+            assert "core" in categories
+            assert "coder" in categories
+            assert len(categories["core"]) >= 1, f"Expected at least 1 core model, got {len(categories['core'])} - categories: {categories}"
+            assert len(categories["coder"]) >= 1, f"Expected at least 1 coder model, got {len(categories['coder'])} - categories: {categories}"
 
     def test_hooks_endpoints(self, client):
         """Test hooks endpoints"""
