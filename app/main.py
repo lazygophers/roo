@@ -14,13 +14,19 @@ import os
 import sys
 from typing import Optional
 from fastapi import FastAPI, Request
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 from contextlib import asynccontextmanager
 from pathlib import Path
 
 # 最小导入
 from app.core.config import API_PREFIX, DEBUG, LOG_LEVEL, PROJECT_ROOT
+from app.routers.api_system_monitor import router as system_monitor_router
+from app.routers.api_models import router as models_router
+from app.routers.mcp import router as mcp_router
+from app.routers.api_rules import router as rules_router
+from app.routers.api_configurations import router as configurations_router
+from app.routers.api_deploy import router as deploy_router
 
 # 全局变量 - 延迟初始化
 _db_service = None
@@ -234,6 +240,14 @@ async def get_status():
 async def health():
     return {"status": "ok", "mode": "minimal"}
 
+# Include additional routers
+app.include_router(system_monitor_router, prefix="/api", tags=["system"])
+app.include_router(models_router, prefix="/api", tags=["models"])
+app.include_router(mcp_router, prefix="/api", tags=["mcp"])
+app.include_router(rules_router, prefix="/api", tags=["rules"])
+app.include_router(configurations_router, prefix="/api", tags=["configurations"])
+app.include_router(deploy_router, prefix="/api/deploy", tags=["deploy"])
+
 # 静态文件配置
 FRONTEND_BUILD_DIR = PROJECT_ROOT / "frontend" / "build"
 FRONTEND_STATIC_DIR = FRONTEND_BUILD_DIR / "static"
@@ -244,8 +258,22 @@ if FRONTEND_BUILD_DIR.exists():
     if FRONTEND_STATIC_DIR.exists():
         app.mount("/static", StaticFiles(directory=str(FRONTEND_STATIC_DIR)), name="static")
 
+    # SPA 路由处理 - 添加回退路由
+    from fastapi import HTTPException
+
+    @app.exception_handler(404)
+    async def spa_handler(request, exc):
+        # 如果请求的是 API 路径，返回 404
+        if request.url.path.startswith('/api'):
+            return JSONResponse(
+                status_code=404,
+                content={"detail": "Not Found"}
+            )
+        # 否则返回 index.html，让前端路由处理
+        return FileResponse(FRONTEND_BUILD_DIR / "index.html")
+
     # 挂载前端应用
-    app.mount("/", StaticFiles(directory=str(FRONTEND_BUILD_DIR), html=True), name="frontend")
+    app.mount("/", StaticFiles(directory=str(FRONTEND_BUILD_DIR)), name="frontend")
 else:
     # 根路径
     @app.get("/")
