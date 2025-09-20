@@ -768,8 +768,7 @@ async def download_export_file(filename: str):
             media_type = 'application/octet-stream'
             headers = {
                 "Content-Disposition": f"attachment; filename={filename}",
-                "Content-Type": "application/octet-stream",
-                "Cache-Control": "no-cache"
+                "Content-Type": "application/octet-stream"
             }
         else:
             media_type = 'text/yaml'
