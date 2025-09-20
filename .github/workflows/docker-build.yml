@@ -44,6 +44,7 @@ jobs:
               - 'Dockerfile'
               - 'docker-compose*.yml'
               - '.dockerignore'
+              - '.github/workflows/docker-build.yml'
             resources:
               - 'resources/**'
 
@@ -150,5 +151,5 @@ jobs:
           echo "**检查的路径:**" >> $GITHUB_STEP_SUMMARY
           echo "- Frontend: \`frontend/**\`" >> $GITHUB_STEP_SUMMARY
           echo "- Backend: \`app/**\`, \`pyproject.toml\`, \`uv.lock\`" >> $GITHUB_STEP_SUMMARY
-          echo "- Docker: \`Dockerfile\`, \`docker-compose*.yml\`" >> $GITHUB_STEP_SUMMARY
+          echo "- Docker: \`Dockerfile\`, \`docker-compose*.yml\`, \`.github/workflows/docker-build.yml\`" >> $GITHUB_STEP_SUMMARY
           echo "- Resources: \`resources/**\`" >> $GITHUB_STEP_SUMMARY
