@@ -203,9 +203,14 @@ The project includes complete Docker containerization with separated build and r
 Automated Docker image building and publishing with GitHub Actions:
 - **GitHub Actions workflow**: `.github/workflows/docker-build.yml`
 - **Restricted triggers**: Only builds on push to master branch and version tags
-- **Smart change detection**: Only builds when relevant files change (frontend/backend/docker)
+- **Smart change detection**: Only builds when relevant files change (frontend/backend/docker/resources)
+- **Advanced caching strategy**:
+  - GitHub Actions cache for dependencies (Node.js npm + Python uv)
+  - Docker BuildKit cache with mount cache for build layers
+  - Registry cache for Docker images
+  - Frontend build cache (.next/cache, node_modules)
+  - Backend dependency cache (uv cache, .venv)
 - **Performance optimizations**: Latest BuildKit v0.12.4, disabled SBOM/Provenance for speed
-- **Multi-level caching**: GitHub Actions cache + Registry cache for maximum efficiency
 - **Multi-platform builds**: linux/amd64, linux/arm64 in single optimized job
 - **Container registry**: Uses GitHub Container Registry (ghcr.io) for GitHub Packages
 - **Tag-based builds**: Force builds on version tags regardless of file changes

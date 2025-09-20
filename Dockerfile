@@ -16,11 +16,15 @@ ENV CI=true
 # 复制前端源码
 COPY frontend/ ./
 
-# 安装前端依赖
-RUN yarn install --frozen-lockfile --production=false
+# 安装前端依赖（使用缓存挂载）
+RUN --mount=type=cache,target=/usr/local/share/.cache/yarn \
+    --mount=type=cache,target=/app/frontend/node_modules \
+    yarn install --frozen-lockfile --production=false
 
-# 构建前端生产版本
-RUN yarn build
+# 构建前端生产版本（使用缓存挂载）
+RUN --mount=type=cache,target=/app/frontend/node_modules \
+    --mount=type=cache,target=/app/frontend/.next/cache \
+    yarn build
 
 # ========== 后端构建阶段 ==========
 FROM python:3.12 AS backend-builder
@@ -35,16 +39,18 @@ RUN apt-get update && apt-get install -y \
     git \
     && rm -rf /var/lib/apt/lists/*
 
-# 安装 uv (Python 包管理器)
-RUN pip install uv
+# 安装 uv (Python 包管理器) 使用缓存挂载
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip install uv
 
 # 复制 Python 项目配置文件
 COPY pyproject.toml uv.lock ./
 
-# 创建虚拟环境并安装依赖（构建阶段使用完整功能）
-RUN uv venv .venv
-RUN uv venv --seed
-RUN uv sync --frozen --no-dev --no-install-project --no-install-workspace
+# 创建虚拟环境并安装依赖（使用缓存挂载）
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv venv .venv && \
+    uv venv --seed && \
+    uv sync --frozen --no-dev --no-install-project --no-install-workspace
 
 # ========== 最终运行阶段 ==========
 FROM alpine
