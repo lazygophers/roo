@@ -80,33 +80,22 @@ RUN apk add --no-cache \
     tzdata \
     tini \
     libffi \
-    python3 \
-    python3-dev \
-    py3-pip \
     gcc \
     musl-dev \
     linux-headers \
     && cp /usr/share/zoneinfo/$TZ /etc/localtime \
     && echo $TZ > /etc/timezone
 
-# 安装 uv 用于重新构建虚拟环境
-RUN pip3 install uv --break-system-packages
+# 从前端构建阶段复制构建后的静态文件
+COPY --from=frontend-builder /app/frontend/build ./frontend/build
 
-# 复制项目配置文件
+# 从后端构建阶段复制构建后的依赖
 COPY --from=backend-builder /app/pyproject.toml /app/uv.lock ./
-
-# 创建并构建虚拟环境（在目标架构上）
-RUN uv venv .venv && uv sync --frozen
-
-# 清理构建依赖
-RUN apk del python3-dev py3-pip gcc musl-dev linux-headers tzdata
+COPY --from=backend-builder /app/.venv .venv
 
 # 复制后端源码
 COPY app/ ./app/
 COPY resources/ ./resources/
-
-# 从前端构建阶段复制构建后的静态文件
-COPY --from=frontend-builder /app/frontend/build ./frontend/build
 
 # 创建必要的目录
 RUN mkdir -p logs data/cache
@@ -117,10 +106,6 @@ USER appuser
 
 # 暴露端口
 EXPOSE 8000
-
-# 健康检查（最小化频率减少资源消耗）
-HEALTHCHECK --interval=120s --timeout=3s --start-period=60s --retries=1 \
-    CMD curl -f http://localhost:8000/api/health || exit 1
 
 # 启动命令（直接启动，不使用tini进行调试）
 CMD ["/app/.venv/bin/python", "-m", "uvicorn", "app.main_optimized:app", \
