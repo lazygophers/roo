@@ -1,0 +1,73 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: lazyai-studio-data-pv
+  labels:
+    app: lazyai-studio
+    type: data
+spec:
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: local-storage
+  hostPath:
+    path: /var/lib/lazyai-studio/data
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: lazyai-studio-logs-pv
+  labels:
+    app: lazyai-studio
+    type: logs
+spec:
+  capacity:
+    storage: 2Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: local-storage
+  hostPath:
+    path: /var/lib/lazyai-studio/logs
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: lazyai-studio-data-pvc
+  namespace: lazyai-studio
+  labels:
+    app: lazyai-studio
+    type: data
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+  storageClassName: local-storage
+  selector:
+    matchLabels:
+      app: lazyai-studio
+      type: data
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: lazyai-studio-logs-pvc
+  namespace: lazyai-studio
+  labels:
+    app: lazyai-studio
+    type: logs
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi
+  storageClassName: local-storage
+  selector:
+    matchLabels:
+      app: lazyai-studio
+      type: logs

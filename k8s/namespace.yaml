@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: lazyai-studio
+  labels:
+    name: lazyai-studio
+    app: lazyai-studio

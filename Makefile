@@ -1,7 +1,7 @@
 # LazyAI Studio Makefile
 # LazyGophers 组织 - 让构建和部署更懒人化！
 
-.PHONY: help install dev build clean test deploy frontend-install frontend-dev frontend-build backend-dev backend-install all docker-build docker-up docker-down docker-logs docker-clean docker-restart docker-deploy
+.PHONY: help install dev build clean test deploy frontend-install frontend-dev frontend-build backend-dev backend-install all docker-build docker-push docker-build-push docker-up docker-down docker-logs docker-clean docker-restart docker-deploy k8s-deploy k8s-deploy-kustomize k8s-delete k8s-delete-kustomize k8s-status k8s-logs k8s-port-forward k8s-describe k8s-shell k8s-events k8s-restart
 
 # 默认目标
 help:
@@ -43,12 +43,24 @@ help:
 	@echo ""
 	@echo "🐳 Docker 命令:"
 	@echo "  docker-build     构建 Docker 镜像"
+	@echo "  docker-push      推送镜像到远程仓库"
+	@echo "  docker-build-push 构建并推送镜像"
 	@echo "  docker-up        启动 Docker 容器（低资源消耗配置）"
 	@echo "  docker-down      停止 Docker 容器"
 	@echo "  docker-restart   重启 Docker 容器"
 	@echo "  docker-logs      查看 Docker 容器日志"
 	@echo "  docker-clean     清理 Docker 资源"
 	@echo "  docker-deploy    一键 Docker 部署（构建+启动）"
+	@echo ""
+	@echo "☸️  Kubernetes 命令:"
+	@echo "  k8s-deploy       部署到 Kubernetes"
+	@echo "  k8s-deploy-kustomize  使用 Kustomize 部署"
+	@echo "  k8s-delete       删除 Kubernetes 资源"
+	@echo "  k8s-status       查看资源状态"
+	@echo "  k8s-logs         查看应用日志"
+	@echo "  k8s-port-forward 启动端口转发"
+	@echo "  k8s-shell        进入容器"
+	@echo "  k8s-restart      重启部署"
 	@echo ""
 	@echo "📦 GitHub Actions:"
 	@echo "  github-check     检查 GitHub Actions 工作流"
@@ -279,8 +291,20 @@ benchmark-clean:
 docker-build:
 	@echo "🐳 构建 Docker 镜像（自动打包前端+后端）..."
 	@echo "💡 这将自动构建前端并打包到后端服务中"
-	docker build -t lazyai-studio:latest .
+	@echo "🏷️ 镜像标签: lazygophers/lazyai-studio:latest"
+	docker build -t lazygophers/lazyai-studio:latest .
 	@echo "✅ Docker 镜像构建完成"
+
+# 推送 Docker 镜像到远程仓库
+docker-push:
+	@echo "📤 推送 Docker 镜像到远程仓库..."
+	@echo "🏷️ 镜像标签: lazygophers/lazyai-studio:latest"
+	docker push lazygophers/lazyai-studio:latest
+	@echo "✅ Docker 镜像推送完成"
+
+# 构建并推送 Docker 镜像
+docker-build-push: docker-build docker-push
+	@echo "🚀 Docker 镜像构建并推送完成！"
 
 # 启动 Docker 容器（低资源消耗配置）
 docker-up:
@@ -325,6 +349,69 @@ docker-deploy: docker-build docker-up
 docker-status:
 	@echo "📊 Docker 容器状态:"
 	docker-compose ps
+
+# ========== Kubernetes 命令 ==========
+# 部署到 Kubernetes
+k8s-deploy:
+	@echo "🚀 部署到 Kubernetes..."
+	kubectl apply -f k8s/
+	@echo "✅ Kubernetes 部署完成"
+	@echo "🔗 使用 'make k8s-port-forward' 访问服务"
+
+# 使用 Kustomize 部署
+k8s-deploy-kustomize:
+	@echo "🚀 使用 Kustomize 部署到 Kubernetes..."
+	kubectl apply -k k8s/
+	@echo "✅ Kustomize 部署完成"
+
+# 删除 Kubernetes 资源
+k8s-delete:
+	@echo "🗑️ 删除 Kubernetes 资源..."
+	kubectl delete -f k8s/
+	@echo "✅ Kubernetes 资源已删除"
+
+# 使用 Kustomize 删除
+k8s-delete-kustomize:
+	@echo "🗑️ 使用 Kustomize 删除 Kubernetes 资源..."
+	kubectl delete -k k8s/
+	@echo "✅ Kustomize 资源已删除"
+
+# 查看状态
+k8s-status:
+	@echo "📊 查看 Kubernetes 资源状态..."
+	kubectl get all -n lazyai-studio
+
+# 查看日志
+k8s-logs:
+	@echo "📋 查看 Kubernetes 日志..."
+	kubectl logs -n lazyai-studio deployment/lazyai-studio -f
+
+# 端口转发
+k8s-port-forward:
+	@echo "🔗 启动端口转发..."
+	@echo "💡 服务将在 http://localhost:8000 可用"
+	kubectl port-forward -n lazyai-studio svc/lazyai-studio-service 8000:8000
+
+# 查看详细信息
+k8s-describe:
+	@echo "📝 查看 Kubernetes 资源详情..."
+	kubectl describe all -n lazyai-studio
+
+# 进入容器
+k8s-shell:
+	@echo "🐚 进入 Pod 容器..."
+	kubectl exec -it -n lazyai-studio deployment/lazyai-studio -- /bin/sh
+
+# 查看事件
+k8s-events:
+	@echo "📋 查看 Kubernetes 事件..."
+	kubectl get events -n lazyai-studio --sort-by=.metadata.creationTimestamp
+
+# 重启部署
+k8s-restart:
+	@echo "🔄 重启 Kubernetes 部署..."
+	kubectl rollout restart deployment/lazyai-studio -n lazyai-studio
+	@echo "✅ 部署重启完成"
 
 # ========== GitHub Actions ==========
 # 检查 GitHub Actions 工作流

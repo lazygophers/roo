@@ -1,12 +1,12 @@
 services:
   lazyai-studio:
-    build: .
+    image: lazygophers/lazyai-studio:latest
     container_name: lazyai-studio
     ports:
       - "8000:8000"
     volumes:
-      - ./data:/app/data
-      - ./logs:/app/logs
+      - lazyai_data:/app/data
+      - lazyai_logs:/app/logs
     environment:
       # Python 运行时环境变量
       - PYTHONUNBUFFERED=1
@@ -52,3 +52,9 @@ services:
       options:
         max-size: "10m"
         max-file: "2"
+
+volumes:
+  lazyai_data:
+    driver: local
+  lazyai_logs:
+    driver: local
