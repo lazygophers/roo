@@ -1,171 +1,116 @@
 # 🚀 LazyAI Studio 部署指南
 
-## CI/CD 自动化部署
+## 🔧 本地开发部署
 
-LazyAI Studio 配置了完整的 CI/CD 自动化部署流程，支持以下功能：
+LazyAI Studio 支持简单的本地开发和生产部署：
 
-### 🔄 自动触发条件
-
-- **推送到 master 分支**：自动构建、测试、发布 Docker 镜像并创建新版本
-- **推送到 luoxin 分支**：自动构建、测试、发布 Docker 镜像并创建新版本
-- **创建 Pull Request**：自动构建预览镜像并运行测试
-- **推送 git 标签 (v*)**：基于标签构建特定版本镜像
-
-### 📦 Docker 镜像发布
-
-每次推送到主分支时，系统会：
-
-1. 运行完整的测试套件（前端 + 后端）
-2. 构建多架构 Docker 镜像（linux/amd64, linux/arm64）
-3. 推送到 GitHub Container Registry
-4. 自动创建 GitHub Release
-5. 发送部署成功通知
-
-### 🏷️ 版本管理
-
-- **自动版本递增**：每次发布自动递增补丁版本号
-- **标签命名规范**：采用 `v{major}.{minor}.{patch}` 格式
-- **镜像标签**：支持 `latest`、`v1.2.3`、分支名等多种标签
-
-## 🐳 Docker 部署方式
-
-### 方式一：使用最新镜像
-
-```bash
-# 拉取最新镜像
-docker pull ghcr.io/luoxin/roo:latest
-
-# 运行容器
-docker run -d \
-  --name lazyai-studio \
-  -p 8000:8000 \
-  -v $(pwd)/data:/app/data \
-  -v $(pwd)/logs:/app/logs \
-  ghcr.io/luoxin/roo:latest
-```
-
-### 方式二：使用 Docker Compose（推荐）
+### 🚀 快速启动
 
 #### 开发环境
 ```bash
-# 使用本地构建
-make docker-deploy
+# 安装依赖
+make install
+
+# 启动开发环境（前端 + 后端）
+make dev
 ```
 
 #### 生产环境
 ```bash
-# 使用发布的镜像
-docker-compose -f docker-compose.prod.yml up -d
+# 构建前端
+make build
+
+# 启动生产服务器
+make run
 ```
 
-### 方式三：指定版本部署
+### 📦 详细命令
 
+查看所有可用命令：
 ```bash
-# 部署特定版本
-docker pull ghcr.io/luoxin/roo:v1.0.0
-docker run -d \
-  --name lazyai-studio \
-  -p 8000:8000 \
-  ghcr.io/luoxin/roo:v1.0.0
+make help
 ```
 
-## 🔧 GitHub 仓库配置
+### 🔧 配置说明
 
-### 分支保护建议
+#### 环境要求
+- Python 3.12+
+- Node.js 18+
+- UV (Python 包管理器)
+- Yarn (前端包管理器)
 
-建议在 GitHub 仓库设置中配置以下分支保护规则：
+#### 项目结构
+- **后端**：FastAPI 应用，运行在 8000 端口
+- **前端**：React 应用，开发时运行在 3000 端口，生产时静态文件由后端服务
 
-#### master 分支保护
-- ✅ 限制推送到匹配的分支
-- ✅ 要求 pull request 审查
-- ✅ 要求状态检查通过
-  - `test (ubuntu-latest)`
-  - `docker (ubuntu-latest)`
-- ✅ 要求分支是最新的
-- ✅ 限制推送（仅管理员）
+### 🚀 部署流程
 
-#### luoxin 分支保护
-- ✅ 要求状态检查通过
-  - `test (ubuntu-latest)`
-  - `docker (ubuntu-latest)`
-- ✅ 要求分支是最新的
+#### 标准开发流程
 
-### 必需的 Secrets
+1. **安装依赖**：`make install`
+2. **开发**：`make dev` 启动开发环境
+3. **测试**：`make test` 运行测试套件
+4. **构建**：`make build` 构建生产版本
+5. **部署**：`make run` 启动生产服务器
 
-CI/CD 流程使用以下 GitHub Secrets：
+#### 性能优化版本
 
-- `GITHUB_TOKEN`（自动提供）：用于推送镜像到 GHCR
+项目提供高性能优化版本：
+```bash
+# 启动优化版本后端
+make backend-dev-optimized
 
-### 权限配置
+# 运行性能基准测试
+make benchmark
+```
 
-确保 GitHub Actions 有以下权限：
-- `contents: write` - 创建 Release
-- `packages: write` - 推送 Docker 镜像
-- `pull-requests: write` - 添加 PR 评论
+### 📊 监控和日志
 
-## 🚀 部署流程
-
-### 标准发布流程
-
-1. **开发**：在 feature 分支开发功能
-2. **测试**：创建 PR 到 master 分支
-   - 自动运行测试和构建预览镜像
-   - 代码审查
-3. **合并**：PR 合并到 master
-   - 自动运行完整测试套件
-   - 构建多架构 Docker 镜像
-   - 推送到 GHCR
-   - 创建新版本 Release
-4. **部署**：使用发布的镜像部署到生产环境
-
-### 热修复流程
-
-紧急修复可以直接推送到 luoxin 分支：
-
-1. **修复**：在 hotfix 分支修复问题
-2. **推送**：直接推送到 luoxin 分支
-   - 自动触发完整 CI/CD 流程
-   - 立即发布新版本
-3. **同步**：将修复合并回 master 分支
-
-## 📊 监控和日志
-
-### 健康检查
-
-Docker 容器配置了健康检查：
+#### 健康检查
 - 检查端点：`http://localhost:8000/api/health`
-- 检查间隔：30秒
-- 超时时间：10秒
-- 重试次数：3次
+- API 文档：`http://localhost:8000/docs`
 
-### 日志收集
-
-容器日志映射到宿主机：
-- 应用日志：`./logs/`
-- 数据文件：`./data/`
-
-### 访问地址
+#### 访问地址
 
 部署成功后可通过以下地址访问：
 - 🏠 主应用：http://localhost:8000
 - 📖 API 文档：http://localhost:8000/docs
 - 💚 健康检查：http://localhost:8000/api/health
 
-## 🔍 故障排除
+### 🧪 测试
 
-### 查看容器日志
+运行测试套件：
 ```bash
-docker logs lazyai-studio
+# 运行所有测试
+make test
+
+# 快速测试（跳过慢速测试）
+make test-fast
+
+# 完整测试套件（包含覆盖率）
+make test-full
+
+# 生成覆盖率报告
+make test-coverage
 ```
 
-### 查看构建状态
-访问 GitHub Actions 页面查看详细的构建日志和状态。
+### 🔍 故障排除
 
-### 常见问题
+#### 常见问题
 
-1. **镜像拉取失败**：确保有正确的 GHCR 访问权限
-2. **容器启动失败**：检查端口占用和卷挂载路径
-3. **健康检查失败**：检查容器内应用是否正常启动
+1. **依赖安装失败**：确保 UV 和 Yarn 已正确安装
+2. **端口占用**：检查 8000 和 3000 端口是否被占用
+3. **前端构建失败**：检查 Node.js 版本是否满足要求
+
+#### 检查系统环境
+```bash
+make check
+```
+
+#### 查看项目信息
+```bash
+make info
+```
 
 ---
 
