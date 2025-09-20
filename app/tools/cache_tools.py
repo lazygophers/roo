@@ -245,9 +245,25 @@ def cache_exists(key: str):
         ]
     }
 )
-def cache_ttl():
+def cache_ttl(key: str):
     """Get cache key's remaining TTL"""
-    pass
+    try:
+        with _cache._lock:
+            if key not in _cache._cache:
+                return {"success": True, "key": key, "ttl": -2, "message": "Key does not exist"}
+
+            entry = _cache._cache[key]
+            if entry["expire_time"] is None:
+                return {"success": True, "key": key, "ttl": -1, "message": "Key never expires"}
+
+            remaining = entry["expire_time"] - time.time()
+            if remaining <= 0:
+                del _cache._cache[key]
+                return {"success": True, "key": key, "ttl": -2, "message": "Key has expired"}
+
+            return {"success": True, "key": key, "ttl": int(remaining)}
+    except Exception as e:
+        return {"success": False, "key": key, "error": str(e)}
 
 
 @cache_tool(
@@ -275,9 +291,18 @@ def cache_ttl():
         ]
     }
 )
-def cache_expire():
+def cache_expire(key: str, ttl: int):
     """Set cache key expiration time"""
-    pass
+    try:
+        with _cache._lock:
+            if key not in _cache._cache:
+                return {"success": False, "key": key, "error": "Key does not exist"}
+
+            entry = _cache._cache[key]
+            entry["expire_time"] = time.time() + ttl if ttl > 0 else None
+            return {"success": True, "key": key, "ttl": ttl, "message": "Expiration time set"}
+    except Exception as e:
+        return {"success": False, "key": key, "error": str(e)}
 
 
 @cache_tool(
@@ -339,9 +364,28 @@ def cache_keys(pattern: str = "*"):
         ]
     }
 )
-def cache_mset():
+def cache_mset(key_values: dict, ttl: int = 0):
     """Set multiple cache key-value pairs in batch"""
-    pass
+    try:
+        success_count = 0
+        errors = []
+
+        for key, value in key_values.items():
+            try:
+                _cache.set(key, value, ttl)
+                success_count += 1
+            except Exception as e:
+                errors.append({"key": key, "error": str(e)})
+
+        return {
+            "success": True,
+            "total_keys": len(key_values),
+            "success_count": success_count,
+            "errors": errors,
+            "ttl": ttl
+        }
+    except Exception as e:
+        return {"success": False, "error": str(e)}
 
 
 @cache_tool(
@@ -365,9 +409,22 @@ def cache_mset():
         ]
     }
 )
-def cache_mget():
+def cache_mget(keys: list):
     """Get values of multiple cache keys in batch"""
-    pass
+    try:
+        results = {}
+        for key in keys:
+            value = _cache.get(key)
+            results[key] = value
+
+        return {
+            "success": True,
+            "results": results,
+            "total_keys": len(keys),
+            "found_keys": len([k for k, v in results.items() if v is not None])
+        }
+    except Exception as e:
+        return {"success": False, "error": str(e)}
 
 
 @cache_tool(
@@ -396,9 +453,32 @@ def cache_mget():
         ]
     }
 )
-def cache_incr():
+def cache_incr(key: str, amount: int = 1):
     """Atomically increment numeric cache value"""
-    pass
+    try:
+        with _cache._lock:
+            current_value = _cache.get(key)
+
+            if current_value is None:
+                # Initialize with the increment amount
+                new_value = amount
+                _cache.set(key, new_value)
+            else:
+                # Try to convert to int and increment
+                try:
+                    current_int = int(current_value)
+                    new_value = current_int + amount
+                    # Preserve the original entry's TTL
+                    entry = _cache._cache.get(key)
+                    expire_time = entry["expire_time"] if entry else None
+                    ttl = int(expire_time - time.time()) if expire_time else 0
+                    _cache.set(key, new_value, ttl if ttl > 0 else 0)
+                except (ValueError, TypeError):
+                    return {"success": False, "key": key, "error": "Value is not a number"}
+
+            return {"success": True, "key": key, "value": new_value, "increment": amount}
+    except Exception as e:
+        return {"success": False, "key": key, "error": str(e)}
 
 
 @cache_tool(
@@ -416,7 +496,37 @@ def cache_incr():
 )
 def cache_info():
     """Get cache system information and statistics"""
-    pass
+    try:
+        with _cache._lock:
+            total_keys = len(_cache._cache)
+            expired_keys = 0
+            persistent_keys = 0
+            current_time = time.time()
+
+            # Analyze cache entries
+            for entry in _cache._cache.values():
+                if entry["expire_time"] is None:
+                    persistent_keys += 1
+                elif entry["expire_time"] <= current_time:
+                    expired_keys += 1
+
+            active_keys = total_keys - expired_keys
+
+            return {
+                "success": True,
+                "statistics": {
+                    "total_keys": total_keys,
+                    "active_keys": active_keys,
+                    "expired_keys": expired_keys,
+                    "persistent_keys": persistent_keys,
+                    "cache_type": "SimpleCache",
+                    "thread_safe": True,
+                    "features": ["TTL", "Thread-Safe", "Pattern Matching"]
+                },
+                "timestamp": int(current_time)
+            }
+    except Exception as e:
+        return {"success": False, "error": str(e)}
 
 
 @cache_tool(

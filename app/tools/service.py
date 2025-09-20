@@ -552,6 +552,14 @@ class MCPToolsService:
 
         return list(merged_tools.values())
 
+    def get_all_tools(self, enabled_only: bool = True) -> List[Dict[str, Any]]:
+        """获取所有工具（别名方法，方便调用）"""
+        return self.get_tools(category=None, enabled_only=enabled_only)
+
+    def get_all_categories(self, enabled_only: bool = True) -> List[Dict[str, Any]]:
+        """获取所有分类（别名方法，方便调用）"""
+        return self.get_categories(enabled_only=enabled_only)
+
     def _get_registry_tools(self, category: str = None, enabled_only: bool = True) -> List[Dict[str, Any]]:
         """从装饰器注册表获取工具"""
         try:
