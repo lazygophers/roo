@@ -58,7 +58,7 @@ RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --frozen
 
 # ========== 最终运行阶段 ==========
-FROM alpine:latest
+FROM python:3.12-slim
 
 # 设置环境变量（运行时优化）
 ENV PYTHONUNBUFFERED=1
@@ -77,38 +77,26 @@ ENV CORS_ORIGINS=*
 ENV CORS_ALLOW_CREDENTIALS=true
 ENV CACHE_TTL=3600
 
-# 创建非root用户（Alpine方式）
-RUN addgroup -g 1000 appuser && adduser -u 1000 -G appuser -s /bin/sh -D appuser
+# 创建非root用户
+RUN groupadd -g 1000 appuser && useradd -u 1000 -g appuser -m appuser
 
 # 设置工作目录
 WORKDIR /app
 
-# 安装运行时必需的系统依赖（最小化版本）
-RUN apk add --no-cache \
+# 安装运行时必需的系统依赖
+RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     ca-certificates \
-    tzdata \
-    tini \
-    libffi \
-    python3 \
-    gcc \
-    musl-dev \
-    linux-headers \
-    && cp /usr/share/zoneinfo/$TZ /etc/localtime \
+    && rm -rf /var/lib/apt/lists/* \
+    && ln -sf /usr/share/zoneinfo/$TZ /etc/localtime \
     && echo $TZ > /etc/timezone
 
 # 从前端构建阶段复制构建后的静态文件
 COPY --from=frontend-builder /app/frontend/build ./frontend/build
 
-# 从后端构建阶段复制构建后的依赖
+# 从后端构建阶段复制构建后的依赖和源码
 COPY --from=backend-builder /app/pyproject.toml /app/uv.lock ./
 COPY --from=backend-builder /app/.venv .venv
-
-# 修复虚拟环境中的 Python 符号链接到 Alpine 系统路径
-RUN cd /app/.venv/bin && \
-    rm -f python python3 && \
-    ln -s /usr/bin/python3 python && \
-    ln -s /usr/bin/python3 python3
 
 # 复制后端源码
 COPY app/ ./app/
@@ -124,7 +112,7 @@ USER appuser
 # 暴露端口
 EXPOSE 8000
 
-# 启动命令（直接启动，不使用tini进行调试）
+# 启动命令
 CMD ["/app/.venv/bin/python", "-m", "uvicorn", "app.main_optimized:app", \
     "--host", "0.0.0.0", "--port", "8000", \
     "--workers", "1", "--log-level", "warning"]

@@ -157,10 +157,8 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: |
-            type=gha,scope=buildkit-cache
             type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:cache
           cache-to: |
-            type=gha,mode=max,scope=buildkit-cache
             type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:cache,mode=max
           build-args: |
             BUILDKIT_INLINE_CACHE=1
@@ -190,7 +188,7 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "⚡ **Performance optimizations applied:**" >> $GITHUB_STEP_SUMMARY
           echo "- Smart change detection" >> $GITHUB_STEP_SUMMARY
-          echo "- Multi-level caching (GHA + Registry + BuildKit)" >> $GITHUB_STEP_SUMMARY
+          echo "- Registry caching (reliable cross-platform)" >> $GITHUB_STEP_SUMMARY
           echo "- Frontend dependency caching (pnpm store + build cache)" >> $GITHUB_STEP_SUMMARY
           echo "- Backend dependency caching (Python + uv)" >> $GITHUB_STEP_SUMMARY
           echo "- Docker layer caching with mount cache" >> $GITHUB_STEP_SUMMARY
