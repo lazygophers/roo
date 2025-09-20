@@ -21,12 +21,22 @@ from pathlib import Path
 
 # 最小导入
 from app.core.config import API_PREFIX, DEBUG, LOG_LEVEL, PROJECT_ROOT
-from app.routers.api_system_monitor import router as system_monitor_router
 from app.routers.api_models import router as models_router
 from app.routers.mcp import router as mcp_router
 from app.routers.api_rules import router as rules_router
 from app.routers.api_configurations import router as configurations_router
 from app.routers.api_deploy import router as deploy_router
+from app.routers.api_commands import router as commands_router
+from app.routers.api_hooks import router as hooks_router
+from app.routers.api_database import router as database_router
+from app.routers.api_roles import router as roles_router
+from app.routers.api_file_security import router as file_security_router
+from app.routers.api_recycle_bin import router as recycle_bin_router
+from app.routers.api_time_tools import router as time_tools_router
+from app.routers.api_cache_tools import router as cache_tools_router
+from app.routers.api_cache import router as cache_router
+from app.routers.api_mcp_config import router as mcp_config_router
+from app.routers.api_web_scraping import router as web_scraping_router
 
 # 全局变量 - 延迟初始化
 _db_service = None
@@ -241,12 +251,22 @@ async def health():
     return {"status": "ok", "mode": "minimal"}
 
 # Include additional routers
-app.include_router(system_monitor_router, prefix="/api", tags=["system"])
 app.include_router(models_router, prefix="/api", tags=["models"])
 app.include_router(mcp_router, prefix="/api", tags=["mcp"])
 app.include_router(rules_router, prefix="/api", tags=["rules"])
 app.include_router(configurations_router, prefix="/api", tags=["configurations"])
 app.include_router(deploy_router, prefix="/api/deploy", tags=["deploy"])
+app.include_router(commands_router, prefix="/api", tags=["commands"])
+app.include_router(hooks_router, prefix="/api", tags=["hooks"])
+app.include_router(database_router, prefix="/api", tags=["database"])
+app.include_router(roles_router, prefix="/api", tags=["roles"])
+app.include_router(file_security_router, prefix="/api", tags=["file-security"])
+app.include_router(recycle_bin_router, prefix="/api", tags=["recycle-bin"])
+app.include_router(time_tools_router, prefix="/api", tags=["time-tools"])
+app.include_router(cache_tools_router, prefix="/api", tags=["cache-tools"])
+app.include_router(cache_router, prefix="/api", tags=["cache"])
+app.include_router(mcp_config_router, prefix="/api", tags=["mcp-config"])
+app.include_router(web_scraping_router, prefix="/api", tags=["web-scraping"])
 
 # 静态文件配置
 FRONTEND_BUILD_DIR = PROJECT_ROOT / "frontend" / "build"

@@ -3,8 +3,6 @@ import { Layout, Button, Space, Menu, theme } from 'antd';
 import { HomeOutlined, SettingOutlined, GithubOutlined, ApiOutlined } from '@ant-design/icons';
 import { useNavigate, useLocation } from 'react-router-dom';
 import ThemeToggle from '../Theme/ThemeToggle';
-// import SystemMonitorMenuItem from '../SystemMonitor/SystemMonitorMenuItem';
-import SystemMonitorPolling from '../SystemMonitor/SystemMonitorPolling';
 import LicenseInfo from '../License/LicenseInfo';
 import './AppLayout.css';
 
@@ -96,15 +94,13 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
           <div style={{ flex: 1 }} />
         </div>
 
-        {/* 系统监控和开源协议信息固定在底部 */}
+        {/* 开源协议信息固定在底部 */}
         <div style={{
           position: 'absolute',
           bottom: 0,
           left: 0,
           right: 0
         }}>
-          {/* 系统监控组件 */}
-          <SystemMonitorPolling />
           {/* 开源协议信息 */}
           <LicenseInfo />
         </div>
