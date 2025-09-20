@@ -199,14 +199,18 @@ The project includes complete Docker containerization with separated build and r
 - **Virtual environment**: Runtime uses `.venv/bin/python` directly without uv dependency
 - **Production ready**: Optimized backend with `main_optimized.py` for minimal resource usage
 
-### CI/CD Pipeline
+### CI/CD Pipeline (Master Branch Only)
 Automated Docker image building and publishing with GitHub Actions:
 - **GitHub Actions workflow**: `.github/workflows/docker-build.yml`
-- **Multi-platform builds**: Supports linux/amd64 and linux/arm64 architectures
-- **Container registry**: Uses GitHub Container Registry (ghcr.io)
-- **Automated triggers**: Builds on push to master/develop branches and version tags
+- **Restricted triggers**: Only builds on push to master branch and version tags
+- **Smart change detection**: Only builds when relevant files change (frontend/backend/docker)
+- **Performance optimizations**: Latest BuildKit v0.12.4, disabled SBOM/Provenance for speed
+- **Multi-level caching**: GitHub Actions cache + Registry cache for maximum efficiency
+- **Multi-platform builds**: linux/amd64, linux/arm64 in single optimized job
+- **Container registry**: Uses GitHub Container Registry (ghcr.io) for GitHub Packages
+- **Tag-based builds**: Force builds on version tags regardless of file changes
+- **Build skipping**: Intelligent skip notifications for documentation-only changes
 - **Version management**: Automatic semantic versioning from git tags
-- **Cache optimization**: Uses GitHub Actions cache for faster builds
 - **Make targets**: `github-check`, `github-release` for CI/CD management
 
 # important-instruction-reminders
