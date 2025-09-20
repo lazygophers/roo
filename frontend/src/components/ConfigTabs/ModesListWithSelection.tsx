@@ -594,36 +594,13 @@ const ModesListWithSelection: React.FC<ModesListProps> = ({
             </Space>
           </Col>
           <Col>
-            <Space>
-              <Button 
-                size="small"
-                onClick={handleSelectAll}
-                disabled={models.length === 0}
-              >
-                全选
-              </Button>
-              <Button 
-                size="small"
-                onClick={handleReverseSelection}
-                disabled={models.length === 0}
-              >
-                反选
-              </Button>
-              <Button 
-                size="small"
-                onClick={handleUnselectAll}
-                disabled={selectedModelCount === 0}
-              >
-                取消全选
-              </Button>
-              <Button 
-                size="small"
-                onClick={onClearSelection}
-                disabled={selectedModelCount === 0}
-              >
-                清空
-              </Button>
-            </Space>
+            <Button
+              size="small"
+              onClick={onClearSelection}
+              disabled={selectedModelCount === 0}
+            >
+              清空
+            </Button>
           </Col>
         </Row>
       </div>
