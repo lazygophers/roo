@@ -1,7 +1,7 @@
 # LazyAI Studio Makefile
 # LazyGophers 组织 - 让构建和部署更懒人化！
 
-.PHONY: help install dev build clean test deploy frontend-install frontend-dev frontend-build backend-dev backend-install all
+.PHONY: help install dev build clean test deploy frontend-install frontend-dev frontend-build backend-dev backend-install all docker-build docker-up docker-down docker-logs docker-clean docker-restart docker-deploy
 
 # 默认目标
 help:
@@ -40,6 +40,15 @@ help:
 	@echo "  benchmark-original    测试原始服务性能"
 	@echo "  benchmark-optimized   测试优化服务性能"
 	@echo "  benchmark-clean       清理性能测试进程"
+	@echo ""
+	@echo "🐳 Docker 命令:"
+	@echo "  docker-build     构建 Docker 镜像"
+	@echo "  docker-up        启动 Docker 容器"
+	@echo "  docker-down      停止 Docker 容器"
+	@echo "  docker-restart   重启 Docker 容器"
+	@echo "  docker-logs      查看 Docker 容器日志"
+	@echo "  docker-clean     清理 Docker 资源"
+	@echo "  docker-deploy    一键 Docker 部署（构建+启动）"
 	@echo ""
 	@echo "🧹 清理命令:"
 	@echo "  clean            清理所有构建文件"
@@ -260,6 +269,56 @@ benchmark-clean:
 	@pkill -f "app.main" || true
 	@pkill -f "app.main_optimized" || true
 	@echo "✅ 清理完成"
+
+# ========== Docker 命令 ==========
+# 构建 Docker 镜像
+docker-build:
+	@echo "🐳 构建 Docker 镜像（自动打包前端+后端）..."
+	@echo "💡 这将自动构建前端并打包到后端服务中"
+	docker build -t lazyai-studio:latest .
+	@echo "✅ Docker 镜像构建完成"
+
+# 启动 Docker 容器
+docker-up:
+	@echo "🐳 启动 Docker 容器..."
+	@echo "💡 服务将在 http://localhost:8000 启动"
+	docker-compose up -d
+	@echo "✅ Docker 容器已启动"
+	@echo "🔗 访问: http://localhost:8000"
+
+# 停止 Docker 容器
+docker-down:
+	@echo "🐳 停止 Docker 容器..."
+	docker-compose down
+	@echo "✅ Docker 容器已停止"
+
+# 重启 Docker 容器
+docker-restart:
+	@echo "🔄 重启 Docker 容器..."
+	docker-compose restart
+	@echo "✅ Docker 容器已重启"
+
+# 查看 Docker 容器日志
+docker-logs:
+	@echo "📋 查看 Docker 容器日志..."
+	docker-compose logs -f
+
+# 清理 Docker 资源
+docker-clean:
+	@echo "🧹 清理 Docker 资源..."
+	docker-compose down -v
+	docker system prune -f
+	@echo "✅ Docker 资源清理完成"
+
+# 一键 Docker 部署（构建+启动）
+docker-deploy: docker-build docker-up
+	@echo "🚀 Docker 一键部署完成！"
+	@echo "🌐 应用已启动: http://localhost:8000"
+
+# Docker 状态检查
+docker-status:
+	@echo "📊 Docker 容器状态:"
+	docker-compose ps
 
 # ========== 额外命令 ==========
 # 显示版本信息
