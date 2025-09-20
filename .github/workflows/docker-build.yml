@@ -44,6 +44,7 @@ jobs:
               - 'Dockerfile'
               - 'docker-compose*.yml'
               - '.dockerignore'
+              - '.github/workflows/docker-build.yml'
             resources:
               - 'resources/**'
 
@@ -74,70 +75,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Node.js and pnpm for frontend cache
-        uses: actions/setup-node@v4
-        with:
-          node-version: "22"
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 9.15.0
-
-      - name: Get pnpm store directory
-        shell: bash
-        run: |
-          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
-
-      - name: Cache pnpm store
-        uses: actions/cache@v4
-        with:
-          path: ${{ env.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('frontend/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
-
-      - name: Cache frontend build cache
-        uses: actions/cache@v4
-        with:
-          path: |
-            frontend/.next/cache
-          key: ${{ runner.os }}-frontend-build-${{ hashFiles('frontend/package*.json', 'frontend/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-frontend-build-
-
-      - name: Setup Python for backend cache
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-
-      - name: Cache Python dependencies
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cache/uv
-            .venv
-          key: ${{ runner.os }}-python-${{ hashFiles('pyproject.toml', 'uv.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-python-
-
-      - name: Cache Docker layers
-        uses: actions/cache@v4
-        with:
-          path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-buildx-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-buildx-
-
-      - name: Cache Docker build context
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.docker/buildx
-            /var/lib/docker/buildx
-          key: ${{ runner.os }}-docker-buildx-${{ hashFiles('Dockerfile', 'frontend/package*.json', 'pyproject.toml') }}
-          restore-keys: |
-            ${{ runner.os }}-docker-buildx-
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -170,24 +107,8 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: |
-            type=gha
-            type=local,src=/tmp/.buildx-cache
-            type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:cache
-          cache-to: |
-            type=gha,mode=max
-            type=local,dest=/tmp/.buildx-cache-new,mode=max
-            type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:cache,mode=max
-          build-args: |
-            BUILDKIT_INLINE_CACHE=1
-            BUILDKIT_CACHE_MOUNT=true
           provenance: false
           sbom: false
-
-      - name: Move cache
-        run: |
-          rm -rf /tmp/.buildx-cache
-          mv /tmp/.buildx-cache-new /tmp/.buildx-cache || true
 
       - name: Generate build summary
         run: |
@@ -209,19 +130,11 @@ jobs:
           echo "- Docker: ${{ needs.detect-changes.outputs.docker-changed }}" >> $GITHUB_STEP_SUMMARY
           echo "- Resources: ${{ needs.detect-changes.outputs.resources-changed }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "⚡ **Performance optimizations applied:**" >> $GITHUB_STEP_SUMMARY
+          echo "⚡ **Build optimizations:**" >> $GITHUB_STEP_SUMMARY
           echo "- Smart change detection" >> $GITHUB_STEP_SUMMARY
-          echo "- Multi-layer Docker caching strategy" >> $GITHUB_STEP_SUMMARY
-          echo "  - GitHub Actions cache (GHA)" >> $GITHUB_STEP_SUMMARY
-          echo "  - Local BuildX cache (/tmp/.buildx-cache)" >> $GITHUB_STEP_SUMMARY
-          echo "  - Registry cache (ghcr.io)" >> $GITHUB_STEP_SUMMARY
-          echo "- Frontend dependency caching (pnpm store + build cache)" >> $GITHUB_STEP_SUMMARY
-          echo "- Backend dependency caching (Python + uv)" >> $GITHUB_STEP_SUMMARY
-          echo "- Docker BuildX context caching" >> $GITHUB_STEP_SUMMARY
-          echo "- BuildKit inline cache + mount cache" >> $GITHUB_STEP_SUMMARY
-          echo "- pnpm for faster package management" >> $GITHUB_STEP_SUMMARY
-          echo "- Optimized Docker Buildx configuration" >> $GITHUB_STEP_SUMMARY
+          echo "- Single platform build (linux/amd64)" >> $GITHUB_STEP_SUMMARY
           echo "- Disabled SBOM/Provenance for speed" >> $GITHUB_STEP_SUMMARY
+          echo "- No caching for clean builds" >> $GITHUB_STEP_SUMMARY
 
   # 仅在文档或非构建文件变更时运行的快速作业
   skip-notification:
@@ -238,5 +151,5 @@ jobs:
           echo "**检查的路径:**" >> $GITHUB_STEP_SUMMARY
           echo "- Frontend: \`frontend/**\`" >> $GITHUB_STEP_SUMMARY
           echo "- Backend: \`app/**\`, \`pyproject.toml\`, \`uv.lock\`" >> $GITHUB_STEP_SUMMARY
-          echo "- Docker: \`Dockerfile\`, \`docker-compose*.yml\`" >> $GITHUB_STEP_SUMMARY
+          echo "- Docker: \`Dockerfile\`, \`docker-compose*.yml\`, \`.github/workflows/docker-build.yml\`" >> $GITHUB_STEP_SUMMARY
           echo "- Resources: \`resources/**\`" >> $GITHUB_STEP_SUMMARY
