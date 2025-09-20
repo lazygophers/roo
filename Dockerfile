@@ -21,16 +21,14 @@ ENV PATH=$PNPM_HOME:$PATH
 # 复制依赖配置文件
 COPY frontend/package.json frontend/pnpm-lock.yaml frontend/.npmrc ./
 
-# 安装前端依赖（使用pnpm缓存挂载）
-RUN --mount=type=cache,target=/root/.local/share/pnpm/store \
-    pnpm install --frozen-lockfile --production=false
+# 安装前端依赖
+RUN pnpm install --frozen-lockfile --production=false
 
 # 复制前端源码
 COPY frontend/ ./
 
-# 构建前端生产版本（使用缓存挂载）
-RUN --mount=type=cache,target=/app/frontend/.next/cache \
-    pnpm build
+# 构建前端生产版本
+RUN pnpm build
 
 # ========== 后端构建阶段 ==========
 FROM python:3.12 AS backend-builder
@@ -45,16 +43,14 @@ RUN apt-get update && apt-get install -y \
     git \
     && rm -rf /var/lib/apt/lists/*
 
-# 安装 uv (Python 包管理器) 使用缓存挂载
-RUN --mount=type=cache,target=/root/.cache/pip \
-    pip install uv
+# 安装 uv (Python 包管理器)
+RUN pip install uv
 
 # 复制 Python 项目配置文件
 COPY pyproject.toml uv.lock ./
 
-# 创建虚拟环境并安装依赖（使用缓存挂载）
-RUN --mount=type=cache,target=/root/.cache/uv \
-    uv venv .venv && \
+# 创建虚拟环境并安装依赖
+RUN uv venv .venv && \
     uv sync --frozen
 
 # ========== 最终运行阶段 ==========
