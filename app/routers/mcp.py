@@ -15,6 +15,7 @@ from app.core.secure_logging import sanitize_for_log
 from app.tools.service import get_mcp_tools_service
 from app.tools.server import get_mcp_server
 from app.core.mcp_tools_service import get_mcp_config_service
+from app.core.mcp_permissions import check_tool_permission, get_permission_manager, refresh_permission_manager
 
 logger = setup_logging()
 
@@ -66,13 +67,33 @@ async def list_mcp_tools():
     try:
         # 从MCP工具服务获取真实的工具数据
         tools_service = get_mcp_tools_service()
-        tools = tools_service.get_tools(enabled_only=False)  # 获取所有工具，包括禁用的
-        
+        all_tools = tools_service.get_tools(enabled_only=False)  # 获取所有工具，包括禁用的
+
+        # 根据权限过滤工具
+        permission_manager = get_permission_manager()
+        allowed_tools = []
+        blocked_tools = []
+
+        for tool in all_tools:
+            if check_tool_permission(tool['name']):
+                allowed_tools.append(tool)
+            else:
+                blocked_tools.append({
+                    "name": tool['name'],
+                    "description": tool['description'],
+                    "category": tool['category'],
+                    "permission_level": permission_manager.get_permission_level(tool['name']),
+                    "blocked_reason": f"需要 {permission_manager.get_permission_level(tool['name'])} 权限，在 {permission_manager.environment} 环境下不可用"
+                })
+
         return {
             "success": True,
             "message": "MCP tools retrieved successfully",
             "data": {
-                "tools": tools,
+                "tools": allowed_tools,
+                "blocked_tools": blocked_tools,
+                "environment": permission_manager.environment,
+                "permission_info": permission_manager.get_permission_info(),
                 "server": "LazyAI Studio MCP Server",
                 "organization": "LazyGophers"
             }
@@ -100,6 +121,22 @@ async def call_mcp_tool(request: MCPToolCallRequest):
         arguments = request.arguments
 
         # 输入验证已通过 Pydantic 模型完成
+
+        # 权限检查：检查工具是否允许在当前环境下使用
+        if not check_tool_permission(tool_name):
+            permission_manager = get_permission_manager()
+            permission_level = permission_manager.get_permission_level(tool_name)
+            return {
+                "success": False,
+                "message": f"工具 '{sanitize_for_log(tool_name)}' 在 {permission_manager.environment} 环境下不可用。此工具需要 {permission_level} 权限，仅在本地环境中可用。",
+                "error_code": "TOOL_PERMISSION_DENIED",
+                "data": {
+                    "tool_name": tool_name,
+                    "environment": permission_manager.environment,
+                    "permission_level": permission_level,
+                    "allowed": False
+                }
+            }
         
         # 获取MCP服务器实例并调用工具
         try:
@@ -558,7 +595,27 @@ async def mcp_streamable_endpoint(request: Dict[str, Any]):
             # 调用工具
             tool_name = params.get("name")
             arguments = params.get("arguments", {})
-            
+
+            # 权限检查：检查工具是否允许在当前环境下使用
+            if not check_tool_permission(tool_name):
+                permission_manager = get_permission_manager()
+                permission_level = permission_manager.get_permission_level(tool_name)
+                return {
+                    "jsonrpc": "2.0",
+                    "id": request.get("id"),
+                    "error": {
+                        "code": -2,
+                        "message": f"工具 '{sanitize_for_log(tool_name)}' 在 {permission_manager.environment} 环境下不可用。此工具需要 {permission_level} 权限，仅在本地环境中可用。",
+                        "data": {
+                            "tool_name": tool_name,
+                            "environment": permission_manager.environment,
+                            "permission_level": permission_level,
+                            "allowed": False,
+                            "error_code": "TOOL_PERMISSION_DENIED"
+                        }
+                    }
+                }
+
             # 获取MCP服务器实例并调用工具
             try:
                 from app.tools.server import get_mcp_server
@@ -1123,6 +1180,59 @@ async def update_category_config_item(category_id: str, config_key: str, request
         return {
             "success": False,
             "message": "Failed to update category configuration item: Internal server error"
+        }
+
+@router.get("/permissions")
+async def get_mcp_permissions():
+    """获取MCP工具权限信息"""
+    try:
+        permission_manager = get_permission_manager()
+
+        return {
+            "success": True,
+            "message": "MCP permissions retrieved successfully",
+            "data": {
+                "environment": permission_manager.environment,
+                "permission_info": permission_manager.get_permission_info(),
+                "allowed_tools": permission_manager.get_allowed_tools(),
+                "blocked_tools": permission_manager.get_blocked_tools(),
+                "restrictions_active": permission_manager.environment != "local"
+            }
+        }
+    except Exception as e:
+        logger.error(f"Failed to get MCP permissions: {sanitize_for_log(str(e))}")
+        return {
+            "success": False,
+            "message": "Failed to get MCP permissions: Internal server error"
+        }
+
+class RefreshPermissionsRequest(BaseModel):
+    """刷新权限请求模型"""
+    environment: Optional[str] = Field(None, description="环境类型 (local/remote)")
+
+@router.post("/permissions/refresh")
+async def refresh_mcp_permissions(request: RefreshPermissionsRequest = None):
+    """刷新MCP工具权限管理器（重新读取环境变量）"""
+    try:
+        environment = request.environment if request else None
+        permission_manager = refresh_permission_manager(environment)
+
+        return {
+            "success": True,
+            "message": "MCP permissions refreshed successfully",
+            "data": {
+                "environment": permission_manager.environment,
+                "permission_info": permission_manager.get_permission_info(),
+                "allowed_tools": permission_manager.get_allowed_tools(),
+                "blocked_tools": permission_manager.get_blocked_tools(),
+                "restrictions_active": permission_manager.environment != "local"
+            }
+        }
+    except Exception as e:
+        logger.error(f"Failed to refresh MCP permissions: {sanitize_for_log(str(e))}")
+        return {
+            "success": False,
+            "message": "Failed to refresh MCP permissions: Internal server error"
         }
 
 @router.get("/categories/github/token-status")

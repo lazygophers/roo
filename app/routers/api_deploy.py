@@ -827,6 +827,7 @@ async def get_cache_stats():
     summary="清理过期缓存",
     description="手动清理所有过期的缓存文件"
 )
+@require_deploy_permission
 async def cleanup_expired_cache():
     """手动清理过期缓存"""
     try:

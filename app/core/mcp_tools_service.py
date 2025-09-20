@@ -232,13 +232,19 @@ class MCPConfigService:
 
     def is_tool_edit_allowed(self) -> bool:
         """检查是否允许编辑MCP工具配置"""
-        # 如果是远程环境，不允许编辑
-        if self._config.is_remote_environment():
-            return False
-        # 也可以从环境变量检查
-        if ENVIRONMENT == "remote":
-            return False
-        return True
+        # 使用权限管理器检查当前环境
+        try:
+            from app.core.mcp_permissions import get_permission_manager
+            permission_manager = get_permission_manager()
+            # 在remote模式下，禁用所有编辑功能
+            return permission_manager.environment == "local"
+        except ImportError:
+            # 如果权限管理器不可用，回退到原有逻辑
+            if self._config.is_remote_environment():
+                return False
+            if ENVIRONMENT == "remote":
+                return False
+            return True
 
     def get_environment_type(self) -> str:
         """获取当前环境类型"""
