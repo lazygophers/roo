@@ -17,6 +17,8 @@ help:
 	@echo "  dev                   启动完整开发环境（前端+后端）"
 	@echo "  backend-dev           仅启动后端开发服务器"
 	@echo "  backend-dev-optimized ⚡启动高性能优化版本服务器"
+	@echo "  backend-dev-ultra     🚀启动极致性能版本服务器"
+	@echo "  backend-dev-minimal   🔋启动最小资源版本服务器"
 	@echo "  frontend-dev          仅启动前端开发服务器"
 	@echo ""
 	@echo "🏗️  构建命令:"
@@ -39,6 +41,9 @@ help:
 	@echo "  benchmark             运行性能基准测试对比"
 	@echo "  benchmark-original    测试原始服务性能"
 	@echo "  benchmark-optimized   测试优化服务性能"
+	@echo "  benchmark-ultra       测试极致性能服务"
+	@echo "  benchmark-minimal     测试最小资源服务"
+	@echo "  benchmark-compare     对比所有版本性能"
 	@echo "  benchmark-clean       清理性能测试进程"
 	@echo ""
 	@echo "🐳 Docker 命令:"
@@ -113,6 +118,24 @@ backend-dev-optimized:
 	uv run uvicorn app.main_optimized:app --reload --host 0.0.0.0 --port 8000
 
 backend-optimized: backend-dev-optimized
+
+# 启动极致性能版本服务器
+backend-dev-ultra:
+	@echo "🚀 启动极致性能版本后端服务器 (Ultra模式)..."
+	@echo "💡 使用延迟加载、垃圾回收优化、最小中间件"
+	@echo "💡 目标: 内存 < 20MB, 响应 < 1ms"
+	uv run uvicorn app.main_ultra:app --reload --host 0.0.0.0 --port 8000
+
+backend-ultra: backend-dev-ultra
+
+# 启动最小资源版本服务器
+backend-dev-minimal:
+	@echo "🔋 启动最小资源版本后端服务器 (Minimal模式)..."
+	@echo "💡 使用零缓存、流式处理、极致内存优化"
+	@echo "💡 目标: 内存 < 15MB, CPU < 5%"
+	uv run uvicorn app.main_minimal:app --reload --host 0.0.0.0 --port 8002
+
+backend-minimal: backend-dev-minimal
 
 frontend-dev:
 	@echo "🚀 启动前端开发服务器..."

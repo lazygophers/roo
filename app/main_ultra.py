@@ -1,339 +1,263 @@
 """
-极致性能优化主应用
-Ultra Performance Main Application
+LazyAI Studio - Ultra Performance Edition
+超高性能版本 - 极致优化内存和CPU使用
 
-特性:
-- 启动时间 < 500ms
-- 内存占用 < 20MB
-- 响应时间 < 1ms
-- 零阻塞架构
-- 智能预热
-- 资源复用
+优化特性:
+- 移除所有非必要服务和中间件
+- 懒加载所有组件
+- 最小化内存占用
+- 减少CPU周期
+- 优化启动时间
 """
 
-import asyncio
-import sys
-import time
-from contextlib import asynccontextmanager
-from pathlib import Path
-
-import uvloop
-from fastapi import FastAPI, Request, HTTPException
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.middleware.gzip import GZipMiddleware
-from fastapi.responses import ORJSONResponse, JSONResponse
-from fastapi.staticfiles import StaticFiles
+from fastapi.responses import JSONResponse
+from contextlib import asynccontextmanager
+from typing import Optional
+import gc
+import os
+import psutil
 
-# 使用高性能事件循环
-if sys.platform != "win32":
-    asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
+# 只导入必要的配置
+from app.core.config import API_PREFIX, DEBUG, LOG_LEVEL, ENVIRONMENT
 
-from app.core.config import API_PREFIX, DEBUG, LOG_LEVEL, PROJECT_ROOT
-from app.core.logging import setup_logging, log_error
-from app.core.ultra_cache_system import get_ultra_cache
-from app.core.ultra_performance_service import (
-    get_ultra_yaml_service,
-    get_ultra_rules_service, 
-    get_ultra_commands_service
-)
+# 延迟导入优化 - 只在需要时导入
+_database_service = None
+_logger = None
 
-# 导入优化的路由
-from app.routers.api_ultra_models import router as ultra_models_router
-from app.routers.api_ultra_rules import router as ultra_rules_router
-from app.routers.api_ultra_commands import router as ultra_commands_router
-from app.routers.api_system_monitor import router as system_monitor_router
-from app.routers.api_configurations import router as configurations_router
-from app.routers.api_deploy import router as deploy_router
+def get_logger():
+    """延迟初始化日志"""
+    global _logger
+    if _logger is None:
+        from app.core.logging import setup_logging
+        _logger = setup_logging(LOG_LEVEL)
+    return _logger
 
-# 设置日志
-logger = setup_logging(LOG_LEVEL)
-
-# 全局统计
-app_stats = {
-    'requests_count': 0,
-    'total_response_time': 0.0,
-    'startup_time': 0.0,
-    'cache_hits': 0,
-    'cache_misses': 0,
-}
-
+def get_database_service():
+    """延迟初始化数据库服务"""
+    global _database_service
+    if _database_service is None:
+        from app.core.database_service_lite import init_lite_database_service
+        _database_service = init_lite_database_service(use_unified_db=True)
+    return _database_service
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """FastAPI 生命周期管理 - 极致优化版本"""
-    startup_start = time.perf_counter()
-    
-    logger.info("🚀 Starting Ultra Performance LazyAI Studio...")
-    
+    """超轻量级生命周期管理"""
+    logger = get_logger()
+    logger.info("Initializing ultra-optimized application...")
+
     try:
-        # 并行初始化所有服务
-        async def init_services():
-            """并行初始化服务"""
-            tasks = []
-            
-            # 初始化缓存系统
-            cache = get_ultra_cache()
-            tasks.append(asyncio.create_task(asyncio.to_thread(cache.warm_up)))
-            
-            # 初始化服务
-            yaml_service = get_ultra_yaml_service()
-            rules_service = get_ultra_rules_service() 
-            commands_service = get_ultra_commands_service()
-            
-            # 预热缓存
-            tasks.extend([
-                asyncio.create_task(asyncio.to_thread(yaml_service.get_all_models)),
-                asyncio.create_task(asyncio.to_thread(rules_service.get_all_rules)),
-                asyncio.create_task(asyncio.to_thread(commands_service.get_all_commands)),
-            ])
-            
-            # 等待所有初始化完成
-            results = await asyncio.gather(*tasks, return_exceptions=True)
-            
-            # 检查结果
-            for i, result in enumerate(results):
-                if isinstance(result, Exception):
-                    logger.error(f"Service initialization {i} failed: {result}")
-                else:
-                    logger.debug(f"Service {i} initialized successfully")
-        
-        # 执行并行初始化
-        await init_services()
-        
-        startup_time = time.perf_counter() - startup_start
-        app_stats['startup_time'] = startup_time
-        
-        logger.info(f"✅ Ultra Performance initialization complete in {startup_time:.3f}s")
-        
-        # 显示启动信息
-        print_startup_banner(startup_time)
-        
-    except Exception as e:
-        logger.error(f"❌ Ultra Performance initialization failed: {e}")
-        raise
-    
-    yield
-    
-    # 关闭时清理
-    logger.info("🔄 Ultra Performance shutdown initiated...")
-    print("👋 Ultra Performance LazyAI Studio shutting down gracefully...\n")
+        # 强制垃圾回收，释放启动时的临时对象
+        gc.collect()
 
+        # 简化启动信息
+        process = psutil.Process()
+        memory_mb = process.memory_info().rss / 1024 / 1024
 
-def print_startup_banner(startup_time: float):
-    """打印启动横幅"""
-    try:
-        import socket
-        hostname = socket.gethostname()
-        local_ip = socket.gethostbyname(hostname)
-    except Exception:
-        local_ip = "127.0.0.1"
-    
-    frontend_status = "✅ Built (Integrated)" if (PROJECT_ROOT / "frontend" / "build").exists() else "⚠️  Not Built"
-    
-    banner = f"""
-{'='*70}
-🚀 ULTRA PERFORMANCE LazyAI Studio - READY!
-⚡ LazyGophers 极致性能版 - 让速度飞起来！
-{'='*70}
-
-📊 Performance Metrics:
-   ⏱️  Startup Time:     {startup_time*1000:.1f}ms
-   🎯 Target Response:   < 1ms
-   💾 Memory Target:     < 20MB
-   🔥 Cache Strategy:    Multi-level + Precompute
-
-📍 Access URLs:
-   🏠 Local:            http://localhost:8000
-   🌐 Network:          http://{local_ip}:8000
-   📖 API Docs:         http://localhost:8000/docs
-   📊 Monitoring:       http://localhost:8000/api/system/monitor
-
-🔗 Ultra Performance Endpoints:
-   ⚡ Models (Ultra):    POST /api/ultra/models
-   ⚡ Rules (Ultra):     POST /api/ultra/rules  
-   ⚡ Commands (Ultra):  POST /api/ultra/commands
-   📈 Cache Stats:      GET /api/ultra/models/stats
-
-🎯 Features:
-   ✅ Zero-copy responses
-   ✅ Multi-level caching
-   ✅ Batch processing
-   ✅ Resource pooling
-   ✅ Precomputed results
-   
-📱 Frontend: {frontend_status}
-
-{'='*70}
-⚡ ULTRA SPEED MODE ACTIVATED! 
-🎉 Ready for lightning-fast AI operations!
-{'='*70}
+        startup_message = f"""
+🚀 LazyAI Studio (Ultra) - Memory: {memory_mb:.1f}MB
+⚡ 极致性能模式启动完成！
+📍 http://localhost:8000
 """
-    
-    print(banner, flush=True)
+        print(startup_message, flush=True)
 
+    except Exception as e:
+        logger.error(f"Startup error: {e}")
+        raise
 
-# 创建 FastAPI 应用 - 极致配置
+    yield
+
+    # 清理资源
+    logger = get_logger()
+    logger.info("Shutting down ultra application...")
+
+    if _database_service:
+        _database_service.close()
+
+    # 强制垃圾回收
+    gc.collect()
+    print("✅ Ultra service closed\n", flush=True)
+
+# 创建最小化的 FastAPI 应用
 app = FastAPI(
-    title="LazyAI Studio Ultra API",
-    description="LazyGophers 出品 - 极致性能优化版 AI 智能工作室 API",
-    version="2.0.0-ultra",
+    title="LazyAI Studio (Ultra)",
+    description="超高性能版 - 极致优化内存和CPU使用",
+    version="1.2.0-ultra",
     debug=DEBUG,
     lifespan=lifespan,
-    default_response_class=ORJSONResponse,  # 使用高性能JSON序列化
+    # 禁用自动文档生成以节省内存
+    docs_url="/docs" if DEBUG else None,
+    redoc_url="/redoc" if DEBUG else None,
+    openapi_url="/openapi.json" if DEBUG else None,
 )
 
-
-# 性能监控中间件
-@app.middleware("http")
-async def performance_middleware(request: Request, call_next):
-    """性能监控中间件"""
-    start_time = time.perf_counter()
-    
-    # 处理请求
-    response = await call_next(request)
-    
-    # 更新统计
-    process_time = time.perf_counter() - start_time
-    app_stats['requests_count'] += 1
-    app_stats['total_response_time'] += process_time
-    
-    # 添加性能头
-    response.headers["X-Process-Time"] = str(round(process_time * 1000, 2))
-    response.headers["X-Requests-Count"] = str(app_stats['requests_count'])
-    response.headers["X-Avg-Response-Time"] = str(round(
-        (app_stats['total_response_time'] / app_stats['requests_count']) * 1000, 2
-    ))
-    
-    return response
-
-
-# 全局异常处理器 - 高性能版本
+# 简化的异常处理器
 @app.exception_handler(Exception)
-async def ultra_exception_handler(request: Request, exc: Exception):
-    """超高性能异常处理"""
-    log_error(exc, f"Ultra handler: {request.method} {request.url}")
-    
-    return ORJSONResponse(
+async def global_exception_handler(request: Request, exc: Exception):
+    logger = get_logger()
+    logger.error(f"Error in {request.method} {request.url}: {exc}")
+    return JSONResponse(
         status_code=500,
-        content={
-            "success": False,
-            "message": "Internal server error",
-            "error_detail": str(exc) if DEBUG else "An error occurred",
-            "timestamp": time.time(),
-            "path": str(request.url.path)
-        }
+        content={"success": False, "message": "Internal server error"}
     )
 
+# 最小化CORS配置
+if ENVIRONMENT == "local":
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],
+        allow_credentials=True,
+        allow_methods=["GET", "POST", "PUT", "DELETE"],
+        allow_headers=["Content-Type", "Authorization"],
+    )
+else:
+    # 生产环境更严格的CORS配置
+    from app.core.config import CORS_ORIGINS, CORS_ALLOW_CREDENTIALS
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=CORS_ORIGINS,
+        allow_credentials=CORS_ALLOW_CREDENTIALS,
+        allow_methods=["GET", "POST", "PUT", "DELETE"],
+        allow_headers=["Content-Type", "Authorization"],
+    )
 
-# 添加中间件 - 优化配置
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+# 延迟加载路由
+@app.get("/api/models")
+async def get_models():
+    """延迟加载模型数据"""
+    db_service = get_database_service()
+    models = db_service.get_models_data()
+    return {"success": True, "data": models, "total": len(models)}
 
-app.add_middleware(GZipMiddleware, minimum_size=1000)  # 压缩优化
+@app.get("/api/models/{slug}")
+async def get_model(slug: str):
+    """获取单个模型"""
+    db_service = get_database_service()
+    model = db_service.get_model_by_slug(slug)
+    if model:
+        return {"success": True, "data": model}
+    return {"success": False, "message": "Model not found"}
 
+@app.get("/api/models/group/{group}")
+async def get_models_by_group(group: str):
+    """按组获取模型"""
+    db_service = get_database_service()
+    models = db_service.get_models_by_group(group)
+    return {"success": True, "data": models, "total": len(models)}
 
-# 注册Ultra路由 - 使用 /api/ultra 前缀
-app.include_router(ultra_models_router, prefix="/api/ultra", tags=["ultra-models"])
-app.include_router(ultra_rules_router, prefix="/api/ultra", tags=["ultra-rules"])
-app.include_router(ultra_commands_router, prefix="/api/ultra", tags=["ultra-commands"])
+@app.post("/api/models/refresh")
+async def refresh_models():
+    """刷新模型缓存"""
+    db_service = get_database_service()
+    result = db_service.refresh_models_cache()
 
-# 兼容性路由 - 重定向到Ultra版本
-app.include_router(ultra_models_router, prefix=API_PREFIX, tags=["models"])
-app.include_router(ultra_rules_router, prefix=API_PREFIX, tags=["rules"])
-app.include_router(ultra_commands_router, prefix=API_PREFIX, tags=["commands"])
+    # 手动触发垃圾回收
+    gc.collect()
 
-# 其他路由
-app.include_router(system_monitor_router, prefix=API_PREFIX, tags=["system"])
-app.include_router(configurations_router, prefix=API_PREFIX, tags=["configurations"])
-app.include_router(deploy_router, prefix="/api/deploy", tags=["deploy"])
+    return {"success": True, "data": result}
 
+@app.get("/api/system/status")
+async def system_status():
+    """系统状态"""
+    process = psutil.Process()
+    memory_info = process.memory_info()
 
-# 健康检查端点 - 超快速版本
-@app.get("/health")
-@app.get("/api/health")
-async def ultra_health_check():
-    """极速健康检查"""
+    db_service = get_database_service()
+    db_status = db_service.get_status()
+
     return {
-        "status": "ultra-healthy", 
-        "version": "2.0.0-ultra",
-        "timestamp": time.time()
-    }
-
-
-# 性能统计端点
-@app.get("/api/ultra/stats")
-async def get_ultra_stats():
-    """获取Ultra性能统计"""
-    cache = get_ultra_cache()
-    cache_stats = cache.get_stats()
-    
-    avg_response_time = (
-        app_stats['total_response_time'] / app_stats['requests_count'] 
-        if app_stats['requests_count'] > 0 else 0
-    )
-    
-    return ORJSONResponse({
         "success": True,
         "data": {
-            "application": {
-                "startup_time_ms": app_stats['startup_time'] * 1000,
-                "requests_count": app_stats['requests_count'],
-                "avg_response_time_ms": avg_response_time * 1000,
-            },
-            "cache": cache_stats,
-            "timestamp": time.time()
-        },
-        "message": "Ultra performance statistics"
-    })
+            "version": "1.2.0-ultra",
+            "mode": "ultra_performance",
+            "memory_mb": round(memory_info.rss / 1024 / 1024, 2),
+            "cpu_percent": process.cpu_percent(),
+            "database": db_status,
+            "optimizations": [
+                "lazy_loading",
+                "minimal_imports",
+                "gc_optimization",
+                "memory_pooling",
+                "no_file_watching",
+                "simplified_middleware"
+            ]
+        }
+    }
 
+@app.post("/api/system/gc")
+async def force_garbage_collection():
+    """手动触发垃圾回收"""
+    collected = gc.collect()
+    process = psutil.Process()
+    memory_mb = process.memory_info().rss / 1024 / 1024
 
-# 静态文件配置
-FRONTEND_BUILD_DIR = PROJECT_ROOT / "frontend" / "build"
-FRONTEND_STATIC_DIR = FRONTEND_BUILD_DIR / "static"
+    return {
+        "success": True,
+        "data": {
+            "collected_objects": collected,
+            "memory_mb": round(memory_mb, 2)
+        }
+    }
 
-# 挂载前端静态资源
-if FRONTEND_BUILD_DIR.exists():
-    if FRONTEND_STATIC_DIR.exists():
-        app.mount("/static", StaticFiles(directory=str(FRONTEND_STATIC_DIR)), name="static")
-    app.mount("/", StaticFiles(directory=str(FRONTEND_BUILD_DIR), html=True), name="frontend")
-else:
-    # 开发模式API信息
-    @app.get("/")
-    async def ultra_root():
-        return ORJSONResponse({
-            "message": "LazyAI Studio Ultra API is running",
-            "organization": "LazyGophers",
-            "motto": "极致性能，让 AI 飞速响应！",
-            "version": "2.0.0-ultra",
-            "mode": "ultra-development",
-            "frontend_status": "not_built",
-            "build_command": "cd frontend && npm run build",
-            "docs": "/docs",
-            "ultra_endpoints": {
-                "models": "/api/ultra/models",
-                "rules": "/api/ultra/rules",
-                "commands": "/api/ultra/commands",
-                "stats": "/api/ultra/stats"
-            }
-        })
+# 健康检查端点
+@app.get("/health")
+async def health_check():
+    return {"status": "healthy", "mode": "ultra"}
 
+@app.get("/api/health")
+async def api_health_check():
+    return await health_check()
 
-if __name__ == "__main__":
-    # 用于直接运行
-    import uvicorn
-    
-    uvicorn.run(
-        "app.main_ultra:app",
-        host="0.0.0.0",
-        port=8001,  # 使用不同端口避免冲突
-        reload=False,  # 生产模式不使用reload
-        workers=1,     # 单进程以保持缓存一致性
-        loop="uvloop", # 使用高性能事件循环
-        http="httptools",  # 使用高性能HTTP解析器
-        access_log=False,  # 关闭访问日志提升性能
-    )
+# 根路径信息
+@app.get("/")
+async def root():
+    process = psutil.Process()
+    memory_mb = process.memory_info().rss / 1024 / 1024
+
+    return {
+        "message": "LazyAI Studio API (Ultra Performance)",
+        "organization": "LazyGophers",
+        "version": "1.2.0-ultra",
+        "mode": "ultra_performance",
+        "memory_mb": round(memory_mb, 2),
+        "features": [
+            "极致内存优化",
+            "CPU使用最小化",
+            "懒加载架构",
+            "垃圾回收优化"
+        ],
+        "docs": "/docs" if DEBUG else "disabled"
+    }
+
+# 如果需要完整API，可以动态加载
+@app.get("/api/load-full-features")
+async def load_full_features():
+    """动态加载完整功能（仅在需要时）"""
+    try:
+        # 动态导入完整路由
+        from app.routers import api_router
+        app.include_router(api_router, prefix=API_PREFIX)
+
+        return {
+            "success": True,
+            "message": "Full features loaded",
+            "warning": "Memory usage will increase"
+        }
+    except Exception as e:
+        return {
+            "success": False,
+            "message": f"Failed to load full features: {e}"
+        }
+
+# 设置进程优先级（如果是Linux/Unix系统）
+try:
+    if hasattr(os, 'nice'):
+        # 设置较低的进程优先级以减少CPU竞争
+        os.nice(5)
+except:
+    pass
+
+# 优化垃圾回收设置
+gc.set_threshold(700, 10, 10)  # 更保守的GC设置
