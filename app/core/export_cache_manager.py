@@ -25,12 +25,12 @@ class ExportCacheManager:
         初始化缓存管理器
 
         Args:
-            cache_dir: 缓存目录，默认为项目根目录下的temp文件夹
+            cache_dir: 缓存目录，默认为项目根目录下的data/temp文件夹
         """
         if cache_dir is None:
-            # 默认使用项目根目录下的temp文件夹
+            # 默认使用项目根目录下的data/temp文件夹
             project_root = Path(__file__).parent.parent.parent
-            cache_dir = project_root / "temp"
+            cache_dir = project_root / "data" / "temp"
 
         self.cache_dir = cache_dir
         self.cache_dir.mkdir(exist_ok=True)

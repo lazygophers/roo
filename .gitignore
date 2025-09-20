@@ -13,5 +13,4 @@ logs/
 .claude/
 .claude*
 .gitignore
-temp/
 .venv

@@ -336,7 +336,7 @@ async def export_custom_modes(request: DeployRequest):
         cached_filename = cache_manager.get_cached_file(config_data)
         if cached_filename:
             # 找到缓存文件，直接返回
-            temp_dir = Path(__file__).parent.parent.parent / "temp"
+            temp_dir = Path(__file__).parent.parent.parent / "data" / "temp"
             cached_file_path = temp_dir / cached_filename
 
             if cached_file_path.exists():
@@ -365,7 +365,7 @@ async def export_custom_modes(request: DeployRequest):
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         unique_id = str(uuid.uuid4())[:8]
 
-        temp_dir = Path(__file__).parent.parent.parent / "temp"
+        temp_dir = Path(__file__).parent.parent.parent / "data" / "temp"
         temp_dir.mkdir(exist_ok=True)
 
         # 检查是否选择了指令
@@ -756,7 +756,7 @@ async def download_export_file(filename: str):
             raise HTTPException(status_code=400, detail="文件名包含非法字符")
 
         # 构建文件路径
-        temp_dir = Path(__file__).parent.parent.parent / "temp"
+        temp_dir = Path(__file__).parent.parent.parent / "data" / "temp"
         file_path = temp_dir / filename
 
         # 检查文件是否存在

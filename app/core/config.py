@@ -61,7 +61,6 @@ FILE_TOOLS_CONFIG = {
     
     # 可删除的目录列表 - 默认只允许项目目录和临时目录
     "deletable_directories": [
-        str(PROJECT_ROOT / "temp"),      # 项目临时目录
         str(PROJECT_ROOT / "data" / "temp"),  # 数据临时目录
         "/tmp",                         # 系统临时目录
         str(Path.home() / "Downloads"),  # 用户下载目录
