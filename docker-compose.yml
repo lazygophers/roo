@@ -8,9 +8,21 @@ services:
       - ./data:/app/data
       - ./logs:/app/logs
     environment:
+      # Python 运行时环境变量
       - PYTHONUNBUFFERED=1
       - PYTHONOPTIMIZE=2
       - PYTHONDONTWRITEBYTECODE=1
+
+      # LazyAI Studio 应用环境变量
+      - ENVIRONMENT=${ENVIRONMENT:-local}       # 运行环境: local 或 remote
+      - DEBUG=${DEBUG:-false}                   # 调试模式
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}           # 日志级别: DEBUG, INFO, WARNING, ERROR
+      - HOST=${HOST:-0.0.0.0}                  # 绑定主机
+      - PORT=${PORT:-8000}                     # 端口号
+      - CORS_ORIGINS=${CORS_ORIGINS:-*}        # CORS 允许的来源，多个用逗号分隔
+      - CORS_ALLOW_CREDENTIALS=${CORS_ALLOW_CREDENTIALS:-true}  # 是否允许携带凭证
+      - CACHE_TTL=${CACHE_TTL:-3600}           # 缓存过期时间（秒）
+      - DATABASE_PATH=${DATABASE_PATH:-/app/data/lazyai.db}  # 数据库文件路径
     restart: unless-stopped
     # 极低资源限制配置
     deploy:
@@ -34,18 +46,9 @@ services:
     read_only: false
     tmpfs:
       - /tmp:rw,noexec,nosuid,size=16m  # 最小临时文件系统16MB
-    # 网络优化
-    networks:
-      - lazyai-network
     # 日志配置（减少日志开销）
     logging:
       driver: "json-file"
       options:
         max-size: "10m"
         max-file: "2"
-
-networks:
-  lazyai-network:
-    driver: bridge
-    driver_opts:
-      com.docker.network.driver.mtu: 1500

@@ -172,6 +172,63 @@ npm audit        # Security audit
 - **MCP Integration**: Model Context Protocol tools (mcp, fastmcp)
 - **Web Tools**: aiohttp, aiofiles, beautifulsoup4 for web scraping
 
+## Environment Configuration
+
+LazyAI Studio supports flexible environment configuration through environment variables for different deployment scenarios.
+
+### Supported Environment Types
+- **local**: Local development environment (default) - allows all CORS origins, suitable for development
+- **remote**: Remote deployment environment - configurable CORS security policies, suitable for production
+
+### Environment Variables
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `ENVIRONMENT` | `local` | Environment type (local/remote) |
+| `DEBUG` | `false` | Debug mode toggle |
+| `LOG_LEVEL` | `INFO` | Log level (DEBUG/INFO/WARNING/ERROR) |
+| `HOST` | `0.0.0.0` | Service bind address |
+| `PORT` | `8000` | Service port |
+| `CORS_ORIGINS` | `*` | CORS allowed origins (remote environment only) |
+| `CORS_ALLOW_CREDENTIALS` | `true` | Allow credentials (remote environment only) |
+| `DATABASE_PATH` | `/app/data/lazyai.db` | Database file path |
+| `CACHE_TTL` | `3600` | Cache expiration time (seconds) |
+
+### Configuration Usage
+
+1. **Copy configuration template**:
+   ```bash
+   cp .env.example .env
+   ```
+
+2. **Edit configuration file**:
+   ```bash
+   vim .env  # Modify as needed
+   ```
+
+3. **Deploy with environment**:
+   ```bash
+   make docker-deploy  # Automatically reads .env file
+   ```
+
+### Configuration Examples
+
+**Local Development**:
+```env
+ENVIRONMENT=local
+DEBUG=true
+LOG_LEVEL=DEBUG
+```
+
+**Remote Production**:
+```env
+ENVIRONMENT=remote
+DEBUG=false
+LOG_LEVEL=INFO
+CORS_ORIGINS=https://yourdomain.com,https://api.yourdomain.com
+CORS_ALLOW_CREDENTIALS=false
+```
+
 ### Code Structure Conventions
 - Backend follows FastAPI patterns with dependency injection
 - Frontend uses React functional components with hooks

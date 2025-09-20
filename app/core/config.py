@@ -14,16 +14,32 @@ HOOKS_DIR = PROJECT_ROOT / "resources" / "hooks"
 API_PREFIX = "/api"
 API_VERSION = "v1"
 
-# 服务器配置
-HOST = "0.0.0.0"
-PORT = 8000
-DEBUG = os.getenv("DEBUG", "false").lower() == "true"
-
-# 日志配置
-LOG_LEVEL = "INFO" if not DEBUG else "DEBUG"
-
 # 环境配置
 ENVIRONMENT = os.getenv("ENVIRONMENT", "local")  # local 或 remote
+
+# 基于环境的服务器配置
+if ENVIRONMENT == "remote":
+    # 远端环境配置
+    HOST = os.getenv("HOST", "0.0.0.0")
+    PORT = int(os.getenv("PORT", "8000"))
+    DEBUG = os.getenv("DEBUG", "false").lower() == "true"
+    LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
+    # 远端环境 CORS 配置
+    CORS_ORIGINS = os.getenv("CORS_ORIGINS", "*").split(",")
+    CORS_ALLOW_CREDENTIALS = os.getenv("CORS_ALLOW_CREDENTIALS", "false").lower() == "true"
+else:  # local 默认配置
+    # 本地环境配置
+    HOST = os.getenv("HOST", "0.0.0.0")
+    PORT = int(os.getenv("PORT", "8000"))
+    DEBUG = os.getenv("DEBUG", "false").lower() == "true"
+    LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
+    # 本地环境 CORS 配置
+    CORS_ORIGINS = ["*"]  # 本地开发允许所有来源
+    CORS_ALLOW_CREDENTIALS = True
+
+# 数据库配置
+DATABASE_PATH = os.getenv("DATABASE_PATH", str(PROJECT_ROOT / "data" / "lazyai.db"))
+CACHE_TTL = int(os.getenv("CACHE_TTL", "3600"))  # 缓存过期时间（秒）
 
 # 文件工具安全配置
 FILE_TOOLS_CONFIG = {

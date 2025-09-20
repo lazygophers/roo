@@ -67,6 +67,16 @@ ENV PYTHONOPTIMIZE=2
 ENV PYTHONPATH=/app
 ENV TZ=Asia/Shanghai
 
+# LazyAI Studio 应用环境变量
+ENV ENVIRONMENT=local
+ENV DEBUG=false
+ENV LOG_LEVEL=INFO
+ENV HOST=0.0.0.0
+ENV PORT=8000
+ENV CORS_ORIGINS=*
+ENV CORS_ALLOW_CREDENTIALS=true
+ENV CACHE_TTL=3600
+
 # 创建非root用户（Alpine方式）
 RUN addgroup -g 1000 appuser && adduser -u 1000 -G appuser -s /bin/sh -D appuser
 
@@ -80,6 +90,7 @@ RUN apk add --no-cache \
     tzdata \
     tini \
     libffi \
+    python3 \
     gcc \
     musl-dev \
     linux-headers \
@@ -92,6 +103,12 @@ COPY --from=frontend-builder /app/frontend/build ./frontend/build
 # 从后端构建阶段复制构建后的依赖
 COPY --from=backend-builder /app/pyproject.toml /app/uv.lock ./
 COPY --from=backend-builder /app/.venv .venv
+
+# 修复虚拟环境中的 Python 符号链接到 Alpine 系统路径
+RUN cd /app/.venv/bin && \
+    rm -f python python3 && \
+    ln -s /usr/bin/python3 python && \
+    ln -s /usr/bin/python3 python3
 
 # 复制后端源码
 COPY app/ ./app/

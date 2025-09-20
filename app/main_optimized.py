@@ -4,7 +4,7 @@ from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 from contextlib import asynccontextmanager
 from pathlib import Path
-from app.core.config import API_PREFIX, DEBUG, LOG_LEVEL, PROJECT_ROOT
+from app.core.config import API_PREFIX, DEBUG, LOG_LEVEL, PROJECT_ROOT, ENVIRONMENT, CORS_ORIGINS, CORS_ALLOW_CREDENTIALS
 from app.core.logging import setup_logging, log_error
 from app.core.database_service_lite import init_lite_database_service, get_lite_database_service
 from app.routers import api_router
@@ -45,7 +45,12 @@ async def lifespan(app: FastAPI):
 🔗 功能入口:
    📊 配置管理:    http://localhost:8000/
    📖 API 文档:    http://localhost:8000/docs
-   💚 健康检查:    http://localhost:8000/api/health"""
+   💚 健康检查:    http://localhost:8000/api/health
+
+⚙️  环境配置:
+   🌍 运行环境:    {ENVIRONMENT.upper()}
+   🔧 调试模式:    {'启用' if DEBUG else '禁用'}
+   📝 日志级别:    {LOG_LEVEL}"""
 
         # 快速检查前端构建状态
         frontend_build = PROJECT_ROOT / "frontend" / "build"
@@ -115,13 +120,13 @@ async def global_exception_handler(request: Request, exc: Exception):
         }
     )
 
-# CORS 中间件配置（优化配置）
+# CORS 中间件配置（基于环境）
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],  # 限制来源
-    allow_credentials=True,
-    allow_methods=["GET", "POST", "PUT", "DELETE"],  # 限制方法
-    allow_headers=["Content-Type", "Authorization"],  # 限制头部
+    allow_origins=CORS_ORIGINS,  # 基于环境的来源配置
+    allow_credentials=CORS_ALLOW_CREDENTIALS,
+    allow_methods=["GET", "POST", "PUT", "DELETE"],  # 允许的HTTP方法
+    allow_headers=["Content-Type", "Authorization"],  # 允许的请求头
 )
 
 # 注册路由
