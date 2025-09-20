@@ -138,7 +138,7 @@ class MinimalDatabaseService:
             return None
 
         except Exception as e:
-            logger.error(f"Error finding model {slug}: {e}")
+            logger.error("Error finding model: %s", repr(slug)[:50])
             return None
         finally:
             self._optimize_memory()
@@ -185,11 +185,11 @@ class MinimalDatabaseService:
                 if len(group_models) % 5 == 0:
                     self._optimize_memory()
 
-            logger.info(f"Found {len(group_models)} models in group '{group}'")
+            logger.info("Found %d models in group: %s", len(group_models), repr(group)[:50])
             return group_models
 
         except Exception as e:
-            logger.error(f"Error loading group {group}: {e}")
+            logger.error("Error loading group: %s", repr(group)[:50])
             return []
         finally:
             self._optimize_memory()
