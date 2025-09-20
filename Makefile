@@ -43,11 +43,11 @@ help:
 	@echo ""
 	@echo "🐳 Docker 命令:"
 	@echo "  docker-build     构建 Docker 镜像 (本地架构)"
-	@echo "  docker-build-multi 构建多架构镜像 (amd64+arm64)"
+	@echo "  docker-build-multi 构建amd64镜像"
 	@echo "  docker-push      推送镜像到远程仓库 (需先登录 GHCR)"
-	@echo "  docker-push-multi 构建并推送多架构镜像"
+	@echo "  docker-push-multi 构建并推送amd64镜像"
 	@echo "  docker-build-push 构建并推送镜像 (单架构)"
-	@echo "  docker-build-push-multi 构建并推送镜像 (多架构)"
+	@echo "  docker-build-push-multi 构建并推送镜像 (amd64)"
 	@echo "  docker-up        启动 Docker 容器（低资源消耗配置）"
 	@echo "  docker-down      停止 Docker 容器"
 	@echo "  docker-restart   重启 Docker 容器"
@@ -85,7 +85,7 @@ backend-install:
 
 frontend-install:
 	@echo "📦 安装前端依赖..."
-	cd frontend && yarn install
+	cd frontend && pnpm install
 	@echo "✅ 前端依赖安装完成"
 
 # ========== 开发环境 ==========
@@ -121,11 +121,11 @@ frontend-dev:
 	@echo "🚀 启动前端开发服务器..."
 	@echo "💡 前端将在 http://localhost:3000 启动"
 	@echo "🔗 后端 API 代理到 http://localhost:8000"
-	cd frontend && yarn start
+	cd frontend && pnpm start
 
-frontend-dev-yarn:
-	@echo "🚀 启动前端开发服务器 (Yarn)..."
-	cd frontend && yarn start
+frontend-dev-pnpm:
+	@echo "🚀 启动前端开发服务器 (pnpm)..."
+	cd frontend && pnpm start
 
 # ========== 构建生产版本 ==========
 build: frontend-build
@@ -133,12 +133,12 @@ build: frontend-build
 
 frontend-build:
 	@echo "🏗️ 构建前端生产版本..."
-	cd frontend && yarn run build
+	cd frontend && pnpm run build
 	@echo "✅ 前端构建完成，静态文件位于 frontend/build/"
 
-frontend-build-yarn:
-	@echo "🏗️ 构建前端生产版本 (Yarn)..."
-	cd frontend && yarn build
+frontend-build-pnpm:
+	@echo "🏗️ 构建前端生产版本 (pnpm)..."
+	cd frontend && pnpm build
 
 # ========== 测试 ==========
 test: test-backend test-frontend
@@ -158,21 +158,21 @@ test-backend-integration:
 
 test-frontend:
 	@echo "🧪 运行前端测试..."
-	cd frontend && yarn run test:ci
+	cd frontend && pnpm run test:ci
 
 test-frontend-watch:
 	@echo "🧪 运行前端测试 (监听模式)..."
-	cd frontend && yarn run test:watch
+	cd frontend && pnpm run test:watch
 
 test-frontend-coverage:
 	@echo "🧪 运行前端测试 (覆盖率报告)..."
-	cd frontend && yarn run test:coverage
+	cd frontend && pnpm run test:coverage
 
 # 快速测试 (跳过慢速测试)
 test-fast:
 	@echo "⚡ 运行快速测试..."
 	uv run pytest tests/ -v -m "not slow" --tb=short
-	cd frontend && yarn run test:ci
+	cd frontend && pnpm run test:ci
 
 # 完整测试套件 (包含集成和慢速测试)
 test-full:
@@ -180,14 +180,14 @@ test-full:
 	@echo "📊 后端测试 (包含集成测试)..."
 	uv run pytest tests/ -v --cov=app --cov-report=html --cov-report=term-missing --cov-fail-under=80
 	@echo "📊 前端测试 (包含覆盖率)..."
-	cd frontend && yarn run test:coverage
+	cd frontend && pnpm run test:coverage
 	@echo "🎉 完整测试套件完成！"
 
 # 测试覆盖率报告
 test-coverage:
 	@echo "📊 生成测试覆盖率报告..."
 	uv run pytest tests/ --cov=app --cov-report=html --cov-report=term-missing --cov-report=xml
-	cd frontend && yarn run test:coverage
+	cd frontend && pnpm run test:coverage
 	@echo "📈 覆盖率报告已生成："
 	@echo "  - 后端: htmlcov/index.html"
 	@echo "  - 前端: frontend/coverage/lcov-report/index.html"
@@ -234,7 +234,7 @@ check:
 	@echo "🔍 检查系统环境..."
 	@command -v uv >/dev/null 2>&1 || { echo "❌ uv 未安装，请先安装 uv"; exit 1; }
 	@command -v node >/dev/null 2>&1 || { echo "❌ Node.js 未安装，请先安装 Node.js"; exit 1; }
-	@command -v yarn >/dev/null 2>&1 || { echo "❌ yarn 未安装，请先安装 yarn"; exit 1; }
+	@command -v pnpm >/dev/null 2>&1 || { echo "❌ pnpm 未安装，请先安装 pnpm"; exit 1; }
 	@echo "✅ 系统环境检查通过"
 
 # 显示项目信息
@@ -299,14 +299,14 @@ docker-build:
 	docker build -t ghcr.io/lazygophers/roo:latest .
 	@echo "✅ Docker 镜像构建完成"
 
-# 构建多架构 Docker 镜像
+# 构建 Docker 镜像 (amd64)
 docker-build-multi:
-	@echo "🐳 构建多架构 Docker 镜像（amd64 + arm64）..."
+	@echo "🐳 构建 Docker 镜像（amd64）..."
 	@echo "💡 这将自动构建前端并打包到后端服务中"
 	@echo "🏷️ 镜像标签: ghcr.io/lazygophers/roo:latest"
-	@echo "🏗️ 架构: linux/amd64, linux/arm64"
-	docker buildx build --platform linux/amd64,linux/arm64 -t ghcr.io/lazygophers/roo:latest .
-	@echo "✅ 多架构 Docker 镜像构建完成"
+	@echo "🏗️ 架构: linux/amd64"
+	docker buildx build --platform linux/amd64 -t ghcr.io/lazygophers/roo:latest .
+	@echo "✅ Docker 镜像构建完成"
 
 # 推送 Docker 镜像到远程仓库（单架构）
 docker-push:
@@ -317,23 +317,23 @@ docker-push:
 	docker push ghcr.io/lazygophers/roo:latest
 	@echo "✅ Docker 镜像推送完成"
 
-# 构建并推送多架构 Docker 镜像
+# 构建并推送 Docker 镜像 (amd64)
 docker-push-multi:
-	@echo "📤 构建并推送多架构 Docker 镜像..."
+	@echo "📤 构建并推送 Docker 镜像..."
 	@echo "🏷️ 镜像标签: ghcr.io/lazygophers/roo:latest"
-	@echo "🏗️ 架构: linux/amd64, linux/arm64"
+	@echo "🏗️ 架构: linux/amd64"
 	@echo "💡 确保已登录 GitHub Container Registry:"
 	@echo "   echo \$$GITHUB_TOKEN | docker login ghcr.io -u USERNAME --password-stdin"
-	docker buildx build --platform linux/amd64,linux/arm64 -t ghcr.io/lazygophers/roo:latest --push .
-	@echo "✅ 多架构 Docker 镜像构建并推送完成"
+	docker buildx build --platform linux/amd64 -t ghcr.io/lazygophers/roo:latest --push .
+	@echo "✅ Docker 镜像构建并推送完成"
 
 # 构建并推送 Docker 镜像（单架构）
 docker-build-push: docker-build docker-push
 	@echo "🚀 Docker 镜像构建并推送完成！"
 
-# 构建并推送 Docker 镜像（多架构）
+# 构建并推送 Docker 镜像（amd64）
 docker-build-push-multi: docker-push-multi
-	@echo "🚀 多架构 Docker 镜像构建并推送完成！"
+	@echo "🚀 Docker 镜像构建并推送完成！"
 
 # 启动 Docker 容器（低资源消耗配置）
 docker-up:
