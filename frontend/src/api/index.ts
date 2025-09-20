@@ -1,6 +1,26 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:8000/api';
+// 动态获取后端地址，使用当前访问地址
+const getAPIBaseURL = () => {
+  // 如果是开发环境且在 localhost，使用默认端口
+  if (process.env.NODE_ENV === 'development' && window.location.hostname === 'localhost') {
+    return 'http://localhost:8000/api';
+  }
+
+  // 生产环境或其他情况，使用当前访问地址的同一域名端口
+  const protocol = window.location.protocol;
+  const hostname = window.location.hostname;
+  const port = window.location.port || (protocol === 'https:' ? '443' : '80');
+
+  // 如果是标准端口，不显示端口号
+  const portSuffix = (protocol === 'https:' && port === '443') || (protocol === 'http:' && port === '80')
+    ? ''
+    : `:${port}`;
+
+  return `${protocol}//${hostname}${portSuffix}/api`;
+};
+
+const API_BASE_URL = getAPIBaseURL();
 
 const api = axios.create({
   baseURL: API_BASE_URL,
