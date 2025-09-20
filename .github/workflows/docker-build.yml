@@ -141,6 +141,8 @@ jobs:
     needs: detect-changes
     if: needs.detect-changes.outputs.should-build == 'false'
     runs-on: lazy
+    permissions:
+      contents: read
     steps:
       - name: Skip build notification
         run: |

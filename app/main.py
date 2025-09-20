@@ -130,7 +130,8 @@ async def list_models():
         models = db.get_models_data()
         return {"success": True, "data": models, "total": len(models)}
     except Exception as e:
-        return JSONResponse({"error": str(e)}, status_code=500)
+        get_logger().error("Error in list_models: %s", str(e))
+        return JSONResponse({"error": "Internal server error"}, status_code=500)
 
 @app.get("/api/models/{slug}")
 async def get_model(slug: str):
@@ -142,7 +143,8 @@ async def get_model(slug: str):
             return {"success": True, "data": model}
         return JSONResponse({"error": "Not found"}, status_code=404)
     except Exception as e:
-        return JSONResponse({"error": str(e)}, status_code=500)
+        get_logger().error("Error in get_model: %s", str(e))
+        return JSONResponse({"error": "Internal server error"}, status_code=500)
 
 @app.get("/api/models/group/{group}")
 async def get_group_models(group: str):
@@ -152,7 +154,8 @@ async def get_group_models(group: str):
         models = db.get_models_by_group(group)
         return {"success": True, "data": models, "total": len(models)}
     except Exception as e:
-        return JSONResponse({"error": str(e)}, status_code=500)
+        get_logger().error("Error in get_group_models: %s", str(e))
+        return JSONResponse({"error": "Internal server error"}, status_code=500)
 
 @app.post("/api/models/refresh")
 async def refresh_models():
@@ -164,7 +167,8 @@ async def refresh_models():
         gc.collect()
         return {"success": True, "data": result}
     except Exception as e:
-        return JSONResponse({"error": str(e)}, status_code=500)
+        get_logger().error("Error in refresh_models: %s", str(e))
+        return JSONResponse({"error": "Internal server error"}, status_code=500)
 
 @app.post("/api/system/gc")
 async def force_gc():
@@ -189,7 +193,8 @@ async def force_gc():
             }
         }
     except Exception as e:
-        return JSONResponse({"error": str(e)}, status_code=500)
+        get_logger().error("Error in force_gc: %s", str(e))
+        return JSONResponse({"error": "Internal server error"}, status_code=500)
 
 @app.get("/api/status")
 async def get_status():
@@ -220,7 +225,8 @@ async def get_status():
             }
         }
     except Exception as e:
-        return JSONResponse({"error": str(e)}, status_code=500)
+        get_logger().error("Error in get_status: %s", str(e))
+        return JSONResponse({"error": "Internal server error"}, status_code=500)
 
 # 健康检查
 @app.get("/health")
@@ -264,7 +270,8 @@ else:
                 }
             }
         except Exception as e:
-            return {"error": str(e)}
+            get_logger().error("Error in root endpoint: %s", str(e))
+            return {"error": "Internal server error"}
 
 # 进程优化
 try:
