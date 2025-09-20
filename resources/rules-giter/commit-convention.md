@@ -2,7 +2,7 @@
 name: commit-convention
 title: Git 提交规范
 description: "遵循 Conventional Commits 规范的 Git 提交信息格式和工作流指南"
-category: rule
+category: Git规范
 priority: high
 tags: [Git, 提交规范, Conventional Commits, 工作流]
 sections:

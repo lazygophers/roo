@@ -2,7 +2,7 @@
 name: golang-guide
 title: Go编程规范指南
 description: "Go语言编程规范和最佳实践，涵盖代码风格、命名约定、错误处理、并发编程和测试规范"
-category: language-guide
+category: 语言指南
 language: go
 priority: high
 tags: [Go, 编程规范, 最佳实践, 并发编程]

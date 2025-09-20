@@ -2,7 +2,7 @@
 name: rust-guide
 title: Rust编程风格指南
 description: "Rust编程语言风格指南权威总结，综合官方文档与社区最佳实践，涵盖命名约定、格式化、工具使用等核心规范"
-category: language-guide
+category: 语言指南
 language: rust
 priority: high
 tags: [Rust, 编程规范, 风格指南, 最佳实践]

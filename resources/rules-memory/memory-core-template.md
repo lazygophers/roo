@@ -2,7 +2,7 @@
 name: memory-core-template
 title: 项目记忆库模板
 description: "项目级别的记忆管理模板，用于存储全局性、持久性信息"
-category: template
+category: 模板
 tags: [记忆库, 项目管理, 模板]
 ---
 

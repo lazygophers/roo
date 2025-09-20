@@ -2,7 +2,7 @@
 name: memory
 title: 记忆库
 description: "AI系统的智能三级记忆库架构，包含项目记忆、任务记忆、上下文记忆的完整设计规范"
-category: system-architecture
+category: 系统架构
 priority: critical
 tags: [记忆库, 系统架构, 三级结构, 智能管理]
 features:

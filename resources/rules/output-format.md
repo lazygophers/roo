@@ -2,7 +2,7 @@
 name: output-format
 title: 输出格式规范
 description: "统一AI系统输出格式规范，确保内容简洁性、清晰度、一致性和专业性"
-category: rule
+category: 格式标准
 priority: high
 tags: [格式规范, 输出标准, 专业性]
 ---

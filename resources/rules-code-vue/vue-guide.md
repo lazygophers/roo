@@ -2,7 +2,7 @@
 name: vue-guide
 title: Vue.js官方风格指南
 description: "Vue.js官方风格指南完整版，提供优先级分类的规范和最佳实践，涵盖必要规则、强烈推荐、推荐使用和谨慎使用等多个级别"
-category: language-guide
+category: 语言指南
 language: vue
 priority: high
 tags: [Vue.js, 风格指南, 官方规范, 最佳实践]

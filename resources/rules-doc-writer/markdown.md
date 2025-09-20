@@ -2,7 +2,7 @@
 name: markdown
 title: Markdown文档编写规范
 description: "AI系统通用的Markdown格式与风格指南，涵盖基本规范、内容元素和项目约定"
-category: documentation
+category: 文档标准
 priority: high
 tags: [Markdown, 文档规范, 格式指南, 最佳实践]
 sections:
