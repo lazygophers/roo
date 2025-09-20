@@ -103,7 +103,7 @@ COPY app/ ./app/
 COPY resources/ ./resources/
 
 # 创建必要的目录
-RUN mkdir -p logs data/cache
+RUN mkdir -p logs data/cache data/temp
 
 # 设置权限并切换到非root用户
 RUN chown -R appuser:appuser /app
