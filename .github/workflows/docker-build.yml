@@ -121,12 +121,33 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-python-
 
+      - name: Cache Docker layers
+        uses: actions/cache@v4
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
+
+      - name: Cache Docker build context
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.docker/buildx
+            /var/lib/docker/buildx
+          key: ${{ runner.os }}-docker-buildx-${{ hashFiles('Dockerfile', 'frontend/package*.json', 'pyproject.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-docker-buildx-
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
         with:
           driver-opts: |
             network=host
             image=moby/buildkit:v0.12.4
+          buildkitd-flags: |
+            --allow-insecure-entitlement security.insecure
+            --allow-insecure-entitlement network.host
 
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v3
@@ -146,6 +167,34 @@ jobs:
             type=semver,pattern={{major}}.{{minor}}
             type=semver,pattern={{major}}
             type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          platforms: linux/amd64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: |
+            type=gha
+            type=local,src=/tmp/.buildx-cache
+            type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:cache
+          cache-to: |
+            type=gha,mode=max
+            type=local,dest=/tmp/.buildx-cache-new,mode=max
+            type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:cache,mode=max
+          build-args: |
+            BUILDKIT_INLINE_CACHE=1
+            BUILDKIT_CACHE_MOUNT=true
+          provenance: false
+          sbom: false
+
+      - name: Move cache
+        run: |
+          rm -rf /tmp/.buildx-cache
+          mv /tmp/.buildx-cache-new /tmp/.buildx-cache || true
 
       - name: Generate build summary
         run: |
@@ -169,12 +218,16 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "⚡ **Performance optimizations applied:**" >> $GITHUB_STEP_SUMMARY
           echo "- Smart change detection" >> $GITHUB_STEP_SUMMARY
-          echo "- Registry caching (reliable cross-platform)" >> $GITHUB_STEP_SUMMARY
+          echo "- Multi-layer Docker caching strategy" >> $GITHUB_STEP_SUMMARY
+          echo "  - GitHub Actions cache (GHA)" >> $GITHUB_STEP_SUMMARY
+          echo "  - Local BuildX cache (/tmp/.buildx-cache)" >> $GITHUB_STEP_SUMMARY
+          echo "  - Registry cache (ghcr.io)" >> $GITHUB_STEP_SUMMARY
           echo "- Frontend dependency caching (pnpm store + build cache)" >> $GITHUB_STEP_SUMMARY
           echo "- Backend dependency caching (Python + uv)" >> $GITHUB_STEP_SUMMARY
-          echo "- Docker layer caching with mount cache" >> $GITHUB_STEP_SUMMARY
+          echo "- Docker BuildX context caching" >> $GITHUB_STEP_SUMMARY
+          echo "- BuildKit inline cache + mount cache" >> $GITHUB_STEP_SUMMARY
           echo "- pnpm for faster package management" >> $GITHUB_STEP_SUMMARY
-          echo "- Latest BuildKit version" >> $GITHUB_STEP_SUMMARY
+          echo "- Latest BuildKit v0.12.4 with network optimizations" >> $GITHUB_STEP_SUMMARY
           echo "- Disabled SBOM/Provenance for speed" >> $GITHUB_STEP_SUMMARY
 
   # 仅在文档或非构建文件变更时运行的快速作业

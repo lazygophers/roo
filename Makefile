@@ -46,7 +46,7 @@ help:
 	@echo "  docker-build-multi 构建amd64镜像"
 	@echo "  docker-push      推送镜像到远程仓库 (需先登录 GHCR)"
 	@echo "  docker-push-multi 构建并推送amd64镜像"
-	@echo "  docker-build-push 构建并推送镜像 (单架构)"
+	@echo "  docker-build-push 构建并推送镜像 (amd64)"
 	@echo "  docker-build-push-multi 构建并推送镜像 (amd64)"
 	@echo "  docker-up        启动 Docker 容器（低资源消耗配置）"
 	@echo "  docker-down      停止 Docker 容器"
@@ -327,8 +327,8 @@ docker-push-multi:
 	docker buildx build --platform linux/amd64 -t ghcr.io/lazygophers/roo:latest --push .
 	@echo "✅ Docker 镜像构建并推送完成"
 
-# 构建并推送 Docker 镜像（单架构）
-docker-build-push: docker-build docker-push
+# 构建并推送 Docker 镜像（amd64）
+docker-build-push: docker-build-multi docker-push
 	@echo "🚀 Docker 镜像构建并推送完成！"
 
 # 构建并推送 Docker 镜像（amd64）
