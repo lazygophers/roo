@@ -4,6 +4,7 @@ import { HomeOutlined, SettingOutlined, GithubOutlined, ApiOutlined } from '@ant
 import { useNavigate, useLocation } from 'react-router-dom';
 import ThemeToggle from '../Theme/ThemeToggle';
 import LicenseInfo from '../License/LicenseInfo';
+import EnvironmentIndicator from '../Environment/EnvironmentIndicator';
 import './AppLayout.css';
 
 const { Sider, Header, Content } = Layout;
@@ -187,6 +188,9 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
           </div>
         </Content>
       </Layout>
+
+      {/* 环境指示器 - 固定在左下角 */}
+      <EnvironmentIndicator />
     </Layout>
   );
 };
