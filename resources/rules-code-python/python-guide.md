@@ -2,7 +2,7 @@
 name: python-guide
 title: Python编程规范指南
 description: "Python开发规范和最佳实践"
-category: language-guide
+category: 语言指南
 language: python
 priority: high
 tags: [Python, uv, pydantic, 类型注解]

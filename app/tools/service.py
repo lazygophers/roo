@@ -82,32 +82,54 @@ class MCPToolsService:
 
         # 自动发现装饰器注册的工具
         logger.info("Starting registry tools discovery...")
+        print("  🔧 [MCP] Discovering and registering MCP tools...", flush=True)
         self._discover_registry_tools()
+
+        # 显示发现结果
+        tools_count = len(self.get_all_tools())
+        categories_count = len(self.get_all_categories())
+        print(f"  ✅ [MCP] Registered {tools_count} tools in {categories_count} categories", flush=True)
         logger.info("Registry tools discovery completed.")
 
     def _discover_registry_tools(self):
         """自动发现并导入装饰器注册的工具"""
         try:
             from app.tools.registry import auto_discover_tools
-            # 发现网络抓取工具模块中的装饰器工具
-            tools_discovered = auto_discover_tools([
-                "app.tools.web_scraping_tools"
-            ])
-            if tools_discovered > 0:
-                logger.info(f"Auto-discovered {tools_discovered} decorator-registered tools")
+
+            # 发现所有工具模块
+            tool_modules = [
+                "app.tools.github_tools",
+                "app.tools.web_scraping_tools",
+                "app.tools.file_tools",
+                "app.tools.time_tools",
+                "app.tools.system_tools",
+                "app.tools.cache_tools"
+            ]
+
+            total_discovered = 0
+            for module in tool_modules:
+                try:
+                    discovered = auto_discover_tools([module])
+                    total_discovered += discovered
+                    if discovered > 0:
+                        logger.debug(f"Discovered {discovered} tools from {module}")
+                except Exception as e:
+                    logger.debug(f"Failed to discover tools from {module}: {e}")
+
+            logger.info(f"Auto-discovered {total_discovered} MCP tools")
 
             # 同步装饰器注册的分类到数据库
             sync_result = self.sync_registry_categories_to_db()
             if sync_result['synced'] > 0 or sync_result['updated'] > 0 or sync_result['removed'] > 0:
-                logger.info(f"Category sync complete: {sync_result['synced']} added, {sync_result['updated']} updated, {sync_result['removed']} removed")
+                logger.info(f"Category sync: {sync_result['synced']} added, {sync_result['updated']} updated, {sync_result['removed']} removed")
 
             # 同步装饰器注册的工具到数据库
             tool_sync_result = self.sync_registry_tools_to_db()
             if tool_sync_result['synced'] > 0 or tool_sync_result['updated'] > 0 or tool_sync_result['removed'] > 0:
-                logger.info(f"Tool sync complete: {tool_sync_result['synced']} added, {tool_sync_result['updated']} updated, {tool_sync_result['removed']} removed")
+                logger.info(f"Tool sync: {tool_sync_result['synced']} added, {tool_sync_result['updated']} updated, {tool_sync_result['removed']} removed")
 
         except Exception as e:
-            logger.debug(f"Failed to auto-discover decorator tools: {e}")
+            logger.warning(f"Failed to auto-discover decorator tools: {e}")
 
     def register_builtin_categories(self):
         """注册内置工具分类到数据库（启动时覆盖）"""
@@ -529,6 +551,14 @@ class MCPToolsService:
                 merged_tools[tool['name']] = tool
 
         return list(merged_tools.values())
+
+    def get_all_tools(self, enabled_only: bool = True) -> List[Dict[str, Any]]:
+        """获取所有工具（别名方法，方便调用）"""
+        return self.get_tools(category=None, enabled_only=enabled_only)
+
+    def get_all_categories(self, enabled_only: bool = True) -> List[Dict[str, Any]]:
+        """获取所有分类（别名方法，方便调用）"""
+        return self.get_categories(enabled_only=enabled_only)
 
     def _get_registry_tools(self, category: str = None, enabled_only: bool = True) -> List[Dict[str, Any]]:
         """从装饰器注册表获取工具"""

@@ -2,7 +2,7 @@
 name: memory-task-template
 title: 任务记忆库模板
 description: "任务级别的记忆管理模板，用于存储单个任务执行过程中的信息"
-category: template
+category: 模板
 tags: [记忆库, 任务管理, 模板]
 ---
 

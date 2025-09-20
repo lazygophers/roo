@@ -2,7 +2,7 @@
 name: ask_followup_question
 title: ask_followup_question 工具使用规范
 description: "用户决策工具核心规范"
-category: rule
+category: 工具规范
 priority: critical
 tags: [交互决策, 用户主导, 工具规范]
 ---

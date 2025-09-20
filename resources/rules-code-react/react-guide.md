@@ -2,7 +2,7 @@
 name: react-guide
 title: React开发规范指南
 description: "React开发规范和最佳实践"
-category: language-guide
+category: 语言指南
 language: react
 priority: high
 tags: [React, TypeScript, JSX]

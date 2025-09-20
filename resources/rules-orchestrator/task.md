@@ -2,7 +2,7 @@
 name: task
 title: 任务管理指南
 description: "AI系统任务分解、评估与执行的核心规范"
-category: rule
+category: 任务管理
 priority: critical
 tags: [任务管理, 模式协作, 工作流程]
 ---

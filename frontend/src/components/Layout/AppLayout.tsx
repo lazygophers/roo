@@ -62,20 +62,54 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
           <div
             className="nav-logo"
             style={{
-              height: 48,
-              margin: 16,
+              height: 64,
+              margin: '16px 12px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              fontWeight: 'bold',
-              fontSize: '16px',
               cursor: 'pointer',
               borderBottom: `1px solid ${colorBorderSecondary}`,
-              flexShrink: 0
+              flexShrink: 0,
+              flexDirection: 'column',
+              gap: '4px'
             }}
             onClick={() => navigate('/')}
           >
-            Roo AI
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px'
+            }}>
+              <img
+                src="/icon-32.png"
+                alt="LazyAI Studio"
+                style={{
+                  width: 24,
+                  height: 24,
+                  borderRadius: '4px'
+                }}
+              />
+              <span style={{
+                fontWeight: 'bold',
+                fontSize: '14px',
+                background: 'linear-gradient(135deg, #1890ff 0%, #52c41a 100%)',
+                backgroundClip: 'text',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                fontFamily: 'system-ui, -apple-system, sans-serif'
+              }}>
+                LazyAI
+              </span>
+            </div>
+            <div style={{
+              fontSize: '10px',
+              color: colorText,
+              opacity: 0.6,
+              fontWeight: 400,
+              letterSpacing: '0.5px'
+            }}>
+              Studio
+            </div>
           </div>
 
           <Menu

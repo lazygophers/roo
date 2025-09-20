@@ -99,7 +99,7 @@ const RolesListWithSelection: React.FC<RolesListWithSelectionProps> = ({
           </Space>
         </div>
       }
-      bodyStyle={{ padding: '12px' }}
+      styles={{ body: { padding: '12px' } }}
     >
       {roles.length === 0 ? (
         <Empty 

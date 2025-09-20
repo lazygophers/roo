@@ -2,7 +2,7 @@
 name: java-guide
 title: Google Java风格指南
 description: "Google Java Style Guide核心规则，涵盖源文件基础、格式化、命名约定、编程实践和Javadoc规范"
-category: language-guide
+category: 语言指南
 language: java
 priority: high
 tags: [Java, 编程规范, Google风格指南]

@@ -2,7 +2,7 @@
 name: tool-usage
 title: 工具使用指南
 description: "AI系统工具选择和应用规范，确保高效、准确的工具使用"
-category: rule
+category: 工具规范
 priority: high
 tags: [工具指南, 使用规范]
 ---

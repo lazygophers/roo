@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { ConfigProvider, App as AntdApp } from 'antd';
 import zhCN from 'antd/locale/zh_CN';
 import { ThemeProvider, useTheme } from './contexts/ThemeContext';
+import { EnvironmentProvider } from './contexts/EnvironmentContext';
 import AppLayout from './components/Layout/AppLayout';
 import ErrorBoundary from './components/ErrorBoundary';
 import Home from './pages/Home';
@@ -38,7 +39,9 @@ function App() {
   return (
     <ErrorBoundary>
       <ThemeProvider>
-        <AppContent />
+        <EnvironmentProvider>
+          <AppContent />
+        </EnvironmentProvider>
       </ThemeProvider>
     </ErrorBoundary>
   );

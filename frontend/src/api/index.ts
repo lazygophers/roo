@@ -320,6 +320,28 @@ export interface EnvironmentResponse {
   data: EnvironmentInfo;
 }
 
+export interface PermissionInfo {
+  environment: 'local' | 'remote';
+  total_tools: number;
+  read_only_tools: number;
+  write_tools: number;
+  allowed_tools: number;
+  blocked_tools: number;
+  restrictions_active: boolean;
+}
+
+export interface PermissionsResponse {
+  success: boolean;
+  message: string;
+  data: {
+    environment: 'local' | 'remote';
+    permission_info: PermissionInfo;
+    allowed_tools: string[];
+    blocked_tools: string[];
+    restrictions_active: boolean;
+  };
+}
+
 
 // API 方法
 export const apiClient = {
@@ -743,6 +765,12 @@ export const apiClient = {
   // 获取环境信息
   getEnvironmentInfo: async () => {
     const response = await api.get('/mcp/environment');
+    return response.data;
+  },
+
+  // 获取权限信息
+  getPermissions: async () => {
+    const response = await api.get('/mcp/permissions');
     return response.data;
   },
 

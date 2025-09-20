@@ -1,13 +1,52 @@
-/* 简洁的导航样式 - 使用主题系统 */
+/* LazyAI Studio品牌logo样式 */
 .nav-logo {
-  transition: all 0.2s ease;
-  border-radius: 6px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 8px;
   margin: 16px 8px !important;
+  position: relative;
+  overflow: hidden;
 }
 
 .nav-logo:hover {
-  background-color: rgba(24, 144, 255, 0.06);
-  transform: scale(1.02);
+  background: linear-gradient(135deg, rgba(24, 144, 255, 0.08) 0%, rgba(82, 196, 26, 0.06) 100%);
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(24, 144, 255, 0.15);
+}
+
+.nav-logo img {
+  transition: all 0.3s ease;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+.nav-logo:hover img {
+  transform: rotate(5deg) scale(1.1);
+  filter: drop-shadow(0 4px 8px rgba(24, 144, 255, 0.3));
+}
+
+/* Logo文字渐变动画 */
+.nav-logo span {
+  background: linear-gradient(135deg, #1890ff 0%, #52c41a 100%);
+  background-size: 200% 200%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradient-shift 3s ease infinite;
+}
+
+@keyframes gradient-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.nav-logo:hover span {
+  animation-duration: 1s;
 }
 
 /* 菜单项基础样式 */
@@ -40,23 +79,67 @@
 /* 响应式调整 */
 @media (max-width: 768px) {
   .nav-logo {
-    font-size: 14px !important;
+    font-size: 12px !important;
     margin: 12px 6px !important;
+    height: 56px !important;
   }
-  
+
+  .nav-logo img {
+    width: 20px !important;
+    height: 20px !important;
+  }
+
+  .nav-logo span {
+    font-size: 12px !important;
+  }
+
+  .nav-logo div:last-child {
+    font-size: 9px !important;
+  }
+
   .ant-menu-item {
     margin: 4px 6px;
     font-size: 13px;
   }
-  
+
   .ant-layout-sider {
     box-shadow: none;
   }
 }
 
+/* 超小屏幕优化 */
+@media (max-width: 480px) {
+  .nav-logo {
+    height: 48px !important;
+    gap: 2px !important;
+  }
+
+  .nav-logo img {
+    width: 18px !important;
+    height: 18px !important;
+  }
+
+  .nav-logo span {
+    font-size: 11px !important;
+  }
+
+  .nav-logo div:last-child {
+    font-size: 8px !important;
+  }
+}
+
 /* 暗色主题优化 */
 [data-theme='dark'] .nav-logo:hover {
-  background-color: rgba(255, 255, 255, 0.08);
+  background: linear-gradient(135deg, rgba(24, 144, 255, 0.12) 0%, rgba(82, 196, 26, 0.08) 100%);
+  box-shadow: 0 4px 12px rgba(24, 144, 255, 0.2);
+}
+
+[data-theme='dark'] .nav-logo img {
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+[data-theme='dark'] .nav-logo:hover img {
+  filter: drop-shadow(0 4px 8px rgba(24, 144, 255, 0.4));
 }
 
 [data-theme='dark'] .ant-menu-item-selected {

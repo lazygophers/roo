@@ -1,7 +1,8 @@
 ---
 name: task
 title: 任务管理
-category: rule
+description: "任务ID格式规范和管理要求"
+category: 任务管理
 tags: [任务ID, 规范, 管理]
 ---
 

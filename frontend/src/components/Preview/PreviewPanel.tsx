@@ -61,7 +61,7 @@ const PreviewPanel: React.FC<PreviewPanelProps> = ({ selectedItem, itemType }) =
         </Space>
       </div>
 
-      <Descriptions column={1} bordered size="small">
+      <Descriptions column={1} bordered size="middle">
         <Descriptions.Item label="Slug">
           <Text code>{model.slug}</Text>
         </Descriptions.Item>
@@ -126,18 +126,12 @@ const PreviewPanel: React.FC<PreviewPanelProps> = ({ selectedItem, itemType }) =
         </Space>
       </div>
 
-      <Descriptions column={2} bordered size="small">
+      <Descriptions column={2} bordered size="middle">
         <Descriptions.Item label="文件名">
           <Text>{file.file_path.split('/').pop()}</Text>
         </Descriptions.Item>
         <Descriptions.Item label="文件大小">
           <Text>{formatFileSize(file.file_size)}</Text>
-        </Descriptions.Item>
-        <Descriptions.Item label="最后修改">
-          <Space size="small">
-            <ClockCircleOutlined />
-            <Text>{formatDate(file.last_modified)}</Text>
-          </Space>
         </Descriptions.Item>
         <Descriptions.Item label="来源目录">
           <Space size="small">
@@ -243,10 +237,12 @@ const PreviewPanel: React.FC<PreviewPanelProps> = ({ selectedItem, itemType }) =
     <Card 
       title={`${itemType === 'model' ? '模型' : itemType === 'command' ? '指令' : '规则'}详情`}
       style={{ height: '100%' }}
-      bodyStyle={{ 
-        height: 'calc(100% - 57px)', 
-        overflow: 'auto',
-        padding: '16px 24px'
+      styles={{
+        body: {
+          height: 'calc(100% - 57px)',
+          overflow: 'auto',
+          padding: '16px 24px'
+        }
       }}
     >
       {renderContent()}

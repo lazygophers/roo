@@ -2,7 +2,7 @@
 name: uv
 title: UV包管理工具指南
 description: "下一代Python包管理工具完整指南，提供极速的包解析、安装和编译功能，是pip、pip-tools和virtualenv的直接替代品"
-category: tool-guide
+category: 工具指南
 tool: uv
 priority: high
 tags: [Python, 包管理, uv, 虚拟环境]

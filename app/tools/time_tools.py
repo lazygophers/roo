@@ -6,7 +6,21 @@ import time
 import datetime
 from typing import Optional, Union
 from dateutil import tz, parser
-from app.tools.registry import time_tool
+from app.tools.registry import time_tool, mcp_category
+
+
+# 注册时间工具分类
+@mcp_category(
+    category_id="time",
+    name="时间处理工具",
+    description="时间戳转换、日期格式化、时区处理等时间相关工具",
+    icon="⏰",
+    enabled=True,
+    sort_order=4
+)
+def register_time_category():
+    """注册时间工具分类"""
+    pass
 
 
 @time_tool(

@@ -2,7 +2,7 @@
 name: mode-specification
 title: 模式规范说明
 description: "AI Code中自定义模式的结构和配置规范文档，定义模式的构成要素、YAML属性详情、文件/目录设置特定于模式的指令等完整规范"
-category: specification
+category: 规范
 priority: critical
 tags: [模式定义, 配置规范, AI Code, 自定义模式]
 sections:

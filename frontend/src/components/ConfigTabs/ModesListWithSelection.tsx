@@ -594,36 +594,13 @@ const ModesListWithSelection: React.FC<ModesListProps> = ({
             </Space>
           </Col>
           <Col>
-            <Space>
-              <Button 
-                size="small"
-                onClick={handleSelectAll}
-                disabled={models.length === 0}
-              >
-                全选
-              </Button>
-              <Button 
-                size="small"
-                onClick={handleReverseSelection}
-                disabled={models.length === 0}
-              >
-                反选
-              </Button>
-              <Button 
-                size="small"
-                onClick={handleUnselectAll}
-                disabled={selectedModelCount === 0}
-              >
-                取消全选
-              </Button>
-              <Button 
-                size="small"
-                onClick={onClearSelection}
-                disabled={selectedModelCount === 0}
-              >
-                清空
-              </Button>
-            </Space>
+            <Button
+              size="small"
+              onClick={onClearSelection}
+              disabled={selectedModelCount === 0}
+            >
+              清空
+            </Button>
           </Col>
         </Row>
       </div>
@@ -726,9 +703,6 @@ const ModesListWithSelection: React.FC<ModesListProps> = ({
                                 </Text>
                                 <Text type="secondary" style={{ fontSize: 10 }}>
                                   📏 {model.file_size ? `${(model.file_size / 1024).toFixed(1)}KB` : 'N/A'}
-                                </Text>
-                                <Text type="secondary" style={{ fontSize: 10 }}>
-                                  📅 {model.last_modified ? new Date(model.last_modified * 1000).toLocaleString() : 'N/A'}
                                 </Text>
                               </Space>
                             </div>
@@ -913,9 +887,6 @@ const ModesListWithSelection: React.FC<ModesListProps> = ({
                                       </Text>
                                       <Text type="secondary" style={{ fontSize: 9 }}>
                                         📏 {rule.file_size ? `${(rule.file_size / 1024).toFixed(1)}KB` : 'N/A'}
-                                      </Text>
-                                      <Text type="secondary" style={{ fontSize: 9 }}>
-                                        📅 {rule.last_modified ? new Date(rule.last_modified).toLocaleDateString() : 'N/A'}
                                       </Text>
                                     </Space>
                                   </div>

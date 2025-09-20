@@ -10,13 +10,15 @@ import ExportToolbar from '../components/ExportToolbar/ExportToolbar';
 import { SelectedItem, ModelRuleBinding } from '../types/selection';
 import { FileMetadata, EnvironmentInfo, apiClient } from '../api';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
+import { useEnvironment } from '../contexts/EnvironmentContext';
 import './ConfigManagement.css';
 
 const ConfigManagementWithSelection: React.FC = () => {
   // 设置页面标题
   useDocumentTitle('配置管理');
-  
+
   const { token } = theme.useToken();
+  const { isRemote, isEditAllowed } = useEnvironment();
   const [selectedItems, setSelectedItems] = useState<SelectedItem[]>([]);
   const [modelRuleBindings, setModelRuleBindings] = useState<ModelRuleBinding[]>([]);
   const [modelRules, setModelRules] = useState<Record<string, FileMetadata[]>>({});

@@ -2,7 +2,7 @@
 name: new_task
 title: new_task 委派规范
 description: "定义 new_task 工具的消息格式规范，包含任务定义、执行边界和响应要求"
-category: rule
+category: 工具规范
 tags: [任务委派, 消息格式, 规范]
 ---
 

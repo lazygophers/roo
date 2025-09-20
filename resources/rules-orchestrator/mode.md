@@ -2,6 +2,8 @@
 name: mode
 title: 模式选择指南
 description: "33个专业模式快速选择指南"
+category: 模式选择
+tags: [模式选择, 专业分工, 协作指南]
 ---
 
 # 模式选择指南
