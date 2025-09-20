@@ -94,7 +94,7 @@ const CommandsList: React.FC<CommandsListProps> = ({ onSelectCommand }) => {
                 hoverable
                 onClick={() => onSelectCommand(command)}
                 style={{ width: '100%', cursor: 'pointer' }}
-                bodyStyle={{ padding: '12px 16px' }}
+                styles={{ body: { padding: '12px 16px' } }}
               >
                 <List.Item.Meta
                   avatar={<FileTextOutlined style={{ fontSize: 16, color: '#1890ff' }} />}

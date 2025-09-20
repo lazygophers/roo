@@ -128,7 +128,7 @@ const RulesList: React.FC<RulesListProps> = ({ onSelectRule }) => {
                 hoverable
                 onClick={() => onSelectRule(rule)}
                 style={{ width: '100%', cursor: 'pointer' }}
-                bodyStyle={{ padding: '12px 16px' }}
+                styles={{ body: { padding: '12px 16px' } }}
               >
                 <List.Item.Meta
                   avatar={<BookOutlined style={{ fontSize: 16, color: '#722ed1' }} />}

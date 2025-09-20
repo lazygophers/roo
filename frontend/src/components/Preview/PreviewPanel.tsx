@@ -237,10 +237,12 @@ const PreviewPanel: React.FC<PreviewPanelProps> = ({ selectedItem, itemType }) =
     <Card 
       title={`${itemType === 'model' ? '模型' : itemType === 'command' ? '指令' : '规则'}详情`}
       style={{ height: '100%' }}
-      bodyStyle={{ 
-        height: 'calc(100% - 57px)', 
-        overflow: 'auto',
-        padding: '16px 24px'
+      styles={{
+        body: {
+          height: 'calc(100% - 57px)',
+          overflow: 'auto',
+          padding: '16px 24px'
+        }
       }}
     >
       {renderContent()}
