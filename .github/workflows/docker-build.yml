@@ -141,13 +141,6 @@ jobs:
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-        with:
-          driver-opts: |
-            network=host
-            image=moby/buildkit:v0.12.4
-          buildkitd-flags: |
-            --allow-insecure-entitlement security.insecure
-            --allow-insecure-entitlement network.host
 
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v3
@@ -227,7 +220,7 @@ jobs:
           echo "- Docker BuildX context caching" >> $GITHUB_STEP_SUMMARY
           echo "- BuildKit inline cache + mount cache" >> $GITHUB_STEP_SUMMARY
           echo "- pnpm for faster package management" >> $GITHUB_STEP_SUMMARY
-          echo "- Latest BuildKit v0.12.4 with network optimizations" >> $GITHUB_STEP_SUMMARY
+          echo "- Optimized Docker Buildx configuration" >> $GITHUB_STEP_SUMMARY
           echo "- Disabled SBOM/Provenance for speed" >> $GITHUB_STEP_SUMMARY
 
   # 仅在文档或非构建文件变更时运行的快速作业
