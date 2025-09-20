@@ -43,7 +43,7 @@ help:
 	@echo ""
 	@echo "🐳 Docker 命令:"
 	@echo "  docker-build     构建 Docker 镜像"
-	@echo "  docker-up        启动 Docker 容器"
+	@echo "  docker-up        启动 Docker 容器（低资源消耗配置）"
 	@echo "  docker-down      停止 Docker 容器"
 	@echo "  docker-restart   重启 Docker 容器"
 	@echo "  docker-logs      查看 Docker 容器日志"
@@ -278,11 +278,12 @@ docker-build:
 	docker build -t lazyai-studio:latest .
 	@echo "✅ Docker 镜像构建完成"
 
-# 启动 Docker 容器
+# 启动 Docker 容器（低资源消耗配置）
 docker-up:
-	@echo "🐳 启动 Docker 容器..."
+	@echo "🐳 启动 Docker 容器（低资源消耗配置）..."
 	@echo "💡 服务将在 http://localhost:8000 启动"
-	docker-compose up -d
+	@echo "⚡ 资源限制: CPU 25%, 内存 128MB"
+	docker-compose up
 	@echo "✅ Docker 容器已启动"
 	@echo "🔗 访问: http://localhost:8000"
 
@@ -314,6 +315,7 @@ docker-clean:
 docker-deploy: docker-build docker-up
 	@echo "🚀 Docker 一键部署完成！"
 	@echo "🌐 应用已启动: http://localhost:8000"
+	@echo "⚡ 资源优化: 最小内存和CPU占用"
 
 # Docker 状态检查
 docker-status:

@@ -70,3 +70,6 @@ tests/
 *.tar.gz
 *.zip
 *.rar
+
+# 数据文件
+data/

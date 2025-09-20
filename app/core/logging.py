@@ -26,9 +26,6 @@ def setup_logging(log_level: str = "INFO") -> logging.Logger:
     console_handler.setFormatter(formatter)
     logger.addHandler(console_handler)
 
-    # 记录日志配置成功
-    logger.info("日志系统初始化成功 - 仅控制台输出")
-
     return logger
 
 

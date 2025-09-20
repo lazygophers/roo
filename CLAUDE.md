@@ -67,7 +67,7 @@ uv run pytest tests/ -m "not slow" -v      # Exclude slow tests
 LazyAI Studio
 ├── Backend (FastAPI)
 │   ├── app/main.py              # Main application entry
-│   ├── app/main_ultra.py        # Ultra-performance variant
+│   ├── app/main_optimized.py    # Ultra-performance variant
 │   ├── app/core/                # Core services
 │   │   ├── database_service.py  # Main data management
 │   │   ├── database_service_lite.py # Performance-optimized
@@ -130,7 +130,7 @@ LazyAI Studio
 
 The system includes multiple performance tiers:
 - **Standard** (`main.py`): Full-featured with file watching
-- **Ultra** (`main_ultra.py`): Maximum performance with aggressive caching
+- **Ultra** (`main_optimized.py`): Maximum performance with aggressive caching
 - **Lite** (`database_service_lite.py`): Minimal resource usage
 
 ## Development Guidelines
@@ -186,3 +186,21 @@ The project includes comprehensive MCP (Model Context Protocol) tools integratio
 - **Cache Management**: Performance optimization through intelligent caching
 
 Access MCP tools through the API endpoints or direct service integration in `app/core/mcp_tools_service.py`
+
+### Docker Support
+The project includes complete Docker containerization with separated build and runtime optimization:
+- **Multi-stage Dockerfile**: Three-stage build (frontend build -> backend build -> runtime)
+- **Build optimization**: No resource constraints during build for reliability
+- **Runtime optimization**: Ultra-minimal Alpine Linux base image with virtual environment execution
+- **Alpine benefits**: Minimal size (~50MB), built-in security, musl libc
+- **System dependencies**: apk-installed curl, ca-certificates, timezone, tini init system
+- **docker-compose.yml**: Low resource consumption configuration (128MB RAM, 25% CPU limit)
+- **Make targets**: `docker-build`, `docker-up`, `docker-deploy` for deployment
+- **Virtual environment**: Runtime uses `.venv/bin/python` directly without uv dependency
+- **Production ready**: Optimized backend with `main_optimized.py` for minimal resource usage
+
+# important-instruction-reminders
+Do what has been asked; nothing more, nothing less.
+NEVER create files unless they're absolutely necessary for achieving your goal.
+ALWAYS prefer editing an existing file to creating a new one.
+NEVER proactively create documentation files (*.md) or README files. Only create documentation files if explicitly requested by the User.

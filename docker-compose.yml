@@ -11,10 +11,43 @@ services:
       - ./logs:/app/logs
     environment:
       - PYTHONUNBUFFERED=1
+      - PYTHONOPTIMIZE=2
+      - PYTHONDONTWRITEBYTECODE=1
     restart: unless-stopped
+    # 极低资源限制配置
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'     # 限制CPU使用率25%
+          memory: 128M     # 限制内存使用128MB
+        reservations:
+          cpus: '0.05'     # 保留CPU使用率5%
+          memory: 64M      # 保留内存64MB
+    # 最小化健康检查
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/api/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
+      interval: 120s     # 2分钟检查一次
+      timeout: 3s
+      retries: 1
+      start_period: 60s
+    # 安全和性能优化
+    security_opt:
+      - no-new-privileges:true
+    read_only: false
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=16m  # 最小临时文件系统16MB
+    # 网络优化
+    networks:
+      - lazyai-network
+    # 日志配置（减少日志开销）
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "2"
+
+networks:
+  lazyai-network:
+    driver: bridge
+    driver_opts:
+      com.docker.network.driver.mtu: 1500
