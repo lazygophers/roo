@@ -133,12 +133,6 @@ const PreviewPanel: React.FC<PreviewPanelProps> = ({ selectedItem, itemType }) =
         <Descriptions.Item label="文件大小">
           <Text>{formatFileSize(file.file_size)}</Text>
         </Descriptions.Item>
-        <Descriptions.Item label="最后修改">
-          <Space size="small">
-            <ClockCircleOutlined />
-            <Text>{formatDate(file.last_modified)}</Text>
-          </Space>
-        </Descriptions.Item>
         <Descriptions.Item label="来源目录">
           <Space size="small">
             <FolderOutlined />
