@@ -20,7 +20,7 @@ commonLabels:
   managed-by: kustomize
 
 images:
-  - name: lazygophers/lazyai-studio
+  - name: ghcr.io/lazygophers/roo
     newTag: latest
 
 replicas:

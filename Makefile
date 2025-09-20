@@ -1,7 +1,7 @@
 # LazyAI Studio Makefile
 # LazyGophers 组织 - 让构建和部署更懒人化！
 
-.PHONY: help install dev build clean test deploy frontend-install frontend-dev frontend-build backend-dev backend-install all docker-build docker-push docker-build-push docker-up docker-down docker-logs docker-clean docker-restart docker-deploy k8s-deploy k8s-deploy-kustomize k8s-delete k8s-delete-kustomize k8s-status k8s-logs k8s-port-forward k8s-describe k8s-shell k8s-events k8s-restart
+.PHONY: help install dev build clean test deploy frontend-install frontend-dev frontend-build backend-dev backend-install all docker-build docker-build-multi docker-push docker-push-multi docker-build-push docker-build-push-multi docker-up docker-down docker-logs docker-clean docker-restart docker-deploy k8s-deploy k8s-deploy-kustomize k8s-delete k8s-delete-kustomize k8s-status k8s-logs k8s-port-forward k8s-describe k8s-shell k8s-events k8s-restart
 
 # 默认目标
 help:
@@ -42,9 +42,12 @@ help:
 	@echo "  benchmark-clean       清理性能测试进程"
 	@echo ""
 	@echo "🐳 Docker 命令:"
-	@echo "  docker-build     构建 Docker 镜像"
-	@echo "  docker-push      推送镜像到远程仓库"
-	@echo "  docker-build-push 构建并推送镜像"
+	@echo "  docker-build     构建 Docker 镜像 (本地架构)"
+	@echo "  docker-build-multi 构建多架构镜像 (amd64+arm64)"
+	@echo "  docker-push      推送镜像到远程仓库 (需先登录 GHCR)"
+	@echo "  docker-push-multi 构建并推送多架构镜像"
+	@echo "  docker-build-push 构建并推送镜像 (单架构)"
+	@echo "  docker-build-push-multi 构建并推送镜像 (多架构)"
 	@echo "  docker-up        启动 Docker 容器（低资源消耗配置）"
 	@echo "  docker-down      停止 Docker 容器"
 	@echo "  docker-restart   重启 Docker 容器"
@@ -287,24 +290,50 @@ benchmark-clean:
 	@echo "✅ 清理完成"
 
 # ========== Docker 命令 ==========
-# 构建 Docker 镜像
+# 构建 Docker 镜像（本地单架构）
 docker-build:
 	@echo "🐳 构建 Docker 镜像（自动打包前端+后端）..."
 	@echo "💡 这将自动构建前端并打包到后端服务中"
-	@echo "🏷️ 镜像标签: lazygophers/lazyai-studio:latest"
-	docker build -t lazygophers/lazyai-studio:latest .
+	@echo "🏷️ 镜像标签: ghcr.io/lazygophers/roo:latest"
+	@echo "🏗️ 架构: 本地架构 ($(shell uname -m))"
+	docker build -t ghcr.io/lazygophers/roo:latest .
 	@echo "✅ Docker 镜像构建完成"
 
-# 推送 Docker 镜像到远程仓库
+# 构建多架构 Docker 镜像
+docker-build-multi:
+	@echo "🐳 构建多架构 Docker 镜像（amd64 + arm64）..."
+	@echo "💡 这将自动构建前端并打包到后端服务中"
+	@echo "🏷️ 镜像标签: ghcr.io/lazygophers/roo:latest"
+	@echo "🏗️ 架构: linux/amd64, linux/arm64"
+	docker buildx build --platform linux/amd64,linux/arm64 -t ghcr.io/lazygophers/roo:latest .
+	@echo "✅ 多架构 Docker 镜像构建完成"
+
+# 推送 Docker 镜像到远程仓库（单架构）
 docker-push:
 	@echo "📤 推送 Docker 镜像到远程仓库..."
-	@echo "🏷️ 镜像标签: lazygophers/lazyai-studio:latest"
-	docker push lazygophers/lazyai-studio:latest
+	@echo "🏷️ 镜像标签: ghcr.io/lazygophers/roo:latest"
+	@echo "💡 确保已登录 GitHub Container Registry:"
+	@echo "   echo \$$GITHUB_TOKEN | docker login ghcr.io -u USERNAME --password-stdin"
+	docker push ghcr.io/lazygophers/roo:latest
 	@echo "✅ Docker 镜像推送完成"
 
-# 构建并推送 Docker 镜像
+# 构建并推送多架构 Docker 镜像
+docker-push-multi:
+	@echo "📤 构建并推送多架构 Docker 镜像..."
+	@echo "🏷️ 镜像标签: ghcr.io/lazygophers/roo:latest"
+	@echo "🏗️ 架构: linux/amd64, linux/arm64"
+	@echo "💡 确保已登录 GitHub Container Registry:"
+	@echo "   echo \$$GITHUB_TOKEN | docker login ghcr.io -u USERNAME --password-stdin"
+	docker buildx build --platform linux/amd64,linux/arm64 -t ghcr.io/lazygophers/roo:latest --push .
+	@echo "✅ 多架构 Docker 镜像构建并推送完成"
+
+# 构建并推送 Docker 镜像（单架构）
 docker-build-push: docker-build docker-push
 	@echo "🚀 Docker 镜像构建并推送完成！"
+
+# 构建并推送 Docker 镜像（多架构）
+docker-build-push-multi: docker-push-multi
+	@echo "🚀 多架构 Docker 镜像构建并推送完成！"
 
 # 启动 Docker 容器（低资源消耗配置）
 docker-up:

@@ -29,7 +29,7 @@ spec:
         fsGroup: 1000
       containers:
       - name: lazyai-studio
-        image: lazygophers/lazyai-studio:latest
+        image: ghcr.io/lazygophers/roo:latest
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 8000

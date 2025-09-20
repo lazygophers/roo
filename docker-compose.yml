@@ -1,6 +1,6 @@
 services:
   lazyai-studio:
-    image: lazygophers/lazyai-studio:latest
+    image: ghcr.io/lazygophers/roo:latest
     container_name: lazyai-studio
     ports:
       - "8000:8000"
