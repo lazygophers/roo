@@ -210,6 +210,73 @@ class DatabaseService:
         for config_name in self._scan_configs:
             results[config_name] = self.sync_config(config_name)
         return results
+
+    def full_refresh_config(self, config_name: str) -> Dict[str, int]:
+        """完全刷新指定配置的数据（覆盖模式）"""
+        if config_name not in self._scan_configs:
+            raise ValueError(f"Config '{config_name}' not found")
+
+        config = self._scan_configs[config_name]
+        table = self.db.table(config['table_name'])
+
+        logger.info(f"🔄 Starting full refresh for '{sanitize_for_log(config_name)}'...")
+
+        # 1. 清空现有数据
+        old_count = len(table.all())
+        table.truncate()
+        logger.info(f"  ✨ Cleared {old_count} existing records")
+
+        # 2. 扫描所有文件
+        scanned_files = self._scan_directory(config_name)
+        logger.info(f"  📁 Scanned {len(scanned_files)} files from {config['path']}")
+
+        # 3. 批量插入新数据
+        if scanned_files:
+            table.insert_multiple(scanned_files)
+            logger.info(f"  ✅ Inserted {len(scanned_files)} new records")
+
+        # 4. 更新同步元数据
+        Query_obj = Query()
+        metadata = {
+            'config_name': config_name,
+            'last_sync': datetime.now().isoformat(),
+            'total_files': len(scanned_files),
+            'sync_type': 'full_refresh',
+            'stats': {
+                'cleared': old_count,
+                'inserted': len(scanned_files),
+                'unchanged': 0,
+                'updated': 0,
+                'deleted': 0
+            }
+        }
+        self.metadata_table.upsert(metadata, Query_obj.config_name == config_name)
+
+        stats = metadata['stats']
+        logger.info(f"✅ Full refresh completed for '{sanitize_for_log(config_name)}': cleared {old_count}, inserted {len(scanned_files)}")
+        return stats
+
+    def full_refresh_all(self) -> Dict[str, Dict[str, int]]:
+        """完全刷新所有配置的数据（覆盖模式）"""
+        logger.info("🚀 Starting full refresh of all resources...")
+
+        results = {}
+        total_configs = len(self._scan_configs)
+
+        for i, config_name in enumerate(self._scan_configs, 1):
+            logger.info(f"📋 Processing config {i}/{total_configs}: {sanitize_for_log(config_name)}")
+            try:
+                results[config_name] = self.full_refresh_config(config_name)
+            except Exception as e:
+                logger.error(f"❌ Failed to refresh config '{sanitize_for_log(config_name)}': {e}")
+                results[config_name] = {'error': str(e)}
+
+        # 计算总体统计
+        total_cleared = sum(r.get('cleared', 0) for r in results.values() if 'error' not in r)
+        total_inserted = sum(r.get('inserted', 0) for r in results.values() if 'error' not in r)
+
+        logger.info(f"🎉 Full refresh completed! Total: cleared {total_cleared} records, inserted {total_inserted} records")
+        return results
     
     def get_cached_data(self, config_name: str, filters: Dict[str, Any] = None) -> List[Dict[str, Any]]:
         """从缓存获取数据"""

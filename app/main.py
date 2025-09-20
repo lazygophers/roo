@@ -54,8 +54,47 @@ def get_database_service():
     """延迟数据库服务初始化"""
     global _db_service
     if _db_service is None:
-        from app.core.database_service_minimal import init_minimal_database_service
-        _db_service = init_minimal_database_service()
+        from app.core.database_service import DatabaseService
+        _db_service = DatabaseService(use_unified_db=True)
+
+        # 添加扫描配置
+        _db_service.add_scan_config(
+            'models',
+            str(PROJECT_ROOT / "resources" / "models"),
+            patterns=['*.yaml', '*.yml'],
+            watch=False  # 启动时不启用文件监听
+        )
+
+        _db_service.add_scan_config(
+            'hooks',
+            str(PROJECT_ROOT / "resources" / "hooks"),
+            patterns=['*.yaml', '*.yml'],
+            watch=False
+        )
+
+        # 添加所有rules相关的配置
+        resources_dir = PROJECT_ROOT / "resources"
+        for rules_dir in resources_dir.glob("rules*"):
+            if rules_dir.is_dir():
+                config_name = rules_dir.name.replace("-", "_")
+                _db_service.add_scan_config(
+                    config_name,
+                    str(rules_dir),
+                    patterns=['*.yaml', '*.yml'],
+                    watch=False
+                )
+
+        # 其他资源配置
+        for resource_type in ['commands', 'roles']:
+            resource_path = resources_dir / resource_type
+            if resource_path.exists():
+                _db_service.add_scan_config(
+                    resource_type,
+                    str(resource_path),
+                    patterns=['*.yaml', '*.yml'],
+                    watch=False
+                )
+
     return _db_service
 
 @asynccontextmanager
@@ -70,6 +109,22 @@ async def lifespan(app: FastAPI):
         start_memory = process.memory_info().rss / 1024 / 1024
 
         print(f"🚀 LazyAI Studio (Minimal) - Starting with {start_memory:.1f}MB", flush=True)
+
+        # 初始化数据库服务并刷新资源数据
+        print("📋 Initializing database service and refreshing resources...", flush=True)
+        try:
+            db_service = get_database_service()
+            if hasattr(db_service, 'full_refresh_all'):
+                # 使用完整数据库服务的完全刷新功能
+                refresh_results = db_service.full_refresh_all()
+                total_files = sum(r.get('inserted', 0) for r in refresh_results.values() if 'error' not in r)
+                print(f"✅ Resources refreshed successfully! Total files processed: {total_files}", flush=True)
+            else:
+                # 如果是最小化服务，使用基本的初始化
+                print("🔧 Using minimal database service mode", flush=True)
+        except Exception as e:
+            get_logger().error(f"Failed to refresh resources: {e}")
+            print(f"⚠️  Resource refresh failed: {e}", flush=True)
 
         # 启动后重新启用GC并优化
         gc.enable()
