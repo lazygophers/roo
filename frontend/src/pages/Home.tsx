@@ -349,8 +349,8 @@ const Home: React.FC = () => {
         {/* 统计数据区域 */}
         <div className={`stats-section ${cardsVisible ? 'visible' : ''}`}>
           <Row gutter={[24, 24]}>
-            <Col xs={24} sm={12} md={8} lg={6}>
-              <Card className="stat-card" hoverable>
+            <Col xs={24} sm={12} md={6} lg={6}>
+              <Card className="stat-card" hoverable style={{ height: '160px' }}>
                 <Statistic
                   title="AI 模型总数"
                   value={stats.totalModels}
@@ -360,8 +360,8 @@ const Home: React.FC = () => {
                 />
               </Card>
             </Col>
-            <Col xs={24} sm={12} md={8} lg={6}>
-              <Card className="stat-card" hoverable>
+            <Col xs={24} sm={12} md={6} lg={6}>
+              <Card className="stat-card" hoverable style={{ height: '160px' }}>
                 <Statistic
                   title="编程助手"
                   value={stats.coderModels}
@@ -371,8 +371,8 @@ const Home: React.FC = () => {
                 />
               </Card>
             </Col>
-            <Col xs={24} sm={12} md={8} lg={6}>
-              <Card className="stat-card" hoverable>
+            <Col xs={24} sm={12} md={6} lg={6}>
+              <Card className="stat-card" hoverable style={{ height: '160px' }}>
                 <Statistic
                   title="MCP 工具"
                   value={stats.mcpTools}
@@ -382,8 +382,8 @@ const Home: React.FC = () => {
                 />
               </Card>
             </Col>
-            <Col xs={24} sm={12} md={8} lg={6}>
-              <Card className="stat-card" hoverable>
+            <Col xs={24} sm={12} md={6} lg={6}>
+              <Card className="stat-card" hoverable style={{ height: '160px' }}>
                 <Statistic
                   title="智能规则"
                   value={stats.rules}
@@ -408,7 +408,7 @@ const Home: React.FC = () => {
                   className="action-card"
                   hoverable
                   onClick={action.onClick}
-                  style={{ textAlign: 'center', cursor: 'pointer' }}
+                  style={{ textAlign: 'center', cursor: 'pointer', height: '160px' }}
                 >
                   <div style={{ fontSize: '32px', color: action.color, marginBottom: '16px' }}>
                     {action.icon}
@@ -433,7 +433,7 @@ const Home: React.FC = () => {
           <Row gutter={[24, 24]}>
             {features.map((feature, index) => (
               <Col xs={24} sm={12} lg={6} key={index}>
-                <Card className="feature-card" hoverable style={{ textAlign: 'center' }}>
+                <Card className="feature-card" hoverable style={{ textAlign: 'center', height: '180px' }}>
                   <div style={{ marginBottom: '16px' }}>
                     {feature.icon}
                   </div>

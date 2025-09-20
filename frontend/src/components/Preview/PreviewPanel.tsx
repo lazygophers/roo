@@ -61,7 +61,7 @@ const PreviewPanel: React.FC<PreviewPanelProps> = ({ selectedItem, itemType }) =
         </Space>
       </div>
 
-      <Descriptions column={1} bordered size="small">
+      <Descriptions column={1} bordered size="middle">
         <Descriptions.Item label="Slug">
           <Text code>{model.slug}</Text>
         </Descriptions.Item>
@@ -126,7 +126,7 @@ const PreviewPanel: React.FC<PreviewPanelProps> = ({ selectedItem, itemType }) =
         </Space>
       </div>
 
-      <Descriptions column={2} bordered size="small">
+      <Descriptions column={2} bordered size="middle">
         <Descriptions.Item label="文件名">
           <Text>{file.file_path.split('/').pop()}</Text>
         </Descriptions.Item>
