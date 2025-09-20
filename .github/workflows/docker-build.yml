@@ -99,12 +99,29 @@ jobs:
             type=raw,value=latest,enable=${{ github.ref == 'refs/heads/master' }}
             type=raw,value=dev,enable=${{ github.ref == 'refs/heads/dev' }}
 
+      - name: Determine build platforms
+        id: platforms
+        run: |
+          if [[ "${{ github.ref }}" == "refs/heads/master" ]] || [[ "${{ github.ref }}" == refs/tags/* ]]; then
+            echo "platforms=linux/amd64,linux/arm64" >> $GITHUB_OUTPUT
+            echo "build_type=multi-arch" >> $GITHUB_OUTPUT
+            echo "🏗️ Master/Tag branch detected - building for amd64 + arm64"
+          elif [[ "${{ github.ref }}" == "refs/heads/dev" ]]; then
+            echo "platforms=linux/amd64" >> $GITHUB_OUTPUT
+            echo "build_type=single-arch" >> $GITHUB_OUTPUT
+            echo "🚀 Dev branch detected - building for amd64 only"
+          else
+            echo "platforms=linux/amd64" >> $GITHUB_OUTPUT
+            echo "build_type=single-arch" >> $GITHUB_OUTPUT
+            echo "🔧 Other branch detected - building for amd64 only"
+          fi
+
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
           context: .
           file: ./Dockerfile
-          platforms: linux/amd64
+          platforms: ${{ steps.platforms.outputs.platforms }}
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
@@ -122,8 +139,14 @@ jobs:
           echo "${{ steps.meta.outputs.tags }}" >> $GITHUB_STEP_SUMMARY
           echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Platforms:** linux/amd64" >> $GITHUB_STEP_SUMMARY
+          echo "**Platforms:** ${{ steps.platforms.outputs.platforms }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Build Type:** ${{ steps.platforms.outputs.build_type }}" >> $GITHUB_STEP_SUMMARY
           echo "**Registry:** GitHub Container Registry" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Branch/Tag Strategy:**" >> $GITHUB_STEP_SUMMARY
+          echo "- **Master/Tags:** Multi-arch (amd64 + arm64)" >> $GITHUB_STEP_SUMMARY
+          echo "- **Dev:** Single-arch (amd64 only)" >> $GITHUB_STEP_SUMMARY
+          echo "- **Other:** Single-arch (amd64 only)" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Changes detected:**" >> $GITHUB_STEP_SUMMARY
           echo "- Frontend: ${{ needs.detect-changes.outputs.frontend-changed }}" >> $GITHUB_STEP_SUMMARY
@@ -133,7 +156,7 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "⚡ **Build optimizations:**" >> $GITHUB_STEP_SUMMARY
           echo "- Smart change detection" >> $GITHUB_STEP_SUMMARY
-          echo "- Single platform build (linux/amd64)" >> $GITHUB_STEP_SUMMARY
+          echo "- Dynamic platform selection" >> $GITHUB_STEP_SUMMARY
           echo "- Disabled SBOM/Provenance for speed" >> $GITHUB_STEP_SUMMARY
           echo "- No caching for clean builds" >> $GITHUB_STEP_SUMMARY
 
