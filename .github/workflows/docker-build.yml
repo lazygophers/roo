@@ -35,7 +35,6 @@ jobs:
             frontend:
               - 'frontend/**'
               - 'frontend/package*.json'
-              - 'frontend/yarn.lock'
               - 'frontend/pnpm-lock.yaml'
             backend:
               - 'app/**'
@@ -75,19 +74,35 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Node.js for frontend cache
+      - name: Setup Node.js and pnpm for frontend cache
         uses: actions/setup-node@v4
         with:
           node-version: '22'
-          cache: 'yarn'
-          cache-dependency-path: frontend/yarn.lock
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.0
+
+      - name: Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - name: Cache pnpm store
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('frontend/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
 
       - name: Cache frontend build cache
         uses: actions/cache@v4
         with:
           path: |
             frontend/.next/cache
-          key: ${{ runner.os }}-frontend-build-${{ hashFiles('frontend/package*.json', 'frontend/yarn.lock') }}
+          key: ${{ runner.os }}-frontend-build-${{ hashFiles('frontend/package*.json', 'frontend/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-frontend-build-
 
@@ -176,9 +191,10 @@ jobs:
           echo "⚡ **Performance optimizations applied:**" >> $GITHUB_STEP_SUMMARY
           echo "- Smart change detection" >> $GITHUB_STEP_SUMMARY
           echo "- Multi-level caching (GHA + Registry + BuildKit)" >> $GITHUB_STEP_SUMMARY
-          echo "- Frontend dependency caching (Node.js + npm)" >> $GITHUB_STEP_SUMMARY
+          echo "- Frontend dependency caching (pnpm store + build cache)" >> $GITHUB_STEP_SUMMARY
           echo "- Backend dependency caching (Python + uv)" >> $GITHUB_STEP_SUMMARY
           echo "- Docker layer caching with mount cache" >> $GITHUB_STEP_SUMMARY
+          echo "- pnpm for faster package management" >> $GITHUB_STEP_SUMMARY
           echo "- Latest BuildKit version" >> $GITHUB_STEP_SUMMARY
           echo "- Disabled SBOM/Provenance for speed" >> $GITHUB_STEP_SUMMARY
 

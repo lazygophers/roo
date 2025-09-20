@@ -20,7 +20,8 @@ htmlcov/
 # Node.js 相关
 frontend/node_modules
 frontend/.pnpm-store
-frontend/pnpm-lock.yaml
+# Keep pnpm-lock.yaml for Docker builds
+# frontend/pnpm-lock.yaml
 frontend/.package-lock.json
 
 # 构建产物（会在Docker内重新构建）

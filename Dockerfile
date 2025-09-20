@@ -4,6 +4,9 @@
 # ========== 前端构建阶段 ==========
 FROM node:22.19.0 AS frontend-builder
 
+# 启用 corepack 并设置 pnpm
+RUN corepack enable && corepack prepare pnpm@9.15.0 --activate
+
 # 设置工作目录
 WORKDIR /app/frontend
 
@@ -12,17 +15,22 @@ ENV NODE_ENV=production
 ENV DISABLE_ESLINT_PLUGIN=true
 ENV GENERATE_SOURCEMAP=false
 ENV CI=true
+ENV PNPM_HOME=/usr/local/bin
+ENV PATH=$PNPM_HOME:$PATH
+
+# 复制依赖配置文件
+COPY frontend/package.json frontend/pnpm-lock.yaml frontend/.npmrc ./
+
+# 安装前端依赖（使用pnpm缓存挂载）
+RUN --mount=type=cache,target=/root/.local/share/pnpm/store \
+    pnpm install --frozen-lockfile --production=false
 
 # 复制前端源码
 COPY frontend/ ./
 
-# 安装前端依赖（使用缓存挂载）
-RUN --mount=type=cache,target=/usr/local/share/.cache/yarn \
-    yarn install --frozen-lockfile --production=false
-
 # 构建前端生产版本（使用缓存挂载）
 RUN --mount=type=cache,target=/app/frontend/.next/cache \
-    yarn build
+    pnpm build
 
 # ========== 后端构建阶段 ==========
 FROM python:3.12 AS backend-builder
@@ -47,11 +55,10 @@ COPY pyproject.toml uv.lock ./
 # 创建虚拟环境并安装依赖（使用缓存挂载）
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv venv .venv && \
-    uv venv --seed && \
-    uv sync --frozen --no-dev --no-install-project --no-install-workspace
+    uv sync --frozen
 
 # ========== 最终运行阶段 ==========
-FROM alpine
+FROM alpine:latest
 
 # 设置环境变量（运行时优化）
 ENV PYTHONUNBUFFERED=1
@@ -66,21 +73,33 @@ RUN addgroup -g 1000 appuser && adduser -u 1000 -G appuser -s /bin/sh -D appuser
 # 设置工作目录
 WORKDIR /app
 
-# 安装运行时必需的系统依赖（使用apk）
+# 安装运行时必需的系统依赖（最小化版本）
 RUN apk add --no-cache \
     curl \
     ca-certificates \
     tzdata \
     tini \
     libffi \
-    libressl-dev \
+    python3 \
+    python3-dev \
+    py3-pip \
+    gcc \
     musl-dev \
+    linux-headers \
     && cp /usr/share/zoneinfo/$TZ /etc/localtime \
-    && echo $TZ > /etc/timezone \
-    && apk del tzdata
+    && echo $TZ > /etc/timezone
 
-# 从构建阶段复制虚拟环境
-COPY --from=backend-builder /app/.venv /app/.venv
+# 安装 uv 用于重新构建虚拟环境
+RUN pip3 install uv --break-system-packages
+
+# 复制项目配置文件
+COPY --from=backend-builder /app/pyproject.toml /app/uv.lock ./
+
+# 创建并构建虚拟环境（在目标架构上）
+RUN uv venv .venv && uv sync --frozen
+
+# 清理构建依赖
+RUN apk del python3-dev py3-pip gcc musl-dev linux-headers tzdata
 
 # 复制后端源码
 COPY app/ ./app/
@@ -103,10 +122,7 @@ EXPOSE 8000
 HEALTHCHECK --interval=120s --timeout=3s --start-period=60s --retries=1 \
     CMD curl -f http://localhost:8000/api/health || exit 1
 
-# 使用tini作为init进程（Alpine最佳实践）
-ENTRYPOINT ["/sbin/tini", "--"]
-
-# 启动命令（直接使用虚拟环境的相对路径）
-CMD [".venv/bin/python", "-m", "uvicorn", "app.main_optimized:app", \
+# 启动命令（直接启动，不使用tini进行调试）
+CMD ["/app/.venv/bin/python", "-m", "uvicorn", "app.main_optimized:app", \
     "--host", "0.0.0.0", "--port", "8000", \
     "--workers", "1", "--log-level", "warning"]

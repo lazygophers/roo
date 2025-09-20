@@ -205,11 +205,15 @@ Automated Docker image building and publishing with GitHub Actions:
 - **Restricted triggers**: Only builds on push to master branch and version tags
 - **Smart change detection**: Only builds when relevant files change (frontend/backend/docker/resources)
 - **Advanced caching strategy**:
-  - GitHub Actions cache for dependencies (Node.js npm + Python uv)
-  - Docker BuildKit cache with mount cache for build layers
-  - Registry cache for Docker images
-  - Frontend build cache (.next/cache, node_modules)
-  - Backend dependency cache (uv cache, .venv)
+  - **pnpm store cache**: Global package store for faster dependency resolution
+  - **Frontend build cache**: .next/cache for incremental compilation
+  - **Backend dependency cache**: Python uv cache + .venv virtual environment
+  - **Docker BuildKit cache**: Multi-level with mount cache for build layers
+  - **Registry cache**: Docker images cached in GitHub Container Registry
+- **Package management optimization**:
+  - **pnpm**: ~40-70% faster than yarn/npm in CI environments
+  - **Shamefully hoist**: Compatible with React Scripts ecosystem
+  - **Content-addressable storage**: Eliminates duplicate downloads
 - **Performance optimizations**: Latest BuildKit v0.12.4, disabled SBOM/Provenance for speed
 - **Multi-platform builds**: linux/amd64, linux/arm64 in single optimized job
 - **Container registry**: Uses GitHub Container Registry (ghcr.io) for GitHub Packages
