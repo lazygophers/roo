@@ -17,13 +17,10 @@ ENV CI=true
 COPY frontend/ ./
 
 # 安装前端依赖
-RUN yarn install --frozen-lockfile --production=false --network-timeout 300000
+RUN yarn install --frozen-lockfile --production=false
 
-# 构建前端生产版本（分配充足内存）
-RUN NODE_OPTIONS="--max-old-space-size=2048" \
-    DISABLE_ESLINT_PLUGIN=true \
-    GENERATE_SOURCEMAP=false \
-    yarn build
+# 构建前端生产版本
+RUN yarn build
 
 # ========== 后端构建阶段 ==========
 FROM python:3.12 AS backend-builder
