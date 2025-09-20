@@ -19,6 +19,7 @@ jobs:
       frontend-changed: ${{ steps.changes.outputs.frontend }}
       backend-changed: ${{ steps.changes.outputs.backend }}
       docker-changed: ${{ steps.changes.outputs.docker }}
+      resources-changed: ${{ steps.changes.outputs.resources }}
       should-build: ${{ steps.should-build.outputs.result }}
     steps:
       - name: Checkout repository
@@ -44,6 +45,8 @@ jobs:
               - 'Dockerfile'
               - 'docker-compose*.yml'
               - '.dockerignore'
+            resources:
+              - 'resources/**'
 
       - name: Determine if build is needed
         id: should-build
@@ -51,7 +54,7 @@ jobs:
           if [[ "${{ github.event_name }}" == "push" && "${{ contains(github.ref, 'refs/tags/') }}" == "true" ]]; then
             echo "result=true" >> $GITHUB_OUTPUT
             echo "🏷️ Tag推送，强制构建"
-          elif [[ "${{ steps.changes.outputs.frontend }}" == "true" || "${{ steps.changes.outputs.backend }}" == "true" || "${{ steps.changes.outputs.docker }}" == "true" ]]; then
+          elif [[ "${{ steps.changes.outputs.frontend }}" == "true" || "${{ steps.changes.outputs.backend }}" == "true" || "${{ steps.changes.outputs.docker }}" == "true" || "${{ steps.changes.outputs.resources }}" == "true" ]]; then
             echo "result=true" >> $GITHUB_OUTPUT
             echo "📦 检测到相关文件变更，需要构建"
           else
@@ -136,6 +139,7 @@ jobs:
           echo "- Frontend: ${{ needs.detect-changes.outputs.frontend-changed }}" >> $GITHUB_STEP_SUMMARY
           echo "- Backend: ${{ needs.detect-changes.outputs.backend-changed }}" >> $GITHUB_STEP_SUMMARY
           echo "- Docker: ${{ needs.detect-changes.outputs.docker-changed }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Resources: ${{ needs.detect-changes.outputs.resources-changed }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "⚡ **Performance optimizations applied:**" >> $GITHUB_STEP_SUMMARY
           echo "- Smart change detection" >> $GITHUB_STEP_SUMMARY
@@ -159,3 +163,4 @@ jobs:
           echo "- Frontend: \`frontend/**\`" >> $GITHUB_STEP_SUMMARY
           echo "- Backend: \`app/**\`, \`pyproject.toml\`, \`uv.lock\`" >> $GITHUB_STEP_SUMMARY
           echo "- Docker: \`Dockerfile\`, \`docker-compose*.yml\`" >> $GITHUB_STEP_SUMMARY
+          echo "- Resources: \`resources/**\`" >> $GITHUB_STEP_SUMMARY
