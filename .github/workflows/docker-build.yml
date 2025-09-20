@@ -14,7 +14,7 @@ env:
 jobs:
   # 检测变更文件，决定是否需要构建
   detect-changes:
-    runs-on: ubuntu-24.04
+    runs-on: lazy
     outputs:
       frontend-changed: ${{ steps.changes.outputs.frontend }}
       backend-changed: ${{ steps.changes.outputs.backend }}
@@ -65,7 +65,7 @@ jobs:
   build-and-push:
     needs: detect-changes
     if: needs.detect-changes.outputs.should-build == 'true'
-    runs-on: ubuntu-24.04
+    runs-on: lazy
     permissions:
       contents: read
       packages: write
@@ -227,7 +227,7 @@ jobs:
   skip-notification:
     needs: detect-changes
     if: needs.detect-changes.outputs.should-build == 'false'
-    runs-on: ubuntu-24.04
+    runs-on: lazy
     steps:
       - name: Skip build notification
         run: |
