@@ -1,0 +1,82 @@
+name: Deploy Dev Branch
+
+on:
+  workflow_run:
+    workflows: ["Docker Build and Push (Master + Dev)"]
+    branches: [dev]
+    types:
+      - completed
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  deploy-dev:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    environment: dev-deployment
+
+    steps:
+      - name: Deploy to Dev Server
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ vars.DEV_SERVER_HOST }}
+          username: root
+          key: ${{ secrets.DEV_SERVER_SSH_KEY }}
+          port: ${{ vars.DEV_SERVER_PORT || 22 }}
+          script: |
+            echo "🚀 Starting dev deployment..."
+
+            # Pull latest image
+            echo "📦 Pulling latest Docker image..."
+            docker pull ghcr.io/lazygophers/roo:dev
+
+            # Navigate to project directory
+            echo "📂 Navigating to project directory..."
+            cd /opt/1panel/docker/compose/lazyai-studio/
+
+            # Stop and recreate containers
+            echo "🔄 Recreating containers..."
+            docker compose up -d --force-recreate
+
+            # Wait for containers to be healthy
+            echo "⏳ Waiting for containers to start..."
+            sleep 10
+
+            # Check container status
+            echo "📊 Container status:"
+            docker compose ps
+
+            # Check logs for any immediate errors
+            echo "📋 Recent logs:"
+            docker compose logs --tail=20
+
+            echo "✅ Dev deployment completed successfully!"
+
+      - name: Deployment Summary
+        if: always()
+        run: |
+          echo "## Dev Deployment Summary 🚀" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Target Server:** \`${{ vars.DEV_SERVER_HOST }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "**Image:** \`${{ env.REGISTRY }}/lazygophers/roo:dev\`" >> $GITHUB_STEP_SUMMARY
+          echo "**Deployment Path:** \`/opt/1panel/docker/compose/lazyai-studio/\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ job.status }}" == "success" ]; then
+            echo "**Status:** ✅ Deployment Successful" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "**Status:** ❌ Deployment Failed" >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Actions Performed:**" >> $GITHUB_STEP_SUMMARY
+          echo "1. Pull \`ghcr.io/lazygophers/roo:dev\` image" >> $GITHUB_STEP_SUMMARY
+          echo "2. Navigate to deployment directory" >> $GITHUB_STEP_SUMMARY
+          echo "3. Recreate containers with \`docker compose up -d --force-recreate\`" >> $GITHUB_STEP_SUMMARY
+          echo "4. Verify container status and logs" >> $GITHUB_STEP_SUMMARY
+
+      - name: Notify Deployment Status
+        if: failure()
+        run: |
+          echo "❌ Dev deployment failed. Please check the server and try again."
+          exit 1
