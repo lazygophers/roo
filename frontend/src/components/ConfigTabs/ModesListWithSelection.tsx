@@ -1,15 +1,15 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
-import { 
-  List, 
-  Card, 
-  Tag, 
-  Space, 
-  Input, 
-  Select, 
-  Row, 
-  Col, 
+import {
+  List,
+  Card,
+  Tag,
+  Space,
+  Input,
+  Select,
+  Row,
+  Col,
   Typography,
-  message,
+  App,
   Spin,
   Checkbox,
   Button,
@@ -51,6 +51,7 @@ const ModesListWithSelection: React.FC<ModesListProps> = ({
   onUpdateModelRules
 }) => {
   const { token } = theme.useToken();
+  const { message } = App.useApp();
   const [models, setModels] = useState<ModelInfo[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchText, setSearchText] = useState('');
@@ -519,17 +520,33 @@ const ModesListWithSelection: React.FC<ModesListProps> = ({
           // Load rules for the model
           await forceExpandModel(model.slug);
 
-          // Defer rule selection to prevent blocking
-          setTimeout(() => {
+          // Wait for rules to be loaded before selecting them
+          let retryCount = 0;
+          const maxRetries = 10; // Maximum 3 seconds wait (10 * 300ms)
+
+          const checkAndSelectRules = () => {
             const associatedRules = modelRulesRef.current[model.slug] || [];
-            console.log(`Auto-selecting ${associatedRules.length} rules for model: ${model.slug}`);
+            console.log(`Auto-selecting ${associatedRules.length} rules for model: ${model.slug} (retry: ${retryCount})`);
             console.log(`Rules for ${model.slug}:`, associatedRules.map(r => r.name || r.file_path));
-            associatedRules.forEach(rule => {
-              if (!isRuleSelectedForModel(rule.file_path, model.slug)) {
-                onModelRuleBinding(model.slug, rule.file_path, true);
-              }
-            });
-          }, 500);
+
+            if (associatedRules.length > 0) {
+              // Rules are loaded, select them all
+              associatedRules.forEach(rule => {
+                if (!isRuleSelectedForModel(rule.file_path, model.slug)) {
+                  onModelRuleBinding(model.slug, rule.file_path, true);
+                }
+              });
+            } else if (retryCount < maxRetries) {
+              // Rules not loaded yet, wait a bit more
+              retryCount++;
+              setTimeout(checkAndSelectRules, 300);
+            } else {
+              console.log(`Max retries reached for model: ${model.slug}, giving up rule selection`);
+            }
+          };
+
+          // Start checking after a short delay
+          setTimeout(checkAndSelectRules, 500);
 
           // Yield control between models
           await new Promise(resolve => setTimeout(resolve, 0));
