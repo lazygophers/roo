@@ -59,6 +59,7 @@ const ModesListWithSelection: React.FC<ModesListProps> = ({
   const [loadingRules, setLoadingRules] = useState<Record<string, boolean>>({});
   const [expandedModels, setExpandedModels] = useState<Set<string>>(new Set());
   const modelRulesRef = useRef<Record<string, FileMetadata[]>>({});
+  const loadingRulesRef = useRef<Record<string, boolean>>({});
 
   // Optimized filteredModels with useMemo to prevent unnecessary re-computations
   const filteredModels = useMemo(() => {
@@ -102,10 +103,14 @@ const ModesListWithSelection: React.FC<ModesListProps> = ({
     loadModels();
   }, []);
 
-  // 同步 modelRules 到 ref
+  // 同步 modelRules 和 loadingRules 到 ref
   useEffect(() => {
     modelRulesRef.current = modelRules;
   }, [modelRules]);
+
+  useEffect(() => {
+    loadingRulesRef.current = loadingRules;
+  }, [loadingRules]);
 
   // 初始化时设置 orchestrator 模式默认展开
   useEffect(() => {
@@ -192,14 +197,62 @@ const ModesListWithSelection: React.FC<ModesListProps> = ({
     return modelSlug === 'orchestrator';
   };
 
-  const handleToggleSelection = (model: ModelInfo) => {
+  // 检查规则是否被特定模式选择
+  const isRuleSelectedForModel = useCallback((rulePath: string, modelSlug: string): boolean => {
+    const bindings = getModelRuleBindings(modelSlug);
+    return bindings.includes(rulePath);
+  }, [getModelRuleBindings]);
+
+  // 智能等待规则加载完成并自动选择
+  const autoSelectRulesAfterLoading = useCallback(async (modelSlug: string) => {
+    console.log(`Starting auto-select for model: ${modelSlug}`);
+
+    const maxWaitTime = 5000; // 最多等待5秒
+    const checkInterval = 100; // 每100ms检查一次
+    const startTime = Date.now();
+
+    // 持续检查直到规则加载完成或超时
+    while (Date.now() - startTime < maxWaitTime) {
+      // 使用 ref 获取最新状态
+      const isLoading = loadingRulesRef.current[modelSlug];
+      const rules = modelRulesRef.current[modelSlug];
+
+      console.log(`Checking model ${modelSlug}: loading=${isLoading}, rules=${rules ? rules.length : 'undefined'}`);
+
+      // 检查是否不再加载且有规则数据
+      if (!isLoading && rules !== undefined) {
+        if (rules.length > 0) {
+          console.log(`Auto-selecting ${rules.length} rules for model: ${modelSlug}`);
+          // 自动选择所有规则
+          rules.forEach(rule => {
+            if (!isRuleSelectedForModel(rule.file_path, modelSlug)) {
+              console.log(`Selecting rule: ${rule.file_path} for model: ${modelSlug}`);
+              onModelRuleBinding(modelSlug, rule.file_path, true);
+            }
+          });
+          return; // 成功完成
+        } else {
+          // 规则已加载但为空数组，也算完成
+          console.log(`No rules to auto-select for model: ${modelSlug} (empty array)`);
+          return;
+        }
+      }
+
+      // 等待一小段时间再检查
+      await new Promise(resolve => setTimeout(resolve, checkInterval));
+    }
+
+    console.warn(`Timeout waiting for rules to load for model: ${modelSlug}, final state: loading=${loadingRulesRef.current[modelSlug]}, rules=${modelRulesRef.current[modelSlug] ? modelRulesRef.current[modelSlug].length : 'undefined'}`);
+  }, [isRuleSelectedForModel, onModelRuleBinding]);
+
+  const handleToggleSelection = async (model: ModelInfo) => {
     // 如果是必选模型且已经选中，阻止取消选择
     if (isRequiredModel(model.slug) && isSelected(model.slug)) {
       return;
     }
-    
+
     const currentlySelected = isSelected(model.slug);
-    
+
     const selectedItem: SelectedItem = {
       id: model.slug,
       type: 'model',
@@ -207,21 +260,16 @@ const ModesListWithSelection: React.FC<ModesListProps> = ({
       data: model
     };
     onToggleSelection(selectedItem);
-    
+
     // 根据选中状态自动展开或收起关联规则
     if (!currentlySelected) {
       // 从未选中变为选中，自动展开并加载关联规则
       handleModelExpand(model.slug);
-      
-      // 自动选择该模式下的所有规则
+
+      // 延迟一下再启动自动选择逻辑，确保规则加载已经开始
       setTimeout(() => {
-        const associatedRules = modelRules[model.slug] || [];
-        associatedRules.forEach(rule => {
-          if (!isRuleSelectedForModel(rule.file_path, model.slug)) {
-            onModelRuleBinding(model.slug, rule.file_path, true);
-          }
-        });
-      }, 100); // 延迟执行确保模式选择状态已更新
+        autoSelectRulesAfterLoading(model.slug);
+      }, 50);
     } else {
       // 从选中变为未选中，自动收起，并取消选择所有关联规则
       setExpandedModels(prev => {
@@ -229,7 +277,7 @@ const ModesListWithSelection: React.FC<ModesListProps> = ({
         newSet.delete(model.slug);
         return newSet;
       });
-      
+
       // 取消选择该模式下的所有规则
       const associatedRules = modelRules[model.slug] || [];
       associatedRules.forEach(rule => {
@@ -303,12 +351,6 @@ const ModesListWithSelection: React.FC<ModesListProps> = ({
     };
   };
   
-  // 检查规则是否被特定模式选择
-  const isRuleSelectedForModel = (rulePath: string, modelSlug: string): boolean => {
-    const bindings = getModelRuleBindings(modelSlug);
-    return bindings.includes(rulePath);
-  };
-
   // 模式slug到规则slug的映射关系 - 根据slug层级查找规则目录
   const getModelRuleSlug = (modelSlug: string): string[] => {
     // 将 slug 按 '-' 分割，生成层级结构的规则目录名称
