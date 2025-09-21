@@ -28,3 +28,9 @@ dependencies = [
     "beautifulsoup4>=4.12.3",
     "aiohttp-cors>=0.8.1",
 ]
+
+[dependency-groups]
+dev = [
+    "pip-audit>=2.9.0",
+    "safety>=3.2.4",
+]
