@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Tag, Tooltip, theme } from 'antd';
 import { CloudOutlined, DesktopOutlined, LoadingOutlined } from '@ant-design/icons';
 import { useEnvironment } from '../../contexts/EnvironmentContext';
@@ -6,6 +6,18 @@ import { useEnvironment } from '../../contexts/EnvironmentContext';
 const EnvironmentIndicator: React.FC = () => {
   const { environment, isLocal, isRemote, loading, error } = useEnvironment();
   const { token } = theme.useToken();
+  const [isMobile, setIsMobile] = useState(false);
+
+  // 检测屏幕大小变化
+  useEffect(() => {
+    const checkIsMobile = () => {
+      setIsMobile(window.innerWidth <= 992); // 与Ant Design的lg断点一致
+    };
+
+    checkIsMobile();
+    window.addEventListener('resize', checkIsMobile);
+    return () => window.removeEventListener('resize', checkIsMobile);
+  }, []);
 
   if (loading) {
     return (
@@ -13,7 +25,7 @@ const EnvironmentIndicator: React.FC = () => {
         style={{
           position: 'fixed',
           bottom: 16,
-          left: 16,
+          left: isMobile ? 16 : 216,
           zIndex: 1000
         }}
       >
@@ -24,9 +36,12 @@ const EnvironmentIndicator: React.FC = () => {
             fontSize: '12px',
             display: 'flex',
             alignItems: 'center',
-            gap: '4px',
-            borderRadius: '12px',
-            padding: '4px 8px'
+            gap: '6px',
+            borderRadius: '16px',
+            padding: '6px 12px',
+            boxShadow: token.boxShadowSecondary,
+            border: 'none',
+            fontWeight: 500
           }}
         >
           检测中...
@@ -41,7 +56,7 @@ const EnvironmentIndicator: React.FC = () => {
         style={{
           position: 'fixed',
           bottom: 16,
-          left: 16,
+          left: isMobile ? 16 : 216,
           zIndex: 1000
         }}
       >
@@ -52,9 +67,12 @@ const EnvironmentIndicator: React.FC = () => {
               fontSize: '12px',
               display: 'flex',
               alignItems: 'center',
-              gap: '4px',
-              borderRadius: '12px',
-              padding: '4px 8px'
+              gap: '6px',
+              borderRadius: '16px',
+              padding: '6px 12px',
+              boxShadow: token.boxShadowSecondary,
+              border: 'none',
+              fontWeight: 500
             }}
           >
             环境未知
@@ -96,7 +114,7 @@ const EnvironmentIndicator: React.FC = () => {
       style={{
         position: 'fixed',
         bottom: 16,
-        left: 16,
+        left: isMobile ? 16 : 216, // 移动端16px，桌面端考虑侧边栏宽度
         zIndex: 1000
       }}
     >
@@ -108,11 +126,13 @@ const EnvironmentIndicator: React.FC = () => {
             fontSize: '12px',
             display: 'flex',
             alignItems: 'center',
-            gap: '4px',
-            borderRadius: '12px',
-            padding: '4px 8px',
+            gap: '6px',
+            borderRadius: '16px',
+            padding: '6px 12px',
             boxShadow: token.boxShadowSecondary,
-            cursor: 'help'
+            cursor: 'help',
+            border: 'none',
+            fontWeight: 500
           }}
         >
           {config.text}
