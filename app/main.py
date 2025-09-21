@@ -16,11 +16,12 @@ from typing import Optional
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
+from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from pathlib import Path
 
 # 最小导入
-from app.core.config import API_PREFIX, DEBUG, LOG_LEVEL, PROJECT_ROOT
+from app.core.config import API_PREFIX, DEBUG, LOG_LEVEL, PROJECT_ROOT, CORS_ORIGINS, CORS_ALLOW_CREDENTIALS
 from app.routers.api_models import router as models_router
 from app.routers.mcp import router as mcp_router
 from app.routers.api_rules import router as rules_router
@@ -189,6 +190,15 @@ app = FastAPI(
     openapi_url="/openapi.json" if DEBUG else None,
 )
 
+# 添加 CORS 中间件
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=CORS_ORIGINS,
+    allow_credentials=CORS_ALLOW_CREDENTIALS,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 # 禁用缓存中间件
 @app.middleware("http")
 async def disable_cache_middleware(request: Request, call_next):
@@ -325,7 +335,7 @@ app.include_router(configurations_router, prefix="/api", tags=["configurations"]
 app.include_router(deploy_router, prefix="/api/deploy", tags=["deploy"])
 app.include_router(commands_router, prefix="/api", tags=["commands"])
 app.include_router(hooks_router, prefix="/api", tags=["hooks"])
-app.include_router(database_router, prefix="/api", tags=["database"])
+app.include_router(database_router, prefix="/api/database", tags=["database"])
 app.include_router(roles_router, prefix="/api", tags=["roles"])
 app.include_router(file_security_router, prefix="/api", tags=["file-security"])
 app.include_router(recycle_bin_router, prefix="/api", tags=["recycle-bin"])

@@ -47,7 +47,9 @@ help:
 	@echo "  benchmark-clean       清理性能测试进程"
 	@echo ""
 	@echo "🐳 Docker 命令:"
-	@echo "  docker-build     构建 Docker 镜像 (amd64)"
+	@echo "  docker-build     构建 Docker 镜像 (amd64, 使用 pnpm)"
+	@echo "  docker-build-yarn 构建 Docker 镜像 (使用 Yarn，解决 pnpm 问题)"
+	@echo "  docker-build-npm 构建 Docker 镜像 (使用 NPM，解决 pnpm 问题)"
 	@echo "  docker-push      推送镜像到远程仓库 (需先登录 GHCR)"
 	@echo "  docker-build-push 构建并推送镜像 (amd64)"
 	@echo "  docker-up        启动 Docker 容器（低资源消耗配置）"
@@ -318,6 +320,20 @@ docker-build:
 	@echo "🏗️ 架构: linux/amd64"
 	docker buildx build -t ghcr.io/lazygophers/roo:latest .
 	@echo "✅ Docker 镜像构建完成"
+
+# 构建 Docker 镜像（使用 yarn 版本，避免 pnpm 问题）
+docker-build-yarn:
+	@echo "🐳 构建 Docker 镜像（使用 Yarn 替代 pnpm）..."
+	@echo "💡 如果遇到 pnpm/corepack 问题，可使用此版本"
+	docker buildx build -f Dockerfile.yarn -t ghcr.io/lazygophers/roo:yarn .
+	@echo "✅ Docker 镜像构建完成（Yarn 版本）"
+
+# 构建 Docker 镜像（使用 npm 版本）
+docker-build-npm:
+	@echo "🐳 构建 Docker 镜像（使用 NPM 替代 pnpm）..."
+	@echo "💡 如果遇到 pnpm/corepack 问题，可使用此版本"
+	docker buildx build -f Dockerfile.npm -t ghcr.io/lazygophers/roo:npm .
+	@echo "✅ Docker 镜像构建完成（NPM 版本）"
 
 # 推送 Docker 镜像到远程仓库（单架构）
 docker-push:

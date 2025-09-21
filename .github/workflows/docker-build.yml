@@ -79,6 +79,14 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
+      - name: Setup Docker cache
+        id: docker-cache
+        uses: ./.github/actions/docker-cache
+        with:
+          cache-key: docker-build-${{ github.ref_name }}-${{ hashFiles('**/Dockerfile', '**/package*.json', '**/pnpm-lock.yaml', '**/pyproject.toml', '**/uv.lock') }}
+          registry: ${{ env.REGISTRY }}
+          image-name: ${{ env.IMAGE_NAME }}
+
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v3
         with:
@@ -125,6 +133,8 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          cache-from: ${{ steps.docker-cache.outputs.cache-from }}
+          cache-to: ${{ steps.docker-cache.outputs.cache-to }}
           provenance: false
           sbom: false
 
@@ -158,7 +168,8 @@ jobs:
           echo "- Smart change detection" >> $GITHUB_STEP_SUMMARY
           echo "- Dynamic platform selection" >> $GITHUB_STEP_SUMMARY
           echo "- Disabled SBOM/Provenance for speed" >> $GITHUB_STEP_SUMMARY
-          echo "- No caching for clean builds" >> $GITHUB_STEP_SUMMARY
+          echo "- Intelligent cache strategy: ${{ steps.docker-cache.outputs.runner-type }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Cache configuration: ${{ steps.docker-cache.outputs.cache-from }}" >> $GITHUB_STEP_SUMMARY
 
   # 仅在文档或非构建文件变更时运行的快速作业
   skip-notification:

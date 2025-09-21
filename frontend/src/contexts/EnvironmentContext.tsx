@@ -60,6 +60,7 @@ export const EnvironmentProvider: React.FC<EnvironmentProviderProps> = ({ childr
     refreshPermissions,
   };
 
+
   return (
     <EnvironmentContext.Provider value={value}>
       {children}

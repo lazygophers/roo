@@ -248,13 +248,54 @@ Access MCP tools through the API endpoints or direct service integration in `app
 The project includes complete Docker containerization with separated build and runtime optimization:
 - **Multi-stage Dockerfile**: Three-stage build (frontend build -> backend build -> runtime)
 - **Build optimization**: No resource constraints during build for reliability
-- **Runtime optimization**: Ultra-minimal Alpine Linux base image with virtual environment execution
-- **Alpine benefits**: Minimal size (~50MB), built-in security, musl libc
-- **System dependencies**: apk-installed curl, ca-certificates, timezone, tini init system
+- **Runtime optimization**: Python 3.12-slim base image with virtual environment execution
+- **System dependencies**: curl, ca-certificates for minimal runtime requirements
 - **docker-compose.yml**: Low resource consumption configuration (128MB RAM, 25% CPU limit)
-- **Make targets**: `docker-build`, `docker-up`, `docker-deploy` for deployment
 - **Virtual environment**: Runtime uses `.venv/bin/python` directly without uv dependency
 - **Production ready**: Optimized backend with `main_optimized.py` for minimal resource usage
+
+#### Docker Build Variants
+The project provides multiple Docker build options to handle different environments and dependency issues:
+
+1. **Main Dockerfile (pnpm)** - Default build using pnpm
+   ```bash
+   make docker-build  # Uses pnpm with corepack
+   ```
+
+2. **Yarn Dockerfile** - Alternative for pnpm/corepack issues
+   ```bash
+   make docker-build-yarn  # Uses yarn instead of pnpm
+   ```
+
+3. **NPM Dockerfile** - Fallback for maximum compatibility
+   ```bash
+   make docker-build-npm  # Uses npm for broadest compatibility
+   ```
+
+#### Known Docker Issues & Solutions
+
+**Issue**: pnpm/corepack activation failures in Docker build
+- **Symptoms**: `corepack prepare pnpm@9.15.0 --activate` fails or times out
+- **Root cause**: Network issues, corepack compatibility, or registry access problems
+- **Solutions**:
+  1. Use yarn alternative: `make docker-build-yarn`
+  2. Use npm alternative: `make docker-build-npm`
+  3. Add registry mirror to main Dockerfile: `pnpm config set registry https://registry.npmmirror.com`
+  4. Increase Docker build timeout: `docker build --timeout 600`
+
+**Issue**: Slow Docker builds with large Node.js images
+- **Solutions**:
+  1. Use Docker BuildKit cache: `DOCKER_BUILDKIT=1 docker build`
+  2. Multi-stage builds already implemented for optimal layer caching
+  3. Consider building in CI/CD with cached layers
+
+#### Make Docker Targets
+- **`docker-build`**: Main Docker build with pnpm
+- **`docker-build-yarn`**: Alternative build using yarn
+- **`docker-build-npm`**: Fallback build using npm
+- **`docker-push`**: Push image to GHCR
+- **`docker-up`**: Start containers with docker-compose
+- **`docker-deploy`**: One-command build and deploy
 
 ### CI/CD Pipeline (Master Branch Only)
 Automated Docker image building and publishing with GitHub Actions:

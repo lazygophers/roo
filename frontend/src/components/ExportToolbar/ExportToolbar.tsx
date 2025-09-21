@@ -17,11 +17,12 @@ import {
   Select,
   Tooltip,
   Popconfirm,
-  App
+  App,
+  Dropdown
 } from 'antd';
-import { 
-  DownloadOutlined, 
-  ClearOutlined, 
+import {
+  DownloadOutlined,
+  ClearOutlined,
   CodeOutlined,
   FileTextOutlined,
   BookOutlined,
@@ -31,7 +32,9 @@ import {
   RocketOutlined,
   UserOutlined,
   RestOutlined,
-  FolderOutlined
+  FolderOutlined,
+  ReloadOutlined,
+  DownOutlined
 } from '@ant-design/icons';
 import { SelectedItem, ModelRuleBinding } from '../../types/selection';
 import { apiClient, FileMetadata, DeployTarget, DeployRequest, EnvironmentInfo } from '../../api';
@@ -58,6 +61,7 @@ interface ExportToolbarProps {
   modelRules: Record<string, FileMetadata[]>;
   onLoadConfiguration?: (config: ConfigurationData) => void;
   environmentInfo?: EnvironmentInfo | null;
+  onRefresh?: (configType: string) => Promise<{ success: boolean; message: string }>;
 }
 
 const ExportToolbar: React.FC<ExportToolbarProps> = ({
@@ -67,7 +71,8 @@ const ExportToolbar: React.FC<ExportToolbarProps> = ({
   modelRuleBindings,
   modelRules,
   onLoadConfiguration,
-  environmentInfo
+  environmentInfo,
+  onRefresh
 }) => {
   const { token } = theme.useToken();
   const { message } = App.useApp();
@@ -84,6 +89,7 @@ const ExportToolbar: React.FC<ExportToolbarProps> = ({
   const [selectedConfigName, setSelectedConfigName] = useState<string | null>(null);
   const [cleanupLoading, setCleanupLoading] = useState(false);
   const [exportLoading, setExportLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState<string | null>(null);
   const [form] = Form.useForm();
   const [deployForm] = Form.useForm();
   const modelCount = selectedItems.filter(item => item.type === 'model').length;
@@ -449,6 +455,38 @@ const ExportToolbar: React.FC<ExportToolbarProps> = ({
     }
   };
 
+  // 处理刷新操作
+  const handleRefreshConfig = async (configType: string) => {
+    if (!onRefresh) return;
+
+    try {
+      setRefreshing(configType);
+      const result = await onRefresh(configType);
+
+      if (result.success) {
+        message.success(result.message);
+      } else {
+        message.error(result.message);
+      }
+    } catch (error) {
+      message.error('刷新操作失败');
+    } finally {
+      setRefreshing(null);
+    }
+  };
+
+  // 获取配置类型显示名称
+  const getConfigDisplayName = (configType: string) => {
+    const typeMap: Record<string, string> = {
+      'models': 'Mode',
+      'commands': '指令',
+      'rules': '规则',
+      'roles': '角色',
+      'all': '全部'
+    };
+    return typeMap[configType] || configType;
+  };
+
   return (
     <Card 
       size="small"
@@ -516,14 +554,15 @@ const ExportToolbar: React.FC<ExportToolbarProps> = ({
             </Tooltip>
             
             <Tooltip title={
-              !isEditAllowed ? '远程环境下VS Code扩展部署功能被禁用' :
-              totalCount === 0 ? '请先选择要部署的项目' : '部署配置到VS Code扩展'
+              totalCount === 0 ? '请先选择要部署的项目' :
+              !isEditAllowed ? '查看部署配置（远程环境下部署操作受限）' :
+              '部署配置到VS Code扩展'
             }>
               <Button
                 size="small"
                 icon={<RocketOutlined />}
                 onClick={handleDeploy}
-                disabled={totalCount === 0 || !isEditAllowed}
+                disabled={totalCount === 0}
                 type="primary"
                 style={{ background: '#722ed1' }}
               >
@@ -543,7 +582,62 @@ const ExportToolbar: React.FC<ExportToolbarProps> = ({
                 配置管理
               </Button>
             </Tooltip>
-            
+
+            {onRefresh && (
+              <Dropdown
+                trigger={['click']}
+                placement="bottomRight"
+                menu={{
+                  items: [
+                    {
+                      key: 'models',
+                      label: 'Mode 列表',
+                      icon: <CodeOutlined />,
+                      disabled: refreshing === 'models',
+                      onClick: () => handleRefreshConfig('models')
+                    },
+                    {
+                      key: 'commands',
+                      label: '指令列表',
+                      icon: <FileTextOutlined />,
+                      disabled: refreshing === 'commands',
+                      onClick: () => handleRefreshConfig('commands')
+                    },
+                    {
+                      key: 'rules',
+                      label: '默认规则列表',
+                      icon: <BookOutlined />,
+                      disabled: refreshing === 'rules',
+                      onClick: () => handleRefreshConfig('rules')
+                    },
+                    {
+                      key: 'roles',
+                      label: '角色选择',
+                      icon: <UserOutlined />,
+                      disabled: refreshing === 'roles',
+                      onClick: () => handleRefreshConfig('roles')
+                    },
+                    { type: 'divider' },
+                    {
+                      key: 'all',
+                      label: '刷新全部',
+                      icon: <ReloadOutlined />,
+                      disabled: refreshing === 'all',
+                      onClick: () => handleRefreshConfig('all')
+                    }
+                  ]
+                }}
+              >
+                <Button
+                  size="small"
+                  icon={<ReloadOutlined spin={refreshing !== null} />}
+                  loading={refreshing !== null}
+                >
+                  刷新数据 <DownOutlined />
+                </Button>
+              </Dropdown>
+            )}
+
             <Tooltip title={
               selectedItems.some(item => item.type === 'command')
                 ? '导出配置压缩包（包含 custom_modes.yaml 和 .roo/commands/ 目录）'
@@ -915,7 +1009,7 @@ const ExportToolbar: React.FC<ExportToolbarProps> = ({
           <Button key="cancel" onClick={() => setDeployModalVisible(false)}>
             取消
           </Button>,
-          <Tooltip title={!isEditAllowed ? '远程环境下部署功能被禁用' : '确认部署到VS Code扩展'}>
+          <Tooltip key="deploy-tooltip" title={!isEditAllowed ? '远程环境下部署功能被禁用' : '确认部署到VS Code扩展'}>
             <Button
               key="deploy"
               type="primary"
@@ -938,6 +1032,19 @@ const ExportToolbar: React.FC<ExportToolbarProps> = ({
               路径将根据您的操作系统自动调整
             </Text>
           </div>
+          {!isEditAllowed && (
+            <div style={{
+              marginTop: 12,
+              padding: 8,
+              backgroundColor: token.colorWarningBg,
+              border: `1px solid ${token.colorWarningBorder}`,
+              borderRadius: 4
+            }}>
+              <Text type="warning" style={{ fontSize: 12 }}>
+                ⚠️ 远程环境模式：您可以查看部署配置，但无法执行实际的部署、清空等操作
+              </Text>
+            </div>
+          )}
         </div>
 
         {/* 当前选择概览 */}

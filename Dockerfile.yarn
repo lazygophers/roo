@@ -1,4 +1,4 @@
-# LazyAI Studio Dockerfile
+# LazyAI Studio Dockerfile (Yarn Version)
 # 多阶段构建：前端构建 -> 后端构建 -> 最终运行
 
 # ========== 前端构建阶段 ==========
@@ -13,23 +13,20 @@ ENV DISABLE_ESLINT_PLUGIN=true
 ENV GENERATE_SOURCEMAP=false
 ENV CI=true
 
-# 启用 corepack 并安装 pnpm（使用指定版本避免兼容性问题）
-RUN corepack enable && \
-    corepack prepare pnpm@9.15.0 --activate && \
-    pnpm config set registry https://registry.npmmirror.com && \
-    pnpm --version
+# 启用 yarn
+RUN corepack enable yarn
 
 # 复制依赖配置文件
-COPY frontend/package.json frontend/pnpm-lock.yaml frontend/.npmrc ./
+COPY frontend/package.json ./
 
-# 安装前端依赖（增加重试和详细日志）
-RUN pnpm install --frozen-lockfile --production=false --verbose
+# 安装前端依赖（使用 yarn 避免 pnpm 问题）
+RUN yarn install --frozen-lockfile
 
 # 复制前端源码
 COPY frontend/ ./
 
 # 构建前端生产版本
-RUN pnpm build
+RUN yarn build
 
 # ========== 后端构建阶段 ==========
 FROM python:3.12 AS backend-builder

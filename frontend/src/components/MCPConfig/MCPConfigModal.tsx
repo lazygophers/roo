@@ -29,6 +29,7 @@ import {
     ExclamationCircleOutlined
 } from '@ant-design/icons';
 import { useTheme } from '../../contexts/ThemeContext';
+import { useEnvironment } from '../../contexts/EnvironmentContext';
 
 const { TextArea } = Input;
 const { Text, Title } = Typography;
@@ -85,6 +86,7 @@ const MCPConfigModal: React.FC<MCPConfigModalProps> = ({
     onSuccess
 }) => {
     const { currentTheme } = useTheme();
+    const { isEditAllowed } = useEnvironment();
     const [form] = Form.useForm();
     const [loading, setLoading] = useState(false);
     const [activeTab, setActiveTab] = useState('global');
@@ -282,17 +284,30 @@ const MCPConfigModal: React.FC<MCPConfigModalProps> = ({
             style={{ top: 20 }}
             styles={{ body: { maxHeight: 'calc(100vh - 200px)', overflowY: 'auto' } }}
             footer={[
-                <Button key="reset" onClick={resetToDefaults} loading={loading}>
-                    重置默认
-                </Button>,
+                <Tooltip key="reset-tooltip" title={!isEditAllowed ? '远程环境下重置功能被禁用' : '重置为默认配置'}>
+                    <Button key="reset" onClick={resetToDefaults} loading={loading} disabled={!isEditAllowed}>
+                        重置默认
+                    </Button>
+                </Tooltip>,
                 <Button key="cancel" onClick={handleCancel}>
                     取消
                 </Button>,
-                <Button key="ok" type="primary" loading={loading} onClick={handleOk}>
-                    保存配置
-                </Button>
+                <Tooltip key="save-tooltip" title={!isEditAllowed ? '远程环境下配置保存功能被禁用' : '保存配置更改'}>
+                    <Button key="ok" type="primary" loading={loading} onClick={handleOk} disabled={!isEditAllowed}>
+                        保存配置
+                    </Button>
+                </Tooltip>
             ]}
         >
+            {!isEditAllowed && (
+                <Alert
+                    message="远程环境模式"
+                    description="当前运行在远程环境模式下，MCP配置功能为只读状态。您可以查看所有配置选项，但无法保存或重置配置。"
+                    type="warning"
+                    showIcon
+                    style={{ marginBottom: 16 }}
+                />
+            )}
             {config && (
                 <Form
                     form={form}
@@ -380,14 +395,17 @@ const MCPConfigModal: React.FC<MCPConfigModalProps> = ({
                                         <GlobalOutlined /> 代理设置
                                     </Title>
                                     <Space>
-                                        <Button
-                                            size="small"
-                                            onClick={testProxyConnection}
-                                            loading={testingConnection}
-                                            icon={<ApiOutlined />}
-                                        >
-                                            测试连接
-                                        </Button>
+                                        <Tooltip title={!isEditAllowed ? '远程环境下测试功能被禁用' : '测试代理连接'}>
+                                            <Button
+                                                size="small"
+                                                onClick={testProxyConnection}
+                                                loading={testingConnection}
+                                                icon={<ApiOutlined />}
+                                                disabled={!isEditAllowed}
+                                            >
+                                                测试连接
+                                            </Button>
+                                        </Tooltip>
                                     </Space>
                                 </div>
 
