@@ -1,0 +1,58 @@
+name: 'Docker Cache Setup'
+description: 'Setup Docker BuildKit cache for self-hosted or GitHub runners'
+inputs:
+  cache-key:
+    description: 'Cache key for Docker build cache'
+    required: true
+  cache-type:
+    description: 'Type of cache (buildkit or registry)'
+    required: false
+    default: 'buildkit'
+outputs:
+  cache-from:
+    description: 'Cache sources for Docker build'
+    value: ${{ steps.setup-cache.outputs.cache-from }}
+  cache-to:
+    description: 'Cache destinations for Docker build'
+    value: ${{ steps.setup-cache.outputs.cache-to }}
+  runner-type:
+    description: 'Detected runner type (self-hosted or github)'
+    value: ${{ steps.setup-cache.outputs.runner-type }}
+runs:
+  using: 'composite'
+  steps:
+    - name: Setup Docker cache
+      id: setup-cache
+      shell: bash
+      run: |
+        # 检测runner类型
+        if [[ "${{ runner.name }}" == *"lazy"* ]] || [[ "${{ runner.os }}" == "Linux" && -d "/tmp/action" ]]; then
+          runner_type="self-hosted"
+          echo "🏠 检测到自建runner: ${{ runner.name }}"
+        else
+          runner_type="github"
+          echo "☁️ 检测到GitHub托管runner: ${{ runner.name }}"
+        fi
+
+        echo "runner-type=$runner_type" >> $GITHUB_OUTPUT
+
+        # 根据runner类型配置缓存
+        if [[ "$runner_type" == "self-hosted" ]]; then
+          # 自建runner使用本地缓存
+          cache_dir="/tmp/action/docker-cache"
+          mkdir -p "$cache_dir"
+
+          cache_from="type=local,src=$cache_dir"
+          cache_to="type=local,dest=$cache_dir,mode=max"
+
+          echo "📁 使用本地Docker缓存: $cache_dir"
+        else
+          # GitHub runner使用GitHub Actions cache
+          cache_from="type=gha"
+          cache_to="type=gha,mode=max"
+
+          echo "☁️ 使用GitHub Actions缓存"
+        fi
+
+        echo "cache-from=$cache_from" >> $GITHUB_OUTPUT
+        echo "cache-to=$cache_to" >> $GITHUB_OUTPUT

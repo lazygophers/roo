@@ -1,0 +1,74 @@
+name: 'Docker Cache Management'
+description: 'Intelligent Docker cache management for self-hosted and GitHub runners'
+inputs:
+  cache-key:
+    description: 'Cache key for Docker build cache'
+    required: true
+  registry:
+    description: 'Docker registry for cache (optional)'
+    required: false
+    default: 'ghcr.io'
+  image-name:
+    description: 'Image name for registry cache'
+    required: false
+outputs:
+  cache-from:
+    description: 'Cache sources for Docker build'
+    value: ${{ steps.setup-cache.outputs.cache-from }}
+  cache-to:
+    description: 'Cache destinations for Docker build'
+    value: ${{ steps.setup-cache.outputs.cache-to }}
+  runner-type:
+    description: 'Detected runner type'
+    value: ${{ steps.setup-cache.outputs.runner-type }}
+runs:
+  using: 'composite'
+  steps:
+    - name: Setup Docker BuildKit cache
+      id: setup-cache
+      shell: bash
+      run: |
+        # 检测runner类型
+        if [[ "${{ runner.name }}" == *"lazy"* ]] || [[ "${{ runner.os }}" == "Linux" && -d "/tmp/action" ]]; then
+          runner_type="self-hosted"
+          echo "🏠 自建runner检测: ${{ runner.name }}"
+        else
+          runner_type="github"
+          echo "☁️ GitHub runner检测: ${{ runner.name }}"
+        fi
+
+        echo "runner-type=$runner_type" >> $GITHUB_OUTPUT
+
+        # 配置缓存策略
+        if [[ "$runner_type" == "self-hosted" ]]; then
+          # 自建runner: 本地文件系统缓存
+          cache_dir="/tmp/action/docker-cache/${{ inputs.cache-key }}"
+          mkdir -p "$cache_dir"
+
+          cache_from="type=local,src=$cache_dir"
+          cache_to="type=local,dest=$cache_dir,mode=max"
+
+          echo "📁 本地Docker缓存: $cache_dir"
+
+          # 显示缓存信息
+          if [[ -d "$cache_dir" ]] && [[ -n "$(ls -A "$cache_dir" 2>/dev/null)" ]]; then
+            cache_size=$(du -sh "$cache_dir" 2>/dev/null | cut -f1 || echo "unknown")
+            echo "💾 现有缓存大小: $cache_size"
+          else
+            echo "🆕 初始化新缓存目录"
+          fi
+        else
+          # GitHub runner: GitHub Actions缓存
+          cache_from="type=gha"
+          cache_to="type=gha,mode=max"
+
+          echo "☁️ GitHub Actions缓存"
+        fi
+
+        echo "cache-from=$cache_from" >> $GITHUB_OUTPUT
+        echo "cache-to=$cache_to" >> $GITHUB_OUTPUT
+
+        # 显示缓存配置
+        echo "🔧 缓存配置:"
+        echo "  From: $cache_from"
+        echo "  To: $cache_to"
