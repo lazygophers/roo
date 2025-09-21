@@ -516,14 +516,15 @@ const ExportToolbar: React.FC<ExportToolbarProps> = ({
             </Tooltip>
             
             <Tooltip title={
-              !isEditAllowed ? '远程环境下VS Code扩展部署功能被禁用' :
-              totalCount === 0 ? '请先选择要部署的项目' : '部署配置到VS Code扩展'
+              totalCount === 0 ? '请先选择要部署的项目' :
+              !isEditAllowed ? '查看部署配置（远程环境下部署操作受限）' :
+              '部署配置到VS Code扩展'
             }>
               <Button
                 size="small"
                 icon={<RocketOutlined />}
                 onClick={handleDeploy}
-                disabled={totalCount === 0 || !isEditAllowed}
+                disabled={totalCount === 0}
                 type="primary"
                 style={{ background: '#722ed1' }}
               >
@@ -938,6 +939,19 @@ const ExportToolbar: React.FC<ExportToolbarProps> = ({
               路径将根据您的操作系统自动调整
             </Text>
           </div>
+          {!isEditAllowed && (
+            <div style={{
+              marginTop: 12,
+              padding: 8,
+              backgroundColor: token.colorWarningBg,
+              border: `1px solid ${token.colorWarningBorder}`,
+              borderRadius: 4
+            }}>
+              <Text type="warning" style={{ fontSize: 12 }}>
+                ⚠️ 远程环境模式：您可以查看部署配置，但无法执行实际的部署、清空等操作
+              </Text>
+            </div>
+          )}
         </div>
 
         {/* 当前选择概览 */}

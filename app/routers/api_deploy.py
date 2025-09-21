@@ -297,7 +297,6 @@ def generate_custom_modes_yaml(
     summary="获取部署目标列表",
     description="获取所有可用的部署目标配置"
 )
-@require_deploy_permission
 async def get_deploy_targets():
     """获取部署目标列表"""
     targets = {}
