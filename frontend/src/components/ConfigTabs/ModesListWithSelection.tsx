@@ -496,25 +496,29 @@ const ModesListWithSelection: React.FC<ModesListProps> = ({
     }));
     console.log('All items:', allItems.map(item => item.id));
     onSelectAll(allItems);
-    
-    // 获取需要新展开的模型
-    const modelsToExpand = filteredModels.filter(model => 
-      !selectedItems.some(item => item.id === model.slug && item.type === 'model')
+
+    // 立即展开所有模型
+    const newExpandedModels = new Set(models.map(model => model.slug));
+    setExpandedModels(newExpandedModels);
+    console.log('Expanded all models:', Array.from(newExpandedModels));
+
+    // 获取需要加载规则的模型
+    const modelsToLoadRules = models.filter(model =>
+      !modelRules[model.slug] && !loadingRules[model.slug]
     );
-    console.log('Models to expand:', modelsToExpand.map(model => model.slug));
-    console.log('Current expanded models:', Array.from(expandedModels));
-    
-    if (modelsToExpand.length > 0) {
-      message.info(`正在展开并加载 ${modelsToExpand.length} 个模型的关联规则...`);
-      
+    console.log('Models to load rules:', modelsToLoadRules.map(model => model.slug));
+
+    if (modelsToLoadRules.length > 0) {
+      message.info(`正在加载 ${modelsToLoadRules.length} 个模型的关联规则...`);
+
       // Process models in batches to prevent blocking the main thread
       const batchSize = 3;
-      const processBatch = async (batch: typeof modelsToExpand) => {
+      const processBatch = async (batch: typeof modelsToLoadRules) => {
         for (const model of batch) {
-          console.log(`Processing model for expand: ${model.slug}`);
-          // Use non-blocking forceExpandModel
+          console.log(`Loading rules for model: ${model.slug}`);
+          // Load rules for the model
           await forceExpandModel(model.slug);
-          
+
           // Defer rule selection to prevent blocking
           setTimeout(() => {
             const associatedRules = modelRulesRef.current[model.slug] || [];
@@ -526,21 +530,21 @@ const ModesListWithSelection: React.FC<ModesListProps> = ({
               }
             });
           }, 500);
-          
+
           // Yield control between models
           await new Promise(resolve => setTimeout(resolve, 0));
         }
       };
-      
+
       // Process models in batches with yielding
-      for (let i = 0; i < modelsToExpand.length; i += batchSize) {
-        const batch = modelsToExpand.slice(i, i + batchSize);
+      for (let i = 0; i < modelsToLoadRules.length; i += batchSize) {
+        const batch = modelsToLoadRules.slice(i, i + batchSize);
         await processBatch(batch);
         // Yield control between batches
         await new Promise(resolve => setTimeout(resolve, 10));
       }
-      
-      console.log('All models processed for expansion and rule selection');
+
+      console.log('All models processed for rule loading and selection');
     }
   };
 
