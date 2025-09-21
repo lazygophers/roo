@@ -638,7 +638,7 @@ const ModesListWithSelection: React.FC<ModesListProps> = ({
                 onClick={handleSelectAll}
                 disabled={models.length === 0}
               >
-                全选当前页
+                全选
               </Button>
               <Button
                 size="small"
