@@ -41,9 +41,10 @@ runs:
 
         # 配置缓存策略
         if [[ "$runner_type" == "self-hosted" ]]; then
-          # 自建runner: 本地文件系统缓存
-          cache_dir="/tmp/action/docker-cache/${{ inputs.cache-key }}"
+          # 自建runner: 本地文件系统缓存在 /tmp/action 下
+          cache_dir="/tmp/action/docker-cache"
           mkdir -p "$cache_dir"
+          chmod 755 "$cache_dir"
 
           cache_from="type=local,src=$cache_dir"
           cache_to="type=local,dest=$cache_dir,mode=max"
