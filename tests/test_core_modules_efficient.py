@@ -153,51 +153,55 @@ class TestConfig:
 
 
 class TestCacheBackends:
-    """测试缓存后端 - 重点测试可用部分"""
+    """测试缓存后端 - 重点测试 DiskCache"""
 
-    def test_memory_cache_backend(self):
-        """测试内存缓存后端"""
+    def test_diskcache_backend(self):
+        """测试 DiskCache 后端 (MCP 缓存工具)"""
         try:
-            from app.core.cache_backends import MemoryCacheBackend
-
-            cache = MemoryCacheBackend()
+            from app.tools.cache_tools import _cache
 
             # 测试基本操作
-            cache.set("test_key", "test_value")
-            value = cache.get("test_key")
+            result = _cache.set("test_key", "test_value")
+            assert result is True
+
+            value = _cache.get("test_key")
             assert value == "test_value"
 
             # 测试删除
-            cache.delete("test_key")
-            assert cache.get("test_key") is None
-
-            # 测试清空
-            cache.set("key1", "value1")
-            cache.set("key2", "value2")
-            cache.clear()
-            assert cache.get("key1") is None
-            assert cache.get("key2") is None
-
-        except ImportError:
-            pytest.skip("MemoryCacheBackend not available")
-
-    def test_cache_backends_with_ttl(self):
-        """测试缓存TTL功能"""
-        try:
-            from app.core.cache_backends import MemoryCacheBackend
-
-            cache = MemoryCacheBackend()
-
-            # 测试TTL设置
-            cache.set("ttl_key", "ttl_value", ttl=1)
-            assert cache.get("ttl_key") == "ttl_value"
+            result = _cache.delete("test_key")
+            assert result is True
+            assert _cache.get("test_key") is None
 
             # 测试存在性检查
-            assert cache.exists("ttl_key") is True
-            assert cache.exists("nonexistent") is False
+            _cache.set("exists_key", "exists_value")
+            assert _cache.exists("exists_key") is True
+            assert _cache.exists("nonexistent") is False
+
+            # 清理测试数据
+            _cache.delete("exists_key")
 
         except ImportError:
-            pytest.skip("MemoryCacheBackend not available")
+            pytest.skip("DiskCache not available")
+
+    def test_cache_tools_with_ttl(self):
+        """测试缓存TTL功能"""
+        try:
+            from app.tools.cache_tools import _cache
+
+            # 测试TTL设置
+            result = _cache.set("ttl_key", "ttl_value", ttl=1)
+            assert result is True
+            assert _cache.get("ttl_key") == "ttl_value"
+
+            # 测试存在性检查
+            assert _cache.exists("ttl_key") is True
+            assert _cache.exists("nonexistent") is False
+
+            # 清理测试数据
+            _cache.delete("ttl_key")
+
+        except ImportError:
+            pytest.skip("DiskCache not available")
 
 
 class TestDatabaseValidators:

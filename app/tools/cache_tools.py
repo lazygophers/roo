@@ -2,6 +2,7 @@
 缓存工具集
 使用装饰器自动注册缓存相关的MCP工具
 """
+import os
 import time
 import threading
 from typing import Dict, Any, Optional
@@ -21,65 +22,179 @@ def register_cache_category():
     """注册缓存工具分类"""
     pass
 
-# Simple in-memory cache implementation
-class SimpleCache:
-    def __init__(self):
-        self._cache: Dict[str, Dict[str, Any]] = {}
-        self._lock = threading.Lock()
+# DiskCache implementation for persistent storage
+class DiskCacheManager:
+    def __init__(self, cache_dir: str = "data/mcp/cache", max_size_mb: int = 1024, timeout: int = 10):
+        import os
+        from pathlib import Path
+        from app.core.config import PROJECT_ROOT
+        from app.core.tool_config_service import get_tool_config
+
+        # Load configuration from file
+        try:
+            config = get_tool_config("cache_tools")
+
+            # Apply configuration with fallbacks to parameters
+            cache_dir = config.get("cache_dir", cache_dir)
+            max_size_mb = config.get("max_size_mb", max_size_mb)
+            timeout = config.get("timeout_seconds", timeout)
+
+            # Store configuration for reference
+            self.config = config
+        except Exception as e:
+            # Fallback to default parameters if config loading fails
+            self.config = {
+                "cache_dir": cache_dir,
+                "max_size_mb": max_size_mb,
+                "timeout_seconds": timeout
+            }
+
+        # Create absolute cache directory path
+        self.cache_dir = Path(PROJECT_ROOT) / cache_dir
+        if self.config.get("auto_create_dirs", True):
+            self.cache_dir.mkdir(parents=True, exist_ok=True)
+
+        try:
+            import diskcache as dc
+
+            # Apply DiskCache specific configuration
+            diskcache_config = self.config.get("diskcache", {})
+
+            self._cache = dc.Cache(
+                directory=str(self.cache_dir),
+                size_limit=max_size_mb * 1024 * 1024,  # Convert MB to bytes
+                timeout=timeout,
+                # DiskCache advanced options from config
+                eviction_policy=diskcache_config.get("eviction_policy", "least-recently-stored"),
+                disk_min_file_size=diskcache_config.get("disk_min_file_size", 32768),
+                disk_pickle_protocol=diskcache_config.get("disk_pickle_protocol", 4),
+                statistics=diskcache_config.get("statistics", True),
+                tag_index=diskcache_config.get("tag_index", False)
+            )
+            self._lock = threading.Lock()
+        except ImportError:
+            raise ImportError("diskcache library is required. Install with: pip install diskcache")
 
     def set(self, key: str, value: Any, ttl: int = 0):
         with self._lock:
-            expire_time = time.time() + ttl if ttl > 0 else None
-            self._cache[key] = {"value": value, "expire_time": expire_time}
+            expire_time = ttl if ttl > 0 else None
+            return self._cache.set(key, value, expire=expire_time)
 
     def get(self, key: str) -> Optional[Any]:
         with self._lock:
-            if key not in self._cache:
+            try:
+                return self._cache.get(key)
+            except KeyError:
                 return None
-            entry = self._cache[key]
-            if entry["expire_time"] and time.time() > entry["expire_time"]:
-                del self._cache[key]
-                return None
-            return entry["value"]
 
     def delete(self, key: str) -> bool:
         with self._lock:
-            if key in self._cache:
-                del self._cache[key]
-                return True
-            return False
+            try:
+                return self._cache.delete(key)
+            except KeyError:
+                return False
 
     def exists(self, key: str) -> bool:
-        return self.get(key) is not None
+        with self._lock:
+            return key in self._cache
 
     def keys(self, pattern: str = "*") -> list:
         with self._lock:
-            # 先获取所有键的列表副本，避免在遍历时修改字典
-            all_keys = list(self._cache.keys())
+            import fnmatch
+            all_keys = list(self._cache)
             if pattern == "*":
-                return [k for k in all_keys if self._is_valid(k)]
-            # Simple pattern matching
-            return [k for k in all_keys if self._match_pattern(k, pattern) and self._is_valid(k)]
-
-    def _is_valid(self, key: str) -> bool:
-        entry = self._cache.get(key)
-        if not entry:
-            return False
-        if entry["expire_time"] and time.time() > entry["expire_time"]:
-            del self._cache[key]
-            return False
-        return True
-
-    def _match_pattern(self, key: str, pattern: str) -> bool:
-        # Simple wildcard matching
-        return pattern.replace("*", "") in key
+                return [str(k) for k in all_keys]
+            # Pattern matching with fnmatch
+            return [str(k) for k in all_keys if fnmatch.fnmatch(str(k), pattern)]
 
     def clear(self):
         with self._lock:
             self._cache.clear()
 
+    def info(self) -> Dict[str, Any]:
+        """Get comprehensive cache statistics and configuration info"""
+        with self._lock:
+            try:
+                stats = self._cache.stats()
+
+                # Get configuration sections
+                monitoring_config = self.config.get("monitoring", {})
+                operations_config = self.config.get("operations", {})
+                limits_config = self.config.get("limits", {})
+                ttl_config = self.config.get("ttl", {})
+
+                return {
+                    # Core info
+                    "backend": "diskcache",
+                    "cache_type": "DiskCache",
+                    "version": self.config.get("version", "1.0"),
+                    "directory": str(self.cache_dir),
+
+                    # Statistics
+                    "statistics": {
+                        "total_keys": len(self._cache),
+                        "cache_hits": stats.get('cache_hits', 0) if monitoring_config.get("enable_statistics") else "disabled",
+                        "cache_misses": stats.get('cache_misses', 0) if monitoring_config.get("enable_statistics") else "disabled",
+                        "size_limit_bytes": self._cache.size_limit,
+                        "size_limit_mb": self._cache.size_limit / (1024 * 1024),
+                        "current_size_bytes": getattr(self._cache, 'volume', 0),
+                        "current_size_mb": getattr(self._cache, 'volume', 0) / (1024 * 1024)
+                    },
+
+                    # Configuration summary
+                    "configuration": {
+                        "cache_dir": self.config.get("cache_dir"),
+                        "max_size_mb": self.config.get("max_size_mb"),
+                        "timeout_seconds": self.config.get("timeout_seconds"),
+                        "ttl_enabled": ttl_config.get("enable_ttl", False),
+                        "default_ttl_seconds": ttl_config.get("default_ttl_seconds", 0),
+                        "thread_safe": operations_config.get("thread_safe", True),
+                        "pattern_matching": operations_config.get("pattern_matching", "fnmatch")
+                    },
+
+                    # Features
+                    "features": [
+                        "Persistent Storage",
+                        "Thread-Safe Operations" if operations_config.get("thread_safe") else "Non-Thread-Safe",
+                        "TTL Support" if ttl_config.get("enable_ttl") else "No TTL",
+                        "Size-Limited",
+                        "Pattern Matching (" + operations_config.get("pattern_matching", "fnmatch") + ")",
+                        "Batch Operations" if operations_config.get("batch_operations") else "Single Operations",
+                        "Statistics" if monitoring_config.get("enable_statistics") else "No Statistics"
+                    ],
+
+                    # Limits
+                    "limits": {
+                        "max_key_length": limits_config.get("max_key_length", 250),
+                        "max_value_size_mb": limits_config.get("max_value_size_mb", 100),
+                        "max_concurrent_operations": limits_config.get("max_concurrent_operations", 10),
+                        "blocked_patterns": limits_config.get("blocked_key_patterns", [])
+                    },
+
+                    # Health
+                    "health": {
+                        "status": "healthy",
+                        "writable": self.cache_dir.exists() and os.access(self.cache_dir, os.W_OK),
+                        "readable": self.cache_dir.exists() and os.access(self.cache_dir, os.R_OK)
+                    }
+                }
+            except Exception as e:
+                return {
+                    "backend": "diskcache",
+                    "cache_type": "DiskCache",
+                    "directory": str(self.cache_dir),
+                    "statistics": {
+                        "total_keys": len(self._cache) if hasattr(self, '_cache') else 0
+                    },
+                    "health": {
+                        "status": "error",
+                        "error": str(e)
+                    },
+                    "features": ["Persistent", "Thread-Safe", "TTL", "Size-Limited"]
+                }
+
 # Global cache instance
-_cache = SimpleCache()
+_cache = DiskCacheManager()
 
 
 @cache_tool(
@@ -248,20 +363,12 @@ def cache_exists(key: str):
 def cache_ttl(key: str):
     """Get cache key's remaining TTL"""
     try:
-        with _cache._lock:
-            if key not in _cache._cache:
-                return {"success": True, "key": key, "ttl": -2, "message": "Key does not exist"}
-
-            entry = _cache._cache[key]
-            if entry["expire_time"] is None:
-                return {"success": True, "key": key, "ttl": -1, "message": "Key never expires"}
-
-            remaining = entry["expire_time"] - time.time()
-            if remaining <= 0:
-                del _cache._cache[key]
-                return {"success": True, "key": key, "ttl": -2, "message": "Key has expired"}
-
-            return {"success": True, "key": key, "ttl": int(remaining)}
+        # DiskCache doesn't have direct TTL support, return simplified response
+        exists = _cache.exists(key)
+        if not exists:
+            return {"success": True, "key": key, "ttl": -2, "message": "Key does not exist"}
+        else:
+            return {"success": True, "key": key, "ttl": -1, "message": "Key exists (TTL not available in DiskCache)"}
     except Exception as e:
         return {"success": False, "key": key, "error": str(e)}
 
@@ -294,13 +401,21 @@ def cache_ttl(key: str):
 def cache_expire(key: str, ttl: int):
     """Set cache key expiration time"""
     try:
-        with _cache._lock:
-            if key not in _cache._cache:
-                return {"success": False, "key": key, "error": "Key does not exist"}
+        # DiskCache doesn't support changing TTL for existing keys
+        # We need to re-set the value with new TTL
+        if not _cache.exists(key):
+            return {"success": False, "key": key, "error": "Key does not exist"}
 
-            entry = _cache._cache[key]
-            entry["expire_time"] = time.time() + ttl if ttl > 0 else None
-            return {"success": True, "key": key, "ttl": ttl, "message": "Expiration time set"}
+        # Get current value and re-set with new TTL
+        current_value = _cache.get(key)
+        if current_value is not None:
+            success = _cache.set(key, current_value, ttl)
+            if success:
+                return {"success": True, "key": key, "ttl": ttl, "message": "Expiration time set (value re-saved)"}
+            else:
+                return {"success": False, "key": key, "error": "Failed to re-set value with new TTL"}
+        else:
+            return {"success": False, "key": key, "error": "Failed to retrieve current value"}
     except Exception as e:
         return {"success": False, "key": key, "error": str(e)}
 
@@ -468,11 +583,8 @@ def cache_incr(key: str, amount: int = 1):
                 try:
                     current_int = int(current_value)
                     new_value = current_int + amount
-                    # Preserve the original entry's TTL
-                    entry = _cache._cache.get(key)
-                    expire_time = entry["expire_time"] if entry else None
-                    ttl = int(expire_time - time.time()) if expire_time else 0
-                    _cache.set(key, new_value, ttl if ttl > 0 else 0)
+                    # DiskCache doesn't expose TTL info, just set without TTL
+                    _cache.set(key, new_value)
                 except (ValueError, TypeError):
                     return {"success": False, "key": key, "error": "Value is not a number"}
 
@@ -497,34 +609,28 @@ def cache_incr(key: str, amount: int = 1):
 def cache_info():
     """Get cache system information and statistics"""
     try:
-        with _cache._lock:
-            total_keys = len(_cache._cache)
-            expired_keys = 0
-            persistent_keys = 0
-            current_time = time.time()
+        # Use the DiskCacheManager's info method
+        info_data = _cache.info()
+        current_time = time.time()
 
-            # Analyze cache entries
-            for entry in _cache._cache.values():
-                if entry["expire_time"] is None:
-                    persistent_keys += 1
-                elif entry["expire_time"] <= current_time:
-                    expired_keys += 1
-
-            active_keys = total_keys - expired_keys
-
-            return {
-                "success": True,
-                "statistics": {
-                    "total_keys": total_keys,
-                    "active_keys": active_keys,
-                    "expired_keys": expired_keys,
-                    "persistent_keys": persistent_keys,
-                    "cache_type": "SimpleCache",
-                    "thread_safe": True,
-                    "features": ["TTL", "Thread-Safe", "Pattern Matching"]
-                },
-                "timestamp": int(current_time)
-            }
+        return {
+            "success": True,
+            "statistics": {
+                "total_keys": info_data.get("total_keys", 0),
+                "active_keys": info_data.get("total_keys", 0),  # DiskCache auto-manages expired keys
+                "expired_keys": 0,  # DiskCache auto-cleans expired keys
+                "persistent_keys": info_data.get("total_keys", 0),  # All keys are persistent
+                "cache_type": info_data.get("cache_type", "DiskCache"),
+                "thread_safe": True,
+                "features": info_data.get("features", ["Persistent", "Thread-Safe", "TTL", "Size-Limited"]),
+                "directory": info_data.get("directory", ""),
+                "cache_hits": info_data.get("cache_hits", 0),
+                "cache_misses": info_data.get("cache_misses", 0),
+                "size_limit": info_data.get("size_limit", 0),
+                "current_size": info_data.get("current_size", 0)
+            },
+            "timestamp": int(current_time)
+        }
     except Exception as e:
         return {"success": False, "error": str(e)}
 

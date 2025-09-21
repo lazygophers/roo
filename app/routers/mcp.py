@@ -1264,3 +1264,537 @@ async def check_github_token_status():
             }
         }
 
+# File-based GitHub Configuration Endpoints
+@router.get("/tools/github/config")
+async def get_github_file_config():
+    """获取GitHub工具的文件配置"""
+    try:
+        from app.core.tool_config_service import get_tool_config_service
+
+        config_service = get_tool_config_service()
+        config = config_service.get_config("github")
+        file_info = config_service.get_config_file_info("github")
+
+        return {
+            "success": True,
+            "message": "GitHub configuration retrieved successfully",
+            "data": {
+                "config": config,
+                "file_info": file_info,
+                "storage_type": "file"
+            }
+        }
+    except Exception as e:
+        logger.error(f"Failed to get GitHub file config: {sanitize_for_log(str(e))}")
+        return {
+            "success": False,
+            "message": "Failed to get GitHub configuration: Internal server error"
+        }
+
+@router.put("/tools/github/config")
+@require_edit_permission
+async def update_github_file_config(request: Dict[str, Any]):
+    """更新GitHub工具的文件配置"""
+    try:
+        from app.core.tool_config_service import get_tool_config_service
+
+        config_data = request.get("config", {})
+        if not config_data:
+            return {
+                "success": False,
+                "message": "Configuration data is required"
+            }
+
+        config_service = get_tool_config_service()
+
+        # 备份当前配置
+        backup_file = config_service.backup_config("github")
+
+        # 更新配置
+        success = config_service.set_config("github", config_data)
+
+        if success:
+            return {
+                "success": True,
+                "message": "GitHub configuration updated successfully",
+                "data": {
+                    "updated_config": config_data,
+                    "backup_file": backup_file,
+                    "timestamp": datetime.now().isoformat()
+                }
+            }
+        else:
+            return {
+                "success": False,
+                "message": "Failed to update GitHub configuration"
+            }
+
+    except Exception as e:
+        logger.error(f"Failed to update GitHub file config: {sanitize_for_log(str(e))}")
+        return {
+            "success": False,
+            "message": "Failed to update GitHub configuration: Internal server error"
+        }
+
+@router.post("/tools/github/config/migrate")
+@require_edit_permission
+async def migrate_github_config_to_file():
+    """将GitHub配置从数据库迁移到文件"""
+    try:
+        from app.core.tool_config_service import get_tool_config_service
+
+        # 获取当前数据库配置
+        tools_service = get_mcp_tools_service()
+        db_config = tools_service.get_category_config('github')
+
+        if not db_config or not db_config.get('config'):
+            return {
+                "success": False,
+                "message": "No database configuration found to migrate"
+            }
+
+        # 转换配置格式
+        file_config = {
+            "enabled": True,
+            "github_token": db_config.get('config', {}).get('github_token', ''),
+            "api_base_url": "https://api.github.com",
+            "timeout": 30,
+            "retry_count": 3,
+            "rate_limit": {
+                "enabled": True,
+                "max_requests_per_hour": 5000
+            },
+            "features": {
+                "repository_management": True,
+                "issue_management": True,
+                "pull_request_management": True,
+                "release_management": True,
+                "organization_access": True,
+                "gist_management": True
+            },
+            "security": {
+                "verify_ssl": True,
+                "log_api_calls": False,
+                "mask_sensitive_data": True
+            },
+            "cache": {
+                "enabled": True,
+                "ttl_seconds": 300,
+                "max_entries": 1000
+            },
+            "version": "1.0",
+            "migrated_from_database": True,
+            "migration_timestamp": datetime.now().isoformat()
+        }
+
+        # 将其他数据库配置项复制到文件配置
+        for key, value in db_config.get('config', {}).items():
+            if key not in file_config:
+                file_config[key] = value
+
+        config_service = get_tool_config_service()
+        success = config_service.set_config("github", file_config)
+
+        if success:
+            return {
+                "success": True,
+                "message": "GitHub configuration migrated to file successfully",
+                "data": {
+                    "migrated_config": file_config,
+                    "source": "database",
+                    "target": "file",
+                    "timestamp": datetime.now().isoformat()
+                }
+            }
+        else:
+            return {
+                "success": False,
+                "message": "Failed to migrate GitHub configuration to file"
+            }
+
+    except Exception as e:
+        logger.error(f"Failed to migrate GitHub config to file: {sanitize_for_log(str(e))}")
+        return {
+            "success": False,
+            "message": "Failed to migrate GitHub configuration: Internal server error"
+        }
+
+@router.get("/tools/github/config/status")
+async def get_github_config_status():
+    """获取GitHub配置状态（数据库 vs 文件）"""
+    try:
+        from app.core.tool_config_service import get_tool_config_service
+
+        config_service = get_tool_config_service()
+        tools_service = get_mcp_tools_service()
+
+        # 检查文件配置
+        file_exists = config_service.config_exists("github")
+        file_config = config_service.get_config("github") if file_exists else None
+        file_info = config_service.get_config_file_info("github")
+
+        # 检查数据库配置
+        db_config = tools_service.get_category_config('github')
+        has_db_config = db_config and db_config.get('config')
+
+        return {
+            "success": True,
+            "message": "GitHub configuration status retrieved successfully",
+            "data": {
+                "file_storage": {
+                    "exists": file_exists,
+                    "config": file_config,
+                    "file_info": file_info
+                },
+                "database_storage": {
+                    "exists": has_db_config,
+                    "config": db_config
+                },
+                "recommendation": "file" if file_exists else "migrate_to_file",
+                "status": "file_based" if file_exists else "database_based"
+            }
+        }
+
+    except Exception as e:
+        logger.error(f"Failed to get GitHub config status: {sanitize_for_log(str(e))}")
+        return {
+            "success": False,
+            "message": "Failed to get GitHub configuration status: Internal server error"
+        }
+
+# File Tools Configuration Endpoints
+@router.get("/tools/file_tools/config")
+async def get_file_tools_config():
+    """获取文件工具的配置"""
+    try:
+        from app.core.tool_config_service import get_tool_config_service
+
+        config_service = get_tool_config_service()
+        config = config_service.get_config("file_tools")
+        file_info = config_service.get_config_file_info("file_tools")
+
+        return {
+            "success": True,
+            "message": "File tools configuration retrieved successfully",
+            "data": {
+                "config": config,
+                "file_info": file_info,
+                "storage_type": "file"
+            }
+        }
+    except Exception as e:
+        logger.error(f"Failed to get file tools config: {sanitize_for_log(str(e))}")
+        return {
+            "success": False,
+            "message": "Failed to get file tools configuration: Internal server error"
+        }
+
+@router.put("/tools/file_tools/config")
+@require_edit_permission
+async def update_file_tools_config(request: Dict[str, Any]):
+    """更新文件工具的配置"""
+    try:
+        from app.core.tool_config_service import get_tool_config_service
+
+        config_data = request.get("config", {})
+        if not config_data:
+            return {
+                "success": False,
+                "message": "Configuration data is required"
+            }
+
+        config_service = get_tool_config_service()
+
+        # 备份当前配置
+        backup_file = config_service.backup_config("file_tools")
+
+        # 更新配置
+        success = config_service.set_config("file_tools", config_data)
+
+        if success:
+            return {
+                "success": True,
+                "message": "File tools configuration updated successfully",
+                "data": {
+                    "updated_config": config_data,
+                    "backup_file": backup_file,
+                    "timestamp": datetime.now().isoformat()
+                }
+            }
+        else:
+            return {
+                "success": False,
+                "message": "Failed to update file tools configuration"
+            }
+
+    except Exception as e:
+        logger.error(f"Failed to update file tools config: {sanitize_for_log(str(e))}")
+        return {
+            "success": False,
+            "message": "Failed to update file tools configuration: Internal server error"
+        }
+
+@router.get("/tools/file_tools/config/status")
+async def get_file_tools_config_status():
+    """获取文件工具配置状态"""
+    try:
+        from app.core.tool_config_service import get_tool_config_service
+
+        config_service = get_tool_config_service()
+        tools_service = get_mcp_tools_service()
+
+        # 检查文件配置
+        file_exists = config_service.config_exists("file_tools")
+        file_config = config_service.get_config("file_tools") if file_exists else None
+        file_info = config_service.get_config_file_info("file_tools")
+
+        # 检查数据库配置
+        db_config = tools_service.get_category_config('file_tools')
+        has_db_config = db_config and db_config.get('config')
+
+        return {
+            "success": True,
+            "message": "File tools configuration status retrieved successfully",
+            "data": {
+                "file_storage": {
+                    "exists": file_exists,
+                    "config": file_config,
+                    "file_info": file_info
+                },
+                "database_storage": {
+                    "exists": has_db_config,
+                    "config": db_config
+                },
+                "recommendation": "file" if file_exists else "create_file_config",
+                "status": "file_based" if file_exists else "database_based"
+            }
+        }
+
+    except Exception as e:
+        logger.error(f"Failed to get file tools config status: {sanitize_for_log(str(e))}")
+        return {
+            "success": False,
+            "message": "Failed to get file tools configuration status: Internal server error"
+        }
+
+# Time Tools Configuration Endpoints
+@router.get("/tools/time_tools/config")
+async def get_time_tools_config():
+    """获取时间工具的配置"""
+    try:
+        from app.core.tool_config_service import get_tool_config_service
+
+        config_service = get_tool_config_service()
+        config = config_service.get_config("time_tools")
+        file_info = config_service.get_config_file_info("time_tools")
+
+        return {
+            "success": True,
+            "message": "Time tools configuration retrieved successfully",
+            "data": {
+                "config": config,
+                "file_info": file_info,
+                "storage_type": "file"
+            }
+        }
+    except Exception as e:
+        logger.error(f"Failed to get time tools config: {sanitize_for_log(str(e))}")
+        return {
+            "success": False,
+            "message": "Failed to get time tools configuration: Internal server error"
+        }
+
+@router.put("/tools/time_tools/config")
+@require_edit_permission
+async def update_time_tools_config(request: Dict[str, Any]):
+    """更新时间工具的配置"""
+    try:
+        from app.core.tool_config_service import get_tool_config_service
+
+        config_data = request.get("config", {})
+        if not config_data:
+            return {
+                "success": False,
+                "message": "Configuration data is required"
+            }
+
+        config_service = get_tool_config_service()
+
+        # 备份当前配置
+        backup_file = config_service.backup_config("time_tools")
+
+        # 更新配置
+        success = config_service.set_config("time_tools", config_data)
+
+        if success:
+            return {
+                "success": True,
+                "message": "Time tools configuration updated successfully",
+                "data": {
+                    "updated_config": config_data,
+                    "backup_file": backup_file,
+                    "timestamp": datetime.now().isoformat()
+                }
+            }
+        else:
+            return {
+                "success": False,
+                "message": "Failed to update time tools configuration"
+            }
+
+    except Exception as e:
+        logger.error(f"Failed to update time tools config: {sanitize_for_log(str(e))}")
+        return {
+            "success": False,
+            "message": "Failed to update time tools configuration: Internal server error"
+        }
+
+@router.get("/tools/time_tools/config/status")
+async def get_time_tools_config_status():
+    """获取时间工具配置状态"""
+    try:
+        from app.core.tool_config_service import get_tool_config_service
+
+        config_service = get_tool_config_service()
+        tools_service = get_mcp_tools_service()
+
+        # 检查文件配置
+        file_exists = config_service.config_exists("time_tools")
+        file_config = config_service.get_config("time_tools") if file_exists else None
+        file_info = config_service.get_config_file_info("time_tools")
+
+        # 检查数据库配置
+        db_config = tools_service.get_category_config('time_tools')
+        has_db_config = db_config and db_config.get('config')
+
+        return {
+            "success": True,
+            "message": "Time tools configuration status retrieved successfully",
+            "data": {
+                "file_storage": {
+                    "exists": file_exists,
+                    "config": file_config,
+                    "file_info": file_info
+                },
+                "database_storage": {
+                    "exists": has_db_config,
+                    "config": db_config
+                },
+                "recommendation": "file" if file_exists else "create_file_config",
+                "status": "file_based" if file_exists else "database_based"
+            }
+        }
+
+    except Exception as e:
+        logger.error(f"Failed to get time tools config status: {sanitize_for_log(str(e))}")
+        return {
+            "success": False,
+            "message": "Failed to get time tools configuration status: Internal server error"
+        }
+
+# Cache Tools Configuration Endpoints
+@router.get("/tools/cache_tools/config")
+async def get_cache_tools_config():
+    """获取缓存工具的配置"""
+    try:
+        from app.core.tool_config_service import get_tool_config_service
+
+        config_service = get_tool_config_service()
+        config = config_service.get_config("cache_tools")
+        file_info = config_service.get_config_file_info("cache_tools")
+
+        return {
+            "success": True,
+            "message": "Cache tools configuration retrieved successfully",
+            "data": {
+                "config": config,
+                "file_info": file_info,
+                "storage_type": "file"
+            }
+        }
+    except Exception as e:
+        logger.error(f"Failed to get cache tools config: {sanitize_for_log(str(e))}")
+        return {
+            "success": False,
+            "message": "Failed to get cache tools configuration: Internal server error"
+        }
+
+@router.put("/tools/cache_tools/config")
+@require_edit_permission
+async def update_cache_tools_config(request: Dict[str, Any]):
+    """更新缓存工具的配置"""
+    try:
+        from app.core.tool_config_service import get_tool_config_service
+
+        config_data = request.get("config", {})
+        if not config_data:
+            return {
+                "success": False,
+                "message": "Configuration data is required"
+            }
+
+        config_service = get_tool_config_service()
+
+        # 备份当前配置
+        backup_file = config_service.backup_config("cache_tools")
+
+        # 更新配置
+        success = config_service.set_config("cache_tools", config_data)
+
+        if success:
+            return {
+                "success": True,
+                "message": "Cache tools configuration updated successfully",
+                "data": {
+                    "updated_config": config_data,
+                    "backup_file": backup_file,
+                    "timestamp": datetime.now().isoformat()
+                }
+            }
+        else:
+            return {
+                "success": False,
+                "message": "Failed to update cache tools configuration"
+            }
+
+    except Exception as e:
+        logger.error(f"Failed to update cache tools config: {sanitize_for_log(str(e))}")
+        return {
+            "success": False,
+            "message": "Failed to update cache tools configuration: Internal server error"
+        }
+
+@router.get("/tools/cache_tools/config/status")
+async def get_cache_tools_config_status():
+    """获取缓存工具配置状态"""
+    try:
+        from app.core.tool_config_service import get_tool_config_service
+
+        config_service = get_tool_config_service()
+
+        # 检查文件配置
+        file_exists = config_service.config_exists("cache_tools")
+        file_config = config_service.get_config("cache_tools") if file_exists else None
+        file_info = config_service.get_config_file_info("cache_tools")
+
+        return {
+            "success": True,
+            "message": "Cache tools configuration status retrieved successfully",
+            "data": {
+                "file_storage": {
+                    "exists": file_exists,
+                    "config": file_config,
+                    "file_info": file_info
+                },
+                "recommendation": "file_based",
+                "status": "file_based"
+            }
+        }
+
+    except Exception as e:
+        logger.error(f"Failed to get cache tools config status: {sanitize_for_log(str(e))}")
+        return {
+            "success": False,
+            "message": "Failed to get cache tools configuration status: Internal server error"
+        }
+

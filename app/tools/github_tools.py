@@ -39,18 +39,61 @@ class GitHubAPIClient:
             # 如果获取配置失败，使用默认值
             self.mcp_config = None
 
-        # Token配置：优先使用参数，其次环境变量，最后从MCP配置中获取
+        # 获取GitHub工具的文件配置
+        try:
+            from app.core.tool_config_service import get_tool_config_service
+            tool_config_service = get_tool_config_service()
+            self.github_config = tool_config_service.get_config("github")
+        except Exception:
+            # 如果获取文件配置失败，使用默认值
+            self.github_config = None
+
+        # Token配置：优先使用参数，其次文件配置，再次环境变量，最后从MCP配置中获取
         self.token = (
             token or
-            os.getenv('GITHUB_TOKEN', '') or
-            (self.mcp_config.environment_variables.get('GITHUB_TOKEN', '') if self.mcp_config else '')
+            (self.github_config.get('github_token') if self.github_config else None) or
+            os.getenv('GITHUB_TOKEN') or
+            (self.mcp_config.environment_variables.get('GITHUB_TOKEN') if self.mcp_config else None)
+        ) or ''
+
+        # 基础URL配置：优先使用文件配置，否则使用默认值
+        self.base_url = (
+            self.github_config.get('api_base_url', 'https://api.github.com') if self.github_config
+            else "https://api.github.com"
         )
 
-        self.base_url = "https://api.github.com"
         self.session = requests.Session()
 
-        # 从MCP配置获取网络设置
-        if self.mcp_config:
+        # 配置GitHub工具特定设置
+        if self.github_config:
+            # 配置重试策略（使用GitHub配置）
+            retry_count = self.github_config.get('retry_count', 3)
+            retry_strategy = Retry(
+                total=retry_count,
+                status_forcelist=[429, 500, 502, 503, 504],
+                allowed_methods=["HEAD", "GET", "OPTIONS"]
+            )
+
+            # 设置请求头
+            self.session.headers.update({
+                "Accept": "application/vnd.github.v3+json",
+                "User-Agent": "LazyAI-Studio-GitHub-Tools/1.0"
+            })
+
+            # 配置超时（使用GitHub配置）
+            self.session.timeout = self.github_config.get('timeout', 30)
+
+            # 配置SSL验证（使用GitHub配置）
+            self.session.verify = self.github_config.get('security', {}).get('verify_ssl', True)
+
+            # 如果有MCP配置，仍然使用代理设置
+            if self.mcp_config:
+                proxy_config = get_proxy_for_requests()
+                if proxy_config:
+                    self.session.proxies.update(proxy_config)
+
+        # 从MCP配置获取网络设置（如果没有GitHub特定配置）
+        elif self.mcp_config:
             network_config = self.mcp_config.network
             # 配置重试策略
             retry_strategy = Retry(
@@ -2421,3 +2464,16 @@ def github_search_users(q: str, sort: str = "", order: str = "desc", per_page: i
         return result
     except Exception as e:
         return {"success": False, "error": str(e)}
+
+
+# 全局GitHub客户端重新加载函数
+def reload_github_client_config():
+    """重新加载GitHub客户端配置"""
+    try:
+        global github_client
+        # 重新创建GitHub客户端实例以加载新配置
+        github_client = GitHubAPIClient()
+        return True
+    except Exception as e:
+        logger.error(f"Failed to reload GitHub client config: {e}")
+        return False

@@ -41,18 +41,52 @@ const GitHubToolsConfigModal: React.FC<GitHubToolsConfigModalProps> = ({visible,
     const saveConfig = async (values: GitHubToolsConfig) => {
         try {
             setLoading(true);
-            const response = await fetch('/api/mcp/categories/github/config', {
+
+            // 转换前端配置格式为文件配置格式
+            const fileConfig = {
+                enabled: true,
+                github_token: values.github_token || '',
+                api_base_url: values.api_base_url || 'https://api.github.com',
+                timeout: values.timeout_seconds || 30,
+                retry_count: values.max_retry_attempts || 3,
+                rate_limit: {
+                    enabled: values.enable_rate_limit_check ?? true,
+                    max_requests_per_hour: 5000
+                },
+                features: {
+                    repository_management: true,
+                    issue_management: true,
+                    pull_request_management: true,
+                    release_management: true,
+                    organization_access: true,
+                    gist_management: true
+                },
+                security: {
+                    verify_ssl: true,
+                    log_api_calls: values.enable_request_logging ?? false,
+                    mask_sensitive_data: true
+                },
+                cache: {
+                    enabled: values.cache_responses ?? true,
+                    ttl_seconds: values.cache_ttl_seconds || 300,
+                    max_entries: 1000
+                },
+                version: "1.0",
+                frontend_config: values // 保留原始前端配置以便后续使用
+            };
+
+            const response = await fetch('/api/mcp/tools/github/config', {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({config: values}),
+                body: JSON.stringify({config: fileConfig}),
             });
 
             const data = await response.json();
 
             if (data.success) {
-                messageApi.success('GitHub工具配置已保存');
+                messageApi.success('GitHub工具配置已保存到文件');
                 onSuccess?.(); // 调用成功回调
             } else {
                 messageApi.error(data.message || '保存配置失败');
@@ -91,11 +125,50 @@ const GitHubToolsConfigModal: React.FC<GitHubToolsConfigModalProps> = ({visible,
                 onFinish={handleFinish}
                 request={async () => {
                     try {
-                        const response = await fetch('/api/mcp/categories/github/config');
+                        // 首先尝试从文件配置获取
+                        const response = await fetch('/api/mcp/tools/github/config');
                         const data = await response.json();
-                        if (data.success) {
-                            return data.data.config;
+
+                        if (data.success && data.data?.config) {
+                            const fileConfig = data.data.config;
+
+                            // 如果有保存的前端配置，直接使用
+                            if (fileConfig.frontend_config) {
+                                return fileConfig.frontend_config;
+                            }
+
+                            // 否则从文件配置转换为前端配置格式
+                            return {
+                                api_base_url: fileConfig.api_base_url || 'https://api.github.com',
+                                github_token: fileConfig.github_token || '',
+                                default_per_page: 30,
+                                enable_rate_limit_check: fileConfig.rate_limit?.enabled ?? true,
+                                enable_auto_retry: true,
+                                max_retry_attempts: fileConfig.retry_count || 3,
+                                retry_delay_seconds: 1,
+                                timeout_seconds: fileConfig.timeout || 30,
+                                enable_request_logging: fileConfig.security?.log_api_calls ?? false,
+                                cache_responses: fileConfig.cache?.enabled ?? true,
+                                cache_ttl_seconds: fileConfig.cache?.ttl_seconds || 300,
+                                default_branch: 'master',
+                                enable_webhook_verification: true,
+                                enable_enterprise_features: false,
+                                enable_graphql_api: false,
+                                enable_security_scanning: true,
+                                enable_dependabot_integration: true
+                            };
                         } else {
+                            // 如果文件配置失败，尝试从数据库配置获取（向后兼容）
+                            try {
+                                const fallbackResponse = await fetch('/api/mcp/categories/github/config');
+                                const fallbackData = await fallbackResponse.json();
+                                if (fallbackData.success && fallbackData.data?.config) {
+                                    return fallbackData.data.config;
+                                }
+                            } catch (fallbackError) {
+                                console.error('Failed to load fallback config:', fallbackError);
+                            }
+
                             // 返回默认配置
                             return {
                                 api_base_url: 'https://api.github.com',

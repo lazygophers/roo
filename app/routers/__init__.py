@@ -11,7 +11,6 @@ from .api_file_security import router as file_security_router
 from .api_recycle_bin import router as recycle_bin_router
 from .api_time_tools import router as time_tools_router
 from .api_cache_tools import router as cache_tools_router
-from .api_cache import router as cache_router
 from .mcp import router as mcp_router
 from .api_mcp_config import router as mcp_config_router
 from .api_web_scraping import router as web_scraping_router
@@ -32,7 +31,6 @@ api_router.include_router(file_security_router, tags=["file-security"])
 api_router.include_router(recycle_bin_router, tags=["recycle-bin"])
 api_router.include_router(time_tools_router, tags=["time-tools"])
 api_router.include_router(cache_tools_router, tags=["cache-tools"])
-api_router.include_router(cache_router, tags=["cache"])
 api_router.include_router(mcp_router, tags=["mcp"])
 api_router.include_router(mcp_config_router, tags=["mcp-config"])
 api_router.include_router(web_scraping_router, tags=["web-scraping"])

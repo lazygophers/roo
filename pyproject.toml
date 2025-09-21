@@ -25,6 +25,7 @@ dependencies = [
     "aiofiles>=24.1.0",
     "beautifulsoup4>=4.12.3",
     "aiohttp-cors>=0.8.1",
+    "diskcache>=5.6.3",
 ]
 
 [dependency-groups]

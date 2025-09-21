@@ -19,7 +19,7 @@ logger = setup_logging()
 class MCPConfigService:
     """MCP配置服务"""
 
-    def __init__(self, config_file: str = "data/mcp_config.json"):
+    def __init__(self, config_file: str = "data/mcp/mcp_config.json"):
         self.config_file = Path(config_file)
         self.config_file.parent.mkdir(parents=True, exist_ok=True)
         self._config: Optional[MCPGlobalConfig] = None

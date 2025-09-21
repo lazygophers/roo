@@ -35,7 +35,7 @@ from app.routers.api_file_security import router as file_security_router
 from app.routers.api_recycle_bin import router as recycle_bin_router
 from app.routers.api_time_tools import router as time_tools_router
 from app.routers.api_cache_tools import router as cache_tools_router
-from app.routers.api_cache import router as cache_router
+# from app.routers.api_cache import router as cache_router  # Removed - using MCP cache tools instead
 from app.routers.api_mcp_config import router as mcp_config_router
 from app.routers.api_web_scraping import router as web_scraping_router
 
@@ -341,7 +341,7 @@ app.include_router(file_security_router, prefix="/api", tags=["file-security"])
 app.include_router(recycle_bin_router, prefix="/api", tags=["recycle-bin"])
 app.include_router(time_tools_router, prefix="/api", tags=["time-tools"])
 app.include_router(cache_tools_router, prefix="/api", tags=["cache-tools"])
-app.include_router(cache_router, prefix="/api", tags=["cache"])
+# app.include_router(cache_router, prefix="/api", tags=["cache"])  # Removed - using MCP cache tools instead
 app.include_router(mcp_config_router, prefix="/api", tags=["mcp-config"])
 app.include_router(web_scraping_router, prefix="/api", tags=["web-scraping"])
 

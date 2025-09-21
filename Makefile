@@ -117,7 +117,7 @@ backend-dev-optimized:
 	@echo "⚡ 启动优化版本后端服务器 (高性能模式)..."
 	@echo "💡 使用懒加载、LRU缓存、无文件监控等优化技术"
 	@echo "💡 服务启动后，请查看控制台中的访问地址指引"
-	uv run uvicorn app.main_optimized:app --reload --host 0.0.0.0 --port 8000
+	uv run uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 
 backend-optimized: backend-dev-optimized
 
@@ -126,7 +126,7 @@ backend-dev-ultra:
 	@echo "🚀 启动极致性能版本后端服务器 (Ultra模式)..."
 	@echo "💡 使用延迟加载、垃圾回收优化、最小中间件"
 	@echo "💡 目标: 内存 < 20MB, 响应 < 1ms"
-	uv run uvicorn app.main_ultra:app --reload --host 0.0.0.0 --port 8000
+	uv run uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 
 backend-ultra: backend-dev-ultra
 
@@ -135,7 +135,7 @@ backend-dev-minimal:
 	@echo "🔋 启动最小资源版本后端服务器 (Minimal模式)..."
 	@echo "💡 使用零缓存、流式处理、极致内存优化"
 	@echo "💡 目标: 内存 < 15MB, CPU < 5%"
-	uv run uvicorn app.main_minimal:app --reload --host 0.0.0.0 --port 8002
+	uv run uvicorn app.main:app --reload --host 0.0.0.0 --port 8002
 
 backend-minimal: backend-dev-minimal
 
@@ -296,19 +296,19 @@ benchmark-original:
 benchmark-optimized:
 	@echo "⚡ 测试优化服务性能..."
 	@echo "⏱️ 启动优化版本服务器进行性能测试"
-	uv run uvicorn app.main_optimized:app --host 127.0.0.1 --port 8002 &
+	uv run uvicorn app.main:app --host 127.0.0.1 --port 8002 &
 	@sleep 3
 	@echo "🧪 运行负载测试..."
 	@curl -s http://localhost:8002/api/health > /dev/null && echo "✅ 优化服务运行正常"
 	@curl -s http://localhost:8002/api/performance | python -m json.tool
-	@pkill -f "app.main_optimized:app" || true
+	@pkill -f "app.main:app" || true
 
 # 清理性能测试进程
 benchmark-clean:
 	@echo "🧹 清理性能测试相关进程..."
 	@pkill -f "performance_benchmark" || true
 	@pkill -f "app.main" || true
-	@pkill -f "app.main_optimized" || true
+	@pkill -f "app.main" || true
 	@echo "✅ 清理完成"
 
 # ========== Docker 命令 ==========

@@ -433,6 +433,15 @@ wheels = [
 ]
 
 [[package]]
+name = "diskcache"
+version = "5.6.3"
+source = { registry = "https://mirrors.bfsu.edu.cn/pypi/web/simple" }
+sdist = { url = "https://mirrors.bfsu.edu.cn/pypi/web/packages/3f/21/1c1ffc1a039ddcc459db43cc108658f32c57d271d7289a2794e401d0fdb6/diskcache-5.6.3.tar.gz", hash = "sha256:2c3a3fa2743d8535d832ec61c2054a1641f41775aa7c556758a109941e33e4fc" }
+wheels = [
+    { url = "https://mirrors.bfsu.edu.cn/pypi/web/packages/3f/27/4570e78fc0bf5ea0ca45eb1de3818a23787af9b390c0b0a0033a1b8236f9/diskcache-5.6.3-py3-none-any.whl", hash = "sha256:5e31b2d5fbad117cc363ebaf6b689474db18a1f6438bc82358b024abd4c2ca19" },
+]
+
+[[package]]
 name = "dparse"
 version = "0.6.4"
 source = { registry = "https://mirrors.bfsu.edu.cn/pypi/web/simple" }
@@ -603,6 +612,7 @@ dependencies = [
     { name = "aiohttp" },
     { name = "aiohttp-cors" },
     { name = "beautifulsoup4" },
+    { name = "diskcache" },
     { name = "fastapi" },
     { name = "httpx" },
     { name = "orjson" },
@@ -633,6 +643,7 @@ requires-dist = [
     { name = "aiohttp", specifier = ">=3.10.11" },
     { name = "aiohttp-cors", specifier = ">=0.8.1" },
     { name = "beautifulsoup4", specifier = ">=4.12.3" },
+    { name = "diskcache", specifier = ">=5.6.3" },
     { name = "fastapi", specifier = ">=0.116.1" },
     { name = "httpx", specifier = ">=0.27.2" },
     { name = "orjson", specifier = ">=3.10.12" },

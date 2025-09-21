@@ -5,28 +5,28 @@
 
 import React, {useState} from 'react';
 import {Alert, Space, Tooltip, Typography} from 'antd';
-import {ModalForm, ProCard, ProFormDigit, ProFormSelect, ProFormSwitch, ProFormText} from '@ant-design/pro-components';
+import {ModalForm, ProCard, ProFormDigit, ProFormSwitch} from '@ant-design/pro-components';
 import {ClockCircleOutlined, DatabaseOutlined, InfoCircleOutlined, SettingOutlined} from '@ant-design/icons';
 import {apiClient} from '../../api';
 import {useTheme} from '../../contexts/ThemeContext';
 
 const {Text, Paragraph} = Typography;
 
-// const { Text, Title } = Typography;
-
 export interface CacheToolsConfig {
-    backend_type: string;
-    default_ttl: number;
-    persistence_enabled: boolean;
-    compression_enabled: boolean;
-    stats_enabled: boolean;
-    // Backend-specific configs
-    diskcache_directory?: string;
-    diskcache_size_limit?: number;
-    memcached_host?: string;
-    memcached_port?: number;
-    lmdb_path?: string;
-    lmdb_map_size?: number;
+    enabled: boolean;
+    backend: string;
+    max_size_mb: number;
+    timeout_seconds: number;
+    auto_create_dirs: boolean;
+    ttl: {
+        default_ttl_seconds: number;
+        enable_ttl: boolean;
+    };
+    monitoring: {
+        enable_statistics: boolean;
+        log_operations: boolean;
+        metrics_collection: boolean;
+    };
 }
 
 interface CacheToolsConfigModalProps {
@@ -47,24 +47,59 @@ const CacheToolsConfigModal: React.FC<CacheToolsConfigModalProps> = ({
     const handleRequest = async () => {
         try {
             const response = await apiClient.getCategoryConfig('cache');
-            if (response.success && response.data) {
-                return response.data;
+            if (response.data?.success && response.data?.data) {
+                const config = response.data.data;
+                // 转换配置格式以匹配表单结构
+                return {
+                    enabled: config.enabled || true,
+                    backend: config.backend || 'diskcache',
+                    max_size_mb: config.max_size_mb || 1024,
+                    timeout_seconds: config.timeout_seconds || 10,
+                    auto_create_dirs: config.auto_create_dirs !== false,
+                    ttl: {
+                        default_ttl_seconds: config.ttl?.default_ttl_seconds || 3600,
+                        enable_ttl: config.ttl?.enable_ttl !== false
+                    },
+                    monitoring: {
+                        enable_statistics: config.monitoring?.enable_statistics !== false,
+                        log_operations: config.monitoring?.log_operations || false,
+                        metrics_collection: config.monitoring?.metrics_collection || false
+                    }
+                };
             }
             return {
-                backend_type: 'tinydb',
-                default_ttl: 3600,
-                persistence_enabled: true,
-                compression_enabled: false,
-                stats_enabled: true
+                enabled: true,
+                backend: 'diskcache',
+                max_size_mb: 1024,
+                timeout_seconds: 10,
+                auto_create_dirs: true,
+                ttl: {
+                    default_ttl_seconds: 3600,
+                    enable_ttl: true
+                },
+                monitoring: {
+                    enable_statistics: true,
+                    log_operations: false,
+                    metrics_collection: false
+                }
             };
         } catch (error) {
             console.error('Failed to load cache config:', error);
             return {
-                backend_type: 'tinydb',
-                default_ttl: 3600,
-                persistence_enabled: true,
-                compression_enabled: false,
-                stats_enabled: true
+                enabled: true,
+                backend: 'diskcache',
+                max_size_mb: 1024,
+                timeout_seconds: 10,
+                auto_create_dirs: true,
+                ttl: {
+                    default_ttl_seconds: 3600,
+                    enable_ttl: true
+                },
+                monitoring: {
+                    enable_statistics: true,
+                    log_operations: false,
+                    metrics_collection: false
+                }
             };
         }
     };
@@ -74,39 +109,11 @@ const CacheToolsConfigModal: React.FC<CacheToolsConfigModalProps> = ({
         try {
             setLoading(true);
 
-            // 提取后端配置
-            const backendConfig: any = {};
+            // 更新缓存工具配置
+            const response = await apiClient.updateCategoryConfigs('cache', values);
 
-            if (values.backend_type === 'diskcache') {
-                if (values.diskcache_directory) backendConfig.directory = values.diskcache_directory;
-                if (values.diskcache_size_limit) backendConfig.size_limit = values.diskcache_size_limit * 1024 * 1024; // Convert MB to bytes
-            } else if (values.backend_type === 'memcached') {
-                if (values.memcached_host) backendConfig.host = values.memcached_host;
-                if (values.memcached_port) backendConfig.port = values.memcached_port;
-            } else if (values.backend_type === 'lmdb') {
-                if (values.lmdb_path) backendConfig.path = values.lmdb_path;
-                if (values.lmdb_map_size) backendConfig.map_size = values.lmdb_map_size * 1024 * 1024; // Convert MB to bytes
-            }
-
-            // 首先更新MCP分类配置
-            const categoryResponse = await apiClient.updateCategoryConfigs('cache', {
-                backend_type: values.backend_type,
-                default_ttl: values.default_ttl,
-                persistence_enabled: values.persistence_enabled,
-                compression_enabled: values.compression_enabled,
-                stats_enabled: values.stats_enabled
-            });
-
-            if (!categoryResponse.success) {
-                throw new Error(categoryResponse.message || '保存MCP配置失败');
-            }
-
-            // 如果需要切换后端，调用后端切换API
-            if (values.backend_type && Object.keys(backendConfig).length > 0) {
-                const backendResponse = await apiClient.switchCacheBackend(values.backend_type, backendConfig);
-                if (!backendResponse.success) {
-                    throw new Error(backendResponse.message || '切换存储后端失败');
-                }
+            if (!response.data?.success) {
+                throw new Error(response.data?.message || '保存配置失败');
             }
 
             onSuccess?.();
@@ -120,15 +127,6 @@ const CacheToolsConfigModal: React.FC<CacheToolsConfigModalProps> = ({
         }
     };
 
-    // 存储后端选项
-    const backendOptions = [
-        {label: 'TinyDB（默认）', value: 'tinydb', description: '基于文件的轻量级数据库'},
-        {label: 'DiskCache', value: 'diskcache', description: '磁盘缓存，支持大容量存储'},
-        {label: 'Memcached', value: 'memcached', description: '分布式内存缓存系统'},
-        {label: 'LMDB', value: 'lmdb', description: '高性能嵌入式数据库'}
-    ];
-
-    const [currentBackend, setCurrentBackend] = useState<string>('tinydb');
 
     return (
         <ModalForm<CacheToolsConfig>
@@ -159,255 +157,234 @@ const CacheToolsConfigModal: React.FC<CacheToolsConfigModalProps> = ({
             onFinish={handleSave}
         >
             <Alert
-                message="缓存工具配置"
-                description="配置缓存工具的运行参数，包括默认TTL时间、内存限制和持久化选项。"
+                message="DiskCache 缓存工具配置"
+                description="配置 DiskCache 持久化缓存系统的运行参数。缓存数据固定存储在 data/mcp/cache 目录下。"
                 type="info"
                 showIcon={false}
                 style={{marginBottom: 24}}
             />
 
-
-            {/* 存储后端配置 */}
+            {/* 基础存储配置 */}
             <ProCard
                 title={
                     <Space>
                         <DatabaseOutlined/>
-                        <Text strong>存储后端配置</Text>
+                        <Text strong>存储配置</Text>
                     </Space>
                 }
                 size="small"
                 style={{marginBottom: 16}}
             >
+                <ProFormSwitch
+                    name="enabled"
+                    label={
+                        <Space>
+                            <DatabaseOutlined/>
+                            启用缓存工具
+                            <Tooltip title="开启或关闭整个缓存系统">
+                                <InfoCircleOutlined/>
+                            </Tooltip>
+                        </Space>
+                    }
+                    extra="关闭后所有缓存操作将不可用"
+                    checkedChildren="开启"
+                    unCheckedChildren="关闭"
+                />
 
-            <ProFormSelect
-                name="backend_type"
-                label={
-                    <Space>
-                        <DatabaseOutlined/>
-                        存储后端类型
-                        <Tooltip title="选择缓存数据的存储后端">
-                            <InfoCircleOutlined/>
-                        </Tooltip>
-                    </Space>
-                }
-                placeholder="请选择存储后端"
-                options={backendOptions}
-                fieldProps={{
-                    allowClear: false,
-                    onChange: (value: string) => setCurrentBackend(value)
-                }}
-                rules={[
-                    {required: true, message: '请选择存储后端'}
-                ]}
-                extra="TinyDB为默认选项，无需额外服务；Memcached需要独立运行的服务"
-                initialValue={'tinydb'}
-            />
+                <ProFormDigit
+                    name="max_size_mb"
+                    label={
+                        <Space>
+                            <DatabaseOutlined/>
+                            最大缓存大小(MB)
+                            <Tooltip title="缓存的最大存储容量">
+                                <InfoCircleOutlined/>
+                            </Tooltip>
+                        </Space>
+                    }
+                    placeholder="1024"
+                    min={10}
+                    max={10240}
+                    formatter={(value?: string | number) => `${value}MB`}
+                    parser={(value?: string) => value?.replace('MB', '') || ''}
+                    rules={[
+                        {required: true, message: '请输入最大缓存大小'},
+                        {type: 'number', min: 10, max: 10240, message: '缓存大小范围为10MB到10GB'}
+                    ]}
+                    extra="达到限制时会自动清理旧数据"
+                />
 
-            {/* DiskCache配置 */}
-            {currentBackend === 'diskcache' && (
-                <>
-                    <ProFormText
-                        name="diskcache_directory"
-                        label="缓存目录"
-                        placeholder="./cache"
-                        initialValue="./cache"
-                        extra="磁盘缓存存储目录"
-                    />
-                    <ProFormDigit
-                        name="diskcache_size_limit"
-                        label="存储上限(MB)"
-                        placeholder="1024"
-                        initialValue={1024}
-                        min={10}
-                        formatter={(value?: string | number) => `${value}MB`}
-                        parser={(value?: string) => value?.replace('MB', '') || ''}
-                        extra="磁盘缓存的最大存储容量"
-                    />
-                </>
-            )}
+                <ProFormDigit
+                    name="timeout_seconds"
+                    label={
+                        <Space>
+                            <ClockCircleOutlined/>
+                            操作超时时间(秒)
+                            <Tooltip title="DiskCache 操作的超时时间">
+                                <InfoCircleOutlined/>
+                            </Tooltip>
+                        </Space>
+                    }
+                    placeholder="10"
+                    min={1}
+                    max={300}
+                    rules={[
+                        {required: true, message: '请输入超时时间'},
+                        {type: 'number', min: 1, max: 300, message: '超时时间范围为1秒到5分钟'}
+                    ]}
+                    extra="缓存操作的最大等待时间"
+                />
 
-            {/* Memcached配置 */}
-            {currentBackend === 'memcached' && (
-                <>
-                    <ProFormText
-                        name="memcached_host"
-                        label="Memcached主机地址"
-                        placeholder="localhost"
-                        initialValue="localhost"
-                        extra="Memcached服务器的主机地址"
-                    />
-                    <ProFormDigit
-                        name="memcached_port"
-                        label="Memcached端口"
-                        placeholder="11211"
-                        initialValue={11211}
-                        min={1}
-                        max={65535}
-                        extra="Memcached服务器的端口号"
-                    />
-                </>
-            )}
-
-            {/* LMDB配置 */}
-            {currentBackend === 'lmdb' && (
-                <>
-                    <ProFormText
-                        name="lmdb_path"
-                        label="LMDB路径"
-                        placeholder="./lmdb_cache"
-                        initialValue="./lmdb_cache"
-                        extra="LMDB数据库文件路径"
-                    />
-                    <ProFormDigit
-                        name="lmdb_map_size"
-                        label="映射大小(MB)"
-                        placeholder="1024"
-                        initialValue={1024}
-                        min={10}
-                        formatter={(value?: string | number) => `${value}MB`}
-                        parser={(value?: string) => value?.replace('MB', '') || ''}
-                        extra="LMDB映射的最大内存大小"
-                    />
-                </>
-            )}
+                <ProFormSwitch
+                    name="auto_create_dirs"
+                    label={
+                        <Space>
+                            <DatabaseOutlined/>
+                            自动创建目录
+                            <Tooltip title="自动创建不存在的缓存目录">
+                                <InfoCircleOutlined/>
+                            </Tooltip>
+                        </Space>
+                    }
+                    extra="启用后会自动创建缓存目录"
+                    checkedChildren="开启"
+                    unCheckedChildren="关闭"
+                />
             </ProCard>
 
-            {/* 基础配置 */}
+            {/* TTL 配置 */}
             <ProCard
                 title={
                     <Space>
                         <ClockCircleOutlined/>
-                        <Text strong>基础配置</Text>
+                        <Text strong>TTL 过期配置</Text>
                     </Space>
                 }
                 size="small"
                 style={{marginBottom: 16}}
             >
+                <ProFormSwitch
+                    name={['ttl', 'enable_ttl']}
+                    label={
+                        <Space>
+                            <ClockCircleOutlined/>
+                            启用TTL功能
+                            <Tooltip title="开启缓存项的自动过期功能">
+                                <InfoCircleOutlined/>
+                            </Tooltip>
+                        </Space>
+                    }
+                    extra="启用后缓存项会在指定时间后自动过期"
+                    checkedChildren="开启"
+                    unCheckedChildren="关闭"
+                />
 
-            <ProFormDigit
-                name="default_ttl"
-                label={
-                    <Space>
-                        <ClockCircleOutlined/>
-                        默认TTL时间（秒）
-                        <Tooltip title="新建缓存项的默认生存时间，单位为秒">
-                            <InfoCircleOutlined/>
-                        </Tooltip>
-                    </Space>
-                }
-                initialValue="3600"
-                min={1}
-                max={86400 * 30} // 最多30天
-                fieldProps={{
-                    precision: 0
-                }}
-                rules={[
-                    {required: true, message: '请输入默认TTL时间'},
-                    {type: 'number', min: 1, max: 86400 * 30, message: 'TTL时间范围为1秒到30天'}
-                ]}
-                extra="缓存项在指定时间后会自动过期删除，建议设置为3600秒（1小时）"
-            />
+                <ProFormDigit
+                    name={['ttl', 'default_ttl_seconds']}
+                    label={
+                        <Space>
+                            <ClockCircleOutlined/>
+                            默认TTL时间（秒）
+                            <Tooltip title="新建缓存项的默认生存时间">
+                                <InfoCircleOutlined/>
+                            </Tooltip>
+                        </Space>
+                    }
+                    placeholder="3600"
+                    min={1}
+                    max={86400 * 30}
+                    fieldProps={{
+                        precision: 0
+                    }}
+                    rules={[
+                        {required: true, message: '请输入默认TTL时间'},
+                        {type: 'number', min: 1, max: 86400 * 30, message: 'TTL时间范围为1秒到30天'}
+                    ]}
+                    extra="建议设置为3600秒（1小时）"
+                />
+
             </ProCard>
 
-            {/* 高级选项 */}
+            {/* 监控配置 */}
             <ProCard
                 title={
                     <Space>
                         <SettingOutlined/>
-                        <Text strong>高级选项</Text>
+                        <Text strong>监控和日志</Text>
                     </Space>
                 }
                 size="small"
                 style={{marginBottom: 16}}
                 collapsible
-                defaultCollapsed={false}
+                defaultCollapsed={true}
             >
-
-            {/* 持久化存储 - TinyDB, DiskCache, LMDB 支持 */}
-            {(currentBackend === 'tinydb' || currentBackend === 'diskcache' || currentBackend === 'lmdb') && (
                 <ProFormSwitch
-                    name="persistence_enabled"
+                    name={['monitoring', 'enable_statistics']}
                     label={
                         <Space>
-                            <DatabaseOutlined/>
-                            启用持久化存储
-                            <Tooltip title="将缓存数据保存到数据库，重启后数据不会丢失">
-                                <InfoCircleOutlined/>
-                            </Tooltip>
-                        </Space>
-                    }
-                    extra={`${currentBackend === 'tinydb' ? 'TinyDB' : currentBackend === 'diskcache' ? 'DiskCache' : 'LMDB'} 支持持久化存储，数据会保存到磁盘`}
-                    checkedChildren="开启"
-                    unCheckedChildren="关闭"
-                />
-            )}
-
-            {/* 统计功能 - 所有后端都支持 */}
-            <ProFormSwitch
-                name="stats_enabled"
-                label={
-                    <Space>
-                        <InfoCircleOutlined/>
-                        启用统计功能
-                        <Tooltip title="收集访问统计、命中率等性能指标">
                             <InfoCircleOutlined/>
-                        </Tooltip>
-                    </Space>
-                }
-                extra="收集缓存访问统计信息，包括命中率、访问次数等"
-                checkedChildren="开启"
-                unCheckedChildren="关闭"
-            />
-
-            {/* 数据压缩 - TinyDB, DiskCache, LMDB 支持 */}
-            {(currentBackend === 'tinydb' || currentBackend === 'diskcache' || currentBackend === 'lmdb') && (
-                <ProFormSwitch
-                    name="compression_enabled"
-                    label={
-                        <Space>
-                            <DatabaseOutlined/>
-                            启用数据压缩
-                            <Tooltip title="对大型缓存值进行压缩存储，节省存储空间">
+                            启用统计功能
+                            <Tooltip title="收集访问统计、命中率等性能指标">
                                 <InfoCircleOutlined/>
                             </Tooltip>
                         </Space>
                     }
-                    extra="对较大的缓存值进行压缩，可以节省存储空间但会增加CPU使用"
+                    extra="收集缓存访问统计信息，包括命中率、访问次数等"
                     checkedChildren="开启"
                     unCheckedChildren="关闭"
                 />
-            )}
 
-            {/* Memcached 特有选项提示 */}
-            {currentBackend === 'memcached' && (
-                <Alert
-                    message="Memcached 存储特性"
-                    description={
-                        <div>
-                            <p><strong>内存存储</strong>：数据存储在内存中，重启后数据会丢失</p>
-                            <p><strong>高性能</strong>：提供极高的读写性能</p>
-                            <p><strong>分布式</strong>：原生支持分布式部署</p>
-                        </div>
+                <ProFormSwitch
+                    name={['monitoring', 'log_operations']}
+                    label={
+                        <Space>
+                            <InfoCircleOutlined/>
+                            记录操作日志
+                            <Tooltip title="记录所有缓存操作的详细日志">
+                                <InfoCircleOutlined/>
+                            </Tooltip>
+                        </Space>
                     }
-                    type="info"
-                    showIcon
-                    style={{ marginBottom: 16 }}
+                    extra="记录所有缓存操作，可能影响性能"
+                    checkedChildren="开启"
+                    unCheckedChildren="关闭"
                 />
-            )}
+
+                <ProFormSwitch
+                    name={['monitoring', 'metrics_collection']}
+                    label={
+                        <Space>
+                            <InfoCircleOutlined/>
+                            收集性能指标
+                            <Tooltip title="收集详细的性能指标数据">
+                                <InfoCircleOutlined/>
+                            </Tooltip>
+                        </Space>
+                    }
+                    extra="收集性能指标，用于系统监控和优化"
+                    checkedChildren="开启"
+                    unCheckedChildren="关闭"
+                />
             </ProCard>
 
             <Alert
-                message="配置说明"
+                message="DiskCache 特性说明"
                 description={
                     <div>
                         <Paragraph style={{margin: '8px 0', fontSize: 13}}>
-                            • <Text strong>默认TTL时间</Text>: 建议设置为3600秒（1小时），平衡缓存效果和内存使用
+                            • <Text strong>持久化存储</Text>: 数据保存在磁盘上，重启后不会丢失
                         </Paragraph>
                         <Paragraph style={{margin: '8px 0', fontSize: 13}}>
-                            • <Text strong>持久化存储</Text>: 推荐开启，确保数据不会因重启而丢失
+                            • <Text strong>线程安全</Text>: 支持多线程并发访问
                         </Paragraph>
                         <Paragraph style={{margin: '8px 0', fontSize: 13}}>
-                            • <Text strong>存储后端</Text>: 根据性能需求选择合适的存储后端类型
+                            • <Text strong>自动淘汰</Text>: 当达到大小限制时自动清理最久未使用的数据
+                        </Paragraph>
+                        <Paragraph style={{margin: '8px 0', fontSize: 13}}>
+                            • <Text strong>高性能</Text>: 针对大容量存储和频繁访问进行优化
+                        </Paragraph>
+                        <Paragraph style={{margin: '8px 0', fontSize: 13}}>
+                            • <Text strong>固定目录</Text>: 缓存数据统一存储在 data/mcp/cache 目录
                         </Paragraph>
                     </div>
                 }

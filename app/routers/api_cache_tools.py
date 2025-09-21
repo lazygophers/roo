@@ -22,7 +22,7 @@ async def get_cache_tools_status():
             "message": "Cache tools status retrieved successfully",
             "data": {
                 "status": "active",
-                "backend_type": "tinydb",
+                "backend_type": "diskcache",
                 "tools_available": True
             }
         }
