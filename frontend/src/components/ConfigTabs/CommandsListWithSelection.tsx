@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   List,
   Card,
@@ -62,17 +62,10 @@ const CommandsListWithSelection: React.FC<CommandsListProps> = ({
     load: triggerLoad
   } = useLazyLoading(loadCommandsData, {
     key: 'commands-list',
-    autoLoad: false, // 改为手动加载
-    cacheTime: 5 * 60 * 1000 // 5分钟缓存
+    autoLoad: true,
+    cacheTime: -1,
+    pageKey: 'config-management'
   });
-
-  // 当组件首次挂载时触发加载
-  useEffect(() => {
-    if (!loaded && !loading) {
-      console.log('[CommandsList] Component mounted, triggering load...');
-      triggerLoad();
-    }
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const formatFileSize = (bytes: number): string => {
     if (bytes === 0) return '0 B';

@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { Row, Col, Tabs, TabsProps, theme, Spin } from 'antd';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Row, Col, Tabs, theme } from 'antd';
 import { CodeOutlined, FileTextOutlined, BookOutlined, UserOutlined } from '@ant-design/icons';
 import ModesListWithSelection from '../components/ConfigTabs/ModesListWithSelection';
 import CommandsListWithSelection from '../components/ConfigTabs/CommandsListWithSelection';
@@ -10,7 +10,7 @@ import ExportToolbar from '../components/ExportToolbar/ExportToolbar';
 import { SelectedItem, ModelRuleBinding } from '../types/selection';
 import { FileMetadata, EnvironmentInfo, apiClient } from '../api';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
-import { useEnvironment } from '../contexts/EnvironmentContext';
+import { pageCacheManager } from '../hooks/useLazyLoading';
 import './ConfigManagement.css';
 
 const ConfigManagementWithSelection: React.FC = () => {
@@ -18,7 +18,6 @@ const ConfigManagementWithSelection: React.FC = () => {
   useDocumentTitle('配置管理');
 
   const { token } = theme.useToken();
-  const { isRemote, isEditAllowed } = useEnvironment();
   const [selectedItems, setSelectedItems] = useState<SelectedItem[]>([]);
   const [modelRuleBindings, setModelRuleBindings] = useState<ModelRuleBinding[]>([]);
   const [modelRules, setModelRules] = useState<Record<string, FileMetadata[]>>({});
@@ -44,13 +43,18 @@ const ConfigManagementWithSelection: React.FC = () => {
     fetchEnvironmentInfo();
   }, [fetchEnvironmentInfo]);
 
+  // 页面卸载时清除缓存
+  useEffect(() => {
+    return () => {
+      pageCacheManager.clearPageCache('config-management');
+    };
+  }, []);
+
   const handleTabChange = (key: string) => {
-    console.log(`Switching to tab: ${key}`);
     setActiveTab(key);
 
     // 标记该Tab为已加载
     if (!loadedTabs.has(key)) {
-      console.log(`Loading tab for the first time: ${key}`);
       setLoadedTabs(prev => {
         const newSet = new Set(prev);
         newSet.add(key);
@@ -192,46 +196,8 @@ const ConfigManagementWithSelection: React.FC = () => {
     }
   };
 
-  // 惰性加载组件包装器
-  const LazyTabContent: React.FC<{
-    tabKey: string;
-    children: React.ReactNode;
-    fallback?: React.ReactNode;
-  }> = ({ tabKey, children, fallback }) => {
-    const shouldLoad = loadedTabs.has(tabKey);
-
-    console.log(`LazyTabContent - Tab: ${tabKey}, shouldLoad: ${shouldLoad}, activeTab: ${activeTab}`);
-
-    // 如果Tab已经被标记为加载，直接渲染子组件
-    if (shouldLoad) {
-      return <>{children}</>;
-    }
-
-    // 如果Tab没有被加载过，显示占位符
-    return (
-      <div style={{
-        height: '400px',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        color: token.colorTextSecondary,
-        backgroundColor: token.colorBgContainer
-      }}>
-        <div style={{ fontSize: '48px', marginBottom: '16px', opacity: 0.5 }}>
-          {tabKey === 'models' ? '⚙️' : tabKey === 'commands' ? '📝' : tabKey === 'rules' ? '📋' : '👤'}
-        </div>
-        <div style={{ fontSize: '16px', fontWeight: 500, marginBottom: '8px' }}>
-          {tabKey === 'models' ? '模式列表' : tabKey === 'commands' ? '指令列表' : tabKey === 'rules' ? '规则列表' : '角色选择'}
-        </div>
-        <div style={{ fontSize: '14px', opacity: 0.7 }}>
-          {fallback || '点击此Tab开始加载内容...'}
-        </div>
-      </div>
-    );
-  };
-
-  const items: TabsProps['items'] = [
+  // Tab标签配置
+  const tabItems = [
     {
       key: 'models',
       label: (
@@ -239,20 +205,6 @@ const ConfigManagementWithSelection: React.FC = () => {
           <CodeOutlined />
           Mode 列表
         </span>
-      ),
-      children: (
-        <LazyTabContent tabKey="models">
-          <ModesListWithSelection
-            selectedItems={selectedItems}
-            onToggleSelection={handleToggleSelection}
-            onSelectAll={handleSelectAll}
-            onClearSelection={handleClearSelection}
-            modelRuleBindings={modelRuleBindings}
-            onModelRuleBinding={handleModelRuleBinding}
-            getModelRuleBindings={getModelRuleBindings}
-            onUpdateModelRules={handleUpdateModelRules}
-          />
-        </LazyTabContent>
       ),
     },
     {
@@ -263,16 +215,6 @@ const ConfigManagementWithSelection: React.FC = () => {
           指令列表
         </span>
       ),
-      children: (
-        <LazyTabContent tabKey="commands">
-          <CommandsListWithSelection
-            selectedItems={selectedItems}
-            onToggleSelection={handleToggleSelection}
-            onSelectAll={handleSelectAll}
-            onClearSelection={handleClearSelection}
-          />
-        </LazyTabContent>
-      ),
     },
     {
       key: 'rules',
@@ -282,16 +224,6 @@ const ConfigManagementWithSelection: React.FC = () => {
           默认规则列表
         </span>
       ),
-      children: (
-        <LazyTabContent tabKey="rules">
-          <RulesListWithSelection
-            selectedItems={selectedItems}
-            onToggleSelection={handleToggleSelection}
-            onSelectAll={handleSelectAll}
-            onClearSelection={handleClearSelection}
-          />
-        </LazyTabContent>
-      ),
     },
     {
       key: 'roles',
@@ -300,16 +232,6 @@ const ConfigManagementWithSelection: React.FC = () => {
           <UserOutlined />
           角色选择
         </span>
-      ),
-      children: (
-        <LazyTabContent tabKey="roles">
-          <RolesListWithSelection
-            selectedItems={selectedItems}
-            onToggleSelection={handleToggleSelection}
-            onSelectAll={handleSelectAll}
-            onClearSelection={handleClearSelection}
-          />
-        </LazyTabContent>
       ),
     },
   ];
@@ -342,15 +264,113 @@ const ConfigManagementWithSelection: React.FC = () => {
             borderRadius: '4px',
             backgroundColor: token.colorBgContainer
           }}>
-            <Tabs
-              activeKey={activeTab}
-              items={items}
-              onChange={handleTabChange}
-              style={{
-                height: '100%',
-                padding: '0 16px',
-              }}
-            />
+            <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+              {/* Tab标签头部 */}
+              <Tabs
+                activeKey={activeTab}
+                onChange={handleTabChange}
+                style={{
+                  paddingLeft: '16px',
+                  paddingRight: '16px',
+                  marginBottom: '0',
+                }}
+                items={tabItems.map(item => ({
+                  key: item.key,
+                  label: item.label,
+                  children: null, // 不在这里渲染内容
+                }))}
+              />
+
+              {/* Tab内容区域，保持所有已加载的内容挂载 */}
+              <div style={{ flex: 1, position: 'relative', overflow: 'hidden', padding: '0 16px' }}>
+                {loadedTabs.has('models') && (
+                  <div style={{
+                    display: activeTab === 'models' ? 'block' : 'none',
+                    height: '100%',
+                    overflowY: 'auto'
+                  }}>
+                    <ModesListWithSelection
+                      selectedItems={selectedItems}
+                      onToggleSelection={handleToggleSelection}
+                      onSelectAll={handleSelectAll}
+                      onClearSelection={handleClearSelection}
+                      modelRuleBindings={modelRuleBindings}
+                      onModelRuleBinding={handleModelRuleBinding}
+                      getModelRuleBindings={getModelRuleBindings}
+                      onUpdateModelRules={handleUpdateModelRules}
+                    />
+                  </div>
+                )}
+
+                {loadedTabs.has('commands') && (
+                  <div style={{
+                    display: activeTab === 'commands' ? 'block' : 'none',
+                    height: '100%',
+                    overflowY: 'auto'
+                  }}>
+                    <CommandsListWithSelection
+                      selectedItems={selectedItems}
+                      onToggleSelection={handleToggleSelection}
+                      onSelectAll={handleSelectAll}
+                      onClearSelection={handleClearSelection}
+                    />
+                  </div>
+                )}
+
+                {loadedTabs.has('rules') && (
+                  <div style={{
+                    display: activeTab === 'rules' ? 'block' : 'none',
+                    height: '100%',
+                    overflowY: 'auto'
+                  }}>
+                    <RulesListWithSelection
+                      selectedItems={selectedItems}
+                      onToggleSelection={handleToggleSelection}
+                      onSelectAll={handleSelectAll}
+                      onClearSelection={handleClearSelection}
+                    />
+                  </div>
+                )}
+
+                {loadedTabs.has('roles') && (
+                  <div style={{
+                    display: activeTab === 'roles' ? 'block' : 'none',
+                    height: '100%',
+                    overflowY: 'auto'
+                  }}>
+                    <RolesListWithSelection
+                      selectedItems={selectedItems}
+                      onToggleSelection={handleToggleSelection}
+                      onSelectAll={handleSelectAll}
+                      onClearSelection={handleClearSelection}
+                    />
+                  </div>
+                )}
+
+                {/* 占位符：当前Tab未加载时显示 */}
+                {!loadedTabs.has(activeTab) && (
+                  <div style={{
+                    height: '100%',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: token.colorTextSecondary,
+                    backgroundColor: token.colorBgContainer
+                  }}>
+                    <div style={{ fontSize: '48px', marginBottom: '16px', opacity: 0.5 }}>
+                      {activeTab === 'models' ? '⚙️' : activeTab === 'commands' ? '📝' : activeTab === 'rules' ? '📋' : '👤'}
+                    </div>
+                    <div style={{ fontSize: '16px', fontWeight: 500, marginBottom: '8px' }}>
+                      {activeTab === 'models' ? '模式列表' : activeTab === 'commands' ? '指令列表' : activeTab === 'rules' ? '规则列表' : '角色选择'}
+                    </div>
+                    <div style={{ fontSize: '14px', opacity: 0.7 }}>
+                      点击此Tab开始加载内容...
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         </Col>
 

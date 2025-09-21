@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Card, List, Button, Typography, Tag, Space, message, Empty, Tooltip, Spin, theme } from 'antd';
 import { UserOutlined, CheckOutlined } from '@ant-design/icons';
 import { apiClient, RoleInfo } from '../../api';
@@ -44,17 +44,10 @@ const RolesListWithSelection: React.FC<RolesListWithSelectionProps> = ({
     load: triggerLoad
   } = useLazyLoading(loadRolesData, {
     key: 'roles-list',
-    autoLoad: false, // 改为手动加载
-    cacheTime: 5 * 60 * 1000 // 5分钟缓存
+    autoLoad: true,
+    cacheTime: -1,
+    pageKey: 'config-management'
   });
-
-  // 当组件首次挂载时触发加载
-  useEffect(() => {
-    if (!loaded && !loading) {
-      console.log('[RolesList] Component mounted, triggering load...');
-      triggerLoad();
-    }
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // 检查角色是否已选择
   const isRoleSelected = (roleId: string) => {

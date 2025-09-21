@@ -124,7 +124,7 @@ const ModesListWithSelection: React.FC<ModesListProps> = ({
         });
         // 如果 orchestrator 还未加载规则，则加载
         if (!modelRules['orchestrator'] && !loadingRules['orchestrator']) {
-          forceExpandModel('orchestrator');
+          loadModelRules('orchestrator');
         }
       }
     }
@@ -450,13 +450,9 @@ const ModesListWithSelection: React.FC<ModesListProps> = ({
   // 强制展开模型（不包含 toggle 逻辑）
   const forceExpandModel = useCallback(async (modelSlug: string) => {
     console.log(`Force expanding model: ${modelSlug}`);
-    const newExpandedModels = new Set(expandedModels);
-    newExpandedModels.add(modelSlug);
-    setExpandedModels(newExpandedModels);
-    console.log(`Expanded models after force expand:`, Array.from(newExpandedModels));
-    
+
     // 如果还没有加载过这个模式的规则，则异步加载（不阻塞 UI）
-    if (!modelRules[modelSlug] && !loadingRules[modelSlug]) {
+    if (!modelRulesRef.current[modelSlug] && !loadingRulesRef.current[modelSlug]) {
       console.log(`Loading rules for model: ${modelSlug}`);
       // Use setTimeout to defer rule loading and prevent blocking
       setTimeout(() => {
@@ -465,7 +461,7 @@ const ModesListWithSelection: React.FC<ModesListProps> = ({
     } else {
       console.log(`Rules already loaded for model: ${modelSlug}`);
     }
-  }, [expandedModels, modelRules, loadingRules, loadModelRules]);
+  }, [loadModelRules]);
 
   // 切换模型展开状态（用于用户点击）
   const handleModelExpand = async (modelSlug: string) => {
