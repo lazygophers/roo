@@ -32,6 +32,7 @@ import {
 } from '@ant-design/icons';
 import {apiClient, MCPCategoryInfo, MCPToolInfo, EnvironmentInfo} from '../api';
 import {useTheme} from '../contexts/ThemeContext';
+import {useEnvironment} from '../contexts/EnvironmentContext';
 import FileToolsConfigModal from '../components/FileTools/FileToolsConfigModal';
 import TimeToolsConfigModal from '../components/TimeTools/TimeToolsConfigModal';
 import GitHubToolsConfigModal from '../components/GitHubTools/GitHubToolsConfigModal';
@@ -49,6 +50,7 @@ const MCPToolsManagement: React.FC = () => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const {currentTheme, themeType} = useTheme();
     const {message: messageApi} = useApp();
+    const {isEditAllowed} = useEnvironment();
     const [loading, setLoading] = useState(false);
     const [tools, setTools] = useState<MCPToolInfo[]>([]);
     const [categories, setCategories] = useState<MCPCategoryInfo[]>([]);
@@ -543,17 +545,17 @@ const MCPToolsManagement: React.FC = () => {
                     extra={
                         <Space size="small">
                             <Tooltip title={
-                                !environmentInfo?.tool_edit_allowed ? '远程环境下配置编辑被禁用' :
+                                !isEditAllowed ? '远程环境下配置编辑被禁用' :
                                 tool.enabled ? '禁用工具' : '启用工具'
                             }>
                                 <Switch
                                     size="small"
                                     checked={tool.enabled}
+                                    disabled={!isEditAllowed}
                                     onChange={(checked) => toggleTool(tool, checked)}
                                     checkedChildren={<CheckCircleOutlined/>}
                                     unCheckedChildren={<ExclamationCircleOutlined/>}
-                                    disabled={!environmentInfo?.tool_edit_allowed}
-                                />
+                                                                    />
                             </Tooltip>
                             <Tooltip title="查看详情">
                                 <Button
@@ -614,11 +616,11 @@ const MCPToolsManagement: React.FC = () => {
             {/* 操作栏 */}
             <Row justify="space-between" style={{marginBottom: 16}}>
                 <Col>
-                    <Tooltip title={environmentInfo?.tool_edit_allowed ? '打开全局配置' : '远程环境下配置编辑被禁用'}>
+                    <Tooltip title={!isEditAllowed ? "远程环境下配置编辑被禁用" : "打开全局配置"}>
                         <Button
                             icon={<SettingOutlined/>}
+                            disabled={!isEditAllowed}
                             onClick={() => setMcpConfigModal(true)}
-                            disabled={!environmentInfo?.tool_edit_allowed}
                             style={{
                                 color: currentTheme.token?.colorPrimary,
                                 borderColor: currentTheme.token?.colorPrimary,
@@ -668,15 +670,15 @@ const MCPToolsManagement: React.FC = () => {
                                             </Title>
                                             <Text type="secondary">({enabledCount}/{categoryTools.length})</Text>
                                             <div onClick={(e) => e.stopPropagation()}>
-                                                <Tooltip title={environmentInfo?.tool_edit_allowed ? (category.enabled ? '禁用分类' : '启用分类') : '远程环境下配置编辑被禁用'}>
+                                                <Tooltip title={isEditAllowed ? (category.enabled ? '禁用分类' : '启用分类') : '远程环境下配置编辑被禁用'}>
                                                     <Switch
                                                         size="small"
                                                         checked={category.enabled}
+                                                        disabled={!isEditAllowed}
                                                         onChange={(checked) => toggleCategory(category, checked)}
                                                         checkedChildren="启用"
                                                         unCheckedChildren="禁用"
-                                                        disabled={!environmentInfo?.tool_edit_allowed}
-                                                    />
+                                                                                                            />
                                                 </Tooltip>
                                             </div>
                                             {category.enabled && (
@@ -688,16 +690,16 @@ const MCPToolsManagement: React.FC = () => {
                                             {!category.enabled && <Tag color="red">分类禁用</Tag>}
                                             {/* 统一的配置按钮样式 */}
                                             {category.id === 'file' && (
-                                                <Tooltip title={environmentInfo?.tool_edit_allowed ? '文件工具安全配置' : '远程环境下配置编辑被禁用'}>
+                                                <Tooltip title={!isEditAllowed ? '远程环境下配置编辑被禁用' : '文件工具安全配置'}>
                                                     <Button
                                                         type="text"
                                                         size="small"
+                                                        disabled={!isEditAllowed}
                                                         onClick={(e) => {
                                                             e.stopPropagation();
                                                             setFileToolsConfigModal(true);
                                                         }}
-                                                        disabled={!environmentInfo?.tool_edit_allowed}
-                                                        style={{
+                                                                                                                style={{
                                                             color: currentTheme.token?.colorPrimary,
                                                             borderColor: currentTheme.token?.colorPrimary,
                                                             backgroundColor: 'rgba(24, 144, 255, 0.06)',
@@ -719,16 +721,16 @@ const MCPToolsManagement: React.FC = () => {
                                                 </Tooltip>
                                             )}
                                             {category.id === 'time' && (
-                                                <Tooltip title={environmentInfo?.tool_edit_allowed ? '时间工具配置' : '远程环境下配置编辑被禁用'}>
+                                                <Tooltip title={!isEditAllowed ? '远程环境下配置编辑被禁用' : '时间工具配置'}>
                                                     <Button
                                                         type="text"
                                                         size="small"
+                                                        disabled={!isEditAllowed}
                                                         onClick={(e) => {
                                                             e.stopPropagation();
                                                             setTimeToolsConfigModal(true);
                                                         }}
-                                                        disabled={!environmentInfo?.tool_edit_allowed}
-                                                        style={{
+                                                                                                                style={{
                                                             color: currentTheme.token?.colorPrimary,
                                                             borderColor: currentTheme.token?.colorPrimary,
                                                             backgroundColor: 'rgba(24, 144, 255, 0.06)',
@@ -750,16 +752,16 @@ const MCPToolsManagement: React.FC = () => {
                                                 </Tooltip>
                                             )}
                                             {category.id === 'cache' && (
-                                                <Tooltip title={environmentInfo?.tool_edit_allowed ? '缓存工具配置' : '远程环境下配置编辑被禁用'}>
+                                                <Tooltip title={!isEditAllowed ? '远程环境下配置编辑被禁用' : '缓存工具配置'}>
                                                     <Button
                                                         type="text"
                                                         size="small"
+                                                        disabled={!isEditAllowed}
                                                         onClick={(e) => {
                                                             e.stopPropagation();
                                                             setCacheToolsConfigModal(true);
                                                         }}
-                                                        disabled={!environmentInfo?.tool_edit_allowed}
-                                                        style={{
+                                                                                                                style={{
                                                             color: currentTheme.token?.colorPrimary,
                                                             borderColor: currentTheme.token?.colorPrimary,
                                                             backgroundColor: 'rgba(24, 144, 255, 0.06)',
@@ -789,16 +791,16 @@ const MCPToolsManagement: React.FC = () => {
                                                             </Tag>
                                                         </Tooltip>
                                                     )}
-                                                    <Tooltip title={environmentInfo?.tool_edit_allowed ? 'GitHub工具配置' : '远程环境下配置编辑被禁用'}>
+                                                    <Tooltip title={!isEditAllowed ? '远程环境下配置编辑被禁用' : 'GitHub工具配置'}>
                                                         <Button
                                                             type="text"
                                                             size="small"
+                                                            disabled={!isEditAllowed}
                                                             onClick={(e) => {
                                                                 e.stopPropagation();
                                                                 setGithubToolsConfigModal(true);
                                                             }}
-                                                            disabled={!environmentInfo?.tool_edit_allowed}
-                                                            style={{
+                                                                                                                        style={{
                                                                 color: currentTheme.token?.colorPrimary,
                                                                 borderColor: currentTheme.token?.colorPrimary,
                                                                 backgroundColor: 'rgba(24, 144, 255, 0.06)',
@@ -821,16 +823,16 @@ const MCPToolsManagement: React.FC = () => {
                                                 </Space>
                                             )}
                                             {category.id === 'web-scraping' && (
-                                                <Tooltip title={environmentInfo?.tool_edit_allowed ? '网络抓取工具配置' : '远程环境下配置编辑被禁用'}>
+                                                <Tooltip title={!isEditAllowed ? '远程环境下配置编辑被禁用' : '网络抓取工具配置'}>
                                                     <Button
                                                         type="text"
                                                         size="small"
+                                                        disabled={!isEditAllowed}
                                                         onClick={(e) => {
                                                             e.stopPropagation();
                                                             setWebScrapingConfigModal(true);
                                                         }}
-                                                        disabled={!environmentInfo?.tool_edit_allowed}
-                                                        style={{
+                                                                                                                style={{
                                                             color: currentTheme.token?.colorPrimary,
                                                             borderColor: currentTheme.token?.colorPrimary,
                                                             backgroundColor: 'rgba(24, 144, 255, 0.06)',
@@ -890,6 +892,7 @@ const MCPToolsManagement: React.FC = () => {
                                             <Button
                                                 type="primary"
                                                 size="small"
+                                                disabled={!isEditAllowed}
                                                 onClick={() => setGithubToolsConfigModal(true)}
                                             >
                                                 立即配置

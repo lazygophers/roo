@@ -560,7 +560,27 @@ def get_database_service(use_unified_db: bool = True) -> DatabaseService:
                 parser_func=rules_parser,
                 watch=True
             )
-    
+
+        # 添加commands扫描配置
+        commands_dir = PROJECT_ROOT / "resources" / "commands"
+        if commands_dir.exists():
+            _db_service.add_scan_config(
+                name="commands",
+                path=str(commands_dir),
+                patterns=['*.yaml', '*.yml'],
+                watch=True
+            )
+
+        # 添加roles扫描配置
+        roles_dir = PROJECT_ROOT / "resources" / "roles"
+        if roles_dir.exists():
+            _db_service.add_scan_config(
+                name="roles",
+                path=str(roles_dir),
+                patterns=['*.yaml', '*.yml'],
+                watch=True
+            )
+
     return _db_service
 
 def init_database_service(use_unified_db: bool = True):

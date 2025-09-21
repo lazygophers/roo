@@ -1009,7 +1009,7 @@ const ExportToolbar: React.FC<ExportToolbarProps> = ({
           <Button key="cancel" onClick={() => setDeployModalVisible(false)}>
             取消
           </Button>,
-          <Tooltip title={!isEditAllowed ? '远程环境下部署功能被禁用' : '确认部署到VS Code扩展'}>
+          <Tooltip key="deploy-tooltip" title={!isEditAllowed ? '远程环境下部署功能被禁用' : '确认部署到VS Code扩展'}>
             <Button
               key="deploy"
               type="primary"

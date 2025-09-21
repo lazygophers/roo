@@ -25,10 +25,10 @@ def require_edit_permission(func):
     async def wrapper(*args, **kwargs):
         config_service = get_mcp_config_service()
         if not config_service.is_tool_edit_allowed():
-            return {
-                "success": False,
-                "message": "在远程环境中，MCP配置编辑被禁用。请在本地环境中使用此功能。"
-            }
+            raise HTTPException(
+                status_code=401,
+                detail="在远程环境中，MCP配置编辑被禁用。请在本地环境中使用此功能。"
+            )
         return await func(*args, **kwargs)
     return wrapper
 
