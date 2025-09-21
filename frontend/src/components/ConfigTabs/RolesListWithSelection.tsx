@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { Card, List, Button, Typography, Tag, Space, message, Empty, Tooltip } from 'antd';
+import React, { useState, useCallback, useEffect } from 'react';
+import { Card, List, Button, Typography, Tag, Space, message, Empty, Tooltip, Spin, theme } from 'antd';
 import { UserOutlined, CheckOutlined } from '@ant-design/icons';
 import { apiClient, RoleInfo } from '../../api';
 import { SelectedItem } from '../../types/selection';
+import { useLazyLoading } from '../../hooks/useLazyLoading';
 
 const { Text, Paragraph } = Typography;
 
@@ -19,25 +20,41 @@ const RolesListWithSelection: React.FC<RolesListWithSelectionProps> = ({
   onSelectAll,
   onClearSelection
 }) => {
+  const { token } = theme.useToken();
   const [roles, setRoles] = useState<RoleInfo[]>([]);
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    loadRoles();
-  }, []);
-
-  const loadRoles = async () => {
+  // 惰性加载角色数据
+  const loadRolesData = useCallback(async () => {
     try {
-      setLoading(true);
+      console.log('[RolesList] Starting to load roles data...');
       const response = await apiClient.getRoles();
       setRoles(response.data);
+      console.log(`[RolesList] Loaded ${response.data.length} roles`);
     } catch (error) {
       console.error('Failed to load roles:', error);
       message.error('加载角色失败');
-    } finally {
-      setLoading(false);
+      throw error; // 重新抛出错误以便useLazyLoading处理
     }
-  };
+  }, []);
+
+  const {
+    loading,
+    loaded,
+    error,
+    load: triggerLoad
+  } = useLazyLoading(loadRolesData, {
+    key: 'roles-list',
+    autoLoad: false, // 改为手动加载
+    cacheTime: 5 * 60 * 1000 // 5分钟缓存
+  });
+
+  // 当组件首次挂载时触发加载
+  useEffect(() => {
+    if (!loaded && !loading) {
+      console.log('[RolesList] Component mounted, triggering load...');
+      triggerLoad();
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // 检查角色是否已选择
   const isRoleSelected = (roleId: string) => {
@@ -72,11 +89,45 @@ const RolesListWithSelection: React.FC<RolesListWithSelectionProps> = ({
     onToggleSelection(selectedItem);
   };
 
-  if (loading) {
+  // 处理加载状态
+  if (loading && !loaded) {
     return (
-      <Card title="角色列表" loading={loading}>
-        <div style={{ height: '400px' }} />
-      </Card>
+      <div style={{
+        height: '400px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
+      }}>
+        <Spin size="large" />
+        <span style={{ marginLeft: 12, color: token.colorTextSecondary }}>
+          正在加载角色数据...
+        </span>
+      </div>
+    );
+  }
+
+  // 处理错误状态
+  if (error) {
+    return (
+      <div style={{
+        height: '400px',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        color: token.colorTextSecondary
+      }}>
+        <div style={{ fontSize: '48px', marginBottom: '16px', opacity: 0.5 }}>❌</div>
+        <div style={{ fontSize: '16px', fontWeight: 500, marginBottom: '8px' }}>
+          加载角色数据失败
+        </div>
+        <div style={{ fontSize: '14px', opacity: 0.7, marginBottom: '16px' }}>
+          {error.message || '未知错误'}
+        </div>
+        <Button type="primary" onClick={triggerLoad}>
+          重新加载
+        </Button>
+      </div>
     );
   }
 

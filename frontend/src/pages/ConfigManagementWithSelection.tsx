@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { Row, Col, Tabs, TabsProps, theme } from 'antd';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { Row, Col, Tabs, TabsProps, theme, Spin } from 'antd';
 import { CodeOutlined, FileTextOutlined, BookOutlined, UserOutlined } from '@ant-design/icons';
 import ModesListWithSelection from '../components/ConfigTabs/ModesListWithSelection';
 import CommandsListWithSelection from '../components/ConfigTabs/CommandsListWithSelection';
@@ -24,6 +24,10 @@ const ConfigManagementWithSelection: React.FC = () => {
   const [modelRules, setModelRules] = useState<Record<string, FileMetadata[]>>({});
   const [environmentInfo, setEnvironmentInfo] = useState<EnvironmentInfo | null>(null);
 
+  // 惰性加载状态管理
+  const [activeTab, setActiveTab] = useState<string>('models');
+  const [loadedTabs, setLoadedTabs] = useState<Set<string>>(new Set(['models'])); // 默认加载第一个Tab
+
   // 获取环境信息
   const fetchEnvironmentInfo = useCallback(async () => {
     try {
@@ -41,7 +45,18 @@ const ConfigManagementWithSelection: React.FC = () => {
   }, [fetchEnvironmentInfo]);
 
   const handleTabChange = (key: string) => {
-    // 切换 tab 时不清空选中项，保持预览状态
+    console.log(`Switching to tab: ${key}`);
+    setActiveTab(key);
+
+    // 标记该Tab为已加载
+    if (!loadedTabs.has(key)) {
+      console.log(`Loading tab for the first time: ${key}`);
+      setLoadedTabs(prev => {
+        const newSet = new Set(prev);
+        newSet.add(key);
+        return newSet;
+      });
+    }
   };
 
   const handleToggleSelection = (item: SelectedItem) => {
@@ -177,7 +192,44 @@ const ConfigManagementWithSelection: React.FC = () => {
     }
   };
 
+  // 惰性加载组件包装器
+  const LazyTabContent: React.FC<{
+    tabKey: string;
+    children: React.ReactNode;
+    fallback?: React.ReactNode;
+  }> = ({ tabKey, children, fallback }) => {
+    const shouldLoad = loadedTabs.has(tabKey);
 
+    console.log(`LazyTabContent - Tab: ${tabKey}, shouldLoad: ${shouldLoad}, activeTab: ${activeTab}`);
+
+    // 如果Tab已经被标记为加载，直接渲染子组件
+    if (shouldLoad) {
+      return <>{children}</>;
+    }
+
+    // 如果Tab没有被加载过，显示占位符
+    return (
+      <div style={{
+        height: '400px',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        color: token.colorTextSecondary,
+        backgroundColor: token.colorBgContainer
+      }}>
+        <div style={{ fontSize: '48px', marginBottom: '16px', opacity: 0.5 }}>
+          {tabKey === 'models' ? '⚙️' : tabKey === 'commands' ? '📝' : tabKey === 'rules' ? '📋' : '👤'}
+        </div>
+        <div style={{ fontSize: '16px', fontWeight: 500, marginBottom: '8px' }}>
+          {tabKey === 'models' ? '模式列表' : tabKey === 'commands' ? '指令列表' : tabKey === 'rules' ? '规则列表' : '角色选择'}
+        </div>
+        <div style={{ fontSize: '14px', opacity: 0.7 }}>
+          {fallback || '点击此Tab开始加载内容...'}
+        </div>
+      </div>
+    );
+  };
 
   const items: TabsProps['items'] = [
     {
@@ -189,16 +241,18 @@ const ConfigManagementWithSelection: React.FC = () => {
         </span>
       ),
       children: (
-        <ModesListWithSelection 
-          selectedItems={selectedItems}
-          onToggleSelection={handleToggleSelection}
-          onSelectAll={handleSelectAll}
-          onClearSelection={handleClearSelection}
-          modelRuleBindings={modelRuleBindings}
-          onModelRuleBinding={handleModelRuleBinding}
-          getModelRuleBindings={getModelRuleBindings}
-          onUpdateModelRules={handleUpdateModelRules}
-        />
+        <LazyTabContent tabKey="models">
+          <ModesListWithSelection
+            selectedItems={selectedItems}
+            onToggleSelection={handleToggleSelection}
+            onSelectAll={handleSelectAll}
+            onClearSelection={handleClearSelection}
+            modelRuleBindings={modelRuleBindings}
+            onModelRuleBinding={handleModelRuleBinding}
+            getModelRuleBindings={getModelRuleBindings}
+            onUpdateModelRules={handleUpdateModelRules}
+          />
+        </LazyTabContent>
       ),
     },
     {
@@ -210,12 +264,14 @@ const ConfigManagementWithSelection: React.FC = () => {
         </span>
       ),
       children: (
-        <CommandsListWithSelection 
-          selectedItems={selectedItems}
-          onToggleSelection={handleToggleSelection}
-          onSelectAll={handleSelectAll}
-          onClearSelection={handleClearSelection}
-        />
+        <LazyTabContent tabKey="commands">
+          <CommandsListWithSelection
+            selectedItems={selectedItems}
+            onToggleSelection={handleToggleSelection}
+            onSelectAll={handleSelectAll}
+            onClearSelection={handleClearSelection}
+          />
+        </LazyTabContent>
       ),
     },
     {
@@ -227,12 +283,14 @@ const ConfigManagementWithSelection: React.FC = () => {
         </span>
       ),
       children: (
-        <RulesListWithSelection 
-          selectedItems={selectedItems}
-          onToggleSelection={handleToggleSelection}
-          onSelectAll={handleSelectAll}
-          onClearSelection={handleClearSelection}
-        />
+        <LazyTabContent tabKey="rules">
+          <RulesListWithSelection
+            selectedItems={selectedItems}
+            onToggleSelection={handleToggleSelection}
+            onSelectAll={handleSelectAll}
+            onClearSelection={handleClearSelection}
+          />
+        </LazyTabContent>
       ),
     },
     {
@@ -244,12 +302,14 @@ const ConfigManagementWithSelection: React.FC = () => {
         </span>
       ),
       children: (
-        <RolesListWithSelection 
-          selectedItems={selectedItems}
-          onToggleSelection={handleToggleSelection}
-          onSelectAll={handleSelectAll}
-          onClearSelection={handleClearSelection}
-        />
+        <LazyTabContent tabKey="roles">
+          <RolesListWithSelection
+            selectedItems={selectedItems}
+            onToggleSelection={handleToggleSelection}
+            onSelectAll={handleSelectAll}
+            onClearSelection={handleClearSelection}
+          />
+        </LazyTabContent>
       ),
     },
   ];
@@ -283,7 +343,7 @@ const ConfigManagementWithSelection: React.FC = () => {
             backgroundColor: token.colorBgContainer
           }}>
             <Tabs
-              defaultActiveKey="models"
+              activeKey={activeTab}
               items={items}
               onChange={handleTabChange}
               style={{
