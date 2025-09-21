@@ -90,6 +90,7 @@ const ExportToolbar: React.FC<ExportToolbarProps> = ({
   const [cleanupLoading, setCleanupLoading] = useState(false);
   const [exportLoading, setExportLoading] = useState(false);
   const [refreshing, setRefreshing] = useState<string | null>(null);
+  const [exportSuccessModalVisible, setExportSuccessModalVisible] = useState(false);
   const [form] = Form.useForm();
   const [deployForm] = Form.useForm();
   const modelCount = selectedItems.filter(item => item.type === 'model').length;
@@ -228,6 +229,8 @@ const ExportToolbar: React.FC<ExportToolbarProps> = ({
 
         const fileType = isCompressed ? '配置压缩包' : 'YAML文件';
         message.success(`${fileType} ${filename} 下载已开始`);
+        // 显示使用指引弹窗
+        setExportSuccessModalVisible(true);
       } else {
         message.error('生成配置文件失败：' + result.message);
       }
@@ -1121,6 +1124,67 @@ const ExportToolbar: React.FC<ExportToolbarProps> = ({
             💡 提示：部署将会自动拼接before/after钩子、选中的规则到模型的customInstructions中，
             然后生成custom_modes.yaml文件并复制到选定的VS Code扩展目录。
           </Text>
+        </div>
+      </Modal>
+
+      {/* 导出成功使用指引弹窗 */}
+      <Modal
+        title="🎉 导出成功！使用指引"
+        open={exportSuccessModalVisible}
+        onCancel={() => setExportSuccessModalVisible(false)}
+        footer={[
+          <Button
+            key="close"
+            type="primary"
+            onClick={() => setExportSuccessModalVisible(false)}
+          >
+            知道了
+          </Button>
+        ]}
+        width={500}
+        closable={true}
+        maskClosable={false}
+      >
+        <div style={{ fontSize: 14, lineHeight: 1.6 }}>
+          <div style={{
+            marginBottom: 16,
+            padding: 12,
+            backgroundColor: token.colorSuccessBg,
+            border: `1px solid ${token.colorSuccessBorder}`,
+            borderRadius: 6
+          }}>
+            <Text style={{ fontWeight: 500 }}>
+              📁 custom_modes.yaml 文件使用方法：
+            </Text>
+            <div style={{ marginTop: 8, color: token.colorTextSecondary }}>
+              该文件可以在模型中，直接导入替换
+            </div>
+          </div>
+
+          <div style={{
+            padding: 12,
+            backgroundColor: token.colorInfoBg,
+            border: `1px solid ${token.colorInfoBorder}`,
+            borderRadius: 6
+          }}>
+            <Text style={{ fontWeight: 500 }}>
+              📂 .roo 目录使用方法：
+            </Text>
+            <div style={{ marginTop: 8, color: token.colorTextSecondary }}>
+              .roo 目录可以放置于全局根目录（~/）或项目根目录，通过斜杠命令使用
+            </div>
+          </div>
+
+          <div style={{
+            marginTop: 16,
+            padding: 8,
+            backgroundColor: token.colorFillTertiary,
+            borderRadius: 4
+          }}>
+            <Text style={{ fontSize: 12, color: token.colorTextSecondary }}>
+              💡 提示：文件已下载到您的默认下载目录，请根据上述说明进行配置
+            </Text>
+          </div>
         </div>
       </Modal>
     </Card>
