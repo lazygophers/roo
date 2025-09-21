@@ -24,8 +24,8 @@ if ENVIRONMENT == "remote":
     PORT = int(os.getenv("PORT", "8000"))
     DEBUG = os.getenv("DEBUG", "false").lower() == "true"
     LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
-    # 远端环境 CORS 配置
-    CORS_ORIGINS = os.getenv("CORS_ORIGINS", "*").split(",")
+    # 远端环境 CORS 配置 - 默认允许所有域名
+    CORS_ORIGINS = os.getenv("CORS_ORIGINS", "*").split(",") if os.getenv("CORS_ORIGINS", "*") != "*" else ["*"]
     CORS_ALLOW_CREDENTIALS = os.getenv("CORS_ALLOW_CREDENTIALS", "false").lower() == "true"
 else:  # local 默认配置
     # 本地环境配置

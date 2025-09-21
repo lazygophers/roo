@@ -7,7 +7,7 @@ from app.core.secure_logging import sanitize_for_log
 
 logger = setup_logging("INFO")
 
-router = APIRouter(prefix="/database", tags=["database"])
+router = APIRouter(tags=["database"])
 
 @router.get("/status", response_model=Dict[str, Any])
 async def get_database_status():

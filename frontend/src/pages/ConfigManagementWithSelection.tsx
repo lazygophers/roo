@@ -160,6 +160,24 @@ const ConfigManagementWithSelection: React.FC = () => {
     setModelRuleBindings([]);
   };
 
+  // 处理刷新配置数据
+  const handleRefreshConfig = async (configType: string): Promise<{ success: boolean; message: string }> => {
+    try {
+      const response = await apiClient.syncDatabaseConfig(configType);
+      if (response.success) {
+        // 刷新后重新获取环境信息以更新页面数据
+        await fetchEnvironmentInfo();
+        return { success: true, message: `${configType} 数据已刷新` };
+      } else {
+        return { success: false, message: response.message || '刷新失败' };
+      }
+    } catch (error) {
+      console.error('刷新配置数据失败:', error);
+      return { success: false, message: '刷新失败' };
+    }
+  };
+
+
 
   const items: TabsProps['items'] = [
     {
@@ -242,7 +260,7 @@ const ConfigManagementWithSelection: React.FC = () => {
       <h2 style={{ margin: '0 0 16px 0', fontSize: '20px', fontWeight: 'normal' }}>
         配置管理
       </h2>
-      
+
       {/* 导出工具栏 */}
       <ExportToolbar
         selectedItems={selectedItems}
@@ -252,6 +270,7 @@ const ConfigManagementWithSelection: React.FC = () => {
         modelRules={modelRules}
         onLoadConfiguration={handleLoadConfiguration}
         environmentInfo={environmentInfo}
+        onRefresh={handleRefreshConfig}
       />
 
       <Row gutter={16} style={{ height: 'calc(100% - 80px)' }}>
