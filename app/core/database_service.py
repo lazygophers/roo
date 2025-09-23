@@ -14,7 +14,7 @@ from app.core.config import PROJECT_ROOT
 from app.core.logging import setup_logging
 from app.core.secure_logging import secure_log_key_value, sanitize_for_log
 from app.core.unified_database import get_unified_database, TableNames
-from app.core.json_cache_service import get_json_cache_service
+from app.core.ultra_cache_system import UltraCacheSystem
 
 logger = setup_logging("INFO")
 
@@ -47,7 +47,7 @@ class DatabaseService:
             # 确保缓存目录存在
             json_cache_dir = PROJECT_ROOT / "data" / "roo"
             json_cache_dir.mkdir(parents=True, exist_ok=True)
-            self.json_cache_service = get_json_cache_service("data/roo")
+            self.json_cache_service = UltraCacheSystem("data/roo")
             logger.info(f"JSON cache service enabled with directory: {json_cache_dir}")
         else:
             self.json_cache_service = None

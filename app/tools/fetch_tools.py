@@ -39,9 +39,12 @@ logger = setup_logging()
         "max_redirects": 5,
         "max_file_size_mb": 100,
         "enable_ssl_verification": True,
-        "default_user_agent": "LazyAI-Studio-WebScraper/1.0",
+        "default_user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
         "max_retries": 3,
         "retry_delay": 1.0,
+
+        # 工具级别代理配置
+        "proxy": "",  # 代理地址，格式如: http://proxy.example.com:8080
 
         # 代理配置示例
         "proxy_example": {
@@ -100,7 +103,7 @@ class WebScrapingConfig:
     def __init__(self):
         # 基础配置
         self.enabled = True
-        self.user_agent = "LazyAI-Studio-WebScraper/1.0"
+        self.user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
         self.timeout = 30
         self.max_retries = 3
         self.retry_delay = 1.0
@@ -171,7 +174,10 @@ class WebScrapingTools:
 
     def _load_basic_config(self, custom_config: Dict[str, Any]):
         """加载基础配置"""
-        if "user_agent" in custom_config:
+        # 工具级别 UA 配置优先
+        if "default_user_agent" in custom_config:
+            self.config.user_agent = custom_config["default_user_agent"]
+        elif "user_agent" in custom_config:
             self.config.user_agent = custom_config["user_agent"]
         elif self.mcp_config:
             self.config.user_agent = self.mcp_config.network.user_agent
@@ -204,9 +210,18 @@ class WebScrapingTools:
 
     def _load_proxy_config(self, custom_config: Dict[str, Any]):
         """加载代理配置"""
-        # 优先使用工具集代理配置
-        proxy_config = custom_config.get("proxy", {})
+        # 优先使用工具集简化代理配置
+        tool_proxy = custom_config.get("proxy", "")
 
+        if tool_proxy:
+            # 工具级别简化代理配置：直接使用代理地址字符串
+            self.config.proxy_enabled = True
+            self.config.proxy_http = tool_proxy
+            self.config.proxy_https = tool_proxy
+            return
+
+        # 其次使用工具集详细代理配置
+        proxy_config = custom_config.get("proxy_config", {})
         if proxy_config:
             self.config.proxy_enabled = proxy_config.get("enabled", False)
             self.config.proxy_http = proxy_config.get("http")
@@ -217,8 +232,8 @@ class WebScrapingTools:
         elif self.mcp_config and hasattr(self.mcp_config, 'proxy') and self.mcp_config.proxy.enabled:
             # 回退到全局MCP代理配置
             self.config.proxy_enabled = self.mcp_config.proxy.enabled
-            self.config.proxy_http = self.mcp_config.proxy.http_proxy
-            self.config.proxy_https = self.mcp_config.proxy.https_proxy
+            self.config.proxy_http = self.mcp_config.proxy.proxy
+            self.config.proxy_https = self.mcp_config.proxy.proxy
             self.config.proxy_username = getattr(self.mcp_config.proxy, 'username', None)
             self.config.proxy_password = getattr(self.mcp_config.proxy, 'password', None)
 

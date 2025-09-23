@@ -882,7 +882,7 @@ const MCPToolsManagement: React.FC = () => {
                                                     </Tooltip>
                                                 </Space>
                                             )}
-                                            {category.id === 'fetch' && (
+                                            {category.id === 'web-scraping' && (
                                                 <Tooltip title={!isEditAllowed ? '远程环境下配置编辑被禁用' : '网络抓取工具配置'}>
                                                     <Button
                                                         type="text"
