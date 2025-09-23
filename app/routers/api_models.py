@@ -2,7 +2,7 @@ from typing import List, Optional
 from fastapi import APIRouter, HTTPException
 from app.models.schemas import ModelsResponse, ErrorResponse, ModelInfo, ModelsRequest, ModelBySlugRequest
 from app.core.yaml_service import YAMLService
-from app.core.database_service import get_database_service
+from app.core.json_file_service import get_json_file_service
 
 router = APIRouter()
 
@@ -13,11 +13,11 @@ router = APIRouter()
     description="获取 resources/models 目录及其子目录下的所有 YAML 文件信息，排除 customInstructions 字段"
 )
 async def get_models(request: ModelsRequest = ModelsRequest()) -> ModelsResponse:
-    """获取所有模型信息（使用数据库缓存）"""
+    """获取所有模型信息（使用JSON文件缓存）"""
     try:
-        # 从数据库缓存获取数据
-        db_service = get_database_service()
-        cached_models = db_service.get_cached_data("models")
+        # 从JSON文件缓存获取数据
+        json_service = get_json_file_service()
+        cached_models = json_service.get_cached_data("models")
         
         # 转换为ModelInfo对象
         models = []

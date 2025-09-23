@@ -52,11 +52,12 @@ def get_logger():
     return _logger
 
 def get_database_service():
-    """延迟数据库服务初始化"""
+    """延迟JSON文件服务初始化 - 替代数据库"""
     global _db_service
     if _db_service is None:
-        from app.core.database_service import DatabaseService
-        _db_service = DatabaseService(use_unified_db=True)
+        # 导入并设置为全局服务
+        from app.core.json_file_service import get_json_file_service
+        _db_service = get_json_file_service()
 
         # 添加扫描配置
         _db_service.add_scan_config(
@@ -89,10 +90,12 @@ def get_database_service():
         for resource_type in ['commands', 'roles']:
             resource_path = resources_dir / resource_type
             if resource_path.exists():
+                # Commands use .md files, others use .yaml/.yml
+                patterns = ['*.md'] if resource_type == 'commands' else ['*.yaml', '*.yml']
                 _db_service.add_scan_config(
                     resource_type,
                     str(resource_path),
-                    patterns=['*.yaml', '*.yml'],
+                    patterns=patterns,
                     watch=False
                 )
 
@@ -111,21 +114,39 @@ async def lifespan(app: FastAPI):
 
         print(f"🚀 LazyAI Studio (Minimal) - Starting with {start_memory:.1f}MB", flush=True)
 
-        # 初始化数据库服务并刷新资源数据
-        print("📋 Initializing database service and refreshing resources...", flush=True)
+        # 初始化JSON文件服务并自动缓存resources metadata到data/roo
+        print("📋 Initializing JSON file service and caching resources metadata...", flush=True)
         try:
-            db_service = get_database_service()
-            if hasattr(db_service, 'full_refresh_all'):
-                # 使用完整数据库服务的完全刷新功能
-                refresh_results = db_service.full_refresh_all()
-                total_files = sum(r.get('inserted', 0) for r in refresh_results.values() if 'error' not in r)
-                print(f"✅ Resources refreshed successfully! Total files processed: {total_files}", flush=True)
-            else:
-                # 如果是最小化服务，使用基本的初始化
-                print("🔧 Using minimal database service mode", flush=True)
+            # 确保data/roo目录存在
+            cache_dir = PROJECT_ROOT / "data" / "roo"
+            cache_dir.mkdir(parents=True, exist_ok=True)
+            print(f"📁 Cache directory ensured: {cache_dir}", flush=True)
+
+            json_service = get_database_service()
+
+            # 显示扫描的资源目录
+            print(f"🔍 Scanning {len(json_service._scan_configs)} resource directories for metadata...", flush=True)
+
+            # 使用新的同步所有配置方法，自动缓存metadata到data/roo
+            refresh_results = json_service.sync_all_configs()
+            total_configs = len(refresh_results)
+            success_configs = sum(1 for success in refresh_results.values() if success)
+
+            # 统计缓存的数据项
+            total_items = 0
+            for config_name, success in refresh_results.items():
+                if success:
+                    cached_data = json_service.get_cached_data(config_name)
+                    total_items += len(cached_data)
+
+            print(f"✅ Metadata caching completed!", flush=True)
+            print(f"   📂 Configs processed: {success_configs}/{total_configs}", flush=True)
+            print(f"   📄 Total items cached: {total_items}", flush=True)
+            print(f"   💾 Cache location: data/roo/*.json", flush=True)
+
         except Exception as e:
-            get_logger().error(f"Failed to refresh resources: {e}")
-            print(f"⚠️  Resource refresh failed: {e}", flush=True)
+            get_logger().error(f"Failed to cache resources metadata: {e}")
+            print(f"⚠️  Metadata caching failed: {e}", flush=True)
 
         # 初始化MCP工具和工具集（由现有服务自动处理）
         print("🔧 MCP tools will be automatically initialized by the service layer...", flush=True)

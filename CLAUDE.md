@@ -69,8 +69,7 @@ LazyAI Studio
 │   ├── app/main.py              # Main application entry
 │   ├── app/main_optimized.py    # Ultra-performance variant
 │   ├── app/core/                # Core services
-│   │   ├── database_service.py  # Main data management
-│   │   ├── database_service_lite.py # Performance-optimized
+│   │   ├── json_file_service.py # JSON-based data management
 │   │   ├── ultra_cache_system.py # Multi-level caching
 │   │   └── secure_logging.py    # Security-hardened logging
 │   ├── app/routers/            # API endpoints
@@ -84,11 +83,11 @@ LazyAI Studio
 
 ### Core Backend Services
 
-1. **Database Service** (`app/core/database_service.py`)
-   - File-based data management with TinyDB
+1. **JSON File Service** (`app/core/json_file_service.py`)
+   - File-based data management with pure JSON files
    - Real-time file watching with watchdog
    - YAML parsing and validation
-   - Caching layer for performance
+   - Direct JSON caching for performance
 
 2. **Ultra Cache System** (`app/core/ultra_cache_system.py`) 
    - Multi-level caching (L1/L2/L3 + disk)
@@ -163,7 +162,7 @@ npm audit        # Security audit
 
 ### Technology Stack
 - **Python**: 3.12+ with UV package manager
-- **Backend**: FastAPI, TinyDB, Uvicorn, PyYAML
+- **Backend**: FastAPI, JSON Files, Uvicorn, PyYAML
 - **Performance**: psutil, orjson, uvloop for optimization
 - **Frontend**: React 19, TypeScript, Ant Design 5
 - **Security**: Input sanitization, log injection prevention
