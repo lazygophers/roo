@@ -217,7 +217,7 @@ const RulesListWithSelection: React.FC<RulesListProps> = ({
                 onClick={handleSelectAllVisible}
                 disabled={rules.length === 0}
               >
-                全选当前页
+                全选
               </Button>
               <Button 
                 size="small"

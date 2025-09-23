@@ -47,7 +47,7 @@ class DatabaseService:
             # 确保缓存目录存在
             json_cache_dir = PROJECT_ROOT / "data" / "roo"
             json_cache_dir.mkdir(parents=True, exist_ok=True)
-            self.json_cache_service = UltraCacheSystem("data/roo")
+            self.json_cache_service = UltraCacheSystem()
             logger.info(f"JSON cache service enabled with directory: {json_cache_dir}")
         else:
             self.json_cache_service = None
