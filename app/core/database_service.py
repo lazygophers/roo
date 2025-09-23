@@ -14,20 +14,23 @@ from app.core.config import PROJECT_ROOT
 from app.core.logging import setup_logging
 from app.core.secure_logging import secure_log_key_value, sanitize_for_log
 from app.core.unified_database import get_unified_database, TableNames
+from app.core.json_cache_service import get_json_cache_service
 
 logger = setup_logging("INFO")
 
 class DatabaseService:
     """数据库服务：自动扫描文件并生成数据库表"""
     
-    def __init__(self, use_unified_db: bool = True):
+    def __init__(self, use_unified_db: bool = True, enable_json_export: bool = True):
         """初始化数据库服务
-        
+
         Args:
             use_unified_db: 是否使用统一数据库，默认为True
+            enable_json_export: 是否启用JSON导出，默认为True
         """
         self.use_unified_db = use_unified_db
-        
+        self.enable_json_export = enable_json_export
+
         if use_unified_db:
             self.unified_db = get_unified_database()
             self.db = self.unified_db.db
@@ -38,12 +41,22 @@ class DatabaseService:
             db_path = str(db_dir / "cache.db")
             self.db = TinyDB(db_path)
             self.unified_db = None
-        
+
+        # 初始化JSON缓存服务
+        if self.enable_json_export:
+            # 确保缓存目录存在
+            json_cache_dir = PROJECT_ROOT / "data" / "roo"
+            json_cache_dir.mkdir(parents=True, exist_ok=True)
+            self.json_cache_service = get_json_cache_service("data/roo")
+            logger.info(f"JSON cache service enabled with directory: {json_cache_dir}")
+        else:
+            self.json_cache_service = None
+
         self.file_monitor = None
         self.observer = None
         self._scan_configs = {}
         self._running = False
-        
+
         # 初始化表（使用统一表名）
         self.files_table = self.db.table(TableNames.CACHE_FILES)
         self.metadata_table = self.db.table(TableNames.CACHE_METADATA)
@@ -200,7 +213,20 @@ class DatabaseService:
             'stats': stats
         }
         self.metadata_table.upsert(metadata, Query_obj.config_name == config_name)
-        
+
+        # 导出到JSON文件（如果启用）
+        if self.enable_json_export and self.json_cache_service:
+            try:
+                # 获取更新后的缓存数据
+                cache_data = self.get_cached_data(config_name)
+                success = self.json_cache_service.export_cache_to_json(config_name, cache_data)
+                if success:
+                    logger.info(f"  📄 Exported {len(cache_data)} items to JSON: {config_name}.json")
+                else:
+                    logger.warning(f"  ⚠️ Failed to export JSON for config: {config_name}")
+            except Exception as e:
+                logger.error(f"  ❌ JSON export error for {config_name}: {e}")
+
         logger.info(f"Sync completed for '{sanitize_for_log(config_name)}': {stats}")
         return stats
     
@@ -251,6 +277,17 @@ class DatabaseService:
             }
         }
         self.metadata_table.upsert(metadata, Query_obj.config_name == config_name)
+
+        # 5. 导出到JSON文件（如果启用）
+        if self.enable_json_export and self.json_cache_service and scanned_files:
+            try:
+                success = self.json_cache_service.export_cache_to_json(config_name, scanned_files)
+                if success:
+                    logger.info(f"  📄 Exported {len(scanned_files)} items to JSON: {config_name}.json")
+                else:
+                    logger.warning(f"  ⚠️ Failed to export JSON for config: {config_name}")
+            except Exception as e:
+                logger.error(f"  ❌ JSON export error for {config_name}: {e}")
 
         stats = metadata['stats']
         logger.info(f"✅ Full refresh completed for '{sanitize_for_log(config_name)}': cleared {old_count}, inserted {len(scanned_files)}")
@@ -496,6 +533,61 @@ class DatabaseService:
         except Exception as e:
             logger.error(f"Failed to get data from table '{table_name}': {e}")
             return []
+
+    def export_all_to_json(self) -> Dict[str, bool]:
+        """手动导出所有缓存数据到JSON文件
+
+        Returns:
+            Dict[str, bool]: 每个配置的导出结果
+        """
+        if not self.enable_json_export or not self.json_cache_service:
+            logger.warning("JSON export is not enabled")
+            return {}
+
+        logger.info("🚀 Starting manual export of all caches to JSON...")
+        return self.json_cache_service.export_all_caches_to_json(self)
+
+    def get_json_cache_summary(self) -> Dict[str, Any]:
+        """获取JSON缓存汇总信息
+
+        Returns:
+            Dict[str, Any]: JSON缓存汇总信息
+        """
+        if not self.enable_json_export or not self.json_cache_service:
+            return {"error": "JSON export is not enabled"}
+
+        return self.json_cache_service.get_json_cache_summary()
+
+    def import_json_to_database(self, config_name: str) -> Dict[str, Any]:
+        """从JSON文件导入数据到数据库
+
+        Args:
+            config_name: 配置名称
+
+        Returns:
+            Dict[str, Any]: 导入结果
+        """
+        if not self.enable_json_export or not self.json_cache_service:
+            return {
+                "success": False,
+                "message": "JSON export/import is not enabled",
+                "imported_count": 0
+            }
+
+        return self.json_cache_service.import_json_to_database(config_name, self)
+
+    def import_all_json_to_database(self) -> Dict[str, Dict[str, Any]]:
+        """导入所有JSON缓存文件到数据库
+
+        Returns:
+            Dict[str, Dict[str, Any]]: 每个配置的导入结果
+        """
+        if not self.enable_json_export or not self.json_cache_service:
+            logger.warning("JSON export/import is not enabled")
+            return {}
+
+        logger.info("🚀 Starting import of all JSON caches to database...")
+        return self.json_cache_service.import_all_json_to_database(self)
     
     def close(self):
         """关闭数据库连接"""
@@ -508,11 +600,11 @@ class DatabaseService:
 # 全局数据库服务实例
 _db_service = None
 
-def get_database_service(use_unified_db: bool = True) -> DatabaseService:
+def get_database_service(use_unified_db: bool = True, enable_json_export: bool = True) -> DatabaseService:
     """获取全局数据库服务实例"""
     global _db_service
     if _db_service is None:
-        _db_service = DatabaseService(use_unified_db=use_unified_db)
+        _db_service = DatabaseService(use_unified_db=use_unified_db, enable_json_export=enable_json_export)
         
         # 添加默认的模型文件扫描配置
         models_dir = PROJECT_ROOT / "resources" / "models"
@@ -583,11 +675,11 @@ def get_database_service(use_unified_db: bool = True) -> DatabaseService:
 
     return _db_service
 
-def init_database_service(use_unified_db: bool = True):
+def init_database_service(use_unified_db: bool = True, enable_json_export: bool = True):
     """初始化数据库服务并执行首次同步"""
     logger.info("Initializing database service...")
-    
-    db_service = get_database_service(use_unified_db=use_unified_db)
+
+    db_service = get_database_service(use_unified_db=use_unified_db, enable_json_export=enable_json_export)
     
     # 执行首次全量同步
     sync_results = db_service.sync_all()
